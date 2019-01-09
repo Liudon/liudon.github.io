@@ -2,7 +2,7 @@
 # If you want to see the full configuration, please check `full-config.toml` .
 # And see https://gohugo.io/getting-started/configuration/ .
 
-baseURL = "http://localhost:1313/"
+baseURL = "https://liudon.github.io"
 title = "流动 - 生活就是一个流动的过程"
 enableRobotsTXT = true
 enableEmoji = true
