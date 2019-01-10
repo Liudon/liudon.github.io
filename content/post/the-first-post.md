@@ -10,3 +10,8 @@ date: 2019-01-09T15:17:04+08:00
 
 具体部署过程参考文章：
 [利用Travis CI和Hugo將Blog自動部署到Github Pages](https://axdlog.com/zh/2018/using-hugo-and-travis-ci-to-deploy-blog-to-github-pages-automatically/)
+
+这篇文章就是通过这种方式来更新的，感觉很是神奇。
+再也不用关注服务器性能这些东西了，只需要专心写字就好了。
+
+接下来只需要搞定自定义域名了，域名还在认证中，无法做解析。
