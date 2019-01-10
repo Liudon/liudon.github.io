@@ -6,10 +6,34 @@
     <description>Recent content on 流动 - 生活就是一个流动的过程</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 09 Jan 2019 15:17:04 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 10 Jan 2019 14:11:09 +0800</lastBuildDate>
     
         <atom:link href="https://liudon.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>关于本站</title>
+      <link>https://liudon.github.io/about/</link>
+      <pubDate>Thu, 10 Jan 2019 14:11:09 +0800</pubDate>
+      
+      <guid>https://liudon.github.io/about/</guid>
+      
+        <description>
+
+&lt;h2 id=&#34;域名的由来&#34;&gt;域名的由来&lt;/h2&gt;
+
+&lt;p&gt;取自本人姓名的拼音。&lt;/p&gt;
+
+&lt;h2 id=&#34;站点名称的由来&#34;&gt;站点名称的由来&lt;/h2&gt;
+
+&lt;p&gt;取自本人姓名的谐音。&lt;/p&gt;
+
+&lt;h2 id=&#34;关于本人&#34;&gt;关于本人&lt;/h2&gt;
+
+&lt;p&gt;喜欢做梦、已婚的80后男生。&lt;/p&gt;
+</description>
+      
+    </item>
     
     <item>
       <title>2019，新开始</title>
@@ -25,6 +49,11 @@
 
 &lt;p&gt;具体部署过程参考文章：
 &lt;a href=&#34;https://axdlog.com/zh/2018/using-hugo-and-travis-ci-to-deploy-blog-to-github-pages-automatically/&#34;&gt;利用Travis CI和Hugo將Blog自動部署到Github Pages&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;这篇文章就是通过这种方式来更新的，感觉很是神奇。
+再也不用关注服务器性能这些东西了，只需要专心写字就好了。&lt;/p&gt;
+
+&lt;p&gt;接下来只需要搞定自定义域名了，域名还在认证中，无法做解析。&lt;/p&gt;
 </description>
       
     </item>
