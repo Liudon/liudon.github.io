@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<?xml-stylesheet type="text/xsl" href="https://liudon.github.io/sitemap.xsl"?>
+<?xml-stylesheet type="text/xsl" href="https://liudon.xyz/sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://liudon.github.io/about/</loc>
+    <loc>https://liudon.xyz/about/</loc>
     <lastmod>2019-01-10T14:11:09+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://liudon.github.io/post/the-first-post/</loc>
+    <loc>https://liudon.xyz/post/the-first-post/</loc>
     <lastmod>2019-01-09T15:17:04+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://liudon.github.io/categories/</loc>
+    <loc>https://liudon.xyz/categories/</loc>
     <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://liudon.github.io/post/</loc>
+    <loc>https://liudon.xyz/post/</loc>
     <lastmod>2019-01-09T15:17:04+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://liudon.github.io/tags/</loc>
+    <loc>https://liudon.xyz/tags/</loc>
     <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://liudon.github.io/</loc>
+    <loc>https://liudon.xyz/</loc>
     <lastmod>2019-01-10T14:11:09+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0</priority>

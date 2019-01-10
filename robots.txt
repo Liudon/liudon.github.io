@@ -1,2 +1,2 @@
 User-agent: *
-Sitemap: https://liudon.github.io/sitemap.xml
+Sitemap: https://liudon.xyz/sitemap.xml

@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>流动 - 生活就是一个流动的过程</title>
-    <link>https://liudon.github.io/</link>
+    <link>https://liudon.xyz/</link>
     <description>Recent content on 流动 - 生活就是一个流动的过程</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Thu, 10 Jan 2019 14:11:09 +0800</lastBuildDate>
     
-        <atom:link href="https://liudon.github.io/index.xml" rel="self" type="application/rss+xml" />
+        <atom:link href="https://liudon.xyz/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>关于本站</title>
-      <link>https://liudon.github.io/about/</link>
+      <link>https://liudon.xyz/about/</link>
       <pubDate>Thu, 10 Jan 2019 14:11:09 +0800</pubDate>
       
-      <guid>https://liudon.github.io/about/</guid>
+      <guid>https://liudon.xyz/about/</guid>
       
         <description>
 
@@ -37,10 +37,10 @@
     
     <item>
       <title>2019，新开始</title>
-      <link>https://liudon.github.io/post/the-first-post/</link>
+      <link>https://liudon.xyz/post/the-first-post/</link>
       <pubDate>Wed, 09 Jan 2019 15:17:04 +0800</pubDate>
       
-      <guid>https://liudon.github.io/post/the-first-post/</guid>
+      <guid>https://liudon.xyz/post/the-first-post/</guid>
       
         <description>&lt;p&gt;从2011年开始写博客，博客程序从WordPress换成Typecho。
 早就有想法换成静态博客，一直没时间搞。&lt;/p&gt;
