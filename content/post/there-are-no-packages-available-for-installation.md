@@ -1,5 +1,5 @@
 ---
-title: "解决Sublime Text安装包时\"There Are No Packages Available for Installation\"的报错
+title: "解决Sublime Text安装包时\"There Are No Packages Available for Installation\"的报错"
 date: 2019-01-11T17:13:14+08:00
 ---
 
