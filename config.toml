@@ -49,7 +49,7 @@ defaultContentLanguage = "zh-cn"           # Default language to use
   name = "关于"
   weight = 30
   identifier = "about"
-  url = "/about"
+  url = "/about/"
 
 [params]
   since = "2011"            # Site creation time          # 站点建立时间
