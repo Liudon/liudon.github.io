@@ -11,6 +11,8 @@ date: 2019-01-11T17:13:14+08:00
 然后按教程把这文件放到本地，配置channel指向本地这个文件，然后提示json解析失败。
 然后检查这个文件，发现文件好像不全。然后换到其他机器curl这个地址，发现下载下来的文件确实不全，不是合法的json内容。
 
+![下载文件内容截图](https://wx4.sinaimg.cn/large/63c9befaly1fz7anr0smxj20fg0famzv.jpg)
+
 又搜索一番后，找到一个case。
 
 [Package Control: There are no packages available for installation/Server Error](https://github.com/wbond/package_control/issues/1397)
