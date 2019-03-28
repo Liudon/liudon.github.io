@@ -6,10 +6,19 @@
     <description>Recent content in Posts on 流动 - 生活就是一个流动的过程</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 11 Jan 2019 17:13:14 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 28 Mar 2019 13:00:50 +0800</lastBuildDate>
     
 	<atom:link href="https://liudon.xyz/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Flink Could Not Resolve Resourcemanager Address</title>
+      <link>https://liudon.xyz/post/flink-could-not-resolve-resourcemanager-address/</link>
+      <pubDate>Thu, 28 Mar 2019 13:00:50 +0800</pubDate>
+      
+      <guid>https://liudon.xyz/post/flink-could-not-resolve-resourcemanager-address/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>解决Sublime Text安装包时&#34;There Are No Packages Available for Installation&#34;的报错</title>

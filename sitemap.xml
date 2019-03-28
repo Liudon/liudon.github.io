@@ -1,6 +1,24 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <?xml-stylesheet type="text/xsl" href="https://liudon.xyz/sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://liudon.xyz/post/flink-could-not-resolve-resourcemanager-address/</loc>
+    <lastmod>2019-03-28T13:00:50+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://liudon.xyz/post/</loc>
+    <lastmod>2019-03-28T13:00:50+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://liudon.xyz/</loc>
+    <lastmod>2019-03-28T13:00:50+08:00</lastmod>
+    <priority>0</priority>
+  </url>
   
   <url>
     <loc>https://liudon.xyz/post/there-are-no-packages-available-for-installation/</loc>
@@ -25,27 +43,11 @@
   
   <url>
     <loc>https://liudon.xyz/categories/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://liudon.xyz/post/</loc>
-    <lastmod>2019-01-11T17:13:14+08:00</lastmod>
-    <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://liudon.xyz/tags/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://liudon.xyz/</loc>
-    <lastmod>2019-01-11T17:13:14+08:00</lastmod>
-    <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
   
