@@ -5,10 +5,68 @@
     <description>Recent content on 流动 - 生活就是一个流动的过程</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 28 Mar 2019 13:00:50 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 16 Aug 2019 19:34:34 +0800</lastBuildDate>
     
         <atom:link href="https://liudon.xyz/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>BCMath 与 科学计数</title>
+      <link>https://liudon.xyz/post/bcmath-and-exponential-notation/</link>
+      <pubDate>Fri, 16 Aug 2019 19:34:34 +0800</pubDate>
+      
+      <guid>https://liudon.xyz/post/bcmath-and-exponential-notation/</guid>
+      
+        <description>&lt;p&gt;代码如下&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&amp;lt;?php
+echo 9.99997600 + 2.4E-5;
+echo &amp;#34;\n===\n&amp;#34;;
+echo bcadd(9.99997600, 2.4E-5, 8);&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;结果为&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;10
+===
+9.99997600&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;问了朋友，查了各种资料，终于在PHP手册里发现了这段话。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Caution
+Passing values of type float to a BCMath function which expects a string as operand may not have the desired effect due to the way PHP converts float values to string, namely that the string may be in exponential notation (which is not supported by BCMath), and that the decimal separator is locale dependent (while BCMath always expects a decimal point).&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;PHP的BCMath方法不支持科学计数&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;解决方法：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;echo bcadd(9.99997600, number_format(2.4E-5, 8, &amp;#39;.&amp;#39;, &amp;#39;&amp;#39;), 8);&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;PHP里浮点数相关的运算一定要使用BCMath函数！&lt;/strong&gt;&lt;/p&gt;
+</description>
+      
+    </item>
     
     <item>
       <title>Flink Could Not Resolve Resourcemanager Address</title>

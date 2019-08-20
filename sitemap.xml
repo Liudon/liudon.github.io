@@ -2,22 +2,31 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://liudon.xyz/post/flink-could-not-resolve-resourcemanager-address/</loc>
-    <lastmod>2019-03-28T13:00:50+08:00</lastmod>
+    <loc>https://liudon.xyz/post/bcmath-and-exponential-notation/</loc>
+    <lastmod>2019-08-16T19:34:34+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://liudon.xyz/post/</loc>
-    <lastmod>2019-03-28T13:00:50+08:00</lastmod>
-    <priority>0</priority>
+    <lastmod>2019-08-16T19:34:34+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://liudon.xyz/</loc>
+    <lastmod>2019-08-16T19:34:34+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://liudon.xyz/post/flink-could-not-resolve-resourcemanager-address/</loc>
     <lastmod>2019-03-28T13:00:50+08:00</lastmod>
-    <priority>0</priority>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
   
   <url>
@@ -43,12 +52,14 @@
   
   <url>
     <loc>https://liudon.xyz/categories/</loc>
-    <priority>0</priority>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://liudon.xyz/tags/</loc>
-    <priority>0</priority>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
   
 </urlset>

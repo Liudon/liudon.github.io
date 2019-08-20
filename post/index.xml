@@ -6,10 +6,19 @@
     <description>Recent content in Posts on 流动 - 生活就是一个流动的过程</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 28 Mar 2019 13:00:50 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 16 Aug 2019 19:34:34 +0800</lastBuildDate>
     
 	<atom:link href="https://liudon.xyz/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>BCMath 与 科学计数</title>
+      <link>https://liudon.xyz/post/bcmath-and-exponential-notation/</link>
+      <pubDate>Fri, 16 Aug 2019 19:34:34 +0800</pubDate>
+      
+      <guid>https://liudon.xyz/post/bcmath-and-exponential-notation/</guid>
+      <description>代码如下 1 2 3 4 &amp;lt;?php echo 9.99997600 + 2.4E-5; echo &amp;#34;\n===\n&amp;#34;; echo bcadd(9.99997600, 2.4E-5, 8); 结果为 1 2 3 10 === 9.99997600 问了朋友，查了各种资料，终于在PHP手册里发现了这段话。 Caution Passing values of type float to a BCMath function which expects a string</description>
+    </item>
     
     <item>
       <title>Flink Could Not Resolve Resourcemanager Address</title>
