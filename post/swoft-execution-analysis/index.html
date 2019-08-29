@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="zh-cn" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Swoft 框架运行分析（一） - 流动 - 生活就是一个流动的过程</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="liudon" />
+  <meta name="description" content="Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。 以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。 刚开始看的时候，感觉" />
+<meta name="keywords" content="Swoft" />
+
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.0-DEV" />
+
+
+<link rel="canonical" href="https://liudon.xyz/post/swoft-execution-analysis/" />
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.c8c1ff75dee09b44060a6c38f41b9036bac2512ccdb22d7f296cec12dc786375.css" integrity="sha256-yMH/dd7gm0QGCmw49BuQNrrCUSzNsi1/KWzsEtx4Y3U=" media="screen" crossorigin="anonymous">
+
+
+
+
+
+<meta property="og:title" content="Swoft 框架运行分析（一）" />
+<meta property="og:description" content="Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。 以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。 刚开始看的时候，感觉" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://liudon.xyz/post/swoft-execution-analysis/" />
+<meta property="article:published_time" content="2019-08-29T17:22:28+08:00" />
+<meta property="article:modified_time" content="2019-08-29T17:22:28+08:00" />
+<meta itemprop="name" content="Swoft 框架运行分析（一）">
+<meta itemprop="description" content="Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。 以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。 刚开始看的时候，感觉">
+
+
+<meta itemprop="datePublished" content="2019-08-29T17:22:28&#43;08:00" />
+<meta itemprop="dateModified" content="2019-08-29T17:22:28&#43;08:00" />
+<meta itemprop="wordCount" content="1167">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Swoft 框架运行分析（一）"/>
+<meta name="twitter:description" content="Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。 以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。 刚开始看的时候，感觉"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-18074379-5', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">流动</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://liudon.xyz/post/">Archives</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://liudon.xyz/tags/">Tags</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://liudon.xyz/about/">关于</a>
+          
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="//cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="//cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.css" crossorigin="anonymous">
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      流动
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://liudon.xyz/post/">Archives</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://liudon.xyz/tags/">Tags</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://liudon.xyz/about/">关于</a>
+          
+
+        
+
+      </li>
+    
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">Swoft 框架运行分析（一）</h1>
+      
+      <div class="post-meta">
+        <time datetime="2019-08-29" class="post-time">
+          2019-08-29
+        </time>
+        
+        <span class="more-meta"> 约 1167 字 </span>
+          <span class="more-meta"> 预计阅读 3 分钟 </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content">
+    
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <blockquote>
+<p>Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。</p>
+</blockquote>
+
+<p>以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。
+刚开始看的时候，感觉自己像个原始人，完全看不懂。
+官方文档没有介绍Swoft的实现，网上的一些文章跟当前版本代码已经不一致了。
+自己花了一周时间，终于梳理清楚了，看完更觉得自己是个原始人了。</p>
+
+<p>使用的框架组件版本为：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">swoft-2.0.5
+swoft-component-2.0.5</pre></td></tr></table>
+</div>
+</div>
+<p>这里以Swoft启动http server为例。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">php bin/swoft http:start</pre></td></tr></table>
+</div>
+</div>
+<p>执行上述命令，启动http server。</p>
+
+<p>这里执行的是bin/swoft文件。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">#!/usr/bin/env php
+&lt;?php declare(strict_types=1);
+
+// Bootstrap
+require_once __DIR__ . &#39;/bootstrap.php&#39;;
+
+Swoole\Coroutine::set([
+    &#39;max_coroutine&#39; =&gt; 300000,
+]);
+
+// Run application
+(new \App\Application())-&gt;run();</pre></td></tr></table>
+</div>
+</div>
+<p>这里引入<code>bootstrap.php</code>文件，引入composer自动加载文件。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&lt;?php
+// Composer autoload
+require_once dirname(__DIR__) . &#39;/vendor/autoload.php&#39;;</pre></td></tr></table>
+</div>
+</div>
+<p>然后执行<code>Swoft\App\Application</code>类下的<code>run</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&lt;?php declare(strict_types=1);
+
+namespace App;
+
+use Swoft\SwoftApplication;
+use function date_default_timezone_set;
+
+/**
+ * Class Application
+ *
+ * @since 2.0
+ */
+class Application extends SwoftApplication
+{
+    protected function beforeInit(): void
+    {
+        parent::beforeInit();
+
+        date_default_timezone_set(&#39;Asia/Shanghai&#39;);
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里继承了<code>Swoft\SwoftApplication</code>类，这里只粘贴了部分代码。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+ * Swoft application
+ *
+ * @since 2.0
+ */
+class SwoftApplication implements SwoftInterface, ApplicationInterface
+{
+
+    /**
+     * Class constructor.
+     *
+     * @param array $config
+     */
+    public function __construct(array $config = [])
+    {
+        // Check runtime env
+        SwoftHelper::checkRuntime();
+
+        // Storage as global static property.
+        Swoft::$app = $this;
+
+        // Before init
+        $this-&gt;beforeInit();
+
+        // Init console logger
+        $this-&gt;initCLogger();
+
+        // Can setting properties by array
+        if ($config) {
+            ObjectHelper::init($this, $config);
+        }
+
+        // Init application
+        $this-&gt;init();
+
+        CLog::info(&#39;Project path is &lt;info&gt;%s&lt;/info&gt;&#39;, $this-&gt;basePath);
+
+        // After init
+        $this-&gt;afterInit();
+    }
+
+    protected function init(): void
+    {
+        // Init system path aliases
+        $this-&gt;findBasePath();
+        $this-&gt;setSystemAlias();
+
+        $processors = $this-&gt;processors();
+
+        $this-&gt;processor = new ApplicationProcessor($this);
+        $this-&gt;processor-&gt;addFirstProcessor(...$processors);
+    }
+
+    /**
+     * Run application
+     */
+    public function run(): void
+    {
+        if (!$this-&gt;beforeRun()) {
+            return;
+        }
+
+        $this-&gt;processor-&gt;handle();
+    }
+
+    /**
+     * @return ProcessorInterface[]
+     */
+    protected function processors(): array
+    {
+        return [
+            new EnvProcessor($this),
+            new ConfigProcessor($this),
+            new AnnotationProcessor($this),
+            new BeanProcessor($this),
+            new EventProcessor($this),
+            new ConsoleProcessor($this),
+        ];
+    }</pre></td></tr></table>
+</div>
+</div>
+<p><code>__construct</code>方法里检查运行环境，初始化日志组件，然后调用了<code>init</code>方法。
+<code>init</code>方法里声明了<code>processor</code>对象。
+<code>processors</code>方法定义了Swoft框架的6个Processor对象。
+<code>run</code>方法里直接调用<code>processor</code>对象的<code>handler</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&lt;?php
+
+namespace Swoft\Processor;
+
+use Swoft\Stdlib\Helper\ArrayHelper;
+use function get_class;
+
+/**
+ * Application processor
+ * @since 2.0
+ */
+class ApplicationProcessor extends Processor
+{
+    /**
+     * @var ProcessorInterface[]
+     */
+    private $processors = [];
+
+    /**
+     * Handle application processors
+     */
+    public function handle(): bool
+    {
+        $disabled = $this-&gt;application-&gt;getDisabledProcessors();
+
+        foreach ($this-&gt;processors as $processor) {
+            $class = get_class($processor);
+
+            // If is disabled, skip handle.
+            if (isset($disabled[$class])) {
+                continue;
+            }
+
+            $processor-&gt;handle();
+        }
+
+        return true;
+    }
+
+    /**
+     * Add first processor
+     *
+     * @param Processor[] $processor
+     * @return bool
+     */
+    public function addFirstProcessor(Processor ...$processor): bool
+    {
+        array_unshift($this-&gt;processors, ... $processor);
+
+        return true;
+    }
+
+    /**
+     * Add last processor
+     *
+     * @param Processor[] $processor
+     *
+     * @return bool
+     */
+    public function addLastProcessor(Processor ...$processor): bool
+    {
+        array_push($this-&gt;processors, ... $processor);
+
+        return true;
+    }
+
+    /**
+     * Add processors
+     *
+     * @param int         $index
+     * @param Processor[] $processors
+     *
+     * @return bool
+     */
+    public function addProcessor(int $index, Processor  ...$processors): bool
+    {
+        ArrayHelper::insert($this-&gt;processors, $index, ...$processors);
+
+        return true;
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p><code>addFirstProcessor</code>方法把process对象赋值给<code>$this-&gt;processors</code>。
+<code>handler</code>方法遍历<code>processors</code>对象，循环执行<code>handler</code>方法。</p>
+
+<p>Swoft的核心逻辑都是靠上面定义的6个Processor模块实现的，接下来一个一个分析。</p>
+
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">liudon</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">2019-08-29</span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">许可协议</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/bcmath-and-exponential-notation/">
+            <span class="next-text nav-default">BCMath 与 科学计数</span>
+            <span class="prev-text nav-mobile">下一篇</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+    
+
+
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+  
+
+
+<a href="https://liudon.xyz/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+  
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2011 -
+    2019
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        liudon
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>
+  <script src="//cdn.staticfile.org/slideout/1.0.1/slideout.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script src="//cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"  crossorigin="anonymous"></script>
+    <script src="//cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js" crossorigin="anonymous"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

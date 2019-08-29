@@ -6,10 +6,19 @@
     <description>Recent content in Posts on 流动 - 生活就是一个流动的过程</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 16 Aug 2019 19:34:34 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 29 Aug 2019 17:22:28 +0800</lastBuildDate>
     
 	<atom:link href="https://liudon.xyz/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Swoft 框架运行分析（一）</title>
+      <link>https://liudon.xyz/post/swoft-execution-analysis/</link>
+      <pubDate>Thu, 29 Aug 2019 17:22:28 +0800</pubDate>
+      
+      <guid>https://liudon.xyz/post/swoft-execution-analysis/</guid>
+      <description>Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。 以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。 刚开始看的时候，感觉</description>
+    </item>
     
     <item>
       <title>BCMath 与 科学计数</title>
