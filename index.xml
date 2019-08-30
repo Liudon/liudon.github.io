@@ -5,10 +5,782 @@
     <description>Recent content on 流动 - 生活就是一个流动的过程</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 29 Aug 2019 17:22:28 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 29 Aug 2019 19:11:04 +0800</lastBuildDate>
     
         <atom:link href="https://liudon.xyz/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Swoft 框架运行分析（二） —— AnnotationProcessor模块分析</title>
+      <link>https://liudon.xyz/post/swoft-execution-analysis-2/</link>
+      <pubDate>Thu, 29 Aug 2019 19:11:04 +0800</pubDate>
+      
+      <guid>https://liudon.xyz/post/swoft-execution-analysis-2/</guid>
+      
+        <description>&lt;p&gt;上一篇介绍了，&lt;code&gt;SwoftApplication&lt;/code&gt;里定义了6个Processor对象。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;protected function processors(): array
+    {
+        return [
+            new EnvProcessor($this),
+            new ConfigProcessor($this),
+            new AnnotationProcessor($this),
+            new BeanProcessor($this),
+            new EventProcessor($this),
+            new ConsoleProcessor($this),
+        ];
+    }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;所有的Processor实现都在&lt;code&gt;framework\src\Processor&lt;/code&gt;目录下。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;EnvProcessor，初始化环境。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;ConfigProcessor，初始化配置。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;AnnotationProcessor，初始化注解。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;BeanProcessor，初始化Bean。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;EventProcessor，初始化事件。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;ConsoleProcessor，初始化控制台。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;今天先讲一下&lt;code&gt;AnnotationProcessor&lt;/code&gt;这个模块的实现。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;79
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&amp;lt;?php declare(strict_types=1);
+
+namespace Swoft\Processor;
+
+use Exception;
+use Swoft\Annotation\AnnotationRegister;
+use Swoft\Log\Helper\CLog;
+
+/**
+ * Annotation processor
+ * @since 2.0
+ */
+class AnnotationProcessor extends Processor
+{
+    /**
+     * Handle annotation
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function handle(): bool
+    {
+        if (!$this-&amp;gt;application-&amp;gt;beforeAnnotation()) {
+            CLog::warning(&amp;#39;Stop annotation processor by beforeAnnotation return false&amp;#39;);
+            return false;
+        }
+
+        $app = $this-&amp;gt;application;
+
+        // Find AutoLoader classes. Parse and collect annotations.
+        AnnotationRegister::load([
+            &amp;#39;inPhar&amp;#39;               =&amp;gt; \IN_PHAR,
+            &amp;#39;basePath&amp;#39;             =&amp;gt; $app-&amp;gt;getBasePath(),
+            &amp;#39;notifyHandler&amp;#39;        =&amp;gt; [$this, &amp;#39;notifyHandler&amp;#39;],
+            &amp;#39;disabledAutoLoaders&amp;#39;  =&amp;gt; $app-&amp;gt;getDisabledAutoLoaders(),
+            &amp;#39;disabledPsr4Prefixes&amp;#39; =&amp;gt; $app-&amp;gt;getDisabledPsr4Prefixes(),
+        ]);
+
+        $stats = AnnotationRegister::getClassStats();
+
+        CLog::info(
+            &amp;#39;Annotations is scanned(autoloader %d, annotation %d, parser %d)&amp;#39;,
+            $stats[&amp;#39;autoloader&amp;#39;],
+            $stats[&amp;#39;annotation&amp;#39;],
+            $stats[&amp;#39;parser&amp;#39;]
+        );
+
+        return $this-&amp;gt;application-&amp;gt;afterAnnotation();
+    }
+
+    /**
+     * @param string $type
+     * @param string $target
+     * @see \Swoft\Annotation\Resource\AnnotationResource::load()
+     */
+    public function notifyHandler(string $type, $target): void
+    {
+        switch ($type) {
+            case &amp;#39;excludeNs&amp;#39;:
+                CLog::debug(&amp;#39;Exclude namespace %s&amp;#39;, $target);
+                break;
+            case &amp;#39;noLoaderFile&amp;#39;:
+                CLog::debug(&amp;#39;No autoloader on %s&amp;#39;, $target);
+                break;
+            case &amp;#39;noLoaderClass&amp;#39;:
+                CLog::debug(&amp;#39;Autoloader class not exist %s&amp;#39;, $target);
+                break;
+            case &amp;#39;findLoaderClass&amp;#39;:
+                CLog::debug(&amp;#39;Find autoloader %s&amp;#39;, $target);
+                break;
+            case &amp;#39;addLoaderClass&amp;#39;:
+                CLog::debug(&amp;#39;Parse autoloader %s&amp;#39;, $target);
+                break;
+            case &amp;#39;noExistClass&amp;#39;:
+                CLog::debug(&amp;#39;Skip interface or trait %s&amp;#39;, $target);
+                break;
+        }
+    }
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;核心逻辑调用&lt;code&gt;AnnotationRegister&lt;/code&gt;类的&lt;code&gt;load&lt;/code&gt;方法，定义如下。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;    /**
+     * Load annotation class
+     *
+     * @param array $config
+     *
+     * @throws AnnotationException
+     * @throws ReflectionException
+     */
+    public static function load(array $config = []): void
+    {
+        $resource = new AnnotationResource($config);
+        $resource-&amp;gt;load();
+    }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;这里又调用了&lt;code&gt;AnnotationResource&lt;/code&gt;类的&lt;code&gt;load&lt;/code&gt;方法，定义如下。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;    /**
+     * Load annotation resource by find ClassLoader
+     *
+     * @throws AnnotationException
+     * @throws ReflectionException
+     */
+    public function load(): void
+    {
+        $prefixDirsPsr4 = $this-&amp;gt;classLoader-&amp;gt;getPrefixesPsr4();
+
+        foreach ($prefixDirsPsr4 as $ns =&amp;gt; $paths) {
+            // Only scan namespaces
+            if ($this-&amp;gt;onlyNamespaces &amp;amp;&amp;amp; !in_array($ns, $this-&amp;gt;onlyNamespaces, true)) {
+                $this-&amp;gt;notify(&amp;#39;excludeNs&amp;#39;, $ns);
+                continue;
+            }
+
+            // It is excluded psr4 prefix
+            if ($this-&amp;gt;isExcludedPsr4Prefix($ns)) {
+                AnnotationRegister::registerExcludeNs($ns);
+                $this-&amp;gt;notify(&amp;#39;excludeNs&amp;#39;, $ns);
+                continue;
+            }
+
+            // Find package/component loader class
+            foreach ($paths as $path) {
+                $loaderFile = $this-&amp;gt;getAnnotationClassLoaderFile($path);
+                if (!file_exists($loaderFile)) {
+                    $this-&amp;gt;notify(&amp;#39;noLoaderFile&amp;#39;, $this-&amp;gt;clearBasePath($path), $loaderFile);
+                    continue;
+                }
+
+                $loaderClass = $this-&amp;gt;getAnnotationLoaderClassName($ns);
+                if (!class_exists($loaderClass)) {
+                    $this-&amp;gt;notify(&amp;#39;noLoaderClass&amp;#39;, $loaderClass);
+                    continue;
+                }
+
+                $loaderObject = new $loaderClass();
+                if (!$loaderObject instanceof LoaderInterface) {
+                    $this-&amp;gt;notify(&amp;#39;invalidLoader&amp;#39;, $loaderFile);
+                    continue;
+                }
+
+                $this-&amp;gt;notify(&amp;#39;findLoaderClass&amp;#39;, $this-&amp;gt;clearBasePath($loaderFile));
+
+                // If is disable, will skip scan annotation classes
+                if (!isset($this-&amp;gt;disabledAutoLoaders[$loaderClass])) {
+                    AnnotationRegister::registerAutoLoaderFile($loaderFile);
+                    $this-&amp;gt;notify(&amp;#39;addLoaderClass&amp;#39;, $loaderClass);
+                    $this-&amp;gt;loadAnnotation($loaderObject);
+                }
+
+                // Storage auto loader to register
+                AnnotationRegister::addAutoLoader($ns, $loaderObject);
+            }
+        }
+    }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;通过&lt;code&gt;getPrefixesPsr4&lt;/code&gt;方法获取所有自动加载的命名空间和目录，遍历目录下的&lt;code&gt;AutoLoader.php&lt;/code&gt;文件。&lt;/p&gt;
+
+&lt;p&gt;通过&lt;code&gt;registerAutoLoaderFile&lt;/code&gt;注册自动加载文件到&lt;code&gt;AnnotationRegister&lt;/code&gt;对象上。&lt;/p&gt;
+
+&lt;p&gt;然后调用了&lt;code&gt;loadAnnotation&lt;/code&gt;方法，传入的是一个&lt;code&gt;autoload&lt;/code&gt;对象。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;    /**
+     * Load annotations from an component loader config.
+     *
+     * @param LoaderInterface $loader
+     *
+     * @throws AnnotationException
+     * @throws ReflectionException
+     */
+    private function loadAnnotation(LoaderInterface $loader): void
+    {
+        $nsPaths = $loader-&amp;gt;getPrefixDirs();
+
+        foreach ($nsPaths as $ns =&amp;gt; $path) {
+            $iterator = DirectoryHelper::recursiveIterator($path);
+
+            /* @var SplFileInfo $splFileInfo */
+            foreach ($iterator as $splFileInfo) {
+                $filePath = $splFileInfo-&amp;gt;getPathname();
+                // $splFileInfo-&amp;gt;isDir();
+                if (is_dir($filePath)) {
+                    continue;
+                }
+
+                $fileName  = $splFileInfo-&amp;gt;getFilename();
+                $extension = $splFileInfo-&amp;gt;getExtension();
+
+                if ($this-&amp;gt;loaderClassSuffix !== $extension || strpos($fileName, &amp;#39;.&amp;#39;) === 0) {
+                    continue;
+                }
+
+                // It is exclude filename
+                if (isset($this-&amp;gt;excludedFilenames[$fileName])) {
+                    AnnotationRegister::registerExcludeFilename($fileName);
+                    continue;
+                }
+
+                $suffix    = sprintf(&amp;#39;.%s&amp;#39;, $this-&amp;gt;loaderClassSuffix);
+                $pathName  = str_replace([$path, &amp;#39;/&amp;#39;, $suffix], [&amp;#39;&amp;#39;, &amp;#39;\\&amp;#39;, &amp;#39;&amp;#39;], $filePath);
+                $className = sprintf(&amp;#39;%s%s&amp;#39;, $ns, $pathName);
+
+                // Fix repeat included file bug
+                $autoload = in_array($filePath, $this-&amp;gt;includedFiles, true);
+
+                // Will filtering: interfaces and traits
+                if (!class_exists($className, !$autoload)) {
+                    $this-&amp;gt;notify(&amp;#39;noExistClass&amp;#39;, $className);
+                    continue;
+                }
+
+                // Parse annotation
+                $this-&amp;gt;parseAnnotation($ns, $className);
+            }
+        }
+    }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;通过getPrefixDirs获取当前命名空间的目录，然后通过&lt;code&gt;recursiveIterator&lt;/code&gt;遍历目录下的文件。&lt;/p&gt;
+
+&lt;p&gt;排除目录和非&lt;code&gt;.php&lt;/code&gt;结尾的文件，最后会调用&lt;code&gt;parseAnnotation&lt;/code&gt;方法。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;    /**
+     * Parser annotation
+     *
+     * @param string $namespace
+     * @param string $className
+     *
+     * @throws AnnotationException
+     * @throws ReflectionException
+     */
+    private function parseAnnotation(string $namespace, string $className): void
+    {
+        // Annotation reader
+        $reflectionClass = new ReflectionClass($className);
+
+        // Fix ignore abstract
+        if ($reflectionClass-&amp;gt;isAbstract()) {
+            return;
+        }
+        $oneClassAnnotation = $this-&amp;gt;parseOneClassAnnotation($reflectionClass);
+
+        if (!empty($oneClassAnnotation)) {
+            AnnotationRegister::registerAnnotation($namespace, $className, $oneClassAnnotation);
+        }
+    }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;这里调用了&lt;code&gt;parseOneClassAnnotation&lt;/code&gt;方法。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;    /**
+     * Parse an class annotation
+     *
+     * @param ReflectionClass $reflectionClass
+     *
+     * @return array
+     * @throws AnnotationException
+     * @throws ReflectionException
+     */
+    private function parseOneClassAnnotation(ReflectionClass $reflectionClass): array
+    {
+        // Annotation reader
+        $reader    = new AnnotationReader();
+        $className = $reflectionClass-&amp;gt;getName();
+
+        $oneClassAnnotation = [];
+        $classAnnotations   = $reader-&amp;gt;getClassAnnotations($reflectionClass);
+
+        // Register annotation parser
+        foreach ($classAnnotations as $classAnnotation) {
+            if ($classAnnotation instanceof AnnotationParser) {
+                $this-&amp;gt;registerParser($className, $classAnnotation);
+
+                return [];
+            }
+        }
+
+        // Class annotation
+        if (!empty($classAnnotations)) {
+            $oneClassAnnotation[&amp;#39;annotation&amp;#39;] = $classAnnotations;
+            $oneClassAnnotation[&amp;#39;reflection&amp;#39;] = $reflectionClass;
+        }
+
+        // Property annotation
+        $reflectionProperties = $reflectionClass-&amp;gt;getProperties();
+        foreach ($reflectionProperties as $reflectionProperty) {
+            $propertyName        = $reflectionProperty-&amp;gt;getName();
+            $propertyAnnotations = $reader-&amp;gt;getPropertyAnnotations($reflectionProperty);
+
+            if (!empty($propertyAnnotations)) {
+                $oneClassAnnotation[&amp;#39;properties&amp;#39;][$propertyName][&amp;#39;annotation&amp;#39;] = $propertyAnnotations;
+                $oneClassAnnotation[&amp;#39;properties&amp;#39;][$propertyName][&amp;#39;reflection&amp;#39;] = $reflectionProperty;
+            }
+        }
+
+        // Method annotation
+        $reflectionMethods = $reflectionClass-&amp;gt;getMethods();
+        foreach ($reflectionMethods as $reflectionMethod) {
+            $methodName        = $reflectionMethod-&amp;gt;getName();
+            $methodAnnotations = $reader-&amp;gt;getMethodAnnotations($reflectionMethod);
+
+            if (!empty($methodAnnotations)) {
+                $oneClassAnnotation[&amp;#39;methods&amp;#39;][$methodName][&amp;#39;annotation&amp;#39;] = $methodAnnotations;
+                $oneClassAnnotation[&amp;#39;methods&amp;#39;][$methodName][&amp;#39;reflection&amp;#39;] = $reflectionMethod;
+            }
+        }
+
+        $parentReflectionClass = $reflectionClass-&amp;gt;getParentClass();
+        if ($parentReflectionClass !== false) {
+            $parentClassAnnotation = $this-&amp;gt;parseOneClassAnnotation($parentReflectionClass);
+            if (!empty($parentClassAnnotation)) {
+                $oneClassAnnotation[&amp;#39;parent&amp;#39;] = $parentClassAnnotation;
+            }
+        }
+
+        return $oneClassAnnotation;
+    }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;这里就是解析注解了，可以看到分别有类注解、属性注解和方法注解三类。&lt;/p&gt;
+
+&lt;p&gt;这里注意这一段代码。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;        // Register annotation parser
+        foreach ($classAnnotations as $classAnnotation) {
+            if ($classAnnotation instanceof AnnotationParser) {
+                $this-&amp;gt;registerParser($className, $classAnnotation);
+
+                return [];
+            }
+        }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;遍历注解类，如果注解属于&lt;code&gt;AnnotationParser&lt;/code&gt;实例，这里调用&lt;code&gt;registerParser&lt;/code&gt;进行注册。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;    /**
+     * @param string $annotationClass
+     * @param string $parserClassName
+     */
+    public static function registerParser(string $annotationClass, string $parserClassName): void
+    {
+        self::$classStats[&amp;#39;parser&amp;#39;]++;
+        self::$parsers[$annotationClass] = $parserClassName;
+    }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;回到上一个方法，解析完后，又调用了&lt;code&gt;AnnotationRegister&lt;/code&gt;类的&lt;code&gt;registerAnnotation&lt;/code&gt;方法进行注册。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;    /**
+     * @param string $loadNamespace
+     * @param string $className
+     * @param array  $classAnnotation
+     */
+    public static function registerAnnotation(string $loadNamespace, string $className, array $classAnnotation): void
+    {
+        self::$classStats[&amp;#39;annotation&amp;#39;]++;
+        self::$annotations[$loadNamespace][$className] = $classAnnotation;
+    }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;至此，整个&lt;code&gt;AnnotationProcessor&lt;/code&gt;加载完毕，这里&lt;code&gt;AnnotationRegister&lt;/code&gt;类里会有两个属性&lt;code&gt;annotations&lt;/code&gt;和&lt;code&gt;parsers&lt;/code&gt;，这个信息在后面的&lt;code&gt;BeanProcessor&lt;/code&gt;里还会用到。&lt;/p&gt;
+</description>
+      
+    </item>
     
     <item>
       <title>Swoft 框架运行分析（一）</title>

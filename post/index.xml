@@ -6,10 +6,19 @@
     <description>Recent content in Posts on 流动 - 生活就是一个流动的过程</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 29 Aug 2019 17:22:28 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 29 Aug 2019 19:11:04 +0800</lastBuildDate>
     
 	<atom:link href="https://liudon.xyz/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Swoft 框架运行分析（二） —— AnnotationProcessor模块分析</title>
+      <link>https://liudon.xyz/post/swoft-execution-analysis-2/</link>
+      <pubDate>Thu, 29 Aug 2019 19:11:04 +0800</pubDate>
+      
+      <guid>https://liudon.xyz/post/swoft-execution-analysis-2/</guid>
+      <description>上一篇介绍了，SwoftApplication里定义了6个Processor对象。 1 2 3 4 5 6 7 8 9 10 11 protected function processors(): array { return [ new EnvProcessor($this), new ConfigProcessor($this), new AnnotationProcessor($this), new BeanProcessor($this), new EventProcessor($this), new</description>
+    </item>
     
     <item>
       <title>Swoft 框架运行分析（一）</title>
