@@ -8,8 +8,11 @@ Keywords: Swoft
 > Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。
 
 以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。
+
 刚开始看的时候，感觉自己像个原始人，完全看不懂。
+
 官方文档没有介绍Swoft的实现，网上的一些文章跟当前版本代码已经不一致了。
+
 自己花了一周时间，终于梳理清楚了，看完更觉得自己是个原始人了。
 
 使用的框架组件版本为：
@@ -163,8 +166,11 @@ class SwoftApplication implements SwoftInterface, ApplicationInterface
 ```
 
 `__construct`方法里检查运行环境，初始化日志组件，然后调用了`init`方法。
+
 `init`方法里声明了`processor`对象。
+
 `processors`方法定义了Swoft框架的6个Processor对象。
+
 `run`方法里直接调用`processor`对象的`handler`方法。
 
 ```
@@ -252,6 +258,7 @@ class ApplicationProcessor extends Processor
 ```
 
 `addFirstProcessor`方法把process对象赋值给`$this->processors`。
-`handler`方法遍历`processors`对象，循环执行`handler`方法。
+
+`handle`方法遍历`processors`对象，循环执行`handle`方法。
 
 Swoft的核心逻辑都是靠上面定义的6个Processor模块实现的，接下来一个一个分析。
