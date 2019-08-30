@@ -1,7 +1,8 @@
 ---
 title: "Swoft 框架运行分析（二） —— AnnotationProcessor模块分析"
 date: 2019-08-29T19:11:04+08:00
-draft: true
+draft: false
+Keywords: Swoft
 ---
 
 上一篇介绍了，`SwoftApplication`里定义了6个Processor对象。
