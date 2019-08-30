@@ -69,7 +69,7 @@
 
 <meta itemprop="datePublished" content="2019-08-29T17:22:28&#43;08:00" />
 <meta itemprop="dateModified" content="2019-08-29T17:22:28&#43;08:00" />
-<meta itemprop="wordCount" content="1167">
+<meta itemprop="wordCount" content="1165">
 
 
 
@@ -270,7 +270,7 @@ if (!doNotTrack) {
           2019-08-29
         </time>
         
-        <span class="more-meta"> 约 1167 字 </span>
+        <span class="more-meta"> 约 1165 字 </span>
           <span class="more-meta"> 预计阅读 3 分钟 </span>
 
         
@@ -296,10 +296,13 @@ if (!doNotTrack) {
 <p>Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。</p>
 </blockquote>
 
-<p>以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。
-刚开始看的时候，感觉自己像个原始人，完全看不懂。
-官方文档没有介绍Swoft的实现，网上的一些文章跟当前版本代码已经不一致了。
-自己花了一周时间，终于梳理清楚了，看完更觉得自己是个原始人了。</p>
+<p>以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。</p>
+
+<p>刚开始看的时候，感觉自己像个原始人，完全看不懂。</p>
+
+<p>官方文档没有介绍Swoft的实现，网上的一些文章跟当前版本代码已经不一致了。</p>
+
+<p>自己花了一周时间，终于梳理清楚了，看完更觉得自己是个原始人了。</p>
 
 <p>使用的框架组件版本为：</p>
 <div class="highlight"><div class="chroma">
@@ -581,10 +584,13 @@ class SwoftApplication implements SwoftInterface, ApplicationInterface
     }</pre></td></tr></table>
 </div>
 </div>
-<p><code>__construct</code>方法里检查运行环境，初始化日志组件，然后调用了<code>init</code>方法。
-<code>init</code>方法里声明了<code>processor</code>对象。
-<code>processors</code>方法定义了Swoft框架的6个Processor对象。
-<code>run</code>方法里直接调用<code>processor</code>对象的<code>handler</code>方法。</p>
+<p><code>__construct</code>方法里检查运行环境，初始化日志组件，然后调用了<code>init</code>方法。</p>
+
+<p><code>init</code>方法里声明了<code>processor</code>对象。</p>
+
+<p><code>processors</code>方法定义了Swoft框架的6个Processor对象。</p>
+
+<p><code>run</code>方法里直接调用<code>processor</code>对象的<code>handler</code>方法。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -753,8 +759,9 @@ class ApplicationProcessor extends Processor
 }</pre></td></tr></table>
 </div>
 </div>
-<p><code>addFirstProcessor</code>方法把process对象赋值给<code>$this-&gt;processors</code>。
-<code>handler</code>方法遍历<code>processors</code>对象，循环执行<code>handler</code>方法。</p>
+<p><code>addFirstProcessor</code>方法把process对象赋值给<code>$this-&gt;processors</code>。</p>
+
+<p><code>handle</code>方法遍历<code>processors</code>对象，循环执行<code>handle</code>方法。</p>
 
 <p>Swoft的核心逻辑都是靠上面定义的6个Processor模块实现的，接下来一个一个分析。</p>
 

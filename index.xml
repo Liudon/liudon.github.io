@@ -21,10 +21,13 @@
 &lt;p&gt;Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。
-刚开始看的时候，感觉自己像个原始人，完全看不懂。
-官方文档没有介绍Swoft的实现，网上的一些文章跟当前版本代码已经不一致了。
-自己花了一周时间，终于梳理清楚了，看完更觉得自己是个原始人了。&lt;/p&gt;
+&lt;p&gt;以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。&lt;/p&gt;
+
+&lt;p&gt;刚开始看的时候，感觉自己像个原始人，完全看不懂。&lt;/p&gt;
+
+&lt;p&gt;官方文档没有介绍Swoft的实现，网上的一些文章跟当前版本代码已经不一致了。&lt;/p&gt;
+
+&lt;p&gt;自己花了一周时间，终于梳理清楚了，看完更觉得自己是个原始人了。&lt;/p&gt;
 
 &lt;p&gt;使用的框架组件版本为：&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -306,10 +309,13 @@ class SwoftApplication implements SwoftInterface, ApplicationInterface
     }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;&lt;code&gt;__construct&lt;/code&gt;方法里检查运行环境，初始化日志组件，然后调用了&lt;code&gt;init&lt;/code&gt;方法。
-&lt;code&gt;init&lt;/code&gt;方法里声明了&lt;code&gt;processor&lt;/code&gt;对象。
-&lt;code&gt;processors&lt;/code&gt;方法定义了Swoft框架的6个Processor对象。
-&lt;code&gt;run&lt;/code&gt;方法里直接调用&lt;code&gt;processor&lt;/code&gt;对象的&lt;code&gt;handler&lt;/code&gt;方法。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;__construct&lt;/code&gt;方法里检查运行环境，初始化日志组件，然后调用了&lt;code&gt;init&lt;/code&gt;方法。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;init&lt;/code&gt;方法里声明了&lt;code&gt;processor&lt;/code&gt;对象。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;processors&lt;/code&gt;方法定义了Swoft框架的6个Processor对象。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;run&lt;/code&gt;方法里直接调用&lt;code&gt;processor&lt;/code&gt;对象的&lt;code&gt;handler&lt;/code&gt;方法。&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
@@ -478,8 +484,9 @@ class ApplicationProcessor extends Processor
 }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;&lt;code&gt;addFirstProcessor&lt;/code&gt;方法把process对象赋值给&lt;code&gt;$this-&amp;gt;processors&lt;/code&gt;。
-&lt;code&gt;handler&lt;/code&gt;方法遍历&lt;code&gt;processors&lt;/code&gt;对象，循环执行&lt;code&gt;handler&lt;/code&gt;方法。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;addFirstProcessor&lt;/code&gt;方法把process对象赋值给&lt;code&gt;$this-&amp;gt;processors&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;handle&lt;/code&gt;方法遍历&lt;code&gt;processors&lt;/code&gt;对象，循环执行&lt;code&gt;handle&lt;/code&gt;方法。&lt;/p&gt;
 
 &lt;p&gt;Swoft的核心逻辑都是靠上面定义的6个Processor模块实现的，接下来一个一个分析。&lt;/p&gt;
 </description>
