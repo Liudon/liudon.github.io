@@ -1,5 +1,5 @@
 ---
-title: "Swoft 框架运行分析（二） —— BeanProcessor模块分析"
+title: "Swoft 框架运行分析（三） —— BeanProcessor模块分析"
 date: 2019-09-02T18:29:06+08:00
 draft: false
 keywords: Swoft
