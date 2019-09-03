@@ -1,7 +1,7 @@
 ---
 title: "Flink Could Not Resolve Resourcemanager Address"
 date: 2019-03-28T13:00:50+08:00
-keywords: Flink
+tags: Flink
 ---
 
 什么是Flink。
