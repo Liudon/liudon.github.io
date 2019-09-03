@@ -23,17 +23,17 @@ protected function processors(): array
 
 所有的Processor实现都在`framework\src\Processor`目录下。
 
-1. EnvProcessor，初始化环境。
+1. EnvProcessor，运行环境检查。
 
-2. ConfigProcessor，初始化配置。
+2. ConfigProcessor，配置相关。
 
-3. AnnotationProcessor，初始化注解。
+3. AnnotationProcessor，注解相关。
 
-4. BeanProcessor，初始化Bean。
+4. BeanProcessor，Bean相关。
 
-5. EventProcessor，初始化事件。
+5. EventProcessor，事件相关。
 
-6. ConsoleProcessor，初始化控制台。
+6. ConsoleProcessor，命令行输入相关。
 
 今天先讲一下`AnnotationProcessor`这个模块的实现。
 
@@ -411,4 +411,4 @@ class AnnotationProcessor extends Processor
     }
 ```
 
-至此，整个`AnnotationProcessor`加载完毕，这里`AnnotationRegister`类里会有两个属性`annotations`和`parsers`，这个信息在后面的`BeanProcessor`里还会用到。
+至此，整个`AnnotationProcessor`加载完毕，这里`AnnotationRegister`类里会有`annotations`和`parsers`两个属性，这个信息在后面的`BeanProcessor`里还会用到。
