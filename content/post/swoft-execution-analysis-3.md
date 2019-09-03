@@ -2,7 +2,7 @@
 title: "Swoft 框架运行分析（二） —— BeanProcessor模块分析"
 date: 2019-09-02T18:29:06+08:00
 draft: false
-Keywords: Swoft
+keywords: Swoft
 ---
 
 今天讲一下`BeanProcessor`模块，先看一下`handle`方法实现。
