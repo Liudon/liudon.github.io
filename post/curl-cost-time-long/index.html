@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-cn" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>一个Curl的耗时长的问题 - 流动 - 生活就是一个流动的过程</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="liudon" />
+  <meta name="description" content="发现某个接口请求很慢，但是后端确认接口是很快的。 在机器上通过shell执行curl命令，确实很快，但是PHP代码里请求又确实很慢。 业务里用到" />
+
+  <meta name="keywords" content="生活, 代码" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.0-DEV" />
+
+
+<link rel="canonical" href="https://liudon.xyz/post/curl-cost-time-long/" />
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.c8c1ff75dee09b44060a6c38f41b9036bac2512ccdb22d7f296cec12dc786375.css" integrity="sha256-yMH/dd7gm0QGCmw49BuQNrrCUSzNsi1/KWzsEtx4Y3U=" media="screen" crossorigin="anonymous">
+
+
+
+
+
+<meta property="og:title" content="一个Curl的耗时长的问题" />
+<meta property="og:description" content="发现某个接口请求很慢，但是后端确认接口是很快的。 在机器上通过shell执行curl命令，确实很快，但是PHP代码里请求又确实很慢。 业务里用到" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://liudon.xyz/post/curl-cost-time-long/" />
+<meta property="article:published_time" content="2019-09-04T11:07:46+08:00" />
+<meta property="article:modified_time" content="2019-09-04T11:07:46+08:00" />
+<meta itemprop="name" content="一个Curl的耗时长的问题">
+<meta itemprop="description" content="发现某个接口请求很慢，但是后端确认接口是很快的。 在机器上通过shell执行curl命令，确实很快，但是PHP代码里请求又确实很慢。 业务里用到">
+
+
+<meta itemprop="datePublished" content="2019-09-04T11:07:46&#43;08:00" />
+<meta itemprop="dateModified" content="2019-09-04T11:07:46&#43;08:00" />
+<meta itemprop="wordCount" content="1001">
+
+
+
+<meta itemprop="keywords" content="php,curl," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="一个Curl的耗时长的问题"/>
+<meta name="twitter:description" content="发现某个接口请求很慢，但是后端确认接口是很快的。 在机器上通过shell执行curl命令，确实很快，但是PHP代码里请求又确实很慢。 业务里用到"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-18074379-5', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">流动</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://liudon.xyz/post/">Archives</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://liudon.xyz/tags/">Tags</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://liudon.xyz/about/">关于</a>
+          
+        
+      </li>
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="//cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="//cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.css" crossorigin="anonymous">
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      流动
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://liudon.xyz/post/">Archives</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://liudon.xyz/tags/">Tags</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://liudon.xyz/about/">关于</a>
+          
+
+        
+
+      </li>
+    
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">一个Curl的耗时长的问题</h1>
+      
+      <div class="post-meta">
+        <time datetime="2019-09-04" class="post-time">
+          2019-09-04
+        </time>
+        
+        <span class="more-meta"> 约 1001 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content">
+    
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <p>发现某个接口请求很慢，但是后端确认接口是很快的。</p>
+
+<p>在机器上通过shell执行curl命令，确实很快，但是PHP代码里请求又确实很慢。</p>
+
+<p>业务里用到了<code>Requests</code>这个库，一开始以为是这个库导致的问题。</p>
+
+<p>在<code>Requests_Transport_cURL</code>类里断点定位了下，确实很慢，<code>curl_getinfo</code>返回的信息如下。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">array (
+  &#39;url&#39; =&gt; &#39;http://xxxxx&#39;,
+  &#39;content_type&#39; =&gt; &#39;text/html&#39;,
+  &#39;http_code&#39; =&gt; 200,
+  &#39;header_size&#39; =&gt; 64,
+  &#39;request_size&#39; =&gt; 305,
+  &#39;filetime&#39; =&gt; -1,
+  &#39;ssl_verify_result&#39; =&gt; 0,
+  &#39;redirect_count&#39; =&gt; 0,
+  &#39;total_time&#39; =&gt; 2.074094,
+  &#39;namelookup_time&#39; =&gt; 2.5E-5,
+  &#39;connect_time&#39; =&gt; 0.032107,
+  &#39;pretransfer_time&#39; =&gt; 0.032109,
+  &#39;size_upload&#39; =&gt; 186,
+  &#39;size_download&#39; =&gt; 99,
+  &#39;speed_download&#39; =&gt; 47,
+  &#39;speed_upload&#39; =&gt; 89,
+  &#39;download_content_length&#39; =&gt; 99,
+  &#39;upload_content_length&#39; =&gt; 186,
+  &#39;starttransfer_time&#39; =&gt; 2.032866,
+  &#39;redirect_time&#39; =&gt; 0,
+  &#39;certinfo&#39; =&gt;
+  array (
+  ),
+)</pre></td></tr></table>
+</div>
+</div>
+<p>这里可以看到<code>starttransfer_time</code>时间很长。</p>
+
+<p>搜索了一番，发现网上一个case，<a href="https://stackoverflow.com/questions/20428632/curl-slow-starttransfer-time">cURL slow starttransfer_time</a>。</p>
+
+<p>里面提供了<code>Expect: 100-continue</code>这个header，又搜索了一番这个header资料。</p>
+
+<p><code>curl</code>在发<code>POST</code>请求的时候，如果body大于1k：</p>
+
+<ol>
+<li>先追加一个<code>Expect: 100-continue</code>请求头信息，发送这个不包含 <code>POST</code> 数据的请求；</li>
+<li>如果服务器返回的响应头信息中包含Expect: 100-continue，则表示 Server 愿意接受数据，这时才 POST 真正数据给 Server；
+如果等待1s，没有收到服务器肯定或否定的应答，那么继续发起POST请求，这种会导致请求耗时变长。</li>
+</ol>
+
+<p>在机器上抓了个包，执行下面命令。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">注意，下面port后面的80改成实际的端口
+
+tcpdump -A -s 0 &#39;tcp port 80 and (((ip[2:2] - ((ip[0]&amp;0xf)&lt;&lt;2)) - ((tcp[12]&amp;0xf0)&gt;&gt;2)) != 0)&#39;</pre></td></tr></table>
+</div>
+</div>
+<p>拿到的包信息。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">09:17:19.421587 IP xxx.54360 &gt; xxxxx:12345: Flags [P.], seq 767181008:767181314, ack 353986709, win 115, options [nop,nop,TS val 2628114858 ecr 1424896084], length 306
+E..f.m@.@...d}@.        A...XF.-.@...h....s.......
+....T.0TPOST /cgi HTTP/1.1
+User-Agent: php-requests/1.6
+Accept: */*
+Accept-Encoding: deflate, gzip
+Referer: http://xxxxx:12345/cgi
+Content-Length: 188
+Expect: 100-continue
+Content-Type: multipart/form-data; boundary=----------------------------ee2f4d848646
+
+
+09:17:21.421786 IP xxx.54360 &gt; xxxxx:12345: Flags [P.], seq 306:494, ack 1, win 115, options [nop,nop,TS val 2628115359 ecr 1424896091], length 188
+E....n@.@..Md}@.        A...XF.-.B...h....s./.....
+....T.0[------------------------------ee2f4d848646
+Content-Disposition: form-data; name=&#34;req&#34;
+
+{&#34;command&#34;:&#34;zzz&#34;,&#34;appId&#34;:&#34;yyyy&#34;}
+------------------------------ee2f4d848646--
+
+09:17:21.458628 IP xxxxx:12345 &gt; xxx.54360: Flags [P.], seq 1:118, ack 494, win 130, options [nop,nop,TS val 1424896593 ecr 2628115359], length 117
+E...X.@.5.Q2    A..d}@.F..X..h.-.B......3.....
+T.2Q....HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 53
+
+{
+    &#34;data&#34;: [],
+    &#34;errno&#34;: 0,
+    &#34;error&#34;: &#34;ok&#34;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>可以看到确实是先发了一个<code>100-continue</code>的请求，然后再发的实际<code>POST</code>请求。</p>
+
+<p>在机器上执行下面的shell命令。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">curl &#39;http://xxxxx:12345/cgi&#39; -H&#34;Expect: 100-continue&#34; -v</pre></td></tr></table>
+</div>
+</div>
+<p>返回如下，可以看到返回的header头里确实没有<code>Expect</code>这项。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">* About to connect() to xxxxx port 12345 (#0)
+*   Trying xxxxx...
+* Connected to xxxxx (xxxxx) port 12345 (#0)
+&gt; GET /cloud_cgi HTTP/1.1
+&gt; User-Agent: curl/7.29.0
+&gt; Host: xxxxx:12345
+&gt; Accept: */*
+&gt; Expect: 100-continue
+&gt; 
+&lt; HTTP/1.1 200 OK
+&lt; Content-Type: text/html
+&lt; Content-Length: 42
+&lt; 
+* Connection #0 to host xxxxx left intact
+{&#34;errno&#34;:100,&#34;error&#34;:&#34;参数格式错误&#34;}</pre></td></tr></table>
+</div>
+</div>
+<p>解决方法：</p>
+
+<p>请求的时候，header里新增一项。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">Expect:</pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">liudon</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">2019-09-04</span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">许可协议</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+
+    
+    
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://liudon.xyz/tags/php/">php</a>
+          <a href="https://liudon.xyz/tags/curl/">curl</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/swoft-execution-analysis-3/">
+            <span class="next-text nav-default">Swoft 框架运行分析（三） —— BeanProcessor模块分析</span>
+            <span class="prev-text nav-mobile">下一篇</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+    
+
+
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+  
+
+
+<a href="https://liudon.xyz/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+  
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2011 -
+    2019
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        liudon
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>
+  <script src="//cdn.staticfile.org/slideout/1.0.1/slideout.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script src="//cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"  crossorigin="anonymous"></script>
+    <script src="//cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js" crossorigin="anonymous"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
