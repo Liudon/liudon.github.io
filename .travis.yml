@@ -17,7 +17,7 @@ before_script:
 
 # script - run the build script
 script:
-    - hugo
+    - hugo -v
     - echo "$CNAME_URL" > public/CNAME
 
 deploy:
