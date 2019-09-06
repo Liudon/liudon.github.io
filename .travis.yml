@@ -12,8 +12,12 @@ python:
 install:
     - go get github.com/gohugoio/hugo
 
+git:
+  submodules: false
+
 before_script:
-    - rm -rf public
+    - git submodule update --init --remote --recursive
+    - rm -rf public 2> /dev/null
 
 # script - run the build script
 script:
