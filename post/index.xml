@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on 流动 - 生活就是一个流动的过程</title>
@@ -6,10 +6,28 @@
     <description>Recent content in Posts on 流动 - 生活就是一个流动的过程</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 06 Sep 2019 15:13:51 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 26 Sep 2019 13:14:23 +0800</lastBuildDate>
     
 	<atom:link href="https://liudon.xyz/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Swoft 框架运行分析（五） —— ConsoleProcessor模块分析</title>
+      <link>https://liudon.xyz/post/swoft-console-processor-analysis/</link>
+      <pubDate>Thu, 26 Sep 2019 13:14:23 +0800</pubDate>
+      
+      <guid>https://liudon.xyz/post/swoft-console-processor-analysis/</guid>
+      <description>这里以Swoft启动http server为例。 1 2 3 4 5 6 7 8 &amp;gt; php bin/swoft http:start &amp;gt; ``` &amp;gt; &amp;gt;执行上述命令，启动http server。 在前面第一篇文章</description>
+    </item>
+    
+    <item>
+      <title>Swoft 框架运行分析（四） —— EventProcessor模块分析</title>
+      <link>https://liudon.xyz/post/swoft-event-processor-analysis/</link>
+      <pubDate>Thu, 26 Sep 2019 13:02:18 +0800</pubDate>
+      
+      <guid>https://liudon.xyz/post/swoft-event-processor-analysis/</guid>
+      <description>今天我们来看一下EventProcessor的实现。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 /** * Handle event register * @return bool */ public function handle(): bool { if (!$this-&amp;gt;application-&amp;gt;beforeEvent()) { CLog::warning(&amp;#39;Stop event processor by beforeEvent</description>
+    </item>
     
     <item>
       <title>一个git submodule update引发的问题</title>
@@ -31,19 +49,19 @@
     
     <item>
       <title>Swoft 框架运行分析（三） —— BeanProcessor模块分析</title>
-      <link>https://liudon.xyz/post/swoft-execution-analysis-3/</link>
+      <link>https://liudon.xyz/post/swoft-bean-processor-analysis/</link>
       <pubDate>Mon, 02 Sep 2019 18:29:06 +0800</pubDate>
       
-      <guid>https://liudon.xyz/post/swoft-execution-analysis-3/</guid>
+      <guid>https://liudon.xyz/post/swoft-bean-processor-analysis/</guid>
       <description>今天讲一下BeanProcessor模块，先看一下handle方法实现。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34</description>
     </item>
     
     <item>
       <title>Swoft 框架运行分析（二） —— AnnotationProcessor模块分析</title>
-      <link>https://liudon.xyz/post/swoft-execution-analysis-2/</link>
+      <link>https://liudon.xyz/post/swoft-anaotion-processor-analysis/</link>
       <pubDate>Thu, 29 Aug 2019 19:11:04 +0800</pubDate>
       
-      <guid>https://liudon.xyz/post/swoft-execution-analysis-2/</guid>
+      <guid>https://liudon.xyz/post/swoft-anaotion-processor-analysis/</guid>
       <description>上一篇介绍了，SwoftApplication里定义了6个Processor对象。 1 2 3 4 5 6 7 8 9 10 11 protected function processors(): array { return [ new EnvProcessor($this), new ConfigProcessor($this), new AnnotationProcessor($this), new BeanProcessor($this), new EventProcessor($this), new</description>
     </item>
     
