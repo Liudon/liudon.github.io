@@ -6,12 +6,9 @@ tags: ["Swoft"]
 
 > 这里以Swoft启动http server为例。
 >
-> ```
 > php bin/swoft http:start
-> ```
 >
 > 执行上述命令，启动http server。
-
 
 在前面第一篇文章的时候，提到了如何启动http服务。
 
