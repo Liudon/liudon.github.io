@@ -10,7 +10,8 @@ tags: ["Swoft"]
 > php bin/swoft http:start
 > ```
 >
->执行上述命令，启动http server。
+> 执行上述命令，启动http server。
+
 
 在前面第一篇文章的时候，提到了如何启动http服务。
 
