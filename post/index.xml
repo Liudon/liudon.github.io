@@ -17,7 +17,7 @@
       <pubDate>Thu, 26 Sep 2019 13:14:23 +0800</pubDate>
       
       <guid>https://liudon.xyz/post/swoft-console-processor-analysis/</guid>
-      <description>这里以Swoft启动http server为例。 1 2 3 4 5 6 7 8 9 &amp;gt; php bin/swoft http:start &amp;gt; ``` &amp;gt; &amp;gt; 执行上述命令，启动http server。 在前面第一篇文章的时</description>
+      <description>这里以Swoft启动http server为例。 php bin/swoft http:start 执行上述命令，启动http server。 在前面第一篇文章的时候，提到了如何启动http服</description>
     </item>
     
     <item>
