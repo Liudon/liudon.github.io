@@ -344,35 +344,35 @@ if (!doNotTrack) {
 </span><span class="lnt">29
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Handle console
-     * @return bool
-     * @throws ReflectionException
-     * @throws ContainerException
-     */
-    public function handle(): bool
-    {
-        if (!$this-&gt;application-&gt;beforeConsole()) {
-            return false;
-        }
+<pre class="chroma">/**
+    * Handle console
+    * @return bool
+    * @throws ReflectionException
+    * @throws ContainerException
+    */
+public function handle(): bool
+{
+    if (!$this-&gt;application-&gt;beforeConsole()) {
+        return false;
+    }
 
-        /** @var Router $router */
-        $router = bean(&#39;cliRouter&#39;);
+    /** @var Router $router */
+    $router = bean(&#39;cliRouter&#39;);
 
-        // Register console routes
-        CommandRegister::register($router);
+    // Register console routes
+    CommandRegister::register($router);
 
-        CLog::info(
-            &#39;Console command route registered (group %d, command %d)&#39;,
-            $router-&gt;groupCount(),
-            $router-&gt;count()
-        );
+    CLog::info(
+        &#39;Console command route registered (group %d, command %d)&#39;,
+        $router-&gt;groupCount(),
+        $router-&gt;count()
+    );
 
-        // Run console application
-        bean(&#39;cliApp&#39;)-&gt;run();
+    // Run console application
+    bean(&#39;cliApp&#39;)-&gt;run();
 
-        return $this-&gt;application-&gt;afterConsole();
-    }</pre></td></tr></table>
+    return $this-&gt;application-&gt;afterConsole();
+}</pre></td></tr></table>
 </div>
 </div>
 <p>这里调用了<code>bean</code>方法获取<code>Bean</code>实例，定义见<code>swoft-component-2.0.5\src\bean\src\Helper\Functions.php</code>。</p>
@@ -432,17 +432,17 @@ if (!doNotTrack) {
 </span><span class="lnt">11
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Get object by name
-     *
-     * @param string $name Bean name Or alias Or class name
-     *
-     * @return object|mixed
-     */
-    public static function getBean(string $name)
-    {
-        return Container::getInstance()-&gt;get($name);
-    }</pre></td></tr></table>
+<pre class="chroma">/**
+    * Get object by name
+    *
+    * @param string $name Bean name Or alias Or class name
+    *
+    * @return object|mixed
+    */
+public static function getBean(string $name)
+{
+    return Container::getInstance()-&gt;get($name);
+}</pre></td></tr></table>
 </div>
 </div>
 <p>最终调用的是<code>Swoft\Bean\Container</code>下的<code>get</code>方法。</p>
@@ -502,58 +502,58 @@ if (!doNotTrack) {
 </span><span class="lnt">52
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Finds an entry of the container by its identifier and returns it.
-     *
-     * @param string $id Bean name Or alias Or class name
-     *
-     * When class name will return all of instance for class name
-     *
-     * @return object
-     * @throws InvalidArgumentException
-     */
-    public function get($id)
-    {
-        // It is singleton
-        if (isset($this-&gt;singletonPool[$id])) {
-            return $this-&gt;singletonPool[$id];
-        }
+<pre class="chroma">/**
+    * Finds an entry of the container by its identifier and returns it.
+    *
+    * @param string $id Bean name Or alias Or class name
+    *
+    * When class name will return all of instance for class name
+    *
+    * @return object
+    * @throws InvalidArgumentException
+    */
+public function get($id)
+{
+    // It is singleton
+    if (isset($this-&gt;singletonPool[$id])) {
+        return $this-&gt;singletonPool[$id];
+    }
 
-        // Prototype by clone
-        if (isset($this-&gt;prototypePool[$id])) {
-            return clone $this-&gt;prototypePool[$id];
-        }
+    // Prototype by clone
+    if (isset($this-&gt;prototypePool[$id])) {
+        return clone $this-&gt;prototypePool[$id];
+    }
 
-        // Alias name
-        $aliasId = $this-&gt;aliases[$id] ?? &#39;&#39;;
-        if ($aliasId) {
-            return $this-&gt;get($aliasId);
-        }
+    // Alias name
+    $aliasId = $this-&gt;aliases[$id] ?? &#39;&#39;;
+    if ($aliasId) {
+        return $this-&gt;get($aliasId);
+    }
 
-        // Class name
-        $classNames = $this-&gt;classNames[$id] ?? [];
-        if ($classNames) {
-            $id = end($classNames);
-            return $this-&gt;get($id);
-        }
+    // Class name
+    $classNames = $this-&gt;classNames[$id] ?? [];
+    if ($classNames) {
+        $id = end($classNames);
+        return $this-&gt;get($id);
+    }
 
-        // Interface
-        if (interface_exists($id)) {
-            $id = InterfaceRegister::getInterfaceInjectBean($id);
-            return $this-&gt;get($id);
-        }
+    // Interface
+    if (interface_exists($id)) {
+        $id = InterfaceRegister::getInterfaceInjectBean($id);
+        return $this-&gt;get($id);
+    }
 
-        // Not defined
-        if (!isset($this-&gt;objectDefinitions[$id])) {
-            throw new InvalidArgumentException(sprintf(&#39;The bean of %s is not defined&#39;, $id));
-        }
+    // Not defined
+    if (!isset($this-&gt;objectDefinitions[$id])) {
+        throw new InvalidArgumentException(sprintf(&#39;The bean of %s is not defined&#39;, $id));
+    }
 
-        /* @var ObjectDefinition $objectDefinition */
-        $objectDefinition = $this-&gt;objectDefinitions[$id];
+    /* @var ObjectDefinition $objectDefinition */
+    $objectDefinition = $this-&gt;objectDefinitions[$id];
 
-        // Prototype
-        return $this-&gt;safeNewBean($objectDefinition-&gt;getName());
-    }</pre></td></tr></table>
+    // Prototype
+    return $this-&gt;safeNewBean($objectDefinition-&gt;getName());
+}</pre></td></tr></table>
 </div>
 </div>
 <p>获取对应的<code>ObjectDefinition</code>实例，然后调用<code>safeNewBean</code>方法。</p>
@@ -577,22 +577,22 @@ if (!doNotTrack) {
 </span><span class="lnt">16
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Secure creation of beans
-     *
-     * @param string $beanName
-     * @param string $id
-     *
-     * @return object|mixed
-     */
-    private function safeNewBean(string $beanName, string $id = &#39;&#39;)
-    {
-        try {
-            return $this-&gt;newBean($beanName, $id);
-        } catch (Throwable $e) {
-            throw new InvalidArgumentException($e-&gt;getMessage(), 500, $e);
-        }
-    }</pre></td></tr></table>
+<pre class="chroma">/**
+    * Secure creation of beans
+    *
+    * @param string $beanName
+    * @param string $id
+    *
+    * @return object|mixed
+    */
+private function safeNewBean(string $beanName, string $id = &#39;&#39;)
+{
+    try {
+        return $this-&gt;newBean($beanName, $id);
+    } catch (Throwable $e) {
+        throw new InvalidArgumentException($e-&gt;getMessage(), 500, $e);
+    }
+}</pre></td></tr></table>
 </div>
 </div>
 <p>这里又调用了<code>newBean</code>方法，在上一篇文章里我们已经讲过这个方法，这里会返回实例化后的<code>Bean</code>类。</p>
@@ -620,24 +620,24 @@ if (!doNotTrack) {
 </span><span class="lnt">18
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * {@inheritDoc}
-     */
-    public function beans(): array
-    {
-        return [
-            &#39;cliApp&#39;    =&gt; [
-                &#39;class&#39;   =&gt; Application::class,
-                &#39;version&#39; =&gt; &#39;2.0.0&#39;
-            ],
-            &#39;cliRouter&#39; =&gt; [
-                &#39;class&#39; =&gt; Router::class,
-            ],
-            &#39;cliDispatcher&#39; =&gt; [
-                &#39;class&#39; =&gt; ConsoleDispatcher::class,
-            ],
-        ];
-    }</pre></td></tr></table>
+<pre class="chroma">/**
+    * {@inheritDoc}
+    */
+public function beans(): array
+{
+    return [
+        &#39;cliApp&#39;    =&gt; [
+            &#39;class&#39;   =&gt; Application::class,
+            &#39;version&#39; =&gt; &#39;2.0.0&#39;
+        ],
+        &#39;cliRouter&#39; =&gt; [
+            &#39;class&#39; =&gt; Router::class,
+        ],
+        &#39;cliDispatcher&#39; =&gt; [
+            &#39;class&#39; =&gt; ConsoleDispatcher::class,
+        ],
+    ];
+}</pre></td></tr></table>
 </div>
 </div>
 <p>所以<code>$router = bean('cliRouter')</code>，返回的是一个<code>Swoft\Console\Router\Router</code>类。</p>
@@ -737,87 +737,87 @@ if (!doNotTrack) {
 </span><span class="lnt">81
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * @param Router $router
-     * @throws ReflectionException
-     */
-    public static function register(Router $router): void
-    {
-        $maxLen  = 12;
-        $groups  = [];
-        $docOpts = [
-            &#39;allow&#39; =&gt; [&#39;example&#39;]
-        ];
-        $defInfo = [
-            &#39;example&#39;     =&gt; &#39;&#39;,
-            &#39;description&#39; =&gt; &#39;No description message&#39;,
-        ];
+<pre class="chroma">/**
+    * @param Router $router
+    * @throws ReflectionException
+    */
+public static function register(Router $router): void
+{
+    $maxLen  = 12;
+    $groups  = [];
+    $docOpts = [
+        &#39;allow&#39; =&gt; [&#39;example&#39;]
+    ];
+    $defInfo = [
+        &#39;example&#39;     =&gt; &#39;&#39;,
+        &#39;description&#39; =&gt; &#39;No description message&#39;,
+    ];
 
-        foreach (self::$commands as $class =&gt; $mapping) {
-            $names = [];
-            $group = $mapping[&#39;group&#39;];
-            // Set ID aliases
-            $router-&gt;setIdAliases($mapping[&#39;idAliases&#39;]);
-            // Set group name aliases
-            $router-&gt;setGroupAliases($group, $mapping[&#39;aliases&#39;]);
+    foreach (self::$commands as $class =&gt; $mapping) {
+        $names = [];
+        $group = $mapping[&#39;group&#39;];
+        // Set ID aliases
+        $router-&gt;setIdAliases($mapping[&#39;idAliases&#39;]);
+        // Set group name aliases
+        $router-&gt;setGroupAliases($group, $mapping[&#39;aliases&#39;]);
 
-            $refInfo = Swoft::getReflection($class);
-            $mhdInfo = $refInfo[&#39;methods&#39;] ?? [];
-            $grpOpts = $mapping[&#39;options&#39;] ?? [];
+        $refInfo = Swoft::getReflection($class);
+        $mhdInfo = $refInfo[&#39;methods&#39;] ?? [];
+        $grpOpts = $mapping[&#39;options&#39;] ?? [];
 
-            foreach ($mapping[&#39;commands&#39;] as $method =&gt; $route) {
-                // $method = $route[&#39;method&#39;];
-                $cmdDesc = $route[&#39;desc&#39;];
-                $command = $route[&#39;command&#39;];
+        foreach ($mapping[&#39;commands&#39;] as $method =&gt; $route) {
+            // $method = $route[&#39;method&#39;];
+            $cmdDesc = $route[&#39;desc&#39;];
+            $command = $route[&#39;command&#39;];
 
-                $idLen = strlen($group . $command);
-                if ($idLen &gt; $maxLen) {
-                    $maxLen = $idLen;
-                }
-
-                $cmdExam = &#39;&#39;;
-                if (!empty($mhdInfo[$method][&#39;comments&#39;])) {
-                    $tagInfo = DocBlock::getTags($mhdInfo[$method][&#39;comments&#39;], $docOpts, $defInfo);
-                    $cmdDesc = $cmdDesc ?: Str::firstLine($tagInfo[&#39;description&#39;]);
-                    $cmdExam = $tagInfo[&#39;example&#39;];
-                }
-
-                $route[&#39;group&#39;]   = $group;
-                $route[&#39;desc&#39;]    = ucfirst($cmdDesc);
-                $route[&#39;example&#39;] = $cmdExam;
-                $route[&#39;options&#39;] = self::mergeOptions($grpOpts, $route[&#39;options&#39;]);
-                // Append group option
-                $route[&#39;enabled&#39;]   = $mapping[&#39;enabled&#39;];
-                $route[&#39;coroutine&#39;] = $mapping[&#39;coroutine&#39;];
-
-                $router-&gt;map($group, $command, [$class, $method], $route);
-                $names[] = $command;
+            $idLen = strlen($group . $command);
+            if ($idLen &gt; $maxLen) {
+                $maxLen = $idLen;
             }
 
-            $groupExam = &#39;&#39;;
-            $groupDesc = $mapping[&#39;desc&#39;];
-            if (!empty($refInfo[&#39;comments&#39;])) {
-                $tagInfo   = DocBlock::getTags($refInfo[&#39;comments&#39;], $docOpts, $defInfo);
-                $groupDesc = $groupDesc ?: Str::firstLine($tagInfo[&#39;description&#39;]);
-                $groupExam = $tagInfo[&#39;example&#39;];
+            $cmdExam = &#39;&#39;;
+            if (!empty($mhdInfo[$method][&#39;comments&#39;])) {
+                $tagInfo = DocBlock::getTags($mhdInfo[$method][&#39;comments&#39;], $docOpts, $defInfo);
+                $cmdDesc = $cmdDesc ?: Str::firstLine($tagInfo[&#39;description&#39;]);
+                $cmdExam = $tagInfo[&#39;example&#39;];
             }
 
-            $groups[$group] = [
-                &#39;names&#39;   =&gt; $names,
-                &#39;desc&#39;    =&gt; ucfirst($groupDesc),
-                &#39;class&#39;   =&gt; $class,
-                &#39;alias&#39;   =&gt; $mapping[&#39;alias&#39;],
-                &#39;aliases&#39; =&gt; $mapping[&#39;aliases&#39;],
-                &#39;example&#39; =&gt; $groupExam,
-            ];
+            $route[&#39;group&#39;]   = $group;
+            $route[&#39;desc&#39;]    = ucfirst($cmdDesc);
+            $route[&#39;example&#39;] = $cmdExam;
+            $route[&#39;options&#39;] = self::mergeOptions($grpOpts, $route[&#39;options&#39;]);
+            // Append group option
+            $route[&#39;enabled&#39;]   = $mapping[&#39;enabled&#39;];
+            $route[&#39;coroutine&#39;] = $mapping[&#39;coroutine&#39;];
+
+            $router-&gt;map($group, $command, [$class, $method], $route);
+            $names[] = $command;
         }
 
-        $router-&gt;setGroups($groups);
-        // +1 because router-&gt;delimiter
-        $router-&gt;setKeyWidth($maxLen + 1);
-        // clear data
-        self::$commands = [];
-    }</pre></td></tr></table>
+        $groupExam = &#39;&#39;;
+        $groupDesc = $mapping[&#39;desc&#39;];
+        if (!empty($refInfo[&#39;comments&#39;])) {
+            $tagInfo   = DocBlock::getTags($refInfo[&#39;comments&#39;], $docOpts, $defInfo);
+            $groupDesc = $groupDesc ?: Str::firstLine($tagInfo[&#39;description&#39;]);
+            $groupExam = $tagInfo[&#39;example&#39;];
+        }
+
+        $groups[$group] = [
+            &#39;names&#39;   =&gt; $names,
+            &#39;desc&#39;    =&gt; ucfirst($groupDesc),
+            &#39;class&#39;   =&gt; $class,
+            &#39;alias&#39;   =&gt; $mapping[&#39;alias&#39;],
+            &#39;aliases&#39; =&gt; $mapping[&#39;aliases&#39;],
+            &#39;example&#39; =&gt; $groupExam,
+        ];
+    }
+
+    $router-&gt;setGroups($groups);
+    // +1 because router-&gt;delimiter
+    $router-&gt;setKeyWidth($maxLen + 1);
+    // clear data
+    self::$commands = [];
+}</pre></td></tr></table>
 </div>
 </div>
 <p>这里遍历了类属性<code>$commands</code>注册路由。</p>
@@ -1367,23 +1367,23 @@ class CommandMappingParser extends Parser
 </span><span class="lnt">17
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * @param string $class
-     * @param string $method
-     * @param array  $route
-     *
-     * @throws AnnotationException
-     */
-    public static function addRoute(string $class, string $method, array $route): void
-    {
-        self::checkClass($class);
+<pre class="chroma">/**
+    * @param string $class
+    * @param string $method
+    * @param array  $route
+    *
+    * @throws AnnotationException
+    */
+public static function addRoute(string $class, string $method, array $route): void
+{
+    self::checkClass($class);
 
-        // init some keys
-        $route[&#39;options&#39;]   = [];
-        $route[&#39;arguments&#39;] = [];
-        // save
-        self::$commands[$class][&#39;commands&#39;][$method] = $route;
-    }</pre></td></tr></table>
+    // init some keys
+    $route[&#39;options&#39;]   = [];
+    $route[&#39;arguments&#39;] = [];
+    // save
+    self::$commands[$class][&#39;commands&#39;][$method] = $route;
+}</pre></td></tr></table>
 </div>
 </div>
 <p>bingo，跟我们猜想的一模一样，这下我们也知道<code>CommandMapping</code>这个注解是用来注册终端的路由信息。</p>
@@ -1399,10 +1399,10 @@ class CommandMappingParser extends Parser
 </span></pre></td>
 <td class="lntd">
 <pre class="chroma">CLog::info(
-            &#39;Console command route registered (group %d, command %d)&#39;,
-            $router-&gt;groupCount(),
-            $router-&gt;count()
-        );</pre></td></tr></table>
+    &#39;Console command route registered (group %d, command %d)&#39;,
+    $router-&gt;groupCount(),
+    $router-&gt;count()
+);</pre></td></tr></table>
 </div>
 </div>
 <p>打印日志。</p>
@@ -1453,36 +1453,36 @@ bean(&#39;cliApp&#39;)-&gt;run();</pre></td></tr></table>
 </span><span class="lnt">30
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * @return void
-     * @throws ContainerException
-     */
-    public function run(): void
-    {
-        try {
-            Swoft::trigger(ConsoleEvent::RUN_BEFORE, $this);
+<pre class="chroma">/**
+    * @return void
+    * @throws ContainerException
+    */
+public function run(): void
+{
+    try {
+        Swoft::trigger(ConsoleEvent::RUN_BEFORE, $this);
 
-            // Prepare
-            $this-&gt;prepare();
+        // Prepare
+        $this-&gt;prepare();
 
-            // Get input command
-            $inputCommand = $this-&gt;input-&gt;getCommand();
+        // Get input command
+        $inputCommand = $this-&gt;input-&gt;getCommand();
 
-            if (!$inputCommand) {
-                $this-&gt;filterSpecialOption();
-            } else {
-                $this-&gt;doRun($inputCommand);
-            }
-
-            Swoft::trigger(ConsoleEvent::RUN_AFTER, $this, $inputCommand);
-        } catch (Throwable $e) {
-            /** @var ConsoleErrorDispatcher $errDispatcher */
-            $errDispatcher = BeanFactory::getSingleton(ConsoleErrorDispatcher::class);
-
-            // Handle request error
-            $errDispatcher-&gt;run($e);
+        if (!$inputCommand) {
+            $this-&gt;filterSpecialOption();
+        } else {
+            $this-&gt;doRun($inputCommand);
         }
-    }</pre></td></tr></table>
+
+        Swoft::trigger(ConsoleEvent::RUN_AFTER, $this, $inputCommand);
+    } catch (Throwable $e) {
+        /** @var ConsoleErrorDispatcher $errDispatcher */
+        $errDispatcher = BeanFactory::getSingleton(ConsoleErrorDispatcher::class);
+
+        // Handle request error
+        $errDispatcher-&gt;run($e);
+    }
+}</pre></td></tr></table>
 </div>
 </div>
 <p>通过<code>Swoft::trigger</code>，注册了<code>ConsoleEvent::RUN_BEFORE</code>和<code>ConsoleEvent::RUN_AFTER</code>两个事件。</p>
@@ -1498,14 +1498,14 @@ bean(&#39;cliApp&#39;)-&gt;run();</pre></td></tr></table>
 </span><span class="lnt">8
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    protected function prepare(): void
-    {
-        $this-&gt;input  = \input();
-        $this-&gt;output = \output();
+<pre class="chroma">protected function prepare(): void
+{
+    $this-&gt;input  = \input();
+    $this-&gt;output = \output();
 
-        // load builtin comments vars
-        $this-&gt;setCommentsVars($this-&gt;commentsVars());
-    }</pre></td></tr></table>
+    // load builtin comments vars
+    $this-&gt;setCommentsVars($this-&gt;commentsVars());
+}</pre></td></tr></table>
 </div>
 </div>
 <p><code>prepare</code>比较简单，这里声明了输入和输出两个类。注意哈，这个后面会用到。</p>
@@ -1588,62 +1588,62 @@ if (!$inputCommand) {
 </span><span class="lnt">56
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * @param string $inputCmd
-     *
-     * @return void
-     * @throws ReflectionException
-     * @throws ContainerException
-     * @throws Throwable
-     */
-    protected function doRun(string $inputCmd): void
-    {
-        $output = $this-&gt;output;
-        /* @var Router $router */
-        $router = Swoft::getBean(&#39;cliRouter&#39;);
-        $result = $router-&gt;match($inputCmd);
+<pre class="chroma">/**
+    * @param string $inputCmd
+    *
+    * @return void
+    * @throws ReflectionException
+    * @throws ContainerException
+    * @throws Throwable
+    */
+protected function doRun(string $inputCmd): void
+{
+    $output = $this-&gt;output;
+    /* @var Router $router */
+    $router = Swoft::getBean(&#39;cliRouter&#39;);
+    $result = $router-&gt;match($inputCmd);
 
-        // Command not found
-        if ($result[0] === Router::NOT_FOUND) {
-            $names = $router-&gt;getAllNames();
-            $output-&gt;liteError(&#34;The entered command &#39;{$inputCmd}&#39; is not exists!&#34;);
+    // Command not found
+    if ($result[0] === Router::NOT_FOUND) {
+        $names = $router-&gt;getAllNames();
+        $output-&gt;liteError(&#34;The entered command &#39;{$inputCmd}&#39; is not exists!&#34;);
 
-            // find similar command names by similar_text()
-            if ($similar = Arr::findSimilar($inputCmd, $names)) {
-                $output-&gt;writef(&#34;\nMaybe what you mean is:\n    &lt;info&gt;%s&lt;/info&gt;&#34;, implode(&#39;, &#39;, $similar));
-            } else {
-                $this-&gt;showApplicationHelp(false);
-            }
-            return;
+        // find similar command names by similar_text()
+        if ($similar = Arr::findSimilar($inputCmd, $names)) {
+            $output-&gt;writef(&#34;\nMaybe what you mean is:\n    &lt;info&gt;%s&lt;/info&gt;&#34;, implode(&#39;, &#39;, $similar));
+        } else {
+            $this-&gt;showApplicationHelp(false);
         }
+        return;
+    }
 
-        $info = $result[1];
+    $info = $result[1];
 
-        // Only input a group name, display help for the group
-        if ($result[0] === Router::ONLY_GROUP) {
-            $this-&gt;showGroupHelp($info[&#39;group&#39;]);
-            return;
-        }
+    // Only input a group name, display help for the group
+    if ($result[0] === Router::ONLY_GROUP) {
+        $this-&gt;showGroupHelp($info[&#39;group&#39;]);
+        return;
+    }
 
-        // Display help for a command
-        if ($this-&gt;input-&gt;getSameOpt([&#39;h&#39;, &#39;help&#39;])) {
-            $this-&gt;showCommandHelp($info);
-            return;
-        }
+    // Display help for a command
+    if ($this-&gt;input-&gt;getSameOpt([&#39;h&#39;, &#39;help&#39;])) {
+        $this-&gt;showCommandHelp($info);
+        return;
+    }
 
-        // Parse default options and arguments
-        $this-&gt;bindCommandFlags($info);
-        $this-&gt;input-&gt;setCommandId($info[&#39;cmdId&#39;]);
+    // Parse default options and arguments
+    $this-&gt;bindCommandFlags($info);
+    $this-&gt;input-&gt;setCommandId($info[&#39;cmdId&#39;]);
 
-        Swoft::triggerByArray(ConsoleEvent::DISPATCH_BEFORE, $this, $info);
+    Swoft::triggerByArray(ConsoleEvent::DISPATCH_BEFORE, $this, $info);
 
-        // Call command handler
-        /** @var ConsoleDispatcher $dispatcher */
-        $dispatcher = Swoft::getSingleton(&#39;cliDispatcher&#39;);
-        $dispatcher-&gt;dispatch($info);
+    // Call command handler
+    /** @var ConsoleDispatcher $dispatcher */
+    $dispatcher = Swoft::getSingleton(&#39;cliDispatcher&#39;);
+    $dispatcher-&gt;dispatch($info);
 
-        Swoft::triggerByArray(ConsoleEvent::DISPATCH_AFTER, $this, $info);
-    }</pre></td></tr></table>
+    Swoft::triggerByArray(ConsoleEvent::DISPATCH_AFTER, $this, $info);
+}</pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -1729,75 +1729,75 @@ $result = $router-&gt;match($inputCmd);</pre></td></tr></table>
 </span><span class="lnt">69
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Match route by input command
-     *
-     * @param array $params [$route]
-     *
-     * @return array
-     *
-     * [
-     *  status, info(array)
-     * ]
-     */
-    public function match(...$params): array
-    {
-        $delimiter = $this-&gt;delimiter;
-        $inputCmd  = trim($params[0], &#34;$delimiter &#34;);
+<pre class="chroma">/**
+    * Match route by input command
+    *
+    * @param array $params [$route]
+    *
+    * @return array
+    *
+    * [
+    *  status, info(array)
+    * ]
+    */
+public function match(...$params): array
+{
+    $delimiter = $this-&gt;delimiter;
+    $inputCmd  = trim($params[0], &#34;$delimiter &#34;);
+    $noSepChar = strpos($inputCmd, $delimiter) === false;
+
+    // If use command ID alias
+    if ($noSepChar &amp;&amp; isset($this-&gt;idAliases[$inputCmd])) {
+        $inputCmd = $this-&gt;idAliases[$inputCmd];
+        // Must re-check
         $noSepChar = strpos($inputCmd, $delimiter) === false;
+    }
 
-        // If use command ID alias
-        if ($noSepChar &amp;&amp; isset($this-&gt;idAliases[$inputCmd])) {
-            $inputCmd = $this-&gt;idAliases[$inputCmd];
-            // Must re-check
-            $noSepChar = strpos($inputCmd, $delimiter) === false;
-        }
+    if ($noSepChar &amp;&amp; in_array($inputCmd, $this-&gt;defaultCommands, true)) {
+        $group   = $this-&gt;defaultGroup;
+        $command = $this-&gt;resolveCommandAlias($inputCmd);
 
-        if ($noSepChar &amp;&amp; in_array($inputCmd, $this-&gt;defaultCommands, true)) {
-            $group   = $this-&gt;defaultGroup;
-            $command = $this-&gt;resolveCommandAlias($inputCmd);
+        // Only a group name
+    } elseif ($noSepChar) {
+        $group = $this-&gt;resolveGroupAlias($inputCmd);
 
-            // Only a group name
-        } elseif ($noSepChar) {
-            $group = $this-&gt;resolveGroupAlias($inputCmd);
-
-            if (isset($this-&gt;groups[$group])) {
-                return [self::ONLY_GROUP, [&#39;group&#39; =&gt; $group]];
-            }
-
-            return [self::NOT_FOUND];
-        } else {
-            $nameList = explode($delimiter, $inputCmd, 2);
-
-            if (count($nameList) === 2) {
-                [$group, $command] = $nameList;
-                // resolve command alias
-                $command = $this-&gt;resolveCommandAlias($command);
-            } else {
-                $command = &#39;&#39;;
-                // $command = $this-&gt;defaultCommand;
-                $group = $nameList[0];
-            }
-        }
-
-        $group = $this-&gt;resolveGroupAlias($group);
-        // build command ID
-        $commandID = $this-&gt;buildCommandID($group, $command);
-
-        if (isset($this-&gt;routes[$commandID])) {
-            $info = $this-&gt;routes[$commandID];
-            // append some info
-            $info[&#39;cmdId&#39;] = $commandID;
-
-            return [self::FOUND, $info];
-        }
-
-        if ($group &amp;&amp; isset($this-&gt;groups[$group])) {
+        if (isset($this-&gt;groups[$group])) {
             return [self::ONLY_GROUP, [&#39;group&#39; =&gt; $group]];
         }
 
         return [self::NOT_FOUND];
-    }</pre></td></tr></table>
+    } else {
+        $nameList = explode($delimiter, $inputCmd, 2);
+
+        if (count($nameList) === 2) {
+            [$group, $command] = $nameList;
+            // resolve command alias
+            $command = $this-&gt;resolveCommandAlias($command);
+        } else {
+            $command = &#39;&#39;;
+            // $command = $this-&gt;defaultCommand;
+            $group = $nameList[0];
+        }
+    }
+
+    $group = $this-&gt;resolveGroupAlias($group);
+    // build command ID
+    $commandID = $this-&gt;buildCommandID($group, $command);
+
+    if (isset($this-&gt;routes[$commandID])) {
+        $info = $this-&gt;routes[$commandID];
+        // append some info
+        $info[&#39;cmdId&#39;] = $commandID;
+
+        return [self::FOUND, $info];
+    }
+
+    if ($group &amp;&amp; isset($this-&gt;groups[$group])) {
+        return [self::ONLY_GROUP, [&#39;group&#39; =&gt; $group]];
+    }
+
+    return [self::NOT_FOUND];
+}</pre></td></tr></table>
 </div>
 </div>
 <p>这里会返回匹配后的路由信息。</p>
@@ -1834,33 +1834,33 @@ $result = $router-&gt;match($inputCmd);</pre></td></tr></table>
 </span><span class="lnt">27
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">        // Command not found
-        if ($result[0] === Router::NOT_FOUND) {
-            $names = $router-&gt;getAllNames();
-            $output-&gt;liteError(&#34;The entered command &#39;{$inputCmd}&#39; is not exists!&#34;);
+<pre class="chroma">// Command not found
+if ($result[0] === Router::NOT_FOUND) {
+    $names = $router-&gt;getAllNames();
+    $output-&gt;liteError(&#34;The entered command &#39;{$inputCmd}&#39; is not exists!&#34;);
 
-            // find similar command names by similar_text()
-            if ($similar = Arr::findSimilar($inputCmd, $names)) {
-                $output-&gt;writef(&#34;\nMaybe what you mean is:\n    &lt;info&gt;%s&lt;/info&gt;&#34;, implode(&#39;, &#39;, $similar));
-            } else {
-                $this-&gt;showApplicationHelp(false);
-            }
-            return;
-        }
+    // find similar command names by similar_text()
+    if ($similar = Arr::findSimilar($inputCmd, $names)) {
+        $output-&gt;writef(&#34;\nMaybe what you mean is:\n    &lt;info&gt;%s&lt;/info&gt;&#34;, implode(&#39;, &#39;, $similar));
+    } else {
+        $this-&gt;showApplicationHelp(false);
+    }
+    return;
+}
 
-        $info = $result[1];
+$info = $result[1];
 
-        // Only input a group name, display help for the group
-        if ($result[0] === Router::ONLY_GROUP) {
-            $this-&gt;showGroupHelp($info[&#39;group&#39;]);
-            return;
-        }
+// Only input a group name, display help for the group
+if ($result[0] === Router::ONLY_GROUP) {
+    $this-&gt;showGroupHelp($info[&#39;group&#39;]);
+    return;
+}
 
-        // Display help for a command
-        if ($this-&gt;input-&gt;getSameOpt([&#39;h&#39;, &#39;help&#39;])) {
-            $this-&gt;showCommandHelp($info);
-            return;
-        }</pre></td></tr></table>
+// Display help for a command
+if ($this-&gt;input-&gt;getSameOpt([&#39;h&#39;, &#39;help&#39;])) {
+    $this-&gt;showCommandHelp($info);
+    return;
+}</pre></td></tr></table>
 </div>
 </div>
 <p>根据返回的路由信息进行不同的处理。</p>
@@ -1873,11 +1873,11 @@ $result = $router-&gt;match($inputCmd);</pre></td></tr></table>
 </span><span class="lnt">5
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">        // Parse default options and arguments
-        $this-&gt;bindCommandFlags($info);
-        $this-&gt;input-&gt;setCommandId($info[&#39;cmdId&#39;]);
+<pre class="chroma">// Parse default options and arguments
+$this-&gt;bindCommandFlags($info);
+$this-&gt;input-&gt;setCommandId($info[&#39;cmdId&#39;]);
 
-        Swoft::triggerByArray(ConsoleEvent::DISPATCH_BEFORE, $this, $info);</pre></td></tr></table>
+Swoft::triggerByArray(ConsoleEvent::DISPATCH_BEFORE, $this, $info);</pre></td></tr></table>
 </div>
 </div>
 <p>绑定默认参数，注册<code>ConsoleEvent::DISPATCH_BEFORE</code>事件。</p>
@@ -1889,10 +1889,10 @@ $result = $router-&gt;match($inputCmd);</pre></td></tr></table>
 </span><span class="lnt">4
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">        // Call command handler
-        /** @var ConsoleDispatcher $dispatcher */
-        $dispatcher = Swoft::getSingleton(&#39;cliDispatcher&#39;);
-        $dispatcher-&gt;dispatch($info);</pre></td></tr></table>
+<pre class="chroma">// Call command handler
+/** @var ConsoleDispatcher $dispatcher */
+$dispatcher = Swoft::getSingleton(&#39;cliDispatcher&#39;);
+$dispatcher-&gt;dispatch($info);</pre></td></tr></table>
 </div>
 </div>
 <p>获取<code>cliDispatcher</code>的<code>Bean</code>实例，对应<code>Swoft\Console\ConsoleDispatcher</code>类，调用<code>dispatch</code>方法。</p>
@@ -1939,45 +1939,45 @@ $result = $router-&gt;match($inputCmd);</pre></td></tr></table>
 </span><span class="lnt">39
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * @param array $params
-     *
-     * @return void
-     * @throws ReflectionException
-     * @throws Throwable
-     */
-    public function dispatch(...$params): void
-    {
-        $route = $params[0];
-        // Handler info
-        [$className, $method] = $route[&#39;handler&#39;];
+<pre class="chroma">/**
+    * @param array $params
+    *
+    * @return void
+    * @throws ReflectionException
+    * @throws Throwable
+    */
+public function dispatch(...$params): void
+{
+    $route = $params[0];
+    // Handler info
+    [$className, $method] = $route[&#39;handler&#39;];
 
-        // Bind method params
-        $params = $this-&gt;getBindParams($className, $method);
-        $object = Swoft::getSingleton($className);
+    // Bind method params
+    $params = $this-&gt;getBindParams($className, $method);
+    $object = Swoft::getSingleton($className);
 
-        // Blocking running
-        if (!$route[&#39;coroutine&#39;]) {
-            $this-&gt;before(get_parent_class($object), $method);
-            PhpHelper::call([$object, $method], ...$params);
-            $this-&gt;after($method);
-            return;
-        }
+    // Blocking running
+    if (!$route[&#39;coroutine&#39;]) {
+        $this-&gt;before(get_parent_class($object), $method);
+        PhpHelper::call([$object, $method], ...$params);
+        $this-&gt;after($method);
+        return;
+    }
 
-        // Hook php io function
-        Runtime::enableCoroutine();
+    // Hook php io function
+    Runtime::enableCoroutine();
 
-        // If in unit test env, has been in coroutine.
-        if (\defined(&#39;PHPUNIT_COMPOSER_INSTALL&#39;)) {
-            $this-&gt;executeByCo($object, $method, $params);
-            return;
-        }
+    // If in unit test env, has been in coroutine.
+    if (\defined(&#39;PHPUNIT_COMPOSER_INSTALL&#39;)) {
+        $this-&gt;executeByCo($object, $method, $params);
+        return;
+    }
 
-        // Coroutine running
-        srun(function () use ($object, $method, $params) {
-            $this-&gt;executeByCo($object, $method, $params);
-        });
-    }</pre></td></tr></table>
+    // Coroutine running
+    srun(function () use ($object, $method, $params) {
+        $this-&gt;executeByCo($object, $method, $params);
+    });
+}</pre></td></tr></table>
 </div>
 </div>
 <p>获取路由对应的类和方法，通过<code>Swoft::getSingleton($className);</code>实例化对象。</p>
@@ -2049,64 +2049,64 @@ $result = $router-&gt;match($inputCmd);</pre></td></tr></table>
 </span><span class="lnt">58
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Start the http server
-     *
-     * @CommandMapping(usage=&#34;{fullCommand} [-d|--daemon]&#34;)
-     * @CommandOption(&#34;daemon&#34;, short=&#34;d&#34;, desc=&#34;Run server on the background&#34;, type=&#34;bool&#34;, default=&#34;false&#34;)
-     *
-     * @throws ReflectionException
-     * @throws ContainerException
-     * @throws ServerException
-     * @example
-     *   {fullCommand}
-     *   {fullCommand} -d
-     *
-     */
-    public function start(): void
-    {
-        $server = $this-&gt;createServer();
+<pre class="chroma">/**
+    * Start the http server
+    *
+    * @CommandMapping(usage=&#34;{fullCommand} [-d|--daemon]&#34;)
+    * @CommandOption(&#34;daemon&#34;, short=&#34;d&#34;, desc=&#34;Run server on the background&#34;, type=&#34;bool&#34;, default=&#34;false&#34;)
+    *
+    * @throws ReflectionException
+    * @throws ContainerException
+    * @throws ServerException
+    * @example
+    *   {fullCommand}
+    *   {fullCommand} -d
+    *
+    */
+public function start(): void
+{
+    $server = $this-&gt;createServer();
 
-        // Check if it has started
-        if ($server-&gt;isRunning()) {
-            $masterPid = $server-&gt;getPid();
-            output()-&gt;writeln(&#34;&lt;error&gt;The HTTP server have been running!(PID: {$masterPid})&lt;/error&gt;&#34;);
-            return;
-        }
+    // Check if it has started
+    if ($server-&gt;isRunning()) {
+        $masterPid = $server-&gt;getPid();
+        output()-&gt;writeln(&#34;&lt;error&gt;The HTTP server have been running!(PID: {$masterPid})&lt;/error&gt;&#34;);
+        return;
+    }
 
-        // Startup settings
-        $this-&gt;configStartOption($server);
+    // Startup settings
+    $this-&gt;configStartOption($server);
 
-        $settings = $server-&gt;getSetting();
-        // Setting
-        $workerNum = $settings[&#39;worker_num&#39;];
+    $settings = $server-&gt;getSetting();
+    // Setting
+    $workerNum = $settings[&#39;worker_num&#39;];
 
-        // Server startup parameters
-        $mainHost = $server-&gt;getHost();
-        $mainPort = $server-&gt;getPort();
-        $modeName = $server-&gt;getModeName();
-        $typeName = $server-&gt;getTypeName();
+    // Server startup parameters
+    $mainHost = $server-&gt;getHost();
+    $mainPort = $server-&gt;getPort();
+    $modeName = $server-&gt;getModeName();
+    $typeName = $server-&gt;getTypeName();
 
-        // Http
-        $panel = [
-            &#39;HTTP&#39; =&gt; [
-                &#39;listen&#39; =&gt; $mainHost . &#39;:&#39; . $mainPort,
-                &#39;type&#39;   =&gt; $typeName,
-                &#39;mode&#39;   =&gt; $modeName,
-                &#39;worker&#39; =&gt; $workerNum,
-            ],
-        ];
+    // Http
+    $panel = [
+        &#39;HTTP&#39; =&gt; [
+            &#39;listen&#39; =&gt; $mainHost . &#39;:&#39; . $mainPort,
+            &#39;type&#39;   =&gt; $typeName,
+            &#39;mode&#39;   =&gt; $modeName,
+            &#39;worker&#39; =&gt; $workerNum,
+        ],
+    ];
 
-        // Port Listeners
-        $panel = $this-&gt;appendPortsToPanel($server, $panel);
+    // Port Listeners
+    $panel = $this-&gt;appendPortsToPanel($server, $panel);
 
-        Show::panel($panel);
+    Show::panel($panel);
 
-        output()-&gt;writeln(&#39;&lt;success&gt;HTTP server start success !&lt;/success&gt;&#39;);
+    output()-&gt;writeln(&#39;&lt;success&gt;HTTP server start success !&lt;/success&gt;&#39;);
 
-        // Start the server
-        $server-&gt;start();
-    }</pre></td></tr></table>
+    // Start the server
+    $server-&gt;start();
+}</pre></td></tr></table>
 </div>
 </div>
 <p>这里先调用了<code>createServer</code>方法。</p>
@@ -2131,23 +2131,23 @@ $result = $router-&gt;match($inputCmd);</pre></td></tr></table>
 </span><span class="lnt">17
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * @return HttpServer
-     * @throws ReflectionException
-     * @throws ContainerException
-     */
-    private function createServer(): HttpServer
-    {
-        $script  = input()-&gt;getScript();
-        $command = $this-&gt;getFullCommand();
+<pre class="chroma">/**
+    * @return HttpServer
+    * @throws ReflectionException
+    * @throws ContainerException
+    */
+private function createServer(): HttpServer
+{
+    $script  = input()-&gt;getScript();
+    $command = $this-&gt;getFullCommand();
 
-        /** @var HttpServer $server */
-        $server = bean(&#39;httpServer&#39;);
-        $server-&gt;setScriptFile(Swoft::app()-&gt;getPath($script));
-        $server-&gt;setFullCommand($command);
+    /** @var HttpServer $server */
+    $server = bean(&#39;httpServer&#39;);
+    $server-&gt;setScriptFile(Swoft::app()-&gt;getPath($script));
+    $server-&gt;setFullCommand($command);
 
-        return $server;
-    }</pre></td></tr></table>
+    return $server;
+}</pre></td></tr></table>
 </div>
 </div>
 <p>获取<code>httpServer</code>的<code>Bean</code>实例。</p>
@@ -2162,11 +2162,11 @@ $result = $router-&gt;match($inputCmd);</pre></td></tr></table>
 </span><span class="lnt">5
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">            &#39;httpServer&#39;      =&gt; [
-                &#39;on&#39; =&gt; [
-                    SwooleEvent::REQUEST =&gt; bean(RequestListener::class)
-                ]
-            ],</pre></td></tr></table>
+<pre class="chroma">&#39;httpServer&#39;      =&gt; [
+    &#39;on&#39; =&gt; [
+        SwooleEvent::REQUEST =&gt; bean(RequestListener::class)
+    ]
+],</pre></td></tr></table>
 </div>
 </div>
 <p>业务定义在<code>swoft-2.0.5\app\bean.php</code>。</p>
@@ -2195,27 +2195,27 @@ $result = $router-&gt;match($inputCmd);</pre></td></tr></table>
 </span><span class="lnt">21
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    &#39;httpServer&#39;        =&gt; [
-        &#39;class&#39;    =&gt; HttpServer::class,
-        &#39;port&#39;     =&gt; 18306,
-        &#39;listener&#39; =&gt; [
-            &#39;rpc&#39; =&gt; bean(&#39;rpcServer&#39;)
-        ],
-        &#39;process&#39;  =&gt; [
+<pre class="chroma">&#39;httpServer&#39;        =&gt; [
+    &#39;class&#39;    =&gt; HttpServer::class,
+    &#39;port&#39;     =&gt; 18306,
+    &#39;listener&#39; =&gt; [
+        &#39;rpc&#39; =&gt; bean(&#39;rpcServer&#39;)
+    ],
+    &#39;process&#39;  =&gt; [
 //            &#39;monitor&#39; =&gt; bean(MonitorProcess::class)
 //            &#39;crontab&#39; =&gt; bean(CrontabProcess::class)
-        ],
-        &#39;on&#39;       =&gt; [
+    ],
+    &#39;on&#39;       =&gt; [
 //            SwooleEvent::TASK   =&gt; bean(SyncTaskListener::class),  // Enable sync task
-            SwooleEvent::TASK   =&gt; bean(TaskListener::class),  // Enable task must task and finish event
-            SwooleEvent::FINISH =&gt; bean(FinishListener::class)
-        ],
-        /* @see HttpServer::$setting */
-        &#39;setting&#39;  =&gt; [
-            &#39;task_worker_num&#39;       =&gt; 12,
-            &#39;task_enable_coroutine&#39; =&gt; true
-        ]
-    ],</pre></td></tr></table>
+        SwooleEvent::TASK   =&gt; bean(TaskListener::class),  // Enable task must task and finish event
+        SwooleEvent::FINISH =&gt; bean(FinishListener::class)
+    ],
+    /* @see HttpServer::$setting */
+    &#39;setting&#39;  =&gt; [
+        &#39;task_worker_num&#39;       =&gt; 12,
+        &#39;task_enable_coroutine&#39; =&gt; true
+    ]
+],</pre></td></tr></table>
 </div>
 </div>
 <p><code>createServer</code>返回的是一个<code>Swoft\Http\Server\HttpServer</code>实例。</p>
@@ -2227,8 +2227,8 @@ $result = $router-&gt;match($inputCmd);</pre></td></tr></table>
 </span><span class="lnt">2
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">        // Start the server
-        $server-&gt;start();</pre></td></tr></table>
+<pre class="chroma">// Start the server
+$server-&gt;start();</pre></td></tr></table>
 </div>
 </div>
 <p>调用<code>Swoft\Http\Server\HttpServer</code>类的<code>start</code>方法。</p>
@@ -2247,17 +2247,17 @@ $result = $router-&gt;match($inputCmd);</pre></td></tr></table>
 </span><span class="lnt">11
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Start server
-     *
-     * @throws ServerException
-     * @throws ContainerException
-     */
-    public function start(): void
-    {
-        $this-&gt;swooleServer = new \Swoole\Http\Server($this-&gt;host, $this-&gt;port, $this-&gt;mode, $this-&gt;type);
-        $this-&gt;startSwoole();
-    }</pre></td></tr></table>
+<pre class="chroma">/**
+    * Start server
+    *
+    * @throws ServerException
+    * @throws ContainerException
+    */
+public function start(): void
+{
+    $this-&gt;swooleServer = new \Swoole\Http\Server($this-&gt;host, $this-&gt;port, $this-&gt;mode, $this-&gt;type);
+    $this-&gt;startSwoole();
+}</pre></td></tr></table>
 </div>
 </div>
 <p>声明<code>Swoole\Http\Server</code>对象，调用<code>startSwoole</code>方法。</p>
@@ -2327,66 +2327,66 @@ $result = $router-&gt;match($inputCmd);</pre></td></tr></table>
 </span><span class="lnt">60
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Bind swoole event and start swoole server
-     *
-     * @throws ServerException
-     * @throws Swoft\Bean\Exception\ContainerException
-     */
-    protected function startSwoole(): void
-    {
-        if (!$this-&gt;swooleServer) {
-            throw new ServerException(&#39;You must to new server before start swoole!&#39;);
-        }
+<pre class="chroma">/**
+    * Bind swoole event and start swoole server
+    *
+    * @throws ServerException
+    * @throws Swoft\Bean\Exception\ContainerException
+    */
+protected function startSwoole(): void
+{
+    if (!$this-&gt;swooleServer) {
+        throw new ServerException(&#39;You must to new server before start swoole!&#39;);
+    }
 
-        // Always enable coroutine hook on server
-        CLog::info(&#39;Swoole\Runtime::enableCoroutine&#39;);
-        Runtime::enableCoroutine();
+    // Always enable coroutine hook on server
+    CLog::info(&#39;Swoole\Runtime::enableCoroutine&#39;);
+    Runtime::enableCoroutine();
 
-        Swoft::trigger(ServerEvent::BEFORE_SETTING, $this);
+    Swoft::trigger(ServerEvent::BEFORE_SETTING, $this);
 
-        // Set settings
-        $this-&gt;swooleServer-&gt;set($this-&gt;setting);
-        // Update setting property
-        // $this-&gt;setSetting($this-&gt;swooleServer-&gt;setting);
+    // Set settings
+    $this-&gt;swooleServer-&gt;set($this-&gt;setting);
+    // Update setting property
+    // $this-&gt;setSetting($this-&gt;swooleServer-&gt;setting);
 
-        // Before Add event
-        Swoft::trigger(ServerEvent::BEFORE_ADDED_EVENT, $this);
+    // Before Add event
+    Swoft::trigger(ServerEvent::BEFORE_ADDED_EVENT, $this);
 
-        // Register events
-        $defaultEvents = $this-&gt;defaultEvents();
-        $swooleEvents  = array_merge($defaultEvents, $this-&gt;on);
+    // Register events
+    $defaultEvents = $this-&gt;defaultEvents();
+    $swooleEvents  = array_merge($defaultEvents, $this-&gt;on);
 
-        // Add events
-        $this-&gt;addEvent($this-&gt;swooleServer, $swooleEvents, $defaultEvents);
+    // Add events
+    $this-&gt;addEvent($this-&gt;swooleServer, $swooleEvents, $defaultEvents);
 
-        //After add event
-        Swoft::trigger(ServerEvent::AFTER_ADDED_EVENT, $this);
+    //After add event
+    Swoft::trigger(ServerEvent::AFTER_ADDED_EVENT, $this);
 
-        // Before listener
-        Swoft::trigger(ServerEvent::BEFORE_ADDED_LISTENER, $this);
+    // Before listener
+    Swoft::trigger(ServerEvent::BEFORE_ADDED_LISTENER, $this);
 
-        // Add port listener
-        $this-&gt;addListener();
+    // Add port listener
+    $this-&gt;addListener();
 
-        // Before bind process
-        Swoft::trigger(ServerEvent::BEFORE_ADDED_PROCESS, $this);
+    // Before bind process
+    Swoft::trigger(ServerEvent::BEFORE_ADDED_PROCESS, $this);
 
-        // Add Process
-        Swoft::trigger(ServerEvent::ADDED_PROCESS, $this);
+    // Add Process
+    Swoft::trigger(ServerEvent::ADDED_PROCESS, $this);
 
-        // After bind process
-        Swoft::trigger(ServerEvent::AFTER_ADDED_PROCESS, $this);
+    // After bind process
+    Swoft::trigger(ServerEvent::AFTER_ADDED_PROCESS, $this);
 
-        // Trigger event
-        Swoft::trigger(ServerEvent::BEFORE_START, $this, array_keys($swooleEvents));
+    // Trigger event
+    Swoft::trigger(ServerEvent::BEFORE_START, $this, array_keys($swooleEvents));
 
-        // Storage server instance
-        self::$server = $this;
+    // Storage server instance
+    self::$server = $this;
 
-        // Start swoole server
-        $this-&gt;swooleServer-&gt;start();
-    }</pre></td></tr></table>
+    // Start swoole server
+    $this-&gt;swooleServer-&gt;start();
+}</pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">

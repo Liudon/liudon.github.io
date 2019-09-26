@@ -341,42 +341,42 @@ if (!doNotTrack) {
 </span><span class="lnt">36
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Handle bean
-     *
-     * @return bool
-     * @throws ReflectionException
-     * @throws AnnotationException
-     */
-    public function handle(): bool
-    {
-        if (!$this-&gt;application-&gt;beforeBean()) {
-            return false;
-        }
+<pre class="chroma">/**
+    * Handle bean
+    *
+    * @return bool
+    * @throws ReflectionException
+    * @throws AnnotationException
+    */
+public function handle(): bool
+{
+    if (!$this-&gt;application-&gt;beforeBean()) {
+        return false;
+    }
 
-        $handler     = new BeanHandler();
-        $definitions = $this-&gt;getDefinitions();
-        $parsers     = AnnotationRegister::getParsers();
-        $annotations = AnnotationRegister::getAnnotations();
+    $handler     = new BeanHandler();
+    $definitions = $this-&gt;getDefinitions();
+    $parsers     = AnnotationRegister::getParsers();
+    $annotations = AnnotationRegister::getAnnotations();
 
-        BeanFactory::addDefinitions($definitions);
-        BeanFactory::addAnnotations($annotations);
-        BeanFactory::addParsers($parsers);
-        BeanFactory::setHandler($handler);
-        BeanFactory::init();
+    BeanFactory::addDefinitions($definitions);
+    BeanFactory::addAnnotations($annotations);
+    BeanFactory::addParsers($parsers);
+    BeanFactory::setHandler($handler);
+    BeanFactory::init();
 
-        /* @var Config $config*/
-        $config = BeanFactory::getBean(&#39;config&#39;);
+    /* @var Config $config*/
+    $config = BeanFactory::getBean(&#39;config&#39;);
 
-        CLog::info(&#39;config path=%s&#39;, $config-&gt;getPath());
-        CLog::info(&#39;config env=%s&#39;, $config-&gt;getEnv());
+    CLog::info(&#39;config path=%s&#39;, $config-&gt;getPath());
+    CLog::info(&#39;config env=%s&#39;, $config-&gt;getEnv());
 
-        $stats = BeanFactory::getStats();
+    $stats = BeanFactory::getStats();
 
-        CLog::info(&#39;Bean is initialized(%s)&#39;, SwoftHelper::formatStats($stats));
+    CLog::info(&#39;Bean is initialized(%s)&#39;, SwoftHelper::formatStats($stats));
 
-        return $this-&gt;application-&gt;afterBean();
-    }</pre></td></tr></table>
+    return $this-&gt;application-&gt;afterBean();
+}</pre></td></tr></table>
 </div>
 </div>
 <p>先通过<code>getDefinitions</code>方法获取所有的Bean定义。</p>
@@ -434,56 +434,56 @@ if (!doNotTrack) {
 </span><span class="lnt">50
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Get bean definitions
-     *
-     * @return array
-     */
-    private function getDefinitions(): array
-    {
-        // Core beans
-        $definitions = [];
-        $autoLoaders = AnnotationRegister::getAutoLoaders();
+<pre class="chroma">/**
+    * Get bean definitions
+    *
+    * @return array
+    */
+private function getDefinitions(): array
+{
+    // Core beans
+    $definitions = [];
+    $autoLoaders = AnnotationRegister::getAutoLoaders();
 
-        // get disabled loaders by application
-        $disabledLoaders = $this-&gt;application-&gt;getDisabledAutoLoaders();
+    // get disabled loaders by application
+    $disabledLoaders = $this-&gt;application-&gt;getDisabledAutoLoaders();
 
-        foreach ($autoLoaders as $autoLoader) {
-            if (!$autoLoader instanceof DefinitionInterface) {
-                continue;
-            }
-
-            $loaderClass = get_class($autoLoader);
-
-            // If the component is disabled by user.
-            if (isset($disabledLoaders[$loaderClass])) {
-                CLog::info(&#39;Auto loader(%s) is &lt;cyan&gt;disabled&lt;/cyan&gt;, skip handle it&#39;, $loaderClass);
-                continue;
-            }
-
-            // If the component is not enabled.
-            if ($autoLoader instanceof ComponentInterface &amp;&amp; !$autoLoader-&gt;isEnable()) {
-                continue;
-            }
-
-            $definitions = ArrayHelper::merge($definitions, $autoLoader-&gt;beans());
+    foreach ($autoLoaders as $autoLoader) {
+        if (!$autoLoader instanceof DefinitionInterface) {
+            continue;
         }
 
-        // Bean definitions
-        $beanFile = $this-&gt;application-&gt;getBeanFile();
-        $beanFile = alias($beanFile);
+        $loaderClass = get_class($autoLoader);
 
-        if (!file_exists($beanFile)) {
-            throw new InvalidArgumentException(
-                sprintf(&#39;The bean config file of %s is not exist!&#39;, $beanFile)
-            );
+        // If the component is disabled by user.
+        if (isset($disabledLoaders[$loaderClass])) {
+            CLog::info(&#39;Auto loader(%s) is &lt;cyan&gt;disabled&lt;/cyan&gt;, skip handle it&#39;, $loaderClass);
+            continue;
         }
 
-        $beanDefinitions = require $beanFile;
-        $definitions     = ArrayHelper::merge($definitions, $beanDefinitions);
+        // If the component is not enabled.
+        if ($autoLoader instanceof ComponentInterface &amp;&amp; !$autoLoader-&gt;isEnable()) {
+            continue;
+        }
 
-        return $definitions;
-    }</pre></td></tr></table>
+        $definitions = ArrayHelper::merge($definitions, $autoLoader-&gt;beans());
+    }
+
+    // Bean definitions
+    $beanFile = $this-&gt;application-&gt;getBeanFile();
+    $beanFile = alias($beanFile);
+
+    if (!file_exists($beanFile)) {
+        throw new InvalidArgumentException(
+            sprintf(&#39;The bean config file of %s is not exist!&#39;, $beanFile)
+        );
+    }
+
+    $beanDefinitions = require $beanFile;
+    $definitions     = ArrayHelper::merge($definitions, $beanDefinitions);
+
+    return $definitions;
+}</pre></td></tr></table>
 </div>
 </div>
 <p>通过<code>AnnotationRegister::getAutoLoaders()</code>拿到所有的autoloader对象，排除掉非<code>DefinitionInterface</code>对象，通过<code>bean()</code>方法获取定义的Bean信息。</p>
@@ -800,65 +800,65 @@ BeanFactory::init();</pre></td></tr></table>
 </span><span class="lnt">59
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Init
-     *
-     * @return void
-     * @throws AnnotationException
-     * @throws ReflectionException
-     */
-    public static function init(): void
-    {
-        Container::getInstance()-&gt;init();
-    }
+<pre class="chroma">/**
+    * Init
+    *
+    * @return void
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+public static function init(): void
+{
+    Container::getInstance()-&gt;init();
+}
 
-    ...
+...
 
-    /**
-     * Add definitions
-     *
-     * @param array $definitions
-     *
-     * @return void
-     */
-    public static function addDefinitions(array $definitions): void
-    {
-        Container::getInstance()-&gt;addDefinitions($definitions);
-    }
+/**
+    * Add definitions
+    *
+    * @param array $definitions
+    *
+    * @return void
+    */
+public static function addDefinitions(array $definitions): void
+{
+    Container::getInstance()-&gt;addDefinitions($definitions);
+}
 
-    /**
-     * Add annotations
-     *
-     * @param array $annotations
-     *
-     * @return void
-     */
-    public static function addAnnotations(array $annotations): void
-    {
-        Container::getInstance()-&gt;addAnnotations($annotations);
-    }
+/**
+    * Add annotations
+    *
+    * @param array $annotations
+    *
+    * @return void
+    */
+public static function addAnnotations(array $annotations): void
+{
+    Container::getInstance()-&gt;addAnnotations($annotations);
+}
 
-    /**
-     * Add annotation parsers
-     *
-     * @param array $annotationParsers
-     *
-     * @return void
-     */
-    public static function addParsers(array $annotationParsers): void
-    {
-        Container::getInstance()-&gt;addParsers($annotationParsers);
-    }
+/**
+    * Add annotation parsers
+    *
+    * @param array $annotationParsers
+    *
+    * @return void
+    */
+public static function addParsers(array $annotationParsers): void
+{
+    Container::getInstance()-&gt;addParsers($annotationParsers);
+}
 
-    /**
-     * Set bean handler
-     *
-     * @param HandlerInterface $handler
-     */
-    public static function setHandler(HandlerInterface $handler): void
-    {
-        Container::getInstance()-&gt;setHandler($handler);
-    }</pre></td></tr></table>
+/**
+    * Set bean handler
+    *
+    * @param HandlerInterface $handler
+    */
+public static function setHandler(HandlerInterface $handler): void
+{
+    Container::getInstance()-&gt;setHandler($handler);
+}</pre></td></tr></table>
 </div>
 </div>
 <p>这里可以看到所有的方法，最终都调用的是<code>Swoft\Bean\Container</code>类。</p>
@@ -910,50 +910,50 @@ BeanFactory::init();</pre></td></tr></table>
 </span><span class="lnt">44
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Add definitions
-     *
-     * @param array $definitions
-     *
-     * @return void
-     */
-    public function addDefinitions(array $definitions): void
-    {
-        $this-&gt;definitions = ArrayHelper::merge($this-&gt;definitions, $definitions);
-    }
+<pre class="chroma">/**
+    * Add definitions
+    *
+    * @param array $definitions
+    *
+    * @return void
+    */
+public function addDefinitions(array $definitions): void
+{
+    $this-&gt;definitions = ArrayHelper::merge($this-&gt;definitions, $definitions);
+}
 
-    /**
-     * Add annotations
-     *
-     * @param array $annotations
-     *
-     * @return void
-     */
-    public function addAnnotations(array $annotations): void
-    {
-        $this-&gt;annotations = ArrayHelper::merge($this-&gt;annotations, $annotations);
-    }
+/**
+    * Add annotations
+    *
+    * @param array $annotations
+    *
+    * @return void
+    */
+public function addAnnotations(array $annotations): void
+{
+    $this-&gt;annotations = ArrayHelper::merge($this-&gt;annotations, $annotations);
+}
 
-    /**
-     * Add annotation parsers
-     *
-     * @param array $annotationParsers
-     *
-     * @return void
-     */
-    public function addParsers(array $annotationParsers): void
-    {
-        $this-&gt;parsers = ArrayHelper::merge($this-&gt;parsers, $annotationParsers);
-    }
+/**
+    * Add annotation parsers
+    *
+    * @param array $annotationParsers
+    *
+    * @return void
+    */
+public function addParsers(array $annotationParsers): void
+{
+    $this-&gt;parsers = ArrayHelper::merge($this-&gt;parsers, $annotationParsers);
+}
 
-    
-    /**
-     * @param HandlerInterface $handler
-     */
-    public function setHandler(HandlerInterface $handler): void
-    {
-        $this-&gt;handler = $handler;
-    }</pre></td></tr></table>
+
+/**
+    * @param HandlerInterface $handler
+    */
+public function setHandler(HandlerInterface $handler): void
+{
+    $this-&gt;handler = $handler;
+}</pre></td></tr></table>
 </div>
 </div>
 <p>这四个方法就是注册属性，接下来是重头戏<code>init</code>方法。</p>
@@ -978,23 +978,23 @@ BeanFactory::init();</pre></td></tr></table>
 </span><span class="lnt">17
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Init
-     *
-     * @throws AnnotationException
-     * @throws ReflectionException
-     */
-    public function init(): void
-    {
-        // Parse annotations
-        $this-&gt;parseAnnotations();
+<pre class="chroma">/**
+    * Init
+    *
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+public function init(): void
+{
+    // Parse annotations
+    $this-&gt;parseAnnotations();
 
-        // Parse definitions
-        $this-&gt;parseDefinitions();
+    // Parse definitions
+    $this-&gt;parseDefinitions();
 
-        // Init beans
-        $this-&gt;initializeBeans();
-    }</pre></td></tr></table>
+    // Init beans
+    $this-&gt;initializeBeans();
+}</pre></td></tr></table>
 </div>
 </div>
 <p>先看<code>parseAnnotations</code>方法，从代码注释上也可以看出大概，解析注解，接下来我们看下具体是如何实现的。</p>
@@ -1016,20 +1016,20 @@ BeanFactory::init();</pre></td></tr></table>
 </span><span class="lnt">14
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Parse annotations
-     *
-     * @throws AnnotationException
-     */
-    private function parseAnnotations(): void
-    {
-        $annotationParser = new AnnotationObjParser(
-            $this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases
-        );
-        $annotationData   = $annotationParser-&gt;parseAnnotations($this-&gt;annotations, $this-&gt;parsers);
+<pre class="chroma">/**
+    * Parse annotations
+    *
+    * @throws AnnotationException
+    */
+private function parseAnnotations(): void
+{
+    $annotationParser = new AnnotationObjParser(
+        $this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases
+    );
+    $annotationData   = $annotationParser-&gt;parseAnnotations($this-&gt;annotations, $this-&gt;parsers);
 
-        [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases] = $annotationData;
-    }</pre></td></tr></table>
+    [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases] = $annotationData;
+}</pre></td></tr></table>
 </div>
 </div>
 <p>声明了一个<code>AnnotationObjParser</code>对象，调用了<code>parseAnnotations</code>方法。</p>
@@ -1059,28 +1059,28 @@ BeanFactory::init();</pre></td></tr></table>
 </span><span class="lnt">22
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Parse annotations
-     *
-     * @param array $annotations
-     * @param array $parsers
-     *
-     * @return array
-     * @throws AnnotationException
-     */
-    public function parseAnnotations(array $annotations, array $parsers): array
-    {
-        $this-&gt;parsers     = $parsers;
-        $this-&gt;annotations = $annotations;
+<pre class="chroma">/**
+    * Parse annotations
+    *
+    * @param array $annotations
+    * @param array $parsers
+    *
+    * @return array
+    * @throws AnnotationException
+    */
+public function parseAnnotations(array $annotations, array $parsers): array
+{
+    $this-&gt;parsers     = $parsers;
+    $this-&gt;annotations = $annotations;
 
-        foreach ($this-&gt;annotations as $loadNameSpace =&gt; $classes) {
-            foreach ($classes as $className =&gt; $classOneAnnotations) {
-                $this-&gt;parseOneClassAnnotations($className, $classOneAnnotations);
-            }
+    foreach ($this-&gt;annotations as $loadNameSpace =&gt; $classes) {
+        foreach ($classes as $className =&gt; $classOneAnnotations) {
+            $this-&gt;parseOneClassAnnotations($className, $classOneAnnotations);
         }
+    }
 
-        return [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases];
-    }</pre></td></tr></table>
+    return [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases];
+}</pre></td></tr></table>
 </div>
 </div>
 <p>这里遍历所有的<code>annotation</code>类，循环调用<code>parseOneClassAnnotations</code>进行解析。</p>
@@ -1165,83 +1165,83 @@ BeanFactory::init();</pre></td></tr></table>
 </span><span class="lnt">77
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Parse class all annotations
-     *
-     * @param string $className
-     * @param array  $classOneAnnotations
-     *
-     * @throws AnnotationException
-     */
-    private function parseOneClassAnnotations(string $className, array $classOneAnnotations): void
-    {
-        // Check class annotation tag
-        if (!isset($classOneAnnotations[&#39;annotation&#39;])) {
-            throw new AnnotationException(
-                sprintf(&#39;Property or method(%s) with `@xxx` must be define class annotation&#39;, $className)
-            );
+<pre class="chroma">/**
+    * Parse class all annotations
+    *
+    * @param string $className
+    * @param array  $classOneAnnotations
+    *
+    * @throws AnnotationException
+    */
+private function parseOneClassAnnotations(string $className, array $classOneAnnotations): void
+{
+    // Check class annotation tag
+    if (!isset($classOneAnnotations[&#39;annotation&#39;])) {
+        throw new AnnotationException(
+            sprintf(&#39;Property or method(%s) with `@xxx` must be define class annotation&#39;, $className)
+        );
+    }
+
+    // Parse class annotations
+    $classAnnotations = $classOneAnnotations[&#39;annotation&#39;];
+    $reflectionClass  = $classOneAnnotations[&#39;reflection&#39;];
+
+    $classAry = [
+        $className,
+        $reflectionClass,
+        $classAnnotations
+    ];
+
+    $objectDefinition = $this-&gt;parseClassAnnotations($classAry);
+
+    // Parse property annotations
+    $propertyInjects        = [];
+    $propertyAllAnnotations = $classOneAnnotations[&#39;properties&#39;] ?? [];
+    foreach ($propertyAllAnnotations as $propertyName =&gt; $propertyOneAnnotations) {
+        $proAnnotations = $propertyOneAnnotations[&#39;annotation&#39;] ?? [];
+        $propertyInject = $this-&gt;parsePropertyAnnotations($classAry, $propertyName, $proAnnotations);
+        if ($propertyInject) {
+            $propertyInjects[$propertyName] = $propertyInject;
         }
+    }
 
-        // Parse class annotations
-        $classAnnotations = $classOneAnnotations[&#39;annotation&#39;];
-        $reflectionClass  = $classOneAnnotations[&#39;reflection&#39;];
+    // Parse method annotations
+    $methodInjects        = [];
+    $methodAllAnnotations = $classOneAnnotations[&#39;methods&#39;] ?? [];
+    foreach ($methodAllAnnotations as $methodName =&gt; $methodOneAnnotations) {
+        $methodAnnotations = $methodOneAnnotations[&#39;annotation&#39;] ?? [];
 
-        $classAry = [
-            $className,
-            $reflectionClass,
-            $classAnnotations
-        ];
-
-        $objectDefinition = $this-&gt;parseClassAnnotations($classAry);
-
-        // Parse property annotations
-        $propertyInjects        = [];
-        $propertyAllAnnotations = $classOneAnnotations[&#39;properties&#39;] ?? [];
-        foreach ($propertyAllAnnotations as $propertyName =&gt; $propertyOneAnnotations) {
-            $proAnnotations = $propertyOneAnnotations[&#39;annotation&#39;] ?? [];
-            $propertyInject = $this-&gt;parsePropertyAnnotations($classAry, $propertyName, $proAnnotations);
-            if ($propertyInject) {
-                $propertyInjects[$propertyName] = $propertyInject;
-            }
+        $methodInject = $this-&gt;parseMethodAnnotations($classAry, $methodName, $methodAnnotations);
+        if ($methodInject) {
+            $methodInjects[$methodName] = $methodInject;
         }
+    }
 
-        // Parse method annotations
-        $methodInjects        = [];
-        $methodAllAnnotations = $classOneAnnotations[&#39;methods&#39;] ?? [];
-        foreach ($methodAllAnnotations as $methodName =&gt; $methodOneAnnotations) {
-            $methodAnnotations = $methodOneAnnotations[&#39;annotation&#39;] ?? [];
+    if (!$objectDefinition) {
+        return;
+    }
 
-            $methodInject = $this-&gt;parseMethodAnnotations($classAry, $methodName, $methodAnnotations);
-            if ($methodInject) {
-                $methodInjects[$methodName] = $methodInject;
-            }
-        }
+    if (!empty($propertyInjects)) {
+        $objectDefinition-&gt;setPropertyInjections($propertyInjects);
+    }
 
-        if (!$objectDefinition) {
-            return;
-        }
+    if (!empty($methodInjects)) {
+        $objectDefinition-&gt;setMethodInjections($methodInjects);
+    }
 
-        if (!empty($propertyInjects)) {
-            $objectDefinition-&gt;setPropertyInjections($propertyInjects);
-        }
+    // Object definition and class name
+    $name         = $objectDefinition-&gt;getName();
+    $aliase       = $objectDefinition-&gt;getAlias();
+    $classNames   = $this-&gt;classNames[$className] ?? [];
+    $classNames[] = $name;
 
-        if (!empty($methodInjects)) {
-            $objectDefinition-&gt;setMethodInjections($methodInjects);
-        }
+    $this-&gt;classNames[$className]   = array_unique($classNames);
+    $this-&gt;objectDefinitions[$name] = $objectDefinition;
 
-        // Object definition and class name
-        $name         = $objectDefinition-&gt;getName();
-        $aliase       = $objectDefinition-&gt;getAlias();
-        $classNames   = $this-&gt;classNames[$className] ?? [];
-        $classNames[] = $name;
-
-        $this-&gt;classNames[$className]   = array_unique($classNames);
-        $this-&gt;objectDefinitions[$name] = $objectDefinition;
-
-        if (!empty($aliase)) {
-            $this-&gt;aliases[$aliase] = $name;
-        }
-    }</pre></td></tr></table>
+    if (!empty($aliase)) {
+        $this-&gt;aliases[$aliase] = $name;
+    }
+}</pre></td></tr></table>
 </div>
 </div>
 <p>这里可以看到分别有类注解、属性注解和方法注解三类。</p>
@@ -1292,47 +1292,47 @@ BeanFactory::init();</pre></td></tr></table>
 </span><span class="lnt">41
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * @param array $classAry
-     *
-     * @return ObjectDefinition|null
-     */
-    private function parseClassAnnotations(array $classAry): ?ObjectDefinition
-    {
-        [, , $classAnnotations] = $classAry;
+<pre class="chroma">/**
+    * @param array $classAry
+    *
+    * @return ObjectDefinition|null
+    */
+private function parseClassAnnotations(array $classAry): ?ObjectDefinition
+{
+    [, , $classAnnotations] = $classAry;
 
-        $objectDefinition = null;
-        foreach ($classAnnotations as $annotation) {
-            $annotationClass = get_class($annotation);
-            if (!isset($this-&gt;parsers[$annotationClass])) {
-                continue;
-            }
-
-            $parserClassName  = $this-&gt;parsers[$annotationClass];
-            $annotationParser = $this-&gt;getAnnotationParser($classAry, $parserClassName);
-
-            $data = $annotationParser-&gt;parse(Parser::TYPE_CLASS, $annotation);
-            if (empty($data)) {
-                continue;
-            }
-
-            if (count($data) !== 4) {
-                throw new InvalidArgumentException(sprintf(&#39;%s annotation parse must be 4 size&#39;, $annotationClass));
-            }
-
-            [$name, $className, $scope, $alias] = $data;
-            $name = empty($name) ? $className : $name;
-
-            if (empty($className)) {
-                throw new InvalidArgumentException(sprintf(&#39;%s with class name can not be empty&#39;, $annotationClass));
-            }
-
-            // Multiple coverage
-            $objectDefinition = new ObjectDefinition($name, $className, $scope, $alias);
+    $objectDefinition = null;
+    foreach ($classAnnotations as $annotation) {
+        $annotationClass = get_class($annotation);
+        if (!isset($this-&gt;parsers[$annotationClass])) {
+            continue;
         }
 
-        return $objectDefinition;
-    }</pre></td></tr></table>
+        $parserClassName  = $this-&gt;parsers[$annotationClass];
+        $annotationParser = $this-&gt;getAnnotationParser($classAry, $parserClassName);
+
+        $data = $annotationParser-&gt;parse(Parser::TYPE_CLASS, $annotation);
+        if (empty($data)) {
+            continue;
+        }
+
+        if (count($data) !== 4) {
+            throw new InvalidArgumentException(sprintf(&#39;%s annotation parse must be 4 size&#39;, $annotationClass));
+        }
+
+        [$name, $className, $scope, $alias] = $data;
+        $name = empty($name) ? $className : $name;
+
+        if (empty($className)) {
+            throw new InvalidArgumentException(sprintf(&#39;%s with class name can not be empty&#39;, $annotationClass));
+        }
+
+        // Multiple coverage
+        $objectDefinition = new ObjectDefinition($name, $className, $scope, $alias);
+    }
+
+    return $objectDefinition;
+}</pre></td></tr></table>
 </div>
 </div>
 <p>类注解，这里会调用对应解析类的<code>parse</code>方法。</p>
@@ -1829,19 +1829,19 @@ class WsModuleParser extends Parser
 </span><span class="lnt">13
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Parse definitions
-     */
-    private function parseDefinitions(): void
-    {
-        $annotationParser = new DefinitionObjParser(
-            $this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases
-        );
+<pre class="chroma">/**
+    * Parse definitions
+    */
+private function parseDefinitions(): void
+{
+    $annotationParser = new DefinitionObjParser(
+        $this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases
+    );
 
-        // Collect info
-        $definitionData = $annotationParser-&gt;parseDefinitions();
-        [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases] = $definitionData;
-    }</pre></td></tr></table>
+    // Collect info
+    $definitionData = $annotationParser-&gt;parseDefinitions();
+    [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases] = $definitionData;
+}</pre></td></tr></table>
 </div>
 </div>
 <p>声明了一个<code>DefinitionObjParser</code>对象，调用了<code>parseDefinitions</code>方法。</p>
@@ -1868,25 +1868,25 @@ class WsModuleParser extends Parser
 </span><span class="lnt">19
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Parse definitions
-     *
-     * @return array
-     */
-    public function parseDefinitions(): array
-    {
-        foreach ($this-&gt;definitions as $beanName =&gt; $definition) {
-            if (isset($this-&gt;objectDefinitions[$beanName])) {
-                $objectDefinition = $this-&gt;objectDefinitions[$beanName];
-                $this-&gt;resetObjectDefinition($beanName, $objectDefinition, $definition);
-                continue;
-            }
-
-            $this-&gt;createObjectDefinition($beanName, $definition);
+<pre class="chroma">/**
+    * Parse definitions
+    *
+    * @return array
+    */
+public function parseDefinitions(): array
+{
+    foreach ($this-&gt;definitions as $beanName =&gt; $definition) {
+        if (isset($this-&gt;objectDefinitions[$beanName])) {
+            $objectDefinition = $this-&gt;objectDefinitions[$beanName];
+            $this-&gt;resetObjectDefinition($beanName, $objectDefinition, $definition);
+            continue;
         }
 
-        return [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases];
-    }</pre></td></tr></table>
+        $this-&gt;createObjectDefinition($beanName, $definition);
+    }
+
+    return [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases];
+}</pre></td></tr></table>
 </div>
 </div>
 <p>遍历所有的<code>Bean</code>对象，调用<code>createObjectDefinition</code>方法。</p>
@@ -1916,28 +1916,28 @@ class WsModuleParser extends Parser
 </span><span class="lnt">22
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Create object definition for definition
-     *
-     * @param string $beanName
-     * @param array  $definition
-     */
-    private function createObjectDefinition(string $beanName, array $definition): void
-    {
-        $className = $definition[&#39;class&#39;] ?? &#39;&#39;;
-        if (empty($className)) {
-            throw new InvalidArgumentException(sprintf(&#39;%s key for definition must be defined class&#39;, $beanName));
-        }
+<pre class="chroma">/**
+    * Create object definition for definition
+    *
+    * @param string $beanName
+    * @param array  $definition
+    */
+private function createObjectDefinition(string $beanName, array $definition): void
+{
+    $className = $definition[&#39;class&#39;] ?? &#39;&#39;;
+    if (empty($className)) {
+        throw new InvalidArgumentException(sprintf(&#39;%s key for definition must be defined class&#39;, $beanName));
+    }
 
-        $objDefinition = new ObjectDefinition($beanName, $className);
-        $objDefinition = $this-&gt;updateObjectDefinitionByDefinition($objDefinition, $definition);
+    $objDefinition = new ObjectDefinition($beanName, $className);
+    $objDefinition = $this-&gt;updateObjectDefinitionByDefinition($objDefinition, $definition);
 
-        $classNames   = $this-&gt;classNames[$className] ?? [];
-        $classNames[] = $beanName;
+    $classNames   = $this-&gt;classNames[$className] ?? [];
+    $classNames[] = $beanName;
 
-        $this-&gt;classNames[$className]       = array_unique($classNames);
-        $this-&gt;objectDefinitions[$beanName] = $objDefinition;
-    }</pre></td></tr></table>
+    $this-&gt;classNames[$className]       = array_unique($classNames);
+    $this-&gt;objectDefinitions[$beanName] = $objDefinition;
+}</pre></td></tr></table>
 </div>
 </div>
 <p>声明了<code>ObjectDefinition</code>对象，调用了<code>updateObjectDefinitionByDefinition</code>方法。</p>
@@ -1997,58 +1997,58 @@ class WsModuleParser extends Parser
 </span><span class="lnt">52
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Update definition
-     *
-     * @param ObjectDefinition $objDfn
-     * @param array            $definition
-     *
-     * @return ObjectDefinition
-     */
-    private function updateObjectDefinitionByDefinition(ObjectDefinition $objDfn, array $definition): ObjectDefinition
-    {
-        [$constructInject, $propertyInjects, $option] = $this-&gt;parseDefinition($definition);
+<pre class="chroma">/**
+    * Update definition
+    *
+    * @param ObjectDefinition $objDfn
+    * @param array            $definition
+    *
+    * @return ObjectDefinition
+    */
+private function updateObjectDefinitionByDefinition(ObjectDefinition $objDfn, array $definition): ObjectDefinition
+{
+    [$constructInject, $propertyInjects, $option] = $this-&gt;parseDefinition($definition);
 
-        // Set construct inject
-        if (!empty($constructInject)) {
-            $objDfn-&gt;setConstructorInjection($constructInject);
-        }
+    // Set construct inject
+    if (!empty($constructInject)) {
+        $objDfn-&gt;setConstructorInjection($constructInject);
+    }
 
-        // Set property inject
-        foreach ($propertyInjects as $propertyName =&gt; $propertyInject) {
-            $objDfn-&gt;setPropertyInjection($propertyName, $propertyInject);
-        }
+    // Set property inject
+    foreach ($propertyInjects as $propertyName =&gt; $propertyInject) {
+        $objDfn-&gt;setPropertyInjection($propertyName, $propertyInject);
+    }
 
-        $scopes = [
-            Bean::SINGLETON,
-            Bean::PROTOTYPE,
-            Bean::REQUEST,
-        ];
+    $scopes = [
+        Bean::SINGLETON,
+        Bean::PROTOTYPE,
+        Bean::REQUEST,
+    ];
 
-        $scope = $option[&#39;scope&#39;] ?? &#39;&#39;;
-        $alias = $option[&#39;alias&#39;] ?? &#39;&#39;;
+    $scope = $option[&#39;scope&#39;] ?? &#39;&#39;;
+    $alias = $option[&#39;alias&#39;] ?? &#39;&#39;;
 
-        if (!empty($scope) &amp;&amp; !in_array($scope, $scopes, true)) {
-            throw new InvalidArgumentException(&#39;Scope for definition is not undefined&#39;);
-        }
+    if (!empty($scope) &amp;&amp; !in_array($scope, $scopes, true)) {
+        throw new InvalidArgumentException(&#39;Scope for definition is not undefined&#39;);
+    }
 
-        // Update scope
-        if (!empty($scope)) {
-            $objDfn-&gt;setScope($scope);
-        }
+    // Update scope
+    if (!empty($scope)) {
+        $objDfn-&gt;setScope($scope);
+    }
 
-        // Update alias
-        if (!empty($alias)) {
-            $objDfn-&gt;setAlias($alias);
+    // Update alias
+    if (!empty($alias)) {
+        $objDfn-&gt;setAlias($alias);
 
-            $objAlias = $objDfn-&gt;getAlias();
-            unset($this-&gt;aliases[$objAlias]);
+        $objAlias = $objDfn-&gt;getAlias();
+        unset($this-&gt;aliases[$objAlias]);
 
-            $this-&gt;aliases[$alias] = $objDfn-&gt;getName();
-        }
+        $this-&gt;aliases[$alias] = $objDfn-&gt;getName();
+    }
 
-        return $objDfn;
-    }</pre></td></tr></table>
+    return $objDfn;
+}</pre></td></tr></table>
 </div>
 </div>
 <p>这里调用了<code>parseDefinition</code>方法进行解析。</p>
@@ -2121,71 +2121,71 @@ class WsModuleParser extends Parser
 </span><span class="lnt">65
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Parse definition
-     *
-     * @param array $definition
-     *
-     * @return array
-     */
-    private function parseDefinition(array $definition): array
-    {
-        // Remove class key
-        unset($definition[&#39;class&#39;]);
+<pre class="chroma">/**
+    * Parse definition
+    *
+    * @param array $definition
+    *
+    * @return array
+    */
+private function parseDefinition(array $definition): array
+{
+    // Remove class key
+    unset($definition[&#39;class&#39;]);
 
-        // Parse construct
-        $constructArgs = $definition[0] ?? [];
-        if (!is_array($constructArgs)) {
-            throw new InvalidArgumentException(&#39;Construct args for definition must be array&#39;);
+    // Parse construct
+    $constructArgs = $definition[0] ?? [];
+    if (!is_array($constructArgs)) {
+        throw new InvalidArgumentException(&#39;Construct args for definition must be array&#39;);
+    }
+
+    // Parse construct args
+    $argInjects = [];
+    foreach ($constructArgs as $arg) {
+        [$argValue, $argIsRef] = $this-&gt;getValueByRef($arg);
+
+        $argInjects[] = new ArgsInjection($argValue, $argIsRef);
+    }
+
+    // Set construct inject
+    $constructInject = null;
+    if (!empty($argInjects)) {
+        $constructInject = new MethodInjection(&#39;__construct&#39;, $argInjects);
+    }
+
+    // Remove construct definition
+    unset($definition[0]);
+
+    // Parse definition option
+    $option = $definition[&#39;__option&#39;] ?? [];
+    if (!is_array($option)) {
+        throw new InvalidArgumentException(&#39;__option for definition must be array&#39;);
+    }
+
+    // Remove `__option`
+    unset($definition[&#39;__option&#39;]);
+
+    // Parse definition properties
+    $propertyInjects = [];
+    foreach ($definition as $propertyName =&gt; $propertyValue) {
+        if (!is_string($propertyName)) {
+            throw new InvalidArgumentException(&#39;Property key from definition must be string&#39;);
         }
 
-        // Parse construct args
-        $argInjects = [];
-        foreach ($constructArgs as $arg) {
-            [$argValue, $argIsRef] = $this-&gt;getValueByRef($arg);
+        [$proValue, $proIsRef] = $this-&gt;getValueByRef($propertyValue);
 
-            $argInjects[] = new ArgsInjection($argValue, $argIsRef);
+        // Parse property for array
+        if (is_array($proValue)) {
+            $proValue = $this-&gt;parseArrayProperty($proValue);
         }
 
-        // Set construct inject
-        $constructInject = null;
-        if (!empty($argInjects)) {
-            $constructInject = new MethodInjection(&#39;__construct&#39;, $argInjects);
-        }
+        $propertyInject = new PropertyInjection($propertyName, $proValue, $proIsRef);
 
-        // Remove construct definition
-        unset($definition[0]);
+        $propertyInjects[$propertyName] = $propertyInject;
+    }
 
-        // Parse definition option
-        $option = $definition[&#39;__option&#39;] ?? [];
-        if (!is_array($option)) {
-            throw new InvalidArgumentException(&#39;__option for definition must be array&#39;);
-        }
-
-        // Remove `__option`
-        unset($definition[&#39;__option&#39;]);
-
-        // Parse definition properties
-        $propertyInjects = [];
-        foreach ($definition as $propertyName =&gt; $propertyValue) {
-            if (!is_string($propertyName)) {
-                throw new InvalidArgumentException(&#39;Property key from definition must be string&#39;);
-            }
-
-            [$proValue, $proIsRef] = $this-&gt;getValueByRef($propertyValue);
-
-            // Parse property for array
-            if (is_array($proValue)) {
-                $proValue = $this-&gt;parseArrayProperty($proValue);
-            }
-
-            $propertyInject = new PropertyInjection($propertyName, $proValue, $proIsRef);
-
-            $propertyInjects[$propertyName] = $propertyInject;
-        }
-
-        return [$constructInject, $propertyInjects, $option];
-    }</pre></td></tr></table>
+    return [$constructInject, $propertyInjects, $option];
+}</pre></td></tr></table>
 </div>
 </div>
 <p>解析<code>__construct</code>方法和传参，解析属性信息。</p>
@@ -2226,35 +2226,35 @@ class WsModuleParser extends Parser
 </span><span class="lnt">29
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Initialize beans
-     *
-     * @throws InvalidArgumentException
-     * @throws ReflectionException
-     */
-    private function initializeBeans(): void
-    {
-        /* @var ObjectDefinition $objectDefinition */
-        foreach ($this-&gt;objectDefinitions as $beanName =&gt; $objectDefinition) {
-            $scope = $objectDefinition-&gt;getScope();
-            // Exclude request
-            if ($scope === Bean::REQUEST) {
-                $this-&gt;requestDefinitions[$beanName] = $objectDefinition;
-                unset($this-&gt;objectDefinitions[$beanName]);
-                continue;
-            }
-
-            // Exclude session
-            if ($scope === Bean::SESSION) {
-                $this-&gt;sessionDefinitions[$beanName] = $objectDefinition;
-                unset($this-&gt;objectDefinitions[$beanName]);
-                continue;
-            }
-
-            // New bean
-            $this-&gt;newBean($beanName);
+<pre class="chroma">/**
+    * Initialize beans
+    *
+    * @throws InvalidArgumentException
+    * @throws ReflectionException
+    */
+private function initializeBeans(): void
+{
+    /* @var ObjectDefinition $objectDefinition */
+    foreach ($this-&gt;objectDefinitions as $beanName =&gt; $objectDefinition) {
+        $scope = $objectDefinition-&gt;getScope();
+        // Exclude request
+        if ($scope === Bean::REQUEST) {
+            $this-&gt;requestDefinitions[$beanName] = $objectDefinition;
+            unset($this-&gt;objectDefinitions[$beanName]);
+            continue;
         }
-    }</pre></td></tr></table>
+
+        // Exclude session
+        if ($scope === Bean::SESSION) {
+            $this-&gt;sessionDefinitions[$beanName] = $objectDefinition;
+            unset($this-&gt;objectDefinitions[$beanName]);
+            continue;
+        }
+
+        // New bean
+        $this-&gt;newBean($beanName);
+    }
+}</pre></td></tr></table>
 </div>
 </div>
 <p>对于<code>scope</code>不为<code>Bean::REQUEST</code>和<code>Bean::SESSION</code>的，调用<code>newBean</code>方法。</p>
@@ -2322,66 +2322,66 @@ class WsModuleParser extends Parser
 </span><span class="lnt">60
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Initialize beans
-     *
-     * @param string $beanName
-     * @param string $id
-     *
-     * @return object
-     * @throws ReflectionException
-     */
-    private function newBean(string $beanName, string $id = &#39;&#39;)
-    {
-        // First, check bean whether has been create.
-        if (isset($this-&gt;singletonPool[$beanName]) || isset($this-&gt;prototypePool[$beanName])) {
-            return $this-&gt;get($beanName);
-        }
+<pre class="chroma">/**
+    * Initialize beans
+    *
+    * @param string $beanName
+    * @param string $id
+    *
+    * @return object
+    * @throws ReflectionException
+    */
+private function newBean(string $beanName, string $id = &#39;&#39;)
+{
+    // First, check bean whether has been create.
+    if (isset($this-&gt;singletonPool[$beanName]) || isset($this-&gt;prototypePool[$beanName])) {
+        return $this-&gt;get($beanName);
+    }
 
-        // Get object definition
-        $objectDefinition = $this-&gt;getNewObjectDefinition($beanName);
+    // Get object definition
+    $objectDefinition = $this-&gt;getNewObjectDefinition($beanName);
 
-        $scope     = $objectDefinition-&gt;getScope();
-        $alias     = $objectDefinition-&gt;getAlias();
-        $className = $objectDefinition-&gt;getClassName();
+    $scope     = $objectDefinition-&gt;getScope();
+    $alias     = $objectDefinition-&gt;getAlias();
+    $className = $objectDefinition-&gt;getClassName();
 
-        // Cache reflection class info
-        Reflections::cache($className);
+    // Cache reflection class info
+    Reflections::cache($className);
 
-        // Before initialize bean
-        $this-&gt;beforeInit($beanName, $className, $objectDefinition);
+    // Before initialize bean
+    $this-&gt;beforeInit($beanName, $className, $objectDefinition);
 
-        $constructArgs   = [];
-        $constructInject = $objectDefinition-&gt;getConstructorInjection();
-        if ($constructInject !== null) {
-            $constructArgs = $this-&gt;getConstructParams($constructInject, $id);
-        }
+    $constructArgs   = [];
+    $constructInject = $objectDefinition-&gt;getConstructorInjection();
+    if ($constructInject !== null) {
+        $constructArgs = $this-&gt;getConstructParams($constructInject, $id);
+    }
 
-        $propertyInjects = $objectDefinition-&gt;getPropertyInjections();
+    $propertyInjects = $objectDefinition-&gt;getPropertyInjections();
 
-        // Proxy class
-        if ($this-&gt;handler) {
-            $className = $this-&gt;handler-&gt;classProxy($className);
-        }
+    // Proxy class
+    if ($this-&gt;handler) {
+        $className = $this-&gt;handler-&gt;classProxy($className);
+    }
 
-        $reflectionClass = new ReflectionClass($className);
-        $reflectObject   = $this-&gt;newInstance($reflectionClass, $constructArgs);
+    $reflectionClass = new ReflectionClass($className);
+    $reflectObject   = $this-&gt;newInstance($reflectionClass, $constructArgs);
 
-        // Inject properties values
-        $this-&gt;newProperty($reflectObject, $reflectionClass, $propertyInjects, $id);
+    // Inject properties values
+    $this-&gt;newProperty($reflectObject, $reflectionClass, $propertyInjects, $id);
 
-        // Alias
-        if (!empty($alias)) {
-            $this-&gt;aliases[$alias] = $beanName;
-        }
+    // Alias
+    if (!empty($alias)) {
+        $this-&gt;aliases[$alias] = $beanName;
+    }
 
-        // Call init method if exist
-        if ($reflectionClass-&gt;hasMethod(self::INIT_METHOD)) {
-            $reflectObject-&gt;{self::INIT_METHOD}();
-        }
+    // Call init method if exist
+    if ($reflectionClass-&gt;hasMethod(self::INIT_METHOD)) {
+        $reflectObject-&gt;{self::INIT_METHOD}();
+    }
 
-        return $this-&gt;setNewBean($beanName, $scope, $reflectObject, $id);
-    }</pre></td></tr></table>
+    return $this-&gt;setNewBean($beanName, $scope, $reflectObject, $id);
+}</pre></td></tr></table>
 </div>
 </div>
 <p>通过反射实例化<code>Bean</code>对应的类，注册对应的属性。</p>
@@ -2420,35 +2420,35 @@ class WsModuleParser extends Parser
 </span><span class="lnt">29
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * @param string $beanName
-     * @param string $scope
-     * @param object $object
-     * @param string $id
-     *
-     * @return object
-     */
-    private function setNewBean(string $beanName, string $scope, $object, string $id = &#39;&#39;)
-    {
-        switch ($scope) {
-            case Bean::SINGLETON: // Singleton
-                $this-&gt;singletonPool[$beanName] = $object;
-                break;
-            case Bean::PROTOTYPE:
-                $this-&gt;prototypePool[$beanName] = $object;
-                // Clone it
-                $object = clone $object;
-                break;
-            case Bean::REQUEST:
-                $this-&gt;requestPool[$id][$beanName] = $object;
-                break;
-            case Bean::SESSION:
-                $this-&gt;sessionPool[$id][$beanName] = $object;
-                break;
-        }
+<pre class="chroma">/**
+    * @param string $beanName
+    * @param string $scope
+    * @param object $object
+    * @param string $id
+    *
+    * @return object
+    */
+private function setNewBean(string $beanName, string $scope, $object, string $id = &#39;&#39;)
+{
+    switch ($scope) {
+        case Bean::SINGLETON: // Singleton
+            $this-&gt;singletonPool[$beanName] = $object;
+            break;
+        case Bean::PROTOTYPE:
+            $this-&gt;prototypePool[$beanName] = $object;
+            // Clone it
+            $object = clone $object;
+            break;
+        case Bean::REQUEST:
+            $this-&gt;requestPool[$id][$beanName] = $object;
+            break;
+        case Bean::SESSION:
+            $this-&gt;sessionPool[$id][$beanName] = $object;
+            break;
+    }
 
-        return $object;
-    }</pre></td></tr></table>
+    return $object;
+}</pre></td></tr></table>
 </div>
 </div>
 <p><code>setNewBean</code>方法，根据对应的scope信息，将实例化后的反射类注册到对应的类属性上。</p>

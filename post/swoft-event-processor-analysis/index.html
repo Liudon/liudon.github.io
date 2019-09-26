@@ -327,28 +327,28 @@ if (!doNotTrack) {
 </span><span class="lnt">22
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Handle event register
-     * @return bool
-     */
-    public function handle(): bool
-    {
-        if (!$this-&gt;application-&gt;beforeEvent()) {
-            CLog::warning(&#39;Stop event processor by beforeEvent return false&#39;);
-            return false;
-        }
+<pre class="chroma">/**
+    * Handle event register
+    * @return bool
+    */
+public function handle(): bool
+{
+    if (!$this-&gt;application-&gt;beforeEvent()) {
+        CLog::warning(&#39;Stop event processor by beforeEvent return false&#39;);
+        return false;
+    }
 
-        /** @var EventManager $eventManager */
-        $eventManager = bean(&#39;eventManager&#39;);
-        [$count1, $count2] = ListenerRegister::register($eventManager);
+    /** @var EventManager $eventManager */
+    $eventManager = bean(&#39;eventManager&#39;);
+    [$count1, $count2] = ListenerRegister::register($eventManager);
 
-        CLog::info(&#39;Event manager initialized(%d listener, %d subscriber)&#39;, $count1, $count2);
+    CLog::info(&#39;Event manager initialized(%d listener, %d subscriber)&#39;, $count1, $count2);
 
-        // Trigger a app init event
-        Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);
+    // Trigger a app init event
+    Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);
 
-        return $this-&gt;application-&gt;afterEvent();
-    }</pre></td></tr></table>
+    return $this-&gt;application-&gt;afterEvent();
+}</pre></td></tr></table>
 </div>
 </div>
 <p>获取<code>eventManager</code>的<code>Bean</code>实例，对应为<code>Swoft\Event\Manager\EventManager</code>类。</p>
@@ -398,39 +398,39 @@ if (!doNotTrack) {
 </span><span class="lnt">33
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * @param EventManager $em
-     *
-     * @return array
-     */
-    public static function register(EventManager $em): array
-    {
-        foreach (self::$listeners as $className =&gt; $eventInfo) {
-            $listener = Swoft::getSingleton($className);
+<pre class="chroma">/**
+    * @param EventManager $em
+    *
+    * @return array
+    */
+public static function register(EventManager $em): array
+{
+    foreach (self::$listeners as $className =&gt; $eventInfo) {
+        $listener = Swoft::getSingleton($className);
 
-            if (!$listener instanceof EventHandlerInterface) {
-                throw new RuntimeException(&#34;The event listener class &#39;{$className}&#39; must be instanceof EventHandlerInterface&#34;);
-            }
-
-            $em-&gt;addListener($listener, $eventInfo);
+        if (!$listener instanceof EventHandlerInterface) {
+            throw new RuntimeException(&#34;The event listener class &#39;{$className}&#39; must be instanceof EventHandlerInterface&#34;);
         }
 
-        foreach (self::$subscribers as $className) {
-            $subscriber = Swoft::getSingleton($className);
-            if (!$subscriber instanceof EventSubscriberInterface) {
-                throw new RuntimeException(&#34;The event subscriber class &#39;{$className}&#39; must be instanceof EventSubscriberInterface&#34;);
-            }
+        $em-&gt;addListener($listener, $eventInfo);
+    }
 
-            $em-&gt;addSubscriber($subscriber);
+    foreach (self::$subscribers as $className) {
+        $subscriber = Swoft::getSingleton($className);
+        if (!$subscriber instanceof EventSubscriberInterface) {
+            throw new RuntimeException(&#34;The event subscriber class &#39;{$className}&#39; must be instanceof EventSubscriberInterface&#34;);
         }
 
-        $count1 = count(self::$listeners);
-        $count2 = count(self::$subscribers);
-        // Clear data
-        self::$listeners = self::$subscribers = [];
+        $em-&gt;addSubscriber($subscriber);
+    }
 
-        return [$count1, $count2];
-    }</pre></td></tr></table>
+    $count1 = count(self::$listeners);
+    $count2 = count(self::$subscribers);
+    // Clear data
+    self::$listeners = self::$subscribers = [];
+
+    return [$count1, $count2];
+}</pre></td></tr></table>
 </div>
 </div>
 <p>遍历<code>ListenerRegister</code>类下的<code>$listeners</code>和<code>$subscribers</code>属性，绑定事件到<code>eventManager</code>的<code>Bean</code>实例上。</p>
@@ -646,15 +646,15 @@ class ListenerParser extends Parser
 </span><span class="lnt">9
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * @param string $className
-     * @param array  $definition [event name =&gt; listener priority]
-     */
-    public static function addListener(string $className, array $definition = []): void
-    {
-        // Collect listeners
-        self::$listeners[$className] = $definition;
-    }</pre></td></tr></table>
+<pre class="chroma">/**
+    * @param string $className
+    * @param array  $definition [event name =&gt; listener priority]
+    */
+public static function addListener(string $className, array $definition = []): void
+{
+    // Collect listeners
+    self::$listeners[$className] = $definition;
+}</pre></td></tr></table>
 </div>
 </div>
 <p>可以看到这里通过<code>ListenerRegister::addListener</code>方法，往<code>ListenerRegister</code>上注册了<code>$listeners</code>属性。</p>
@@ -668,8 +668,8 @@ class ListenerParser extends Parser
 </span><span class="lnt">2
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    // Trigger a app init event
-    Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);</pre></td></tr></table>
+<pre class="chroma">// Trigger a app init event
+Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);</pre></td></tr></table>
 </div>
 </div>
 <p>trigger的方法定义如下。</p>
@@ -691,20 +691,20 @@ class ListenerParser extends Parser
 </span><span class="lnt">14
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Trigger an swoft application event
-     *
-     * @param string|EventInterface $event eg: &#39;app.start&#39; &#39;app.stop&#39;
-     * @param null|mixed            $target
-     * @param array                 $params
-     *
-     * @return EventInterface
-     */
-    public static function trigger($event, $target = null, ...$params): EventInterface
-    {
-        /** @see EventManager::trigger() */
-        return BeanFactory::getSingleton(&#39;eventManager&#39;)-&gt;trigger($event, $target, $params);
-    }</pre></td></tr></table>
+<pre class="chroma">/**
+    * Trigger an swoft application event
+    *
+    * @param string|EventInterface $event eg: &#39;app.start&#39; &#39;app.stop&#39;
+    * @param null|mixed            $target
+    * @param array                 $params
+    *
+    * @return EventInterface
+    */
+public static function trigger($event, $target = null, ...$params): EventInterface
+{
+    /** @see EventManager::trigger() */
+    return BeanFactory::getSingleton(&#39;eventManager&#39;)-&gt;trigger($event, $target, $params);
+}</pre></td></tr></table>
 </div>
 </div>
 <p>这里调用了<code>eventManager</code>这个<code>Bean</code>实例的<code>trigger</code>方法。</p>
@@ -782,76 +782,76 @@ class ListenerParser extends Parser
 </span><span class="lnt">70
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * Trigger an event. Can accept an EventInterface or will create one if not passed
-     *
-     * @param string|EventInterface $event  &#39;app.start&#39; &#39;app.stop&#39;
-     * @param mixed|string          $target It is object or string.
-     * @param array|mixed           $args
-     *
-     * @return EventInterface
-     * @throws InvalidArgumentException
-     */
-    public function trigger($event, $target = null, array $args = []): EventInterface
-    {
-        if ($isString = is_string($event)) {
-            $name = trim($event);
-        } elseif ($event instanceof EventInterface) {
-            $name = trim($event-&gt;getName());
-        } else {
-            throw new InvalidArgumentException(&#39;Invalid event params for trigger event handler&#39;);
+<pre class="chroma">/**
+    * Trigger an event. Can accept an EventInterface or will create one if not passed
+    *
+    * @param string|EventInterface $event  &#39;app.start&#39; &#39;app.stop&#39;
+    * @param mixed|string          $target It is object or string.
+    * @param array|mixed           $args
+    *
+    * @return EventInterface
+    * @throws InvalidArgumentException
+    */
+public function trigger($event, $target = null, array $args = []): EventInterface
+{
+    if ($isString = is_string($event)) {
+        $name = trim($event);
+    } elseif ($event instanceof EventInterface) {
+        $name = trim($event-&gt;getName());
+    } else {
+        throw new InvalidArgumentException(&#39;Invalid event params for trigger event handler&#39;);
+    }
+
+    $shouldCall = [];
+
+    // Have matched listener
+    if (isset($this-&gt;listenedEvents[$name])) {
+        $shouldCall[$name] = &#39;&#39;;
+    }
+
+    // Like &#39;app.db.query&#39; =&gt; prefix: &#39;app.db&#39;
+    if ($pos = strrpos($name, &#39;.&#39;)) {
+        $prefix = substr($name, 0, $pos);
+
+        // Have a wildcards listener. eg &#39;app.db.*&#39;
+        $wildcardEvent = $prefix . &#39;.*&#39;;
+        if (isset($this-&gt;listenedEvents[$wildcardEvent])) {
+            $shouldCall[$wildcardEvent] = substr($name, $pos + 1);
         }
+    }
 
-        $shouldCall = [];
+    // Not found listeners
+    if (!$shouldCall) {
+        return $isString ? $this-&gt;basicEvent : $event;
+    }
 
-        // Have matched listener
-        if (isset($this-&gt;listenedEvents[$name])) {
-            $shouldCall[$name] = &#39;&#39;;
+    /** @var EventInterface $event */
+    if ($isString) {
+        $event = $this-&gt;events[$name] ?? $this-&gt;basicEvent;
+    }
+
+    // Initial value
+    $event-&gt;setName($name);
+    $event-&gt;setParams($args);
+    $event-&gt;setTarget($target);
+    $event-&gt;stopPropagation(false);
+
+    // Notify event listeners
+    foreach ($shouldCall as $name =&gt; $method) {
+        $this-&gt;triggerListeners($this-&gt;listeners[$name], $event, $method);
+
+        if ($event-&gt;isPropagationStopped()) {
+            return $event;
         }
+    }
 
-        // Like &#39;app.db.query&#39; =&gt; prefix: &#39;app.db&#39;
-        if ($pos = strrpos($name, &#39;.&#39;)) {
-            $prefix = substr($name, 0, $pos);
+    // Have global wildcards &#39;*&#39; listener.
+    if (isset($this-&gt;listenedEvents[&#39;*&#39;])) {
+        $this-&gt;triggerListeners($this-&gt;listeners[&#39;*&#39;], $event);
+    }
 
-            // Have a wildcards listener. eg &#39;app.db.*&#39;
-            $wildcardEvent = $prefix . &#39;.*&#39;;
-            if (isset($this-&gt;listenedEvents[$wildcardEvent])) {
-                $shouldCall[$wildcardEvent] = substr($name, $pos + 1);
-            }
-        }
-
-        // Not found listeners
-        if (!$shouldCall) {
-            return $isString ? $this-&gt;basicEvent : $event;
-        }
-
-        /** @var EventInterface $event */
-        if ($isString) {
-            $event = $this-&gt;events[$name] ?? $this-&gt;basicEvent;
-        }
-
-        // Initial value
-        $event-&gt;setName($name);
-        $event-&gt;setParams($args);
-        $event-&gt;setTarget($target);
-        $event-&gt;stopPropagation(false);
-
-        // Notify event listeners
-        foreach ($shouldCall as $name =&gt; $method) {
-            $this-&gt;triggerListeners($this-&gt;listeners[$name], $event, $method);
-
-            if ($event-&gt;isPropagationStopped()) {
-                return $event;
-            }
-        }
-
-        // Have global wildcards &#39;*&#39; listener.
-        if (isset($this-&gt;listenedEvents[&#39;*&#39;])) {
-            $this-&gt;triggerListeners($this-&gt;listeners[&#39;*&#39;], $event);
-        }
-
-        return $event;
-    }</pre></td></tr></table>
+    return $event;
+}</pre></td></tr></table>
 </div>
 </div>
 <p>如果存在对应的事件，调用<code>triggerListeners</code>方法。</p>
@@ -891,38 +891,38 @@ class ListenerParser extends Parser
 </span><span class="lnt">32
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    /**
-     * @param array|ListenerQueue $listeners
-     * @param EventInterface      $event
-     * @param string              $method
-     */
-    protected function triggerListeners($listeners, EventInterface $event, string $method = &#39;&#39;): void
-    {
-        // $handled = false;
-        $name     = $event-&gt;getName();
-        $callable = false === strpos($name, &#39;.&#39;);
+<pre class="chroma">/**
+    * @param array|ListenerQueue $listeners
+    * @param EventInterface      $event
+    * @param string              $method
+    */
+protected function triggerListeners($listeners, EventInterface $event, string $method = &#39;&#39;): void
+{
+    // $handled = false;
+    $name     = $event-&gt;getName();
+    $callable = false === strpos($name, &#39;.&#39;);
 
-        // 循环调用监听器，处理事件
-        foreach ($listeners as $listener) {
-            if ($event-&gt;isPropagationStopped()) {
-                break;
-            }
+    // 循环调用监听器，处理事件
+    foreach ($listeners as $listener) {
+        if ($event-&gt;isPropagationStopped()) {
+            break;
+        }
 
-            if (is_object($listener)) {
-                if ($listener instanceof EventHandlerInterface) {
-                    $listener-&gt;handle($event);
-                } elseif ($method &amp;&amp; method_exists($listener, $method)) {
-                    $listener-&gt;$method($event);
-                } elseif ($callable &amp;&amp; method_exists($listener, $name)) {
-                    $listener-&gt;$name($event);
-                } elseif (method_exists($listener, &#39;__invoke&#39;)) {
-                    $listener($event);
-                }
-            } elseif (is_callable($listener)) {
+        if (is_object($listener)) {
+            if ($listener instanceof EventHandlerInterface) {
+                $listener-&gt;handle($event);
+            } elseif ($method &amp;&amp; method_exists($listener, $method)) {
+                $listener-&gt;$method($event);
+            } elseif ($callable &amp;&amp; method_exists($listener, $name)) {
+                $listener-&gt;$name($event);
+            } elseif (method_exists($listener, &#39;__invoke&#39;)) {
                 $listener($event);
             }
+        } elseif (is_callable($listener)) {
+            $listener($event);
         }
-    }</pre></td></tr></table>
+    }
+}</pre></td></tr></table>
 </div>
 </div>
 <p>遍历事件回调，执行对应方法。</p>
@@ -934,8 +934,8 @@ class ListenerParser extends Parser
 </span><span class="lnt">2
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">    // Trigger a app init event
-    Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);</pre></td></tr></table>
+<pre class="chroma">// Trigger a app init event
+Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);</pre></td></tr></table>
 </div>
 </div>
 <p>这里的事件为<code>SwoftEvent::APP_INIT_COMPLETE</code>，所以这里会执行这个事件下的所有回调。</p>
