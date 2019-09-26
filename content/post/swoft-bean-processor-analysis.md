@@ -7,97 +7,97 @@ tags: ["Swoft"]
 今天讲一下`BeanProcessor`模块，先看一下`handle`方法实现。
 
 ```
-    /**
-     * Handle bean
-     *
-     * @return bool
-     * @throws ReflectionException
-     * @throws AnnotationException
-     */
-    public function handle(): bool
-    {
-        if (!$this->application->beforeBean()) {
-            return false;
-        }
-
-        $handler     = new BeanHandler();
-        $definitions = $this->getDefinitions();
-        $parsers     = AnnotationRegister::getParsers();
-        $annotations = AnnotationRegister::getAnnotations();
-
-        BeanFactory::addDefinitions($definitions);
-        BeanFactory::addAnnotations($annotations);
-        BeanFactory::addParsers($parsers);
-        BeanFactory::setHandler($handler);
-        BeanFactory::init();
-
-        /* @var Config $config*/
-        $config = BeanFactory::getBean('config');
-
-        CLog::info('config path=%s', $config->getPath());
-        CLog::info('config env=%s', $config->getEnv());
-
-        $stats = BeanFactory::getStats();
-
-        CLog::info('Bean is initialized(%s)', SwoftHelper::formatStats($stats));
-
-        return $this->application->afterBean();
+/**
+    * Handle bean
+    *
+    * @return bool
+    * @throws ReflectionException
+    * @throws AnnotationException
+    */
+public function handle(): bool
+{
+    if (!$this->application->beforeBean()) {
+        return false;
     }
+
+    $handler     = new BeanHandler();
+    $definitions = $this->getDefinitions();
+    $parsers     = AnnotationRegister::getParsers();
+    $annotations = AnnotationRegister::getAnnotations();
+
+    BeanFactory::addDefinitions($definitions);
+    BeanFactory::addAnnotations($annotations);
+    BeanFactory::addParsers($parsers);
+    BeanFactory::setHandler($handler);
+    BeanFactory::init();
+
+    /* @var Config $config*/
+    $config = BeanFactory::getBean('config');
+
+    CLog::info('config path=%s', $config->getPath());
+    CLog::info('config env=%s', $config->getEnv());
+
+    $stats = BeanFactory::getStats();
+
+    CLog::info('Bean is initialized(%s)', SwoftHelper::formatStats($stats));
+
+    return $this->application->afterBean();
+}
 ```
 
 先通过`getDefinitions`方法获取所有的Bean定义。
 
 ```
-    /**
-     * Get bean definitions
-     *
-     * @return array
-     */
-    private function getDefinitions(): array
-    {
-        // Core beans
-        $definitions = [];
-        $autoLoaders = AnnotationRegister::getAutoLoaders();
+/**
+    * Get bean definitions
+    *
+    * @return array
+    */
+private function getDefinitions(): array
+{
+    // Core beans
+    $definitions = [];
+    $autoLoaders = AnnotationRegister::getAutoLoaders();
 
-        // get disabled loaders by application
-        $disabledLoaders = $this->application->getDisabledAutoLoaders();
+    // get disabled loaders by application
+    $disabledLoaders = $this->application->getDisabledAutoLoaders();
 
-        foreach ($autoLoaders as $autoLoader) {
-            if (!$autoLoader instanceof DefinitionInterface) {
-                continue;
-            }
-
-            $loaderClass = get_class($autoLoader);
-
-            // If the component is disabled by user.
-            if (isset($disabledLoaders[$loaderClass])) {
-                CLog::info('Auto loader(%s) is <cyan>disabled</cyan>, skip handle it', $loaderClass);
-                continue;
-            }
-
-            // If the component is not enabled.
-            if ($autoLoader instanceof ComponentInterface && !$autoLoader->isEnable()) {
-                continue;
-            }
-
-            $definitions = ArrayHelper::merge($definitions, $autoLoader->beans());
+    foreach ($autoLoaders as $autoLoader) {
+        if (!$autoLoader instanceof DefinitionInterface) {
+            continue;
         }
 
-        // Bean definitions
-        $beanFile = $this->application->getBeanFile();
-        $beanFile = alias($beanFile);
+        $loaderClass = get_class($autoLoader);
 
-        if (!file_exists($beanFile)) {
-            throw new InvalidArgumentException(
-                sprintf('The bean config file of %s is not exist!', $beanFile)
-            );
+        // If the component is disabled by user.
+        if (isset($disabledLoaders[$loaderClass])) {
+            CLog::info('Auto loader(%s) is <cyan>disabled</cyan>, skip handle it', $loaderClass);
+            continue;
         }
 
-        $beanDefinitions = require $beanFile;
-        $definitions     = ArrayHelper::merge($definitions, $beanDefinitions);
+        // If the component is not enabled.
+        if ($autoLoader instanceof ComponentInterface && !$autoLoader->isEnable()) {
+            continue;
+        }
 
-        return $definitions;
+        $definitions = ArrayHelper::merge($definitions, $autoLoader->beans());
     }
+
+    // Bean definitions
+    $beanFile = $this->application->getBeanFile();
+    $beanFile = alias($beanFile);
+
+    if (!file_exists($beanFile)) {
+        throw new InvalidArgumentException(
+            sprintf('The bean config file of %s is not exist!', $beanFile)
+        );
+    }
+
+    $beanDefinitions = require $beanFile;
+    $definitions     = ArrayHelper::merge($definitions, $beanDefinitions);
+
+    return $definitions;
+}
 ```
 
 通过`AnnotationRegister::getAutoLoaders()`拿到所有的autoloader对象，排除掉非`DefinitionInterface`对象，通过`bean()`方法获取定义的Bean信息。
@@ -241,264 +241,264 @@ BeanFactory::init();
 向BeanFatory注册信息。
 
 ```
-    /**
-     * Init
-     *
-     * @return void
-     * @throws AnnotationException
-     * @throws ReflectionException
-     */
-    public static function init(): void
-    {
-        Container::getInstance()->init();
-    }
+/**
+    * Init
+    *
+    * @return void
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+public static function init(): void
+{
+    Container::getInstance()->init();
+}
 
-    ...
+...
 
-    /**
-     * Add definitions
-     *
-     * @param array $definitions
-     *
-     * @return void
-     */
-    public static function addDefinitions(array $definitions): void
-    {
-        Container::getInstance()->addDefinitions($definitions);
-    }
+/**
+    * Add definitions
+    *
+    * @param array $definitions
+    *
+    * @return void
+    */
+public static function addDefinitions(array $definitions): void
+{
+    Container::getInstance()->addDefinitions($definitions);
+}
 
-    /**
-     * Add annotations
-     *
-     * @param array $annotations
-     *
-     * @return void
-     */
-    public static function addAnnotations(array $annotations): void
-    {
-        Container::getInstance()->addAnnotations($annotations);
-    }
+/**
+    * Add annotations
+    *
+    * @param array $annotations
+    *
+    * @return void
+    */
+public static function addAnnotations(array $annotations): void
+{
+    Container::getInstance()->addAnnotations($annotations);
+}
 
-    /**
-     * Add annotation parsers
-     *
-     * @param array $annotationParsers
-     *
-     * @return void
-     */
-    public static function addParsers(array $annotationParsers): void
-    {
-        Container::getInstance()->addParsers($annotationParsers);
-    }
+/**
+    * Add annotation parsers
+    *
+    * @param array $annotationParsers
+    *
+    * @return void
+    */
+public static function addParsers(array $annotationParsers): void
+{
+    Container::getInstance()->addParsers($annotationParsers);
+}
 
-    /**
-     * Set bean handler
-     *
-     * @param HandlerInterface $handler
-     */
-    public static function setHandler(HandlerInterface $handler): void
-    {
-        Container::getInstance()->setHandler($handler);
-    }
+/**
+    * Set bean handler
+    *
+    * @param HandlerInterface $handler
+    */
+public static function setHandler(HandlerInterface $handler): void
+{
+    Container::getInstance()->setHandler($handler);
+}
 ```
 
 这里可以看到所有的方法，最终都调用的是`Swoft\Bean\Container`类。
 
 ```
-    /**
-     * Add definitions
-     *
-     * @param array $definitions
-     *
-     * @return void
-     */
-    public function addDefinitions(array $definitions): void
-    {
-        $this->definitions = ArrayHelper::merge($this->definitions, $definitions);
-    }
+/**
+    * Add definitions
+    *
+    * @param array $definitions
+    *
+    * @return void
+    */
+public function addDefinitions(array $definitions): void
+{
+    $this->definitions = ArrayHelper::merge($this->definitions, $definitions);
+}
 
-    /**
-     * Add annotations
-     *
-     * @param array $annotations
-     *
-     * @return void
-     */
-    public function addAnnotations(array $annotations): void
-    {
-        $this->annotations = ArrayHelper::merge($this->annotations, $annotations);
-    }
+/**
+    * Add annotations
+    *
+    * @param array $annotations
+    *
+    * @return void
+    */
+public function addAnnotations(array $annotations): void
+{
+    $this->annotations = ArrayHelper::merge($this->annotations, $annotations);
+}
 
-    /**
-     * Add annotation parsers
-     *
-     * @param array $annotationParsers
-     *
-     * @return void
-     */
-    public function addParsers(array $annotationParsers): void
-    {
-        $this->parsers = ArrayHelper::merge($this->parsers, $annotationParsers);
-    }
+/**
+    * Add annotation parsers
+    *
+    * @param array $annotationParsers
+    *
+    * @return void
+    */
+public function addParsers(array $annotationParsers): void
+{
+    $this->parsers = ArrayHelper::merge($this->parsers, $annotationParsers);
+}
 
-    
-    /**
-     * @param HandlerInterface $handler
-     */
-    public function setHandler(HandlerInterface $handler): void
-    {
-        $this->handler = $handler;
-    }
+
+/**
+    * @param HandlerInterface $handler
+    */
+public function setHandler(HandlerInterface $handler): void
+{
+    $this->handler = $handler;
+}
 ```
 
 这四个方法就是注册属性，接下来是重头戏`init`方法。
 
 ```
-    /**
-     * Init
-     *
-     * @throws AnnotationException
-     * @throws ReflectionException
-     */
-    public function init(): void
-    {
-        // Parse annotations
-        $this->parseAnnotations();
+/**
+    * Init
+    *
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+public function init(): void
+{
+    // Parse annotations
+    $this->parseAnnotations();
 
-        // Parse definitions
-        $this->parseDefinitions();
+    // Parse definitions
+    $this->parseDefinitions();
 
-        // Init beans
-        $this->initializeBeans();
-    }
+    // Init beans
+    $this->initializeBeans();
+}
 ```
 
 先看`parseAnnotations`方法，从代码注释上也可以看出大概，解析注解，接下来我们看下具体是如何实现的。
 
 ```
-    /**
-     * Parse annotations
-     *
-     * @throws AnnotationException
-     */
-    private function parseAnnotations(): void
-    {
-        $annotationParser = new AnnotationObjParser(
-            $this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases
-        );
-        $annotationData   = $annotationParser->parseAnnotations($this->annotations, $this->parsers);
+/**
+    * Parse annotations
+    *
+    * @throws AnnotationException
+    */
+private function parseAnnotations(): void
+{
+    $annotationParser = new AnnotationObjParser(
+        $this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases
+    );
+    $annotationData   = $annotationParser->parseAnnotations($this->annotations, $this->parsers);
 
-        [$this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases] = $annotationData;
-    }
+    [$this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases] = $annotationData;
+}
 ```
 
 声明了一个`AnnotationObjParser`对象，调用了`parseAnnotations`方法。
 
 ```
-    /**
-     * Parse annotations
-     *
-     * @param array $annotations
-     * @param array $parsers
-     *
-     * @return array
-     * @throws AnnotationException
-     */
-    public function parseAnnotations(array $annotations, array $parsers): array
-    {
-        $this->parsers     = $parsers;
-        $this->annotations = $annotations;
+/**
+    * Parse annotations
+    *
+    * @param array $annotations
+    * @param array $parsers
+    *
+    * @return array
+    * @throws AnnotationException
+    */
+public function parseAnnotations(array $annotations, array $parsers): array
+{
+    $this->parsers     = $parsers;
+    $this->annotations = $annotations;
 
-        foreach ($this->annotations as $loadNameSpace => $classes) {
-            foreach ($classes as $className => $classOneAnnotations) {
-                $this->parseOneClassAnnotations($className, $classOneAnnotations);
-            }
+    foreach ($this->annotations as $loadNameSpace => $classes) {
+        foreach ($classes as $className => $classOneAnnotations) {
+            $this->parseOneClassAnnotations($className, $classOneAnnotations);
         }
-
-        return [$this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases];
     }
+
+    return [$this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases];
+}
 ```
 
 这里遍历所有的`annotation`类，循环调用`parseOneClassAnnotations`进行解析。
 
 ```
-    /**
-     * Parse class all annotations
-     *
-     * @param string $className
-     * @param array  $classOneAnnotations
-     *
-     * @throws AnnotationException
-     */
-    private function parseOneClassAnnotations(string $className, array $classOneAnnotations): void
-    {
-        // Check class annotation tag
-        if (!isset($classOneAnnotations['annotation'])) {
-            throw new AnnotationException(
-                sprintf('Property or method(%s) with `@xxx` must be define class annotation', $className)
-            );
-        }
+/**
+    * Parse class all annotations
+    *
+    * @param string $className
+    * @param array  $classOneAnnotations
+    *
+    * @throws AnnotationException
+    */
+private function parseOneClassAnnotations(string $className, array $classOneAnnotations): void
+{
+    // Check class annotation tag
+    if (!isset($classOneAnnotations['annotation'])) {
+        throw new AnnotationException(
+            sprintf('Property or method(%s) with `@xxx` must be define class annotation', $className)
+        );
+    }
 
-        // Parse class annotations
-        $classAnnotations = $classOneAnnotations['annotation'];
-        $reflectionClass  = $classOneAnnotations['reflection'];
+    // Parse class annotations
+    $classAnnotations = $classOneAnnotations['annotation'];
+    $reflectionClass  = $classOneAnnotations['reflection'];
 
-        $classAry = [
-            $className,
-            $reflectionClass,
-            $classAnnotations
-        ];
+    $classAry = [
+        $className,
+        $reflectionClass,
+        $classAnnotations
+    ];
 
-        $objectDefinition = $this->parseClassAnnotations($classAry);
+    $objectDefinition = $this->parseClassAnnotations($classAry);
 
-        // Parse property annotations
-        $propertyInjects        = [];
-        $propertyAllAnnotations = $classOneAnnotations['properties'] ?? [];
-        foreach ($propertyAllAnnotations as $propertyName => $propertyOneAnnotations) {
-            $proAnnotations = $propertyOneAnnotations['annotation'] ?? [];
-            $propertyInject = $this->parsePropertyAnnotations($classAry, $propertyName, $proAnnotations);
-            if ($propertyInject) {
-                $propertyInjects[$propertyName] = $propertyInject;
-            }
-        }
-
-        // Parse method annotations
-        $methodInjects        = [];
-        $methodAllAnnotations = $classOneAnnotations['methods'] ?? [];
-        foreach ($methodAllAnnotations as $methodName => $methodOneAnnotations) {
-            $methodAnnotations = $methodOneAnnotations['annotation'] ?? [];
-
-            $methodInject = $this->parseMethodAnnotations($classAry, $methodName, $methodAnnotations);
-            if ($methodInject) {
-                $methodInjects[$methodName] = $methodInject;
-            }
-        }
-
-        if (!$objectDefinition) {
-            return;
-        }
-
-        if (!empty($propertyInjects)) {
-            $objectDefinition->setPropertyInjections($propertyInjects);
-        }
-
-        if (!empty($methodInjects)) {
-            $objectDefinition->setMethodInjections($methodInjects);
-        }
-
-        // Object definition and class name
-        $name         = $objectDefinition->getName();
-        $aliase       = $objectDefinition->getAlias();
-        $classNames   = $this->classNames[$className] ?? [];
-        $classNames[] = $name;
-
-        $this->classNames[$className]   = array_unique($classNames);
-        $this->objectDefinitions[$name] = $objectDefinition;
-
-        if (!empty($aliase)) {
-            $this->aliases[$aliase] = $name;
+    // Parse property annotations
+    $propertyInjects        = [];
+    $propertyAllAnnotations = $classOneAnnotations['properties'] ?? [];
+    foreach ($propertyAllAnnotations as $propertyName => $propertyOneAnnotations) {
+        $proAnnotations = $propertyOneAnnotations['annotation'] ?? [];
+        $propertyInject = $this->parsePropertyAnnotations($classAry, $propertyName, $proAnnotations);
+        if ($propertyInject) {
+            $propertyInjects[$propertyName] = $propertyInject;
         }
     }
+
+    // Parse method annotations
+    $methodInjects        = [];
+    $methodAllAnnotations = $classOneAnnotations['methods'] ?? [];
+    foreach ($methodAllAnnotations as $methodName => $methodOneAnnotations) {
+        $methodAnnotations = $methodOneAnnotations['annotation'] ?? [];
+
+        $methodInject = $this->parseMethodAnnotations($classAry, $methodName, $methodAnnotations);
+        if ($methodInject) {
+            $methodInjects[$methodName] = $methodInject;
+        }
+    }
+
+    if (!$objectDefinition) {
+        return;
+    }
+
+    if (!empty($propertyInjects)) {
+        $objectDefinition->setPropertyInjections($propertyInjects);
+    }
+
+    if (!empty($methodInjects)) {
+        $objectDefinition->setMethodInjections($methodInjects);
+    }
+
+    // Object definition and class name
+    $name         = $objectDefinition->getName();
+    $aliase       = $objectDefinition->getAlias();
+    $classNames   = $this->classNames[$className] ?? [];
+    $classNames[] = $name;
+
+    $this->classNames[$className]   = array_unique($classNames);
+    $this->objectDefinitions[$name] = $objectDefinition;
+
+    if (!empty($aliase)) {
+        $this->aliases[$aliase] = $name;
+    }
+}
 ```
 
 这里可以看到分别有类注解、属性注解和方法注解三类。
@@ -506,47 +506,47 @@ BeanFactory::init();
 对应官方文档的[注解说明](https://en.swoft.org/docs/2.x/zh-CN/annotation/index.html#%E8%A7%84%E8%8C%83)。
 
 ```
-    /**
-     * @param array $classAry
-     *
-     * @return ObjectDefinition|null
-     */
-    private function parseClassAnnotations(array $classAry): ?ObjectDefinition
-    {
-        [, , $classAnnotations] = $classAry;
+/**
+    * @param array $classAry
+    *
+    * @return ObjectDefinition|null
+    */
+private function parseClassAnnotations(array $classAry): ?ObjectDefinition
+{
+    [, , $classAnnotations] = $classAry;
 
-        $objectDefinition = null;
-        foreach ($classAnnotations as $annotation) {
-            $annotationClass = get_class($annotation);
-            if (!isset($this->parsers[$annotationClass])) {
-                continue;
-            }
-
-            $parserClassName  = $this->parsers[$annotationClass];
-            $annotationParser = $this->getAnnotationParser($classAry, $parserClassName);
-
-            $data = $annotationParser->parse(Parser::TYPE_CLASS, $annotation);
-            if (empty($data)) {
-                continue;
-            }
-
-            if (count($data) !== 4) {
-                throw new InvalidArgumentException(sprintf('%s annotation parse must be 4 size', $annotationClass));
-            }
-
-            [$name, $className, $scope, $alias] = $data;
-            $name = empty($name) ? $className : $name;
-
-            if (empty($className)) {
-                throw new InvalidArgumentException(sprintf('%s with class name can not be empty', $annotationClass));
-            }
-
-            // Multiple coverage
-            $objectDefinition = new ObjectDefinition($name, $className, $scope, $alias);
+    $objectDefinition = null;
+    foreach ($classAnnotations as $annotation) {
+        $annotationClass = get_class($annotation);
+        if (!isset($this->parsers[$annotationClass])) {
+            continue;
         }
 
-        return $objectDefinition;
+        $parserClassName  = $this->parsers[$annotationClass];
+        $annotationParser = $this->getAnnotationParser($classAry, $parserClassName);
+
+        $data = $annotationParser->parse(Parser::TYPE_CLASS, $annotation);
+        if (empty($data)) {
+            continue;
+        }
+
+        if (count($data) !== 4) {
+            throw new InvalidArgumentException(sprintf('%s annotation parse must be 4 size', $annotationClass));
+        }
+
+        [$name, $className, $scope, $alias] = $data;
+        $name = empty($name) ? $className : $name;
+
+        if (empty($className)) {
+            throw new InvalidArgumentException(sprintf('%s with class name can not be empty', $annotationClass));
+        }
+
+        // Multiple coverage
+        $objectDefinition = new ObjectDefinition($name, $className, $scope, $alias);
     }
+
+    return $objectDefinition;
+}
 ```
 
 类注解，这里会调用对应解析类的`parse`方法。
@@ -797,197 +797,197 @@ class WsModuleParser extends Parser
 回到`Container`类的`init`方法，接下来调用了`parseDefinitions`方法。
 
 ```
-    /**
-     * Parse definitions
-     */
-    private function parseDefinitions(): void
-    {
-        $annotationParser = new DefinitionObjParser(
-            $this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases
-        );
+/**
+    * Parse definitions
+    */
+private function parseDefinitions(): void
+{
+    $annotationParser = new DefinitionObjParser(
+        $this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases
+    );
 
-        // Collect info
-        $definitionData = $annotationParser->parseDefinitions();
-        [$this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases] = $definitionData;
-    }
+    // Collect info
+    $definitionData = $annotationParser->parseDefinitions();
+    [$this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases] = $definitionData;
+}
 ```
 
 声明了一个`DefinitionObjParser`对象，调用了`parseDefinitions`方法。
 
 ```
-    /**
-     * Parse definitions
-     *
-     * @return array
-     */
-    public function parseDefinitions(): array
-    {
-        foreach ($this->definitions as $beanName => $definition) {
-            if (isset($this->objectDefinitions[$beanName])) {
-                $objectDefinition = $this->objectDefinitions[$beanName];
-                $this->resetObjectDefinition($beanName, $objectDefinition, $definition);
-                continue;
-            }
-
-            $this->createObjectDefinition($beanName, $definition);
+/**
+    * Parse definitions
+    *
+    * @return array
+    */
+public function parseDefinitions(): array
+{
+    foreach ($this->definitions as $beanName => $definition) {
+        if (isset($this->objectDefinitions[$beanName])) {
+            $objectDefinition = $this->objectDefinitions[$beanName];
+            $this->resetObjectDefinition($beanName, $objectDefinition, $definition);
+            continue;
         }
 
-        return [$this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases];
+        $this->createObjectDefinition($beanName, $definition);
     }
+
+    return [$this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases];
+}
 ```
 
 遍历所有的`Bean`对象，调用`createObjectDefinition`方法。
 
 ```
-    /**
-     * Create object definition for definition
-     *
-     * @param string $beanName
-     * @param array  $definition
-     */
-    private function createObjectDefinition(string $beanName, array $definition): void
-    {
-        $className = $definition['class'] ?? '';
-        if (empty($className)) {
-            throw new InvalidArgumentException(sprintf('%s key for definition must be defined class', $beanName));
-        }
-
-        $objDefinition = new ObjectDefinition($beanName, $className);
-        $objDefinition = $this->updateObjectDefinitionByDefinition($objDefinition, $definition);
-
-        $classNames   = $this->classNames[$className] ?? [];
-        $classNames[] = $beanName;
-
-        $this->classNames[$className]       = array_unique($classNames);
-        $this->objectDefinitions[$beanName] = $objDefinition;
+/**
+    * Create object definition for definition
+    *
+    * @param string $beanName
+    * @param array  $definition
+    */
+private function createObjectDefinition(string $beanName, array $definition): void
+{
+    $className = $definition['class'] ?? '';
+    if (empty($className)) {
+        throw new InvalidArgumentException(sprintf('%s key for definition must be defined class', $beanName));
     }
+
+    $objDefinition = new ObjectDefinition($beanName, $className);
+    $objDefinition = $this->updateObjectDefinitionByDefinition($objDefinition, $definition);
+
+    $classNames   = $this->classNames[$className] ?? [];
+    $classNames[] = $beanName;
+
+    $this->classNames[$className]       = array_unique($classNames);
+    $this->objectDefinitions[$beanName] = $objDefinition;
+}
 ```
 
 声明了`ObjectDefinition`对象，调用了`updateObjectDefinitionByDefinition`方法。
 
 ```
-    /**
-     * Update definition
-     *
-     * @param ObjectDefinition $objDfn
-     * @param array            $definition
-     *
-     * @return ObjectDefinition
-     */
-    private function updateObjectDefinitionByDefinition(ObjectDefinition $objDfn, array $definition): ObjectDefinition
-    {
-        [$constructInject, $propertyInjects, $option] = $this->parseDefinition($definition);
+/**
+    * Update definition
+    *
+    * @param ObjectDefinition $objDfn
+    * @param array            $definition
+    *
+    * @return ObjectDefinition
+    */
+private function updateObjectDefinitionByDefinition(ObjectDefinition $objDfn, array $definition): ObjectDefinition
+{
+    [$constructInject, $propertyInjects, $option] = $this->parseDefinition($definition);
 
-        // Set construct inject
-        if (!empty($constructInject)) {
-            $objDfn->setConstructorInjection($constructInject);
-        }
-
-        // Set property inject
-        foreach ($propertyInjects as $propertyName => $propertyInject) {
-            $objDfn->setPropertyInjection($propertyName, $propertyInject);
-        }
-
-        $scopes = [
-            Bean::SINGLETON,
-            Bean::PROTOTYPE,
-            Bean::REQUEST,
-        ];
-
-        $scope = $option['scope'] ?? '';
-        $alias = $option['alias'] ?? '';
-
-        if (!empty($scope) && !in_array($scope, $scopes, true)) {
-            throw new InvalidArgumentException('Scope for definition is not undefined');
-        }
-
-        // Update scope
-        if (!empty($scope)) {
-            $objDfn->setScope($scope);
-        }
-
-        // Update alias
-        if (!empty($alias)) {
-            $objDfn->setAlias($alias);
-
-            $objAlias = $objDfn->getAlias();
-            unset($this->aliases[$objAlias]);
-
-            $this->aliases[$alias] = $objDfn->getName();
-        }
-
-        return $objDfn;
+    // Set construct inject
+    if (!empty($constructInject)) {
+        $objDfn->setConstructorInjection($constructInject);
     }
+
+    // Set property inject
+    foreach ($propertyInjects as $propertyName => $propertyInject) {
+        $objDfn->setPropertyInjection($propertyName, $propertyInject);
+    }
+
+    $scopes = [
+        Bean::SINGLETON,
+        Bean::PROTOTYPE,
+        Bean::REQUEST,
+    ];
+
+    $scope = $option['scope'] ?? '';
+    $alias = $option['alias'] ?? '';
+
+    if (!empty($scope) && !in_array($scope, $scopes, true)) {
+        throw new InvalidArgumentException('Scope for definition is not undefined');
+    }
+
+    // Update scope
+    if (!empty($scope)) {
+        $objDfn->setScope($scope);
+    }
+
+    // Update alias
+    if (!empty($alias)) {
+        $objDfn->setAlias($alias);
+
+        $objAlias = $objDfn->getAlias();
+        unset($this->aliases[$objAlias]);
+
+        $this->aliases[$alias] = $objDfn->getName();
+    }
+
+    return $objDfn;
+}
 ```
 
 这里调用了`parseDefinition`方法进行解析。
 
 ```
-    /**
-     * Parse definition
-     *
-     * @param array $definition
-     *
-     * @return array
-     */
-    private function parseDefinition(array $definition): array
-    {
-        // Remove class key
-        unset($definition['class']);
+/**
+    * Parse definition
+    *
+    * @param array $definition
+    *
+    * @return array
+    */
+private function parseDefinition(array $definition): array
+{
+    // Remove class key
+    unset($definition['class']);
 
-        // Parse construct
-        $constructArgs = $definition[0] ?? [];
-        if (!is_array($constructArgs)) {
-            throw new InvalidArgumentException('Construct args for definition must be array');
-        }
-
-        // Parse construct args
-        $argInjects = [];
-        foreach ($constructArgs as $arg) {
-            [$argValue, $argIsRef] = $this->getValueByRef($arg);
-
-            $argInjects[] = new ArgsInjection($argValue, $argIsRef);
-        }
-
-        // Set construct inject
-        $constructInject = null;
-        if (!empty($argInjects)) {
-            $constructInject = new MethodInjection('__construct', $argInjects);
-        }
-
-        // Remove construct definition
-        unset($definition[0]);
-
-        // Parse definition option
-        $option = $definition['__option'] ?? [];
-        if (!is_array($option)) {
-            throw new InvalidArgumentException('__option for definition must be array');
-        }
-
-        // Remove `__option`
-        unset($definition['__option']);
-
-        // Parse definition properties
-        $propertyInjects = [];
-        foreach ($definition as $propertyName => $propertyValue) {
-            if (!is_string($propertyName)) {
-                throw new InvalidArgumentException('Property key from definition must be string');
-            }
-
-            [$proValue, $proIsRef] = $this->getValueByRef($propertyValue);
-
-            // Parse property for array
-            if (is_array($proValue)) {
-                $proValue = $this->parseArrayProperty($proValue);
-            }
-
-            $propertyInject = new PropertyInjection($propertyName, $proValue, $proIsRef);
-
-            $propertyInjects[$propertyName] = $propertyInject;
-        }
-
-        return [$constructInject, $propertyInjects, $option];
+    // Parse construct
+    $constructArgs = $definition[0] ?? [];
+    if (!is_array($constructArgs)) {
+        throw new InvalidArgumentException('Construct args for definition must be array');
     }
+
+    // Parse construct args
+    $argInjects = [];
+    foreach ($constructArgs as $arg) {
+        [$argValue, $argIsRef] = $this->getValueByRef($arg);
+
+        $argInjects[] = new ArgsInjection($argValue, $argIsRef);
+    }
+
+    // Set construct inject
+    $constructInject = null;
+    if (!empty($argInjects)) {
+        $constructInject = new MethodInjection('__construct', $argInjects);
+    }
+
+    // Remove construct definition
+    unset($definition[0]);
+
+    // Parse definition option
+    $option = $definition['__option'] ?? [];
+    if (!is_array($option)) {
+        throw new InvalidArgumentException('__option for definition must be array');
+    }
+
+    // Remove `__option`
+    unset($definition['__option']);
+
+    // Parse definition properties
+    $propertyInjects = [];
+    foreach ($definition as $propertyName => $propertyValue) {
+        if (!is_string($propertyName)) {
+            throw new InvalidArgumentException('Property key from definition must be string');
+        }
+
+        [$proValue, $proIsRef] = $this->getValueByRef($propertyValue);
+
+        // Parse property for array
+        if (is_array($proValue)) {
+            $proValue = $this->parseArrayProperty($proValue);
+        }
+
+        $propertyInject = new PropertyInjection($propertyName, $proValue, $proIsRef);
+
+        $propertyInjects[$propertyName] = $propertyInject;
+    }
+
+    return [$constructInject, $propertyInjects, $option];
+}
 ```
 
 解析`__construct`方法和传参，解析属性信息。
@@ -997,100 +997,100 @@ class WsModuleParser extends Parser
 回到`Container`类的`init`方法，接下来调用了`initializeBeans`方法。
 
 ```
-    /**
-     * Initialize beans
-     *
-     * @throws InvalidArgumentException
-     * @throws ReflectionException
-     */
-    private function initializeBeans(): void
-    {
-        /* @var ObjectDefinition $objectDefinition */
-        foreach ($this->objectDefinitions as $beanName => $objectDefinition) {
-            $scope = $objectDefinition->getScope();
-            // Exclude request
-            if ($scope === Bean::REQUEST) {
-                $this->requestDefinitions[$beanName] = $objectDefinition;
-                unset($this->objectDefinitions[$beanName]);
-                continue;
-            }
-
-            // Exclude session
-            if ($scope === Bean::SESSION) {
-                $this->sessionDefinitions[$beanName] = $objectDefinition;
-                unset($this->objectDefinitions[$beanName]);
-                continue;
-            }
-
-            // New bean
-            $this->newBean($beanName);
+/**
+    * Initialize beans
+    *
+    * @throws InvalidArgumentException
+    * @throws ReflectionException
+    */
+private function initializeBeans(): void
+{
+    /* @var ObjectDefinition $objectDefinition */
+    foreach ($this->objectDefinitions as $beanName => $objectDefinition) {
+        $scope = $objectDefinition->getScope();
+        // Exclude request
+        if ($scope === Bean::REQUEST) {
+            $this->requestDefinitions[$beanName] = $objectDefinition;
+            unset($this->objectDefinitions[$beanName]);
+            continue;
         }
+
+        // Exclude session
+        if ($scope === Bean::SESSION) {
+            $this->sessionDefinitions[$beanName] = $objectDefinition;
+            unset($this->objectDefinitions[$beanName]);
+            continue;
+        }
+
+        // New bean
+        $this->newBean($beanName);
     }
+}
 ```
 
 对于`scope`不为`Bean::REQUEST`和`Bean::SESSION`的，调用`newBean`方法。
 
 ```
-    /**
-     * Initialize beans
-     *
-     * @param string $beanName
-     * @param string $id
-     *
-     * @return object
-     * @throws ReflectionException
-     */
-    private function newBean(string $beanName, string $id = '')
-    {
-        // First, check bean whether has been create.
-        if (isset($this->singletonPool[$beanName]) || isset($this->prototypePool[$beanName])) {
-            return $this->get($beanName);
-        }
-
-        // Get object definition
-        $objectDefinition = $this->getNewObjectDefinition($beanName);
-
-        $scope     = $objectDefinition->getScope();
-        $alias     = $objectDefinition->getAlias();
-        $className = $objectDefinition->getClassName();
-
-        // Cache reflection class info
-        Reflections::cache($className);
-
-        // Before initialize bean
-        $this->beforeInit($beanName, $className, $objectDefinition);
-
-        $constructArgs   = [];
-        $constructInject = $objectDefinition->getConstructorInjection();
-        if ($constructInject !== null) {
-            $constructArgs = $this->getConstructParams($constructInject, $id);
-        }
-
-        $propertyInjects = $objectDefinition->getPropertyInjections();
-
-        // Proxy class
-        if ($this->handler) {
-            $className = $this->handler->classProxy($className);
-        }
-
-        $reflectionClass = new ReflectionClass($className);
-        $reflectObject   = $this->newInstance($reflectionClass, $constructArgs);
-
-        // Inject properties values
-        $this->newProperty($reflectObject, $reflectionClass, $propertyInjects, $id);
-
-        // Alias
-        if (!empty($alias)) {
-            $this->aliases[$alias] = $beanName;
-        }
-
-        // Call init method if exist
-        if ($reflectionClass->hasMethod(self::INIT_METHOD)) {
-            $reflectObject->{self::INIT_METHOD}();
-        }
-
-        return $this->setNewBean($beanName, $scope, $reflectObject, $id);
+/**
+    * Initialize beans
+    *
+    * @param string $beanName
+    * @param string $id
+    *
+    * @return object
+    * @throws ReflectionException
+    */
+private function newBean(string $beanName, string $id = '')
+{
+    // First, check bean whether has been create.
+    if (isset($this->singletonPool[$beanName]) || isset($this->prototypePool[$beanName])) {
+        return $this->get($beanName);
     }
+
+    // Get object definition
+    $objectDefinition = $this->getNewObjectDefinition($beanName);
+
+    $scope     = $objectDefinition->getScope();
+    $alias     = $objectDefinition->getAlias();
+    $className = $objectDefinition->getClassName();
+
+    // Cache reflection class info
+    Reflections::cache($className);
+
+    // Before initialize bean
+    $this->beforeInit($beanName, $className, $objectDefinition);
+
+    $constructArgs   = [];
+    $constructInject = $objectDefinition->getConstructorInjection();
+    if ($constructInject !== null) {
+        $constructArgs = $this->getConstructParams($constructInject, $id);
+    }
+
+    $propertyInjects = $objectDefinition->getPropertyInjections();
+
+    // Proxy class
+    if ($this->handler) {
+        $className = $this->handler->classProxy($className);
+    }
+
+    $reflectionClass = new ReflectionClass($className);
+    $reflectObject   = $this->newInstance($reflectionClass, $constructArgs);
+
+    // Inject properties values
+    $this->newProperty($reflectObject, $reflectionClass, $propertyInjects, $id);
+
+    // Alias
+    if (!empty($alias)) {
+        $this->aliases[$alias] = $beanName;
+    }
+
+    // Call init method if exist
+    if ($reflectionClass->hasMethod(self::INIT_METHOD)) {
+        $reflectObject->{self::INIT_METHOD}();
+    }
+
+    return $this->setNewBean($beanName, $scope, $reflectObject, $id);
+}
 ```
 
 通过反射实例化`Bean`对应的类，注册对应的属性。
@@ -1098,35 +1098,35 @@ class WsModuleParser extends Parser
 如果类存在`self::INIT_METHOD`方法，执行此方法。
 
 ```
-    /**
-     * @param string $beanName
-     * @param string $scope
-     * @param object $object
-     * @param string $id
-     *
-     * @return object
-     */
-    private function setNewBean(string $beanName, string $scope, $object, string $id = '')
-    {
-        switch ($scope) {
-            case Bean::SINGLETON: // Singleton
-                $this->singletonPool[$beanName] = $object;
-                break;
-            case Bean::PROTOTYPE:
-                $this->prototypePool[$beanName] = $object;
-                // Clone it
-                $object = clone $object;
-                break;
-            case Bean::REQUEST:
-                $this->requestPool[$id][$beanName] = $object;
-                break;
-            case Bean::SESSION:
-                $this->sessionPool[$id][$beanName] = $object;
-                break;
-        }
-
-        return $object;
+/**
+    * @param string $beanName
+    * @param string $scope
+    * @param object $object
+    * @param string $id
+    *
+    * @return object
+    */
+private function setNewBean(string $beanName, string $scope, $object, string $id = '')
+{
+    switch ($scope) {
+        case Bean::SINGLETON: // Singleton
+            $this->singletonPool[$beanName] = $object;
+            break;
+        case Bean::PROTOTYPE:
+            $this->prototypePool[$beanName] = $object;
+            // Clone it
+            $object = clone $object;
+            break;
+        case Bean::REQUEST:
+            $this->requestPool[$id][$beanName] = $object;
+            break;
+        case Bean::SESSION:
+            $this->sessionPool[$id][$beanName] = $object;
+            break;
     }
+
+    return $object;
+}
 ```
 
 `setNewBean`方法，根据对应的scope信息，将实例化后的反射类注册到对应的类属性上。

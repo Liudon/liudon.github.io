@@ -121,82 +121,82 @@ class AnnotationProcessor extends Processor
 核心逻辑调用`AnnotationRegister`类的`load`方法，定义如下。
 
 ```
-    /**
-     * Load annotation class
-     *
-     * @param array $config
-     *
-     * @throws AnnotationException
-     * @throws ReflectionException
-     */
-    public static function load(array $config = []): void
-    {
-        $resource = new AnnotationResource($config);
-        $resource->load();
-    }
+/**
+    * Load annotation class
+    *
+    * @param array $config
+    *
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+public static function load(array $config = []): void
+{
+    $resource = new AnnotationResource($config);
+    $resource->load();
+}
 ```
 
 这里又调用了`AnnotationResource`类的`load`方法，定义如下。
 
 ```
-    /**
-     * Load annotation resource by find ClassLoader
-     *
-     * @throws AnnotationException
-     * @throws ReflectionException
-     */
-    public function load(): void
-    {
-        $prefixDirsPsr4 = $this->classLoader->getPrefixesPsr4();
+/**
+    * Load annotation resource by find ClassLoader
+    *
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+public function load(): void
+{
+    $prefixDirsPsr4 = $this->classLoader->getPrefixesPsr4();
 
-        foreach ($prefixDirsPsr4 as $ns => $paths) {
-            // Only scan namespaces
-            if ($this->onlyNamespaces && !in_array($ns, $this->onlyNamespaces, true)) {
-                $this->notify('excludeNs', $ns);
+    foreach ($prefixDirsPsr4 as $ns => $paths) {
+        // Only scan namespaces
+        if ($this->onlyNamespaces && !in_array($ns, $this->onlyNamespaces, true)) {
+            $this->notify('excludeNs', $ns);
+            continue;
+        }
+
+        // It is excluded psr4 prefix
+        if ($this->isExcludedPsr4Prefix($ns)) {
+            AnnotationRegister::registerExcludeNs($ns);
+            $this->notify('excludeNs', $ns);
+            continue;
+        }
+
+        // Find package/component loader class
+        foreach ($paths as $path) {
+            $loaderFile = $this->getAnnotationClassLoaderFile($path);
+            if (!file_exists($loaderFile)) {
+                $this->notify('noLoaderFile', $this->clearBasePath($path), $loaderFile);
                 continue;
             }
 
-            // It is excluded psr4 prefix
-            if ($this->isExcludedPsr4Prefix($ns)) {
-                AnnotationRegister::registerExcludeNs($ns);
-                $this->notify('excludeNs', $ns);
+            $loaderClass = $this->getAnnotationLoaderClassName($ns);
+            if (!class_exists($loaderClass)) {
+                $this->notify('noLoaderClass', $loaderClass);
                 continue;
             }
 
-            // Find package/component loader class
-            foreach ($paths as $path) {
-                $loaderFile = $this->getAnnotationClassLoaderFile($path);
-                if (!file_exists($loaderFile)) {
-                    $this->notify('noLoaderFile', $this->clearBasePath($path), $loaderFile);
-                    continue;
-                }
-
-                $loaderClass = $this->getAnnotationLoaderClassName($ns);
-                if (!class_exists($loaderClass)) {
-                    $this->notify('noLoaderClass', $loaderClass);
-                    continue;
-                }
-
-                $loaderObject = new $loaderClass();
-                if (!$loaderObject instanceof LoaderInterface) {
-                    $this->notify('invalidLoader', $loaderFile);
-                    continue;
-                }
-
-                $this->notify('findLoaderClass', $this->clearBasePath($loaderFile));
-
-                // If is disable, will skip scan annotation classes
-                if (!isset($this->disabledAutoLoaders[$loaderClass])) {
-                    AnnotationRegister::registerAutoLoaderFile($loaderFile);
-                    $this->notify('addLoaderClass', $loaderClass);
-                    $this->loadAnnotation($loaderObject);
-                }
-
-                // Storage auto loader to register
-                AnnotationRegister::addAutoLoader($ns, $loaderObject);
+            $loaderObject = new $loaderClass();
+            if (!$loaderObject instanceof LoaderInterface) {
+                $this->notify('invalidLoader', $loaderFile);
+                continue;
             }
+
+            $this->notify('findLoaderClass', $this->clearBasePath($loaderFile));
+
+            // If is disable, will skip scan annotation classes
+            if (!isset($this->disabledAutoLoaders[$loaderClass])) {
+                AnnotationRegister::registerAutoLoaderFile($loaderFile);
+                $this->notify('addLoaderClass', $loaderClass);
+                $this->loadAnnotation($loaderObject);
+            }
+
+            // Storage auto loader to register
+            AnnotationRegister::addAutoLoader($ns, $loaderObject);
         }
     }
+}
 ```
 
 通过`getPrefixesPsr4`方法获取所有自动加载的命名空间和目录，遍历目录下的`AutoLoader.php`文件。
@@ -206,60 +206,60 @@ class AnnotationProcessor extends Processor
 然后调用了`loadAnnotation`方法，传入的是一个`autoload`对象。
 
 ```
-    /**
-     * Load annotations from an component loader config.
-     *
-     * @param LoaderInterface $loader
-     *
-     * @throws AnnotationException
-     * @throws ReflectionException
-     */
-    private function loadAnnotation(LoaderInterface $loader): void
-    {
-        $nsPaths = $loader->getPrefixDirs();
+/**
+    * Load annotations from an component loader config.
+    *
+    * @param LoaderInterface $loader
+    *
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+private function loadAnnotation(LoaderInterface $loader): void
+{
+    $nsPaths = $loader->getPrefixDirs();
 
-        foreach ($nsPaths as $ns => $path) {
-            $iterator = DirectoryHelper::recursiveIterator($path);
+    foreach ($nsPaths as $ns => $path) {
+        $iterator = DirectoryHelper::recursiveIterator($path);
 
-            /* @var SplFileInfo $splFileInfo */
-            foreach ($iterator as $splFileInfo) {
-                $filePath = $splFileInfo->getPathname();
-                // $splFileInfo->isDir();
-                if (is_dir($filePath)) {
-                    continue;
-                }
-
-                $fileName  = $splFileInfo->getFilename();
-                $extension = $splFileInfo->getExtension();
-
-                if ($this->loaderClassSuffix !== $extension || strpos($fileName, '.') === 0) {
-                    continue;
-                }
-
-                // It is exclude filename
-                if (isset($this->excludedFilenames[$fileName])) {
-                    AnnotationRegister::registerExcludeFilename($fileName);
-                    continue;
-                }
-
-                $suffix    = sprintf('.%s', $this->loaderClassSuffix);
-                $pathName  = str_replace([$path, '/', $suffix], ['', '\\', ''], $filePath);
-                $className = sprintf('%s%s', $ns, $pathName);
-
-                // Fix repeat included file bug
-                $autoload = in_array($filePath, $this->includedFiles, true);
-
-                // Will filtering: interfaces and traits
-                if (!class_exists($className, !$autoload)) {
-                    $this->notify('noExistClass', $className);
-                    continue;
-                }
-
-                // Parse annotation
-                $this->parseAnnotation($ns, $className);
+        /* @var SplFileInfo $splFileInfo */
+        foreach ($iterator as $splFileInfo) {
+            $filePath = $splFileInfo->getPathname();
+            // $splFileInfo->isDir();
+            if (is_dir($filePath)) {
+                continue;
             }
+
+            $fileName  = $splFileInfo->getFilename();
+            $extension = $splFileInfo->getExtension();
+
+            if ($this->loaderClassSuffix !== $extension || strpos($fileName, '.') === 0) {
+                continue;
+            }
+
+            // It is exclude filename
+            if (isset($this->excludedFilenames[$fileName])) {
+                AnnotationRegister::registerExcludeFilename($fileName);
+                continue;
+            }
+
+            $suffix    = sprintf('.%s', $this->loaderClassSuffix);
+            $pathName  = str_replace([$path, '/', $suffix], ['', '\\', ''], $filePath);
+            $className = sprintf('%s%s', $ns, $pathName);
+
+            // Fix repeat included file bug
+            $autoload = in_array($filePath, $this->includedFiles, true);
+
+            // Will filtering: interfaces and traits
+            if (!class_exists($className, !$autoload)) {
+                $this->notify('noExistClass', $className);
+                continue;
+            }
+
+            // Parse annotation
+            $this->parseAnnotation($ns, $className);
         }
     }
+}
 ```
 
 通过getPrefixDirs获取当前命名空间的目录，然后通过`recursiveIterator`遍历目录下的文件。
@@ -267,102 +267,102 @@ class AnnotationProcessor extends Processor
 排除目录和非`.php`结尾的文件，最后会调用`parseAnnotation`方法。
 
 ```
-    /**
-     * Parser annotation
-     *
-     * @param string $namespace
-     * @param string $className
-     *
-     * @throws AnnotationException
-     * @throws ReflectionException
-     */
-    private function parseAnnotation(string $namespace, string $className): void
-    {
-        // Annotation reader
-        $reflectionClass = new ReflectionClass($className);
+/**
+    * Parser annotation
+    *
+    * @param string $namespace
+    * @param string $className
+    *
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+private function parseAnnotation(string $namespace, string $className): void
+{
+    // Annotation reader
+    $reflectionClass = new ReflectionClass($className);
 
-        // Fix ignore abstract
-        if ($reflectionClass->isAbstract()) {
-            return;
-        }
-        $oneClassAnnotation = $this->parseOneClassAnnotation($reflectionClass);
-
-        if (!empty($oneClassAnnotation)) {
-            AnnotationRegister::registerAnnotation($namespace, $className, $oneClassAnnotation);
-        }
+    // Fix ignore abstract
+    if ($reflectionClass->isAbstract()) {
+        return;
     }
+    $oneClassAnnotation = $this->parseOneClassAnnotation($reflectionClass);
+
+    if (!empty($oneClassAnnotation)) {
+        AnnotationRegister::registerAnnotation($namespace, $className, $oneClassAnnotation);
+    }
+}
 ```
 
 这里调用了`parseOneClassAnnotation`方法。
 
 ```
-    /**
-     * Parse an class annotation
-     *
-     * @param ReflectionClass $reflectionClass
-     *
-     * @return array
-     * @throws AnnotationException
-     * @throws ReflectionException
-     */
-    private function parseOneClassAnnotation(ReflectionClass $reflectionClass): array
-    {
-        // Annotation reader
-        $reader    = new AnnotationReader();
-        $className = $reflectionClass->getName();
+/**
+    * Parse an class annotation
+    *
+    * @param ReflectionClass $reflectionClass
+    *
+    * @return array
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+private function parseOneClassAnnotation(ReflectionClass $reflectionClass): array
+{
+    // Annotation reader
+    $reader    = new AnnotationReader();
+    $className = $reflectionClass->getName();
 
-        $oneClassAnnotation = [];
-        $classAnnotations   = $reader->getClassAnnotations($reflectionClass);
+    $oneClassAnnotation = [];
+    $classAnnotations   = $reader->getClassAnnotations($reflectionClass);
 
-        // Register annotation parser
-        foreach ($classAnnotations as $classAnnotation) {
-            if ($classAnnotation instanceof AnnotationParser) {
-                $this->registerParser($className, $classAnnotation);
+    // Register annotation parser
+    foreach ($classAnnotations as $classAnnotation) {
+        if ($classAnnotation instanceof AnnotationParser) {
+            $this->registerParser($className, $classAnnotation);
 
-                return [];
-            }
+            return [];
         }
-
-        // Class annotation
-        if (!empty($classAnnotations)) {
-            $oneClassAnnotation['annotation'] = $classAnnotations;
-            $oneClassAnnotation['reflection'] = $reflectionClass;
-        }
-
-        // Property annotation
-        $reflectionProperties = $reflectionClass->getProperties();
-        foreach ($reflectionProperties as $reflectionProperty) {
-            $propertyName        = $reflectionProperty->getName();
-            $propertyAnnotations = $reader->getPropertyAnnotations($reflectionProperty);
-
-            if (!empty($propertyAnnotations)) {
-                $oneClassAnnotation['properties'][$propertyName]['annotation'] = $propertyAnnotations;
-                $oneClassAnnotation['properties'][$propertyName]['reflection'] = $reflectionProperty;
-            }
-        }
-
-        // Method annotation
-        $reflectionMethods = $reflectionClass->getMethods();
-        foreach ($reflectionMethods as $reflectionMethod) {
-            $methodName        = $reflectionMethod->getName();
-            $methodAnnotations = $reader->getMethodAnnotations($reflectionMethod);
-
-            if (!empty($methodAnnotations)) {
-                $oneClassAnnotation['methods'][$methodName]['annotation'] = $methodAnnotations;
-                $oneClassAnnotation['methods'][$methodName]['reflection'] = $reflectionMethod;
-            }
-        }
-
-        $parentReflectionClass = $reflectionClass->getParentClass();
-        if ($parentReflectionClass !== false) {
-            $parentClassAnnotation = $this->parseOneClassAnnotation($parentReflectionClass);
-            if (!empty($parentClassAnnotation)) {
-                $oneClassAnnotation['parent'] = $parentClassAnnotation;
-            }
-        }
-
-        return $oneClassAnnotation;
     }
+
+    // Class annotation
+    if (!empty($classAnnotations)) {
+        $oneClassAnnotation['annotation'] = $classAnnotations;
+        $oneClassAnnotation['reflection'] = $reflectionClass;
+    }
+
+    // Property annotation
+    $reflectionProperties = $reflectionClass->getProperties();
+    foreach ($reflectionProperties as $reflectionProperty) {
+        $propertyName        = $reflectionProperty->getName();
+        $propertyAnnotations = $reader->getPropertyAnnotations($reflectionProperty);
+
+        if (!empty($propertyAnnotations)) {
+            $oneClassAnnotation['properties'][$propertyName]['annotation'] = $propertyAnnotations;
+            $oneClassAnnotation['properties'][$propertyName]['reflection'] = $reflectionProperty;
+        }
+    }
+
+    // Method annotation
+    $reflectionMethods = $reflectionClass->getMethods();
+    foreach ($reflectionMethods as $reflectionMethod) {
+        $methodName        = $reflectionMethod->getName();
+        $methodAnnotations = $reader->getMethodAnnotations($reflectionMethod);
+
+        if (!empty($methodAnnotations)) {
+            $oneClassAnnotation['methods'][$methodName]['annotation'] = $methodAnnotations;
+            $oneClassAnnotation['methods'][$methodName]['reflection'] = $reflectionMethod;
+        }
+    }
+
+    $parentReflectionClass = $reflectionClass->getParentClass();
+    if ($parentReflectionClass !== false) {
+        $parentClassAnnotation = $this->parseOneClassAnnotation($parentReflectionClass);
+        if (!empty($parentClassAnnotation)) {
+            $oneClassAnnotation['parent'] = $parentClassAnnotation;
+        }
+    }
+
+    return $oneClassAnnotation;
+}
 ```
 
 这里就是解析注解了，可以看到分别有类注解、属性注解和方法注解三类。
@@ -370,44 +370,44 @@ class AnnotationProcessor extends Processor
 这里注意这一段代码。
 
 ```
-        // Register annotation parser
-        foreach ($classAnnotations as $classAnnotation) {
-            if ($classAnnotation instanceof AnnotationParser) {
-                $this->registerParser($className, $classAnnotation);
+// Register annotation parser
+foreach ($classAnnotations as $classAnnotation) {
+    if ($classAnnotation instanceof AnnotationParser) {
+        $this->registerParser($className, $classAnnotation);
 
-                return [];
-            }
-        }
+        return [];
+    }
+}
 ```
 
 遍历注解类，如果注解属于`AnnotationParser`实例，这里调用`registerParser`进行注册。
 
 ```
-    /**
-     * @param string $annotationClass
-     * @param string $parserClassName
-     */
-    public static function registerParser(string $annotationClass, string $parserClassName): void
-    {
-        self::$classStats['parser']++;
-        self::$parsers[$annotationClass] = $parserClassName;
-    }
+/**
+    * @param string $annotationClass
+    * @param string $parserClassName
+    */
+public static function registerParser(string $annotationClass, string $parserClassName): void
+{
+    self::$classStats['parser']++;
+    self::$parsers[$annotationClass] = $parserClassName;
+}
 ```
 
 
 回到上一个方法，解析完后，又调用了`AnnotationRegister`类的`registerAnnotation`方法进行注册。
 
 ```
-    /**
-     * @param string $loadNamespace
-     * @param string $className
-     * @param array  $classAnnotation
-     */
-    public static function registerAnnotation(string $loadNamespace, string $className, array $classAnnotation): void
-    {
-        self::$classStats['annotation']++;
-        self::$annotations[$loadNamespace][$className] = $classAnnotation;
-    }
+/**
+    * @param string $loadNamespace
+    * @param string $className
+    * @param array  $classAnnotation
+    */
+public static function registerAnnotation(string $loadNamespace, string $className, array $classAnnotation): void
+{
+    self::$classStats['annotation']++;
+    self::$annotations[$loadNamespace][$className] = $classAnnotation;
+}
 ```
 
 至此，整个`AnnotationProcessor`加载完毕，这里`AnnotationRegister`类里会有`annotations`和`parsers`两个属性，这个信息在后面的`BeanProcessor`里还会用到。
