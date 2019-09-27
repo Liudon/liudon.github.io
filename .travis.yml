@@ -16,7 +16,6 @@ env:
 # install - install any dependencies required
 install:
   - mkdir -p $HOME/src/hugo
-  - ll
   - export TRAVIS_BUILD_DIR=$HOME/src/hugo
   - cd $HOME/src/hugo
   - go get github.com/magefile/mage
