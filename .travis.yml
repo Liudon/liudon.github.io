@@ -15,13 +15,15 @@ env:
 # before_install
 # install - install any dependencies required
 install:
-  - mkdir -p $HOME/src/hugo
-  - cd $HOME/src/hugo
+  - mkdir $HOME/src
+  - cd $HOME/src
+  - git clone https://github.com/gohugoio/hugo.git
+  - cd hugo
   - go get github.com/magefile/mage
-  - go mod download || true
-  - mage -v test
-  - mage -v check
+  - go mod download
   - mage -v hugo
+  - ./hugo version
+  - pwd
 
 git:
   submodules: false
