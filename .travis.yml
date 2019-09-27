@@ -9,12 +9,17 @@ python:
 
 env:
   global:
+  - GOPROXY="https://proxy.golang.org"
   - HUGO_BUILD_TAGS="extended"
 
 # before_install
 # install - install any dependencies required
 install:
-    - go get github.com/gohugoio/hugo
+  - mkdir -p $HOME/src
+  - mv $TRAVIS_BUILD_DIR $HOME/src
+  - export TRAVIS_BUILD_DIR=$HOME/src/hugo
+  - cd $HOME/src/hugo
+  - go get github.com/magefile/mage
 
 git:
   submodules: false
@@ -25,7 +30,11 @@ before_script:
 
 # script - run the build script
 script:
-    - hugo -v --gc
+    - go mod download || true
+    - mage -v test
+    - mage -v check
+    - mage -v hugo
+    - hugo
     - echo "$CNAME_URL" > public/CNAME
 
 deploy:
