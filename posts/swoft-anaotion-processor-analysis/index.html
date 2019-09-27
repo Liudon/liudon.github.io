@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article# fb: http://ogp.me/ns/fb#"><meta name="theme-color" content="#fff" />
+        <script>
+            const theme = localStorage.getItem('theme');
+            if (theme === "dark") {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000');
+            } else if (theme === "light") {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff');
+            }
+        </script>
+
+    <meta charset="UTF-8" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    
+    <meta name="renderer" content="webkit" />
+
+    <meta name="generator" content="Hugo 0.59.0-DEV" />
+
+    <title>Swoft 框架运行分析（二） —— AnnotationProcessor模块分析 | 流动</title>
+
+    <link rel="stylesheet" href="/css/meme.min.ffa4361d0228b34b408c4a5d389bc27a12516cd311efbca3d27f96a0ef0900f3.css" integrity="sha256-/6Q2HQIos0tAjEpdOJvCehJRbNMR77yj0n+WoO8JAPM=" data-instant-track /><style data-instant-track>html[data-theme='dark'] .post img {filter:invert(85%) hue-rotate(180deg)}.post-body h1,.post-body h2,.post-body h3,.post-body h4,.post-body h5,.post-body h6,.contents-title,.contents-title-indent {font-variant:small-caps}</style>
+
+    <link href="https://fonts.googleapis.com/css?family=EB+Garamond:400,400i,700,700i|Noto+Serif+SC:400,700|Source+Code+Pro:400,400i,700,700i|Cinzel+Decorative:700&display=swap&subset=chinese-simplified" rel="stylesheet" />
+
+    <meta name="author" content="liudon" />
+    
+    
+    <meta name="description" content="上一篇介绍了，SwoftApplication里定义了6个Processor对象。 1……" />
+    <meta name="keywords" content="swoft" />
+    
+    <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="流动" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="流动" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://liudon.xyz/posts/swoft-anaotion-processor-analysis/" />
+
+
+
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": 2019-08-29T19:11:04&#43;08:00,
+        "dateModified": 2019-09-27T12:19:57&#43;00:00,
+        "url": https://liudon.xyz/posts/swoft-anaotion-processor-analysis/,
+        "headline": Swoft 框架运行分析（二） —— AnnotationProcessor模块分析,
+        "description": 上一篇介绍了，SwoftApplication里定义了6个Processor对象。 1……,
+        "keywords": swoft,
+        "inLanguage" : "zh-CN",
+        "articleSection": posts,
+        "wordCount": 1989,
+        "image": https://liudon.xyz/icons/apple-touch-icon.png,
+        "author": {
+            "@type": "Person",
+            "email": i@liudon.org,
+            "image": https://liudon.xyz/icons/apple-touch-icon.png,
+            "url": https://liudon.xyz,
+            "name": liudon
+        },
+        "license": [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh),
+        "publisher": {
+            "@type": "Organization",
+            "name": 流动,
+            "logo": {
+                "@type": "ImageObject",
+                "url": https://liudon.xyz/icons/apple-touch-icon.png
+            },
+            "url": https://liudon.xyz/
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": https://liudon.xyz/
+        }
+    }
+</script>
+
+    
+
+
+
+<meta name="twitter:card" content="summary" />
+
+
+    
+
+
+
+
+
+
+<meta property="og:title" content="Swoft 框架运行分析（二） —— AnnotationProcessor模块分析" />
+<meta property="og:description" content="上一篇介绍了，SwoftApplication里定义了6个Processor对象。 1……" />
+<meta property="og:url" content="https://liudon.xyz/posts/swoft-anaotion-processor-analysis/" />
+<meta property="og:site_name" content="流动" />
+<meta property="og:locale" content="zh-CN" /><meta property="og:image" content="https://liudon.xyz/icons/apple-touch-icon.png" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2019-08-29T19:11:04+08:00" />
+    <meta property="article:modified_time" content="2019-09-27T12:19:57+00:00" />
+    
+    
+    <meta property="article:section" content="posts" />
+    <meta property="article:tag" content="swoft" />
+
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        <div class="site-brand">
+            
+            <a href="/" class="brand">流动</a>
+            
+        </div>
+    </header>
+
+            
+    <nav class="nav">
+        <ul class="menu" id="menu">
+            
+            
+        </ul>
+    </nav>
+
+            
+            
+    
+        
+            
+        
+        
+        <div id="theme-toggle" onclick="modeSwitcher()">🌞</div>
+    
+
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+        <article class="content post">
+            
+            <h1 class="post-title">Swoft 框架运行分析（二） —— AnnotationProcessor模块分析</h1>
+
+            
+
+            
+                
+            
+
+            
+                <div class="post-meta">
+    
+        
+        <time datetime="2019-08-29T19:11:04+08:00" class="post-meta-item published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>2019-08-08</time>
+    
+    
+    
+    
+        
+        
+        
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>1989</span>
+    
+    
+        
+        <span class="post-meta-item readingtime"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>4&nbsp;分钟</span>
+    
+</div>
+            
+
+            
+
+
+                <div class="post-body"><p style="text-indent:0"><span class="drop-cap">上</span>一篇介绍了，<code>SwoftApplication</code>里定义了6个Processor对象。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">protected function processors(): array
+    {
+        return [
+            new EnvProcessor($this),
+            new ConfigProcessor($this),
+            new AnnotationProcessor($this),
+            new BeanProcessor($this),
+            new EventProcessor($this),
+            new ConsoleProcessor($this),
+        ];
+    }</pre></td></tr></table>
+</div>
+</div>
+<p>所有的Processor实现都在<code>framework\src\Processor</code>目录下。</p>
+
+<ol>
+<li><p>EnvProcessor，运行环境检查。</p></li>
+
+<li><p>ConfigProcessor，配置相关。</p></li>
+
+<li><p>AnnotationProcessor，注解相关。</p></li>
+
+<li><p>BeanProcessor，Bean相关。</p></li>
+
+<li><p>EventProcessor，事件相关。</p></li>
+
+<li><p>ConsoleProcessor，命令行输入相关。</p></li>
+</ol>
+
+<p>今天先讲一下<code>AnnotationProcessor</code>这个模块的实现。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&lt;?php declare(strict_types=1);
+
+namespace Swoft\Processor;
+
+use Exception;
+use Swoft\Annotation\AnnotationRegister;
+use Swoft\Log\Helper\CLog;
+
+/**
+ * Annotation processor
+ * @since 2.0
+ */
+class AnnotationProcessor extends Processor
+{
+    /**
+     * Handle annotation
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function handle(): bool
+    {
+        if (!$this-&gt;application-&gt;beforeAnnotation()) {
+            CLog::warning(&#39;Stop annotation processor by beforeAnnotation return false&#39;);
+            return false;
+        }
+
+        $app = $this-&gt;application;
+
+        // Find AutoLoader classes. Parse and collect annotations.
+        AnnotationRegister::load([
+            &#39;inPhar&#39;               =&gt; \IN_PHAR,
+            &#39;basePath&#39;             =&gt; $app-&gt;getBasePath(),
+            &#39;notifyHandler&#39;        =&gt; [$this, &#39;notifyHandler&#39;],
+            &#39;disabledAutoLoaders&#39;  =&gt; $app-&gt;getDisabledAutoLoaders(),
+            &#39;disabledPsr4Prefixes&#39; =&gt; $app-&gt;getDisabledPsr4Prefixes(),
+        ]);
+
+        $stats = AnnotationRegister::getClassStats();
+
+        CLog::info(
+            &#39;Annotations is scanned(autoloader %d, annotation %d, parser %d)&#39;,
+            $stats[&#39;autoloader&#39;],
+            $stats[&#39;annotation&#39;],
+            $stats[&#39;parser&#39;]
+        );
+
+        return $this-&gt;application-&gt;afterAnnotation();
+    }
+
+    /**
+     * @param string $type
+     * @param string $target
+     * @see \Swoft\Annotation\Resource\AnnotationResource::load()
+     */
+    public function notifyHandler(string $type, $target): void
+    {
+        switch ($type) {
+            case &#39;excludeNs&#39;:
+                CLog::debug(&#39;Exclude namespace %s&#39;, $target);
+                break;
+            case &#39;noLoaderFile&#39;:
+                CLog::debug(&#39;No autoloader on %s&#39;, $target);
+                break;
+            case &#39;noLoaderClass&#39;:
+                CLog::debug(&#39;Autoloader class not exist %s&#39;, $target);
+                break;
+            case &#39;findLoaderClass&#39;:
+                CLog::debug(&#39;Find autoloader %s&#39;, $target);
+                break;
+            case &#39;addLoaderClass&#39;:
+                CLog::debug(&#39;Parse autoloader %s&#39;, $target);
+                break;
+            case &#39;noExistClass&#39;:
+                CLog::debug(&#39;Skip interface or trait %s&#39;, $target);
+                break;
+        }
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>核心逻辑调用<code>AnnotationRegister</code>类的<code>load</code>方法，定义如下。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Load annotation class
+    *
+    * @param array $config
+    *
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+public static function load(array $config = []): void
+{
+    $resource = new AnnotationResource($config);
+    $resource-&gt;load();
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里又调用了<code>AnnotationResource</code>类的<code>load</code>方法，定义如下。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Load annotation resource by find ClassLoader
+    *
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+public function load(): void
+{
+    $prefixDirsPsr4 = $this-&gt;classLoader-&gt;getPrefixesPsr4();
+
+    foreach ($prefixDirsPsr4 as $ns =&gt; $paths) {
+        // Only scan namespaces
+        if ($this-&gt;onlyNamespaces &amp;&amp; !in_array($ns, $this-&gt;onlyNamespaces, true)) {
+            $this-&gt;notify(&#39;excludeNs&#39;, $ns);
+            continue;
+        }
+
+        // It is excluded psr4 prefix
+        if ($this-&gt;isExcludedPsr4Prefix($ns)) {
+            AnnotationRegister::registerExcludeNs($ns);
+            $this-&gt;notify(&#39;excludeNs&#39;, $ns);
+            continue;
+        }
+
+        // Find package/component loader class
+        foreach ($paths as $path) {
+            $loaderFile = $this-&gt;getAnnotationClassLoaderFile($path);
+            if (!file_exists($loaderFile)) {
+                $this-&gt;notify(&#39;noLoaderFile&#39;, $this-&gt;clearBasePath($path), $loaderFile);
+                continue;
+            }
+
+            $loaderClass = $this-&gt;getAnnotationLoaderClassName($ns);
+            if (!class_exists($loaderClass)) {
+                $this-&gt;notify(&#39;noLoaderClass&#39;, $loaderClass);
+                continue;
+            }
+
+            $loaderObject = new $loaderClass();
+            if (!$loaderObject instanceof LoaderInterface) {
+                $this-&gt;notify(&#39;invalidLoader&#39;, $loaderFile);
+                continue;
+            }
+
+            $this-&gt;notify(&#39;findLoaderClass&#39;, $this-&gt;clearBasePath($loaderFile));
+
+            // If is disable, will skip scan annotation classes
+            if (!isset($this-&gt;disabledAutoLoaders[$loaderClass])) {
+                AnnotationRegister::registerAutoLoaderFile($loaderFile);
+                $this-&gt;notify(&#39;addLoaderClass&#39;, $loaderClass);
+                $this-&gt;loadAnnotation($loaderObject);
+            }
+
+            // Storage auto loader to register
+            AnnotationRegister::addAutoLoader($ns, $loaderObject);
+        }
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>通过<code>getPrefixesPsr4</code>方法获取所有自动加载的命名空间和目录，遍历目录下的<code>AutoLoader.php</code>文件。</p>
+
+<p>通过<code>registerAutoLoaderFile</code>注册自动加载文件到<code>AnnotationRegister</code>对象上。</p>
+
+<p>然后调用了<code>loadAnnotation</code>方法，传入的是一个<code>autoload</code>对象。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Load annotations from an component loader config.
+    *
+    * @param LoaderInterface $loader
+    *
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+private function loadAnnotation(LoaderInterface $loader): void
+{
+    $nsPaths = $loader-&gt;getPrefixDirs();
+
+    foreach ($nsPaths as $ns =&gt; $path) {
+        $iterator = DirectoryHelper::recursiveIterator($path);
+
+        /* @var SplFileInfo $splFileInfo */
+        foreach ($iterator as $splFileInfo) {
+            $filePath = $splFileInfo-&gt;getPathname();
+            // $splFileInfo-&gt;isDir();
+            if (is_dir($filePath)) {
+                continue;
+            }
+
+            $fileName  = $splFileInfo-&gt;getFilename();
+            $extension = $splFileInfo-&gt;getExtension();
+
+            if ($this-&gt;loaderClassSuffix !== $extension || strpos($fileName, &#39;.&#39;) === 0) {
+                continue;
+            }
+
+            // It is exclude filename
+            if (isset($this-&gt;excludedFilenames[$fileName])) {
+                AnnotationRegister::registerExcludeFilename($fileName);
+                continue;
+            }
+
+            $suffix    = sprintf(&#39;.%s&#39;, $this-&gt;loaderClassSuffix);
+            $pathName  = str_replace([$path, &#39;/&#39;, $suffix], [&#39;&#39;, &#39;\\&#39;, &#39;&#39;], $filePath);
+            $className = sprintf(&#39;%s%s&#39;, $ns, $pathName);
+
+            // Fix repeat included file bug
+            $autoload = in_array($filePath, $this-&gt;includedFiles, true);
+
+            // Will filtering: interfaces and traits
+            if (!class_exists($className, !$autoload)) {
+                $this-&gt;notify(&#39;noExistClass&#39;, $className);
+                continue;
+            }
+
+            // Parse annotation
+            $this-&gt;parseAnnotation($ns, $className);
+        }
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>通过getPrefixDirs获取当前命名空间的目录，然后通过<code>recursiveIterator</code>遍历目录下的文件。</p>
+
+<p>排除目录和非<code>.php</code>结尾的文件，最后会调用<code>parseAnnotation</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Parser annotation
+    *
+    * @param string $namespace
+    * @param string $className
+    *
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+private function parseAnnotation(string $namespace, string $className): void
+{
+    // Annotation reader
+    $reflectionClass = new ReflectionClass($className);
+
+    // Fix ignore abstract
+    if ($reflectionClass-&gt;isAbstract()) {
+        return;
+    }
+    $oneClassAnnotation = $this-&gt;parseOneClassAnnotation($reflectionClass);
+
+    if (!empty($oneClassAnnotation)) {
+        AnnotationRegister::registerAnnotation($namespace, $className, $oneClassAnnotation);
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里调用了<code>parseOneClassAnnotation</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Parse an class annotation
+    *
+    * @param ReflectionClass $reflectionClass
+    *
+    * @return array
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+private function parseOneClassAnnotation(ReflectionClass $reflectionClass): array
+{
+    // Annotation reader
+    $reader    = new AnnotationReader();
+    $className = $reflectionClass-&gt;getName();
+
+    $oneClassAnnotation = [];
+    $classAnnotations   = $reader-&gt;getClassAnnotations($reflectionClass);
+
+    // Register annotation parser
+    foreach ($classAnnotations as $classAnnotation) {
+        if ($classAnnotation instanceof AnnotationParser) {
+            $this-&gt;registerParser($className, $classAnnotation);
+
+            return [];
+        }
+    }
+
+    // Class annotation
+    if (!empty($classAnnotations)) {
+        $oneClassAnnotation[&#39;annotation&#39;] = $classAnnotations;
+        $oneClassAnnotation[&#39;reflection&#39;] = $reflectionClass;
+    }
+
+    // Property annotation
+    $reflectionProperties = $reflectionClass-&gt;getProperties();
+    foreach ($reflectionProperties as $reflectionProperty) {
+        $propertyName        = $reflectionProperty-&gt;getName();
+        $propertyAnnotations = $reader-&gt;getPropertyAnnotations($reflectionProperty);
+
+        if (!empty($propertyAnnotations)) {
+            $oneClassAnnotation[&#39;properties&#39;][$propertyName][&#39;annotation&#39;] = $propertyAnnotations;
+            $oneClassAnnotation[&#39;properties&#39;][$propertyName][&#39;reflection&#39;] = $reflectionProperty;
+        }
+    }
+
+    // Method annotation
+    $reflectionMethods = $reflectionClass-&gt;getMethods();
+    foreach ($reflectionMethods as $reflectionMethod) {
+        $methodName        = $reflectionMethod-&gt;getName();
+        $methodAnnotations = $reader-&gt;getMethodAnnotations($reflectionMethod);
+
+        if (!empty($methodAnnotations)) {
+            $oneClassAnnotation[&#39;methods&#39;][$methodName][&#39;annotation&#39;] = $methodAnnotations;
+            $oneClassAnnotation[&#39;methods&#39;][$methodName][&#39;reflection&#39;] = $reflectionMethod;
+        }
+    }
+
+    $parentReflectionClass = $reflectionClass-&gt;getParentClass();
+    if ($parentReflectionClass !== false) {
+        $parentClassAnnotation = $this-&gt;parseOneClassAnnotation($parentReflectionClass);
+        if (!empty($parentClassAnnotation)) {
+            $oneClassAnnotation[&#39;parent&#39;] = $parentClassAnnotation;
+        }
+    }
+
+    return $oneClassAnnotation;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里就是解析注解了，可以看到分别有类注解、属性注解和方法注解三类。</p>
+
+<p>这里注意这一段代码。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">// Register annotation parser
+foreach ($classAnnotations as $classAnnotation) {
+    if ($classAnnotation instanceof AnnotationParser) {
+        $this-&gt;registerParser($className, $classAnnotation);
+
+        return [];
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>遍历注解类，如果注解属于<code>AnnotationParser</code>实例，这里调用<code>registerParser</code>进行注册。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * @param string $annotationClass
+    * @param string $parserClassName
+    */
+public static function registerParser(string $annotationClass, string $parserClassName): void
+{
+    self::$classStats[&#39;parser&#39;]++;
+    self::$parsers[$annotationClass] = $parserClassName;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>回到上一个方法，解析完后，又调用了<code>AnnotationRegister</code>类的<code>registerAnnotation</code>方法进行注册。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * @param string $loadNamespace
+    * @param string $className
+    * @param array  $classAnnotation
+    */
+public static function registerAnnotation(string $loadNamespace, string $className, array $classAnnotation): void
+{
+    self::$classStats[&#39;annotation&#39;]++;
+    self::$annotations[$loadNamespace][$className] = $classAnnotation;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>至此，整个<code>AnnotationProcessor</code>加载完毕，这里<code>AnnotationRegister</code>类里会有<code>annotations</code>和<code>parsers</code>两个属性，这个信息在后面的<code>BeanProcessor</code>里还会用到。</p>
+</div>
+
+        </article>
+
+        
+            
+            
+            
+                <ul class="post-copyright">
+                    <li class="post-copyright-author">作者：<a href="https://liudon.xyz" target="_blank">liudon</a></li>
+                    
+                        <li class="post-copyright-link">链接：<a href="/posts/swoft-anaotion-processor-analysis/" target="_blank">https://liudon.xyz/posts/swoft-anaotion-processor-analysis/</a></li>
+                    
+                    
+                        <li class="post-copyright-license">版权：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC BY-NC-SA 4.0</a></li>
+                    
+                </ul>
+            
+        
+
+        
+            <div class="updated-badge-container"><div title="Updated @ 2019-09-27 12:19:57 UTC" style="cursor:help;display:inline-block">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2019-09-27</text><text x="915" y="140" textLength="650" transform="scale(.1)">2019-09-27</text></g></svg></div></div>
+        
+
+        
+
+        
+            
+            
+                <div class="related-posts">
+                    <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+                    <ul class="related-list">
+                        
+                            <li class="related-item">
+                                <a href="/posts/swoft-console-processor-analysis/" class="related-link">Swoft 框架运行分析（五） —— ConsoleProcessor模块分析</a>
+                            </li>
+                        
+                            <li class="related-item">
+                                <a href="/posts/swoft-event-processor-analysis/" class="related-link">Swoft 框架运行分析（四） —— EventProcessor模块分析</a>
+                            </li>
+                        
+                            <li class="related-item">
+                                <a href="/posts/swoft-bean-processor-analysis/" class="related-link">Swoft 框架运行分析（三） —— BeanProcessor模块分析</a>
+                            </li>
+                        
+                            <li class="related-item">
+                                <a href="/posts/swoft-execution-analysis/" class="related-link">Swoft 框架运行分析（一）</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+        
+
+        
+            
+                <div class="post-tags">
+                    
+                        
+                        
+                            
+                            <a href="/tags/swoft/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>Swoft</a>
+                        
+                    
+                </div>
+            
+        
+
+        
+            <footer class="minimal-footer">
+                
+                    
+                    <div class="post-tag"><a href="/tags/swoft/" rel="tag" class="post-tag-link">#swoft</a></div>
+                
+                
+                
+                    
+                
+            </footer>
+        
+
+        
+
+        
+            
+                
+                
+            
+            
+            
+            
+                <ul class="post-nav">
+                    
+                        <li class="post-nav-prev">
+                            <a href="/posts/swoft-bean-processor-analysis/" rel="prev">< Swoft 框架运行分析（三） —— BeanProcessor模块分析</a>
+                        </li>
+                    
+                    
+                        <li class="post-nav-next">
+                            <a href="/posts/swoft-execution-analysis/" rel="next">Swoft 框架运行分析（一） ></a>
+                        </li>
+                    
+                </ul>
+            
+        
+
+        
+        
+    </div>
+</main>
+
+            
+    <a href="#" class="back-to-top"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            
+                
+            
+            
+
+            
+                
+            
+            
+
+            
+                
+            
+            
+
+            <div class="site-info">© 2011–2019<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>liudon</div>
+
+            
+                <div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank">MemE</a></div>
+            
+
+            
+                <div class="site-copyright"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC BY-NC-SA 4.0</a></div>
+            
+
+            
+        </div>
+    </footer>
+
+        </div>
+    </body>
+    <script src="/js/meme.min.5523549ad6e0623b279bdccbfe3ebf3035624bba0d6dcda2272d63da1a43ed83.js" integrity="sha256-VSNUmtbgYjsnm9zL/j6/MDViS7oNbc2iJy1j2hpD7YM=" data-no-instant></script><script data-no-instant>InstantClick.init();</script>
+
+    
+        <script data-no-instant>
+            InstantClick.on('change', function () {
+                const theme = localStorage.getItem('theme');
+                if (theme === "dark") {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000');
+                    document.getElementById("theme-toggle").innerHTML = "🌙";
+
+                    var els = [].slice.apply(document.getElementsByClassName("chroma"));
+                    for (var i = 0; i < els.length; i++) {
+                        els[i].className = els[i].className.replace(/ *\bchroma\b/g, "chroma-dark");
+                    }
+                } else if (theme === "light") {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff');
+                    document.getElementById("theme-toggle").innerHTML = "🌞";
+
+                    var els = [].slice.apply(document.getElementsByClassName("chroma-dark"));
+                    for (var i = 0; i < els.length; i++) {
+                        els[i].className = els[i].className.replace(/ *\bchroma-dark\b/g, "chroma");
+                    }
+                }
+            });
+        </script>
+    
+
+
+
+
+
+</html>

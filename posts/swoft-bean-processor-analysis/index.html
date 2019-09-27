@@ -1,0 +1,2540 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article# fb: http://ogp.me/ns/fb#"><meta name="theme-color" content="#fff" />
+        <script>
+            const theme = localStorage.getItem('theme');
+            if (theme === "dark") {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000');
+            } else if (theme === "light") {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff');
+            }
+        </script>
+
+    <meta charset="UTF-8" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    
+    <meta name="renderer" content="webkit" />
+
+    <meta name="generator" content="Hugo 0.59.0-DEV" />
+
+    <title>Swoft 框架运行分析（三） —— BeanProcessor模块分析 | 流动</title>
+
+    <link rel="stylesheet" href="/css/meme.min.ffa4361d0228b34b408c4a5d389bc27a12516cd311efbca3d27f96a0ef0900f3.css" integrity="sha256-/6Q2HQIos0tAjEpdOJvCehJRbNMR77yj0n+WoO8JAPM=" data-instant-track /><style data-instant-track>html[data-theme='dark'] .post img {filter:invert(85%) hue-rotate(180deg)}.post-body h1,.post-body h2,.post-body h3,.post-body h4,.post-body h5,.post-body h6,.contents-title,.contents-title-indent {font-variant:small-caps}</style>
+
+    <link href="https://fonts.googleapis.com/css?family=EB+Garamond:400,400i,700,700i|Noto+Serif+SC:400,700|Source+Code+Pro:400,400i,700,700i|Cinzel+Decorative:700&display=swap&subset=chinese-simplified" rel="stylesheet" />
+
+    <meta name="author" content="liudon" />
+    
+    
+    <meta name="description" content="今天讲一下BeanProcessor模块，先看一下handle方法实现。 1 2 3 4 5 6……" />
+    <meta name="keywords" content="swoft" />
+    
+    <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="流动" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="流动" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://liudon.xyz/posts/swoft-bean-processor-analysis/" />
+
+
+
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": 2019-09-02T18:29:06&#43;08:00,
+        "dateModified": 2019-09-27T12:19:57&#43;00:00,
+        "url": https://liudon.xyz/posts/swoft-bean-processor-analysis/,
+        "headline": Swoft 框架运行分析（三） —— BeanProcessor模块分析,
+        "description": 今天讲一下BeanProcessor模块，先看一下handle方法实现。 1 2 3 4 5 6……,
+        "keywords": swoft,
+        "inLanguage" : "zh-CN",
+        "articleSection": posts,
+        "wordCount": 5024,
+        "image": https://liudon.xyz/icons/apple-touch-icon.png,
+        "author": {
+            "@type": "Person",
+            "email": i@liudon.org,
+            "image": https://liudon.xyz/icons/apple-touch-icon.png,
+            "url": https://liudon.xyz,
+            "name": liudon
+        },
+        "license": [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh),
+        "publisher": {
+            "@type": "Organization",
+            "name": 流动,
+            "logo": {
+                "@type": "ImageObject",
+                "url": https://liudon.xyz/icons/apple-touch-icon.png
+            },
+            "url": https://liudon.xyz/
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": https://liudon.xyz/
+        }
+    }
+</script>
+
+    
+
+
+
+<meta name="twitter:card" content="summary" />
+
+
+    
+
+
+
+
+
+
+<meta property="og:title" content="Swoft 框架运行分析（三） —— BeanProcessor模块分析" />
+<meta property="og:description" content="今天讲一下BeanProcessor模块，先看一下handle方法实现。 1 2 3 4 5 6……" />
+<meta property="og:url" content="https://liudon.xyz/posts/swoft-bean-processor-analysis/" />
+<meta property="og:site_name" content="流动" />
+<meta property="og:locale" content="zh-CN" /><meta property="og:image" content="https://liudon.xyz/icons/apple-touch-icon.png" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2019-09-02T18:29:06+08:00" />
+    <meta property="article:modified_time" content="2019-09-27T12:19:57+00:00" />
+    
+    
+    <meta property="article:section" content="posts" />
+    <meta property="article:tag" content="swoft" />
+
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        <div class="site-brand">
+            
+            <a href="/" class="brand">流动</a>
+            
+        </div>
+    </header>
+
+            
+    <nav class="nav">
+        <ul class="menu" id="menu">
+            
+            
+        </ul>
+    </nav>
+
+            
+            
+    
+        
+            
+        
+        
+        <div id="theme-toggle" onclick="modeSwitcher()">🌞</div>
+    
+
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+        <article class="content post">
+            
+            <h1 class="post-title">Swoft 框架运行分析（三） —— BeanProcessor模块分析</h1>
+
+            
+
+            
+                
+            
+
+            
+                <div class="post-meta">
+    
+        
+        <time datetime="2019-09-02T18:29:06+08:00" class="post-meta-item published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>2019-09-09</time>
+    
+    
+    
+    
+        
+        
+        
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>5024</span>
+    
+    
+        
+        <span class="post-meta-item readingtime"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>11&nbsp;分钟</span>
+    
+</div>
+            
+
+            
+
+
+                <div class="post-body"><p style="text-indent:0"><span class="drop-cap">今</span>天讲一下<code>BeanProcessor</code>模块，先看一下<code>handle</code>方法实现。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Handle bean
+    *
+    * @return bool
+    * @throws ReflectionException
+    * @throws AnnotationException
+    */
+public function handle(): bool
+{
+    if (!$this-&gt;application-&gt;beforeBean()) {
+        return false;
+    }
+
+    $handler     = new BeanHandler();
+    $definitions = $this-&gt;getDefinitions();
+    $parsers     = AnnotationRegister::getParsers();
+    $annotations = AnnotationRegister::getAnnotations();
+
+    BeanFactory::addDefinitions($definitions);
+    BeanFactory::addAnnotations($annotations);
+    BeanFactory::addParsers($parsers);
+    BeanFactory::setHandler($handler);
+    BeanFactory::init();
+
+    /* @var Config $config*/
+    $config = BeanFactory::getBean(&#39;config&#39;);
+
+    CLog::info(&#39;config path=%s&#39;, $config-&gt;getPath());
+    CLog::info(&#39;config env=%s&#39;, $config-&gt;getEnv());
+
+    $stats = BeanFactory::getStats();
+
+    CLog::info(&#39;Bean is initialized(%s)&#39;, SwoftHelper::formatStats($stats));
+
+    return $this-&gt;application-&gt;afterBean();
+}</pre></td></tr></table>
+</div>
+</div>
+<p>先通过<code>getDefinitions</code>方法获取所有的Bean定义。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Get bean definitions
+    *
+    * @return array
+    */
+private function getDefinitions(): array
+{
+    // Core beans
+    $definitions = [];
+    $autoLoaders = AnnotationRegister::getAutoLoaders();
+
+    // get disabled loaders by application
+    $disabledLoaders = $this-&gt;application-&gt;getDisabledAutoLoaders();
+
+    foreach ($autoLoaders as $autoLoader) {
+        if (!$autoLoader instanceof DefinitionInterface) {
+            continue;
+        }
+
+        $loaderClass = get_class($autoLoader);
+
+        // If the component is disabled by user.
+        if (isset($disabledLoaders[$loaderClass])) {
+            CLog::info(&#39;Auto loader(%s) is &lt;cyan&gt;disabled&lt;/cyan&gt;, skip handle it&#39;, $loaderClass);
+            continue;
+        }
+
+        // If the component is not enabled.
+        if ($autoLoader instanceof ComponentInterface &amp;&amp; !$autoLoader-&gt;isEnable()) {
+            continue;
+        }
+
+        $definitions = ArrayHelper::merge($definitions, $autoLoader-&gt;beans());
+    }
+
+    // Bean definitions
+    $beanFile = $this-&gt;application-&gt;getBeanFile();
+    $beanFile = alias($beanFile);
+
+    if (!file_exists($beanFile)) {
+        throw new InvalidArgumentException(
+            sprintf(&#39;The bean config file of %s is not exist!&#39;, $beanFile)
+        );
+    }
+
+    $beanDefinitions = require $beanFile;
+    $definitions     = ArrayHelper::merge($definitions, $beanDefinitions);
+
+    return $definitions;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>通过<code>AnnotationRegister::getAutoLoaders()</code>拿到所有的autoloader对象，排除掉非<code>DefinitionInterface</code>对象，通过<code>bean()</code>方法获取定义的Bean信息。</p>
+
+<p>这里以<code>http-server\src\AutoLoader.php</code>为例。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span><span class="lnt">91
+</span><span class="lnt">92
+</span><span class="lnt">93
+</span><span class="lnt">94
+</span><span class="lnt">95
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&lt;?php declare(strict_types=1);
+
+namespace Swoft\Http\Server;
+
+use function bean;
+use function dirname;
+use ReflectionException;
+use Swoft\Bean\Exception\ContainerException;
+use Swoft\Helper\ComposerJSON;
+use Swoft\Http\Message\ContentType;
+use Swoft\Http\Message\Response;
+use Swoft\Http\Server\Formatter\HtmlResponseFormatter;
+use Swoft\Http\Server\Formatter\JsonResponseFormatter;
+use Swoft\Http\Server\Formatter\XmlResponseFormatter;
+use Swoft\Http\Server\Parser\JsonRequestParser;
+use Swoft\Http\Server\Parser\XmlRequestParser;
+use Swoft\Http\Server\Swoole\RequestListener;
+use Swoft\Server\SwooleEvent;
+use Swoft\SwoftComponent;
+
+/**
+ * Class AutoLoader
+ *
+ * @since 2.0
+ */
+class AutoLoader extends SwoftComponent
+{
+    /**
+     * Metadata information for the component.
+     *
+     * @return array
+     * @see ComponentInterface::getMetadata()
+     */
+    public function metadata(): array
+    {
+        $jsonFile = dirname(__DIR__) . &#39;/composer.json&#39;;
+
+        return ComposerJSON::open($jsonFile)-&gt;getMetadata();
+    }
+
+    /**
+     * Get namespace and dirs
+     *
+     * @return array
+     */
+    public function getPrefixDirs(): array
+    {
+        return [
+            __NAMESPACE__ =&gt; __DIR__,
+        ];
+    }
+
+    /**
+     * @return array
+     * @throws ReflectionException
+     * @throws ContainerException
+     */
+    public function beans(): array
+    {
+        return [
+            &#39;httpRequest&#39;     =&gt; [
+                &#39;parsers&#39; =&gt; [
+                    ContentType::XML  =&gt; bean(XmlRequestParser::class),
+                    ContentType::JSON =&gt; bean(JsonRequestParser::class),
+                ]
+            ],
+            &#39;httpResponse&#39;    =&gt; [
+                &#39;format&#39;     =&gt; Response::FORMAT_JSON,
+                &#39;formatters&#39; =&gt; [
+                    Response::FORMAT_HTML =&gt; bean(HtmlResponseFormatter::class),
+                    Response::FORMAT_JSON =&gt; bean(JsonResponseFormatter::class),
+                    Response::FORMAT_XML  =&gt; bean(XmlResponseFormatter::class),
+                ]
+            ],
+            &#39;acceptFormatter&#39; =&gt; [
+                &#39;formats&#39; =&gt; [
+                    ContentType::JSON =&gt; Response::FORMAT_JSON,
+                    ContentType::HTML =&gt; Response::FORMAT_HTML,
+                    ContentType::XML  =&gt; Response::FORMAT_XML,
+                ]
+            ],
+            &#39;httpServer&#39;      =&gt; [
+                &#39;on&#39; =&gt; [
+                    SwooleEvent::REQUEST =&gt; bean(RequestListener::class)
+                ]
+            ],
+            &#39;httpRouter&#39;      =&gt; [
+                &#39;name&#39;            =&gt; &#39;swoft-http-router&#39;,
+                // config
+                &#39;ignoreLastSlash&#39; =&gt; true,
+                &#39;tmpCacheNumber&#39;  =&gt; 500,
+            ],
+        ];
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>可以看到，这里通过<code>beans()</code>定义了<code>httpRequest</code>、<code>httpResponse</code>、<code>acceptFormatter</code>、<code>httpServer</code>和<code>httpRouter</code>四个Bean对象。</p>
+
+<p>回到上面<code>getDefinitions</code>方法。</p>
+
+<p><code>$definitions = ArrayHelper::merge($definitions, $autoLoader-&gt;beans());</code></p>
+
+<p>然后将Bean信息添加到<code>definitions</code>对象上。</p>
+
+<p>之后通过<code>$beanFile = $this-&gt;application-&gt;getBeanFile();</code>获取bean配置文件。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$beanDefinitions = require $beanFile;
+$definitions     = ArrayHelper::merge($definitions, $beanDefinitions);</pre></td></tr></table>
+</div>
+</div>
+<p>加载配置文件，然后将Bean信息添加到<code>definitions</code>对象上。</p>
+
+<p>可以看到Bean有两种定义方式：通过AutoLoader和配置文件，与<a href="https://en.swoft.org/docs/2.x/zh-CN/bean/bean.html" target="_blank">swoft官方文档</a>里的说明一致。</p>
+
+<p>回到<code>handle</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$parsers     = AnnotationRegister::getParsers();
+$annotations = AnnotationRegister::getAnnotations();</pre></td></tr></table>
+</div>
+</div>
+<p>还记得上一篇文章最后提到的<code>AnnotationRegister</code>类的<code>annotations</code>和<code>parsers</code>两个属性吗？这里通过<code>getParsers</code>和<code>getAnnotations</code>获取这两个属性。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">BeanFactory::addDefinitions($definitions);
+BeanFactory::addAnnotations($annotations);
+BeanFactory::addParsers($parsers);
+BeanFactory::setHandler($handler);
+BeanFactory::init();</pre></td></tr></table>
+</div>
+</div>
+<p>向BeanFatory注册信息。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Init
+    *
+    * @return void
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+public static function init(): void
+{
+    Container::getInstance()-&gt;init();
+}
+
+...
+
+/**
+    * Add definitions
+    *
+    * @param array $definitions
+    *
+    * @return void
+    */
+public static function addDefinitions(array $definitions): void
+{
+    Container::getInstance()-&gt;addDefinitions($definitions);
+}
+
+/**
+    * Add annotations
+    *
+    * @param array $annotations
+    *
+    * @return void
+    */
+public static function addAnnotations(array $annotations): void
+{
+    Container::getInstance()-&gt;addAnnotations($annotations);
+}
+
+/**
+    * Add annotation parsers
+    *
+    * @param array $annotationParsers
+    *
+    * @return void
+    */
+public static function addParsers(array $annotationParsers): void
+{
+    Container::getInstance()-&gt;addParsers($annotationParsers);
+}
+
+/**
+    * Set bean handler
+    *
+    * @param HandlerInterface $handler
+    */
+public static function setHandler(HandlerInterface $handler): void
+{
+    Container::getInstance()-&gt;setHandler($handler);
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里可以看到所有的方法，最终都调用的是<code>Swoft\Bean\Container</code>类。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Add definitions
+    *
+    * @param array $definitions
+    *
+    * @return void
+    */
+public function addDefinitions(array $definitions): void
+{
+    $this-&gt;definitions = ArrayHelper::merge($this-&gt;definitions, $definitions);
+}
+
+/**
+    * Add annotations
+    *
+    * @param array $annotations
+    *
+    * @return void
+    */
+public function addAnnotations(array $annotations): void
+{
+    $this-&gt;annotations = ArrayHelper::merge($this-&gt;annotations, $annotations);
+}
+
+/**
+    * Add annotation parsers
+    *
+    * @param array $annotationParsers
+    *
+    * @return void
+    */
+public function addParsers(array $annotationParsers): void
+{
+    $this-&gt;parsers = ArrayHelper::merge($this-&gt;parsers, $annotationParsers);
+}
+
+
+/**
+    * @param HandlerInterface $handler
+    */
+public function setHandler(HandlerInterface $handler): void
+{
+    $this-&gt;handler = $handler;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这四个方法就是注册属性，接下来是重头戏<code>init</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Init
+    *
+    * @throws AnnotationException
+    * @throws ReflectionException
+    */
+public function init(): void
+{
+    // Parse annotations
+    $this-&gt;parseAnnotations();
+
+    // Parse definitions
+    $this-&gt;parseDefinitions();
+
+    // Init beans
+    $this-&gt;initializeBeans();
+}</pre></td></tr></table>
+</div>
+</div>
+<p>先看<code>parseAnnotations</code>方法，从代码注释上也可以看出大概，解析注解，接下来我们看下具体是如何实现的。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Parse annotations
+    *
+    * @throws AnnotationException
+    */
+private function parseAnnotations(): void
+{
+    $annotationParser = new AnnotationObjParser(
+        $this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases
+    );
+    $annotationData   = $annotationParser-&gt;parseAnnotations($this-&gt;annotations, $this-&gt;parsers);
+
+    [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases] = $annotationData;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>声明了一个<code>AnnotationObjParser</code>对象，调用了<code>parseAnnotations</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Parse annotations
+    *
+    * @param array $annotations
+    * @param array $parsers
+    *
+    * @return array
+    * @throws AnnotationException
+    */
+public function parseAnnotations(array $annotations, array $parsers): array
+{
+    $this-&gt;parsers     = $parsers;
+    $this-&gt;annotations = $annotations;
+
+    foreach ($this-&gt;annotations as $loadNameSpace =&gt; $classes) {
+        foreach ($classes as $className =&gt; $classOneAnnotations) {
+            $this-&gt;parseOneClassAnnotations($className, $classOneAnnotations);
+        }
+    }
+
+    return [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases];
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里遍历所有的<code>annotation</code>类，循环调用<code>parseOneClassAnnotations</code>进行解析。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Parse class all annotations
+    *
+    * @param string $className
+    * @param array  $classOneAnnotations
+    *
+    * @throws AnnotationException
+    */
+private function parseOneClassAnnotations(string $className, array $classOneAnnotations): void
+{
+    // Check class annotation tag
+    if (!isset($classOneAnnotations[&#39;annotation&#39;])) {
+        throw new AnnotationException(
+            sprintf(&#39;Property or method(%s) with `@xxx` must be define class annotation&#39;, $className)
+        );
+    }
+
+    // Parse class annotations
+    $classAnnotations = $classOneAnnotations[&#39;annotation&#39;];
+    $reflectionClass  = $classOneAnnotations[&#39;reflection&#39;];
+
+    $classAry = [
+        $className,
+        $reflectionClass,
+        $classAnnotations
+    ];
+
+    $objectDefinition = $this-&gt;parseClassAnnotations($classAry);
+
+    // Parse property annotations
+    $propertyInjects        = [];
+    $propertyAllAnnotations = $classOneAnnotations[&#39;properties&#39;] ?? [];
+    foreach ($propertyAllAnnotations as $propertyName =&gt; $propertyOneAnnotations) {
+        $proAnnotations = $propertyOneAnnotations[&#39;annotation&#39;] ?? [];
+        $propertyInject = $this-&gt;parsePropertyAnnotations($classAry, $propertyName, $proAnnotations);
+        if ($propertyInject) {
+            $propertyInjects[$propertyName] = $propertyInject;
+        }
+    }
+
+    // Parse method annotations
+    $methodInjects        = [];
+    $methodAllAnnotations = $classOneAnnotations[&#39;methods&#39;] ?? [];
+    foreach ($methodAllAnnotations as $methodName =&gt; $methodOneAnnotations) {
+        $methodAnnotations = $methodOneAnnotations[&#39;annotation&#39;] ?? [];
+
+        $methodInject = $this-&gt;parseMethodAnnotations($classAry, $methodName, $methodAnnotations);
+        if ($methodInject) {
+            $methodInjects[$methodName] = $methodInject;
+        }
+    }
+
+    if (!$objectDefinition) {
+        return;
+    }
+
+    if (!empty($propertyInjects)) {
+        $objectDefinition-&gt;setPropertyInjections($propertyInjects);
+    }
+
+    if (!empty($methodInjects)) {
+        $objectDefinition-&gt;setMethodInjections($methodInjects);
+    }
+
+    // Object definition and class name
+    $name         = $objectDefinition-&gt;getName();
+    $aliase       = $objectDefinition-&gt;getAlias();
+    $classNames   = $this-&gt;classNames[$className] ?? [];
+    $classNames[] = $name;
+
+    $this-&gt;classNames[$className]   = array_unique($classNames);
+    $this-&gt;objectDefinitions[$name] = $objectDefinition;
+
+    if (!empty($aliase)) {
+        $this-&gt;aliases[$aliase] = $name;
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里可以看到分别有类注解、属性注解和方法注解三类。</p>
+
+<p>对应官方文档的<a href="https://en.swoft.org/docs/2.x/zh-CN/annotation/index.html#%E8%A7%84%E8%8C%83" target="_blank">注解说明</a>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * @param array $classAry
+    *
+    * @return ObjectDefinition|null
+    */
+private function parseClassAnnotations(array $classAry): ?ObjectDefinition
+{
+    [, , $classAnnotations] = $classAry;
+
+    $objectDefinition = null;
+    foreach ($classAnnotations as $annotation) {
+        $annotationClass = get_class($annotation);
+        if (!isset($this-&gt;parsers[$annotationClass])) {
+            continue;
+        }
+
+        $parserClassName  = $this-&gt;parsers[$annotationClass];
+        $annotationParser = $this-&gt;getAnnotationParser($classAry, $parserClassName);
+
+        $data = $annotationParser-&gt;parse(Parser::TYPE_CLASS, $annotation);
+        if (empty($data)) {
+            continue;
+        }
+
+        if (count($data) !== 4) {
+            throw new InvalidArgumentException(sprintf(&#39;%s annotation parse must be 4 size&#39;, $annotationClass));
+        }
+
+        [$name, $className, $scope, $alias] = $data;
+        $name = empty($name) ? $className : $name;
+
+        if (empty($className)) {
+            throw new InvalidArgumentException(sprintf(&#39;%s with class name can not be empty&#39;, $annotationClass));
+        }
+
+        // Multiple coverage
+        $objectDefinition = new ObjectDefinition($name, $className, $scope, $alias);
+    }
+
+    return $objectDefinition;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>类注解，这里会调用对应解析类的<code>parse</code>方法。</p>
+
+<p>这里以<code>websocket-server\src\Annotation\Mapping\WsModule.php</code>和<code>websocket-server\src\Annotation\Parser\WsModuleParser.php</code>为例。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&lt;?php declare(strict_types=1);
+
+namespace Swoft\WebSocket\Server\Annotation\Mapping;
+
+use Doctrine\Common\Annotations\Annotation\Attribute;
+use Doctrine\Common\Annotations\Annotation\Attributes;
+use Doctrine\Common\Annotations\Annotation\Required;
+use Doctrine\Common\Annotations\Annotation\Target;
+use Swoft\WebSocket\Server\MessageParser\RawTextParser;
+
+/**
+ * Class WebSocket - mark an websocket module handler class
+ *
+ * @since 2.0
+ *
+ * @Annotation
+ * @Target(&#34;CLASS&#34;)
+ * @Attributes(
+ *     @Attribute(&#34;name&#34;, type=&#34;string&#34;),
+ *     @Attribute(&#34;path&#34;, type=&#34;string&#34;),
+ *     @Attribute(&#34;controllers&#34;, type=&#34;array&#34;),
+ *     @Attribute(&#34;messageParser&#34;, type=&#34;string&#34;),
+ * )
+ */
+final class WsModule
+{
+    /**
+     * Websocket route path.(it must unique in a application)
+     *
+     * @var string
+     * @Required()
+     */
+    private $path = &#39;/&#39;;
+
+    /**
+     * Module name.
+     *
+     * @var string
+     */
+    private $name = &#39;&#39;;
+
+    /**
+     * Routing path params binding. eg. {&#34;id&#34;=&#34;\d+&#34;}
+     *
+     * @var array
+     */
+    private $params = [];
+
+    /**
+     * Message controllers of the module
+     *
+     * @var string[]
+     */
+    private $controllers = [];
+
+    /**
+     * Message parser class for the module
+     *
+     * @var string
+     */
+    private $messageParser = RawTextParser::class;
+
+    /**
+     * Default message command. Format &#39;controller.action&#39;
+     *
+     * @var string
+     */
+    private $defaultCommand = &#39;home.index&#39;;
+
+    /**
+     * Default message opcode for response. please see WEBSOCKET_OPCODE_*
+     *
+     * @var int
+     */
+    private $defaultOpcode = 0;
+
+    /**
+     * Class constructor.
+     *
+     * @param array $values
+     */
+    public function __construct(array $values)
+    {
+        if (isset($values[&#39;value&#39;])) {
+            $this-&gt;path = (string)$values[&#39;value&#39;];
+        } elseif (isset($values[&#39;path&#39;])) {
+            $this-&gt;path = (string)$values[&#39;path&#39;];
+        }
+
+        if (isset($values[&#39;name&#39;])) {
+            $this-&gt;name = (string)$values[&#39;name&#39;];
+        }
+
+        if (isset($values[&#39;params&#39;])) {
+            $this-&gt;params = (array)$values[&#39;params&#39;];
+        }
+
+        if (isset($values[&#39;controllers&#39;])) {
+            $this-&gt;controllers = (array)$values[&#39;controllers&#39;];
+        }
+
+        if (isset($values[&#39;messageParser&#39;])) {
+            $this-&gt;messageParser = $values[&#39;messageParser&#39;];
+        }
+
+        if (isset($values[&#39;defaultOpcode&#39;])) {
+            $this-&gt;defaultOpcode = (int)$values[&#39;defaultOpcode&#39;];
+        }
+
+        if (isset($values[&#39;defaultCommand&#39;])) {
+            $this-&gt;defaultCommand = $values[&#39;defaultCommand&#39;];
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this-&gt;path;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessageParser(): string
+    {
+        return $this-&gt;messageParser;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultCommand(): string
+    {
+        return $this-&gt;defaultCommand;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this-&gt;name;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getControllers(): array
+    {
+        return $this-&gt;controllers;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParams(): array
+    {
+        return $this-&gt;params;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultOpcode(): int
+    {
+        return $this-&gt;defaultOpcode;
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p><code>WsModule</code>声明了一个类注解。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&lt;?php declare(strict_types=1);
+
+namespace Swoft\WebSocket\Server\Annotation\Parser;
+
+use Swoft\Annotation\Annotation\Mapping\AnnotationParser;
+use Swoft\Annotation\Annotation\Parser\Parser;
+use Swoft\Annotation\Exception\AnnotationException;
+use Swoft\Bean\Annotation\Mapping\Bean;
+use Swoft\Stdlib\Helper\Str;
+use Swoft\WebSocket\Server\Annotation\Mapping\WsModule;
+use Swoft\WebSocket\Server\MessageParser\RawTextParser;
+use Swoft\WebSocket\Server\Router\RouteRegister;
+
+/**
+ * Class WebSocketParser
+ *
+ * @since 2.0
+ *
+ * @AnnotationParser(WsModule::class)
+ */
+class WsModuleParser extends Parser
+{
+    /**
+     * Parse object
+     *
+     * @param int      $type Class or Method or Property
+     * @param WsModule $ann  Annotation object
+     *
+     * @return array
+     * Return empty array is nothing to do!
+     * When class type return [$beanName, $className, $scope, $alias, $size] is to inject bean
+     * When property type return [$propertyValue, $isRef] is to reference value
+     * @throws AnnotationException
+     */
+    public function parse(int $type, $ann): array
+    {
+        if ($type !== self::TYPE_CLASS) {
+            throw new AnnotationException(&#39;`@WsModule` must be defined on class!&#39;);
+        }
+
+        $class = $this-&gt;className;
+
+        RouteRegister::bindModule($class, [
+            &#39;path&#39;           =&gt; $ann-&gt;getPath() ?: Str::getClassName($class, &#39;Module&#39;),
+            &#39;name&#39;           =&gt; $ann-&gt;getName(),
+            &#39;params&#39;         =&gt; $ann-&gt;getParams(),
+            &#39;class&#39;          =&gt; $class,
+            &#39;eventMethods&#39;   =&gt; [],
+            &#39;controllers&#39;    =&gt; $ann-&gt;getControllers(),
+            &#39;messageParser&#39;  =&gt; $ann-&gt;getMessageParser() ?: RawTextParser::class,
+            &#39;defaultOpcode&#39; =&gt; $ann-&gt;getDefaultOpcode(),
+            &#39;defaultCommand&#39; =&gt; $ann-&gt;getDefaultCommand(),
+        ]);
+
+        return [$class, $class, Bean::SINGLETON, &#39;&#39;];
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>按上一篇文章说明，这里<code>WsModuleParser</code>会被标记为注解类<code>WsModule</code>的注解解析类。</p>
+
+<p>解析注解的时候，会调用<code>WsModuleParser</code>的<code>parse</code>方法，这里通过<code>RouteRegister::bindModule</code>做了一些路由操作，这里后续再讲，这里不做深入介绍。</p>
+
+<p>属性和方法注解，也是类似的，<code>parseAnnotations</code>方法就讲完了。</p>
+
+<p>回到<code>Container</code>类的<code>init</code>方法，接下来调用了<code>parseDefinitions</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Parse definitions
+    */
+private function parseDefinitions(): void
+{
+    $annotationParser = new DefinitionObjParser(
+        $this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases
+    );
+
+    // Collect info
+    $definitionData = $annotationParser-&gt;parseDefinitions();
+    [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases] = $definitionData;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>声明了一个<code>DefinitionObjParser</code>对象，调用了<code>parseDefinitions</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Parse definitions
+    *
+    * @return array
+    */
+public function parseDefinitions(): array
+{
+    foreach ($this-&gt;definitions as $beanName =&gt; $definition) {
+        if (isset($this-&gt;objectDefinitions[$beanName])) {
+            $objectDefinition = $this-&gt;objectDefinitions[$beanName];
+            $this-&gt;resetObjectDefinition($beanName, $objectDefinition, $definition);
+            continue;
+        }
+
+        $this-&gt;createObjectDefinition($beanName, $definition);
+    }
+
+    return [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases];
+}</pre></td></tr></table>
+</div>
+</div>
+<p>遍历所有的<code>Bean</code>对象，调用<code>createObjectDefinition</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Create object definition for definition
+    *
+    * @param string $beanName
+    * @param array  $definition
+    */
+private function createObjectDefinition(string $beanName, array $definition): void
+{
+    $className = $definition[&#39;class&#39;] ?? &#39;&#39;;
+    if (empty($className)) {
+        throw new InvalidArgumentException(sprintf(&#39;%s key for definition must be defined class&#39;, $beanName));
+    }
+
+    $objDefinition = new ObjectDefinition($beanName, $className);
+    $objDefinition = $this-&gt;updateObjectDefinitionByDefinition($objDefinition, $definition);
+
+    $classNames   = $this-&gt;classNames[$className] ?? [];
+    $classNames[] = $beanName;
+
+    $this-&gt;classNames[$className]       = array_unique($classNames);
+    $this-&gt;objectDefinitions[$beanName] = $objDefinition;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>声明了<code>ObjectDefinition</code>对象，调用了<code>updateObjectDefinitionByDefinition</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Update definition
+    *
+    * @param ObjectDefinition $objDfn
+    * @param array            $definition
+    *
+    * @return ObjectDefinition
+    */
+private function updateObjectDefinitionByDefinition(ObjectDefinition $objDfn, array $definition): ObjectDefinition
+{
+    [$constructInject, $propertyInjects, $option] = $this-&gt;parseDefinition($definition);
+
+    // Set construct inject
+    if (!empty($constructInject)) {
+        $objDfn-&gt;setConstructorInjection($constructInject);
+    }
+
+    // Set property inject
+    foreach ($propertyInjects as $propertyName =&gt; $propertyInject) {
+        $objDfn-&gt;setPropertyInjection($propertyName, $propertyInject);
+    }
+
+    $scopes = [
+        Bean::SINGLETON,
+        Bean::PROTOTYPE,
+        Bean::REQUEST,
+    ];
+
+    $scope = $option[&#39;scope&#39;] ?? &#39;&#39;;
+    $alias = $option[&#39;alias&#39;] ?? &#39;&#39;;
+
+    if (!empty($scope) &amp;&amp; !in_array($scope, $scopes, true)) {
+        throw new InvalidArgumentException(&#39;Scope for definition is not undefined&#39;);
+    }
+
+    // Update scope
+    if (!empty($scope)) {
+        $objDfn-&gt;setScope($scope);
+    }
+
+    // Update alias
+    if (!empty($alias)) {
+        $objDfn-&gt;setAlias($alias);
+
+        $objAlias = $objDfn-&gt;getAlias();
+        unset($this-&gt;aliases[$objAlias]);
+
+        $this-&gt;aliases[$alias] = $objDfn-&gt;getName();
+    }
+
+    return $objDfn;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里调用了<code>parseDefinition</code>方法进行解析。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Parse definition
+    *
+    * @param array $definition
+    *
+    * @return array
+    */
+private function parseDefinition(array $definition): array
+{
+    // Remove class key
+    unset($definition[&#39;class&#39;]);
+
+    // Parse construct
+    $constructArgs = $definition[0] ?? [];
+    if (!is_array($constructArgs)) {
+        throw new InvalidArgumentException(&#39;Construct args for definition must be array&#39;);
+    }
+
+    // Parse construct args
+    $argInjects = [];
+    foreach ($constructArgs as $arg) {
+        [$argValue, $argIsRef] = $this-&gt;getValueByRef($arg);
+
+        $argInjects[] = new ArgsInjection($argValue, $argIsRef);
+    }
+
+    // Set construct inject
+    $constructInject = null;
+    if (!empty($argInjects)) {
+        $constructInject = new MethodInjection(&#39;__construct&#39;, $argInjects);
+    }
+
+    // Remove construct definition
+    unset($definition[0]);
+
+    // Parse definition option
+    $option = $definition[&#39;__option&#39;] ?? [];
+    if (!is_array($option)) {
+        throw new InvalidArgumentException(&#39;__option for definition must be array&#39;);
+    }
+
+    // Remove `__option`
+    unset($definition[&#39;__option&#39;]);
+
+    // Parse definition properties
+    $propertyInjects = [];
+    foreach ($definition as $propertyName =&gt; $propertyValue) {
+        if (!is_string($propertyName)) {
+            throw new InvalidArgumentException(&#39;Property key from definition must be string&#39;);
+        }
+
+        [$proValue, $proIsRef] = $this-&gt;getValueByRef($propertyValue);
+
+        // Parse property for array
+        if (is_array($proValue)) {
+            $proValue = $this-&gt;parseArrayProperty($proValue);
+        }
+
+        $propertyInject = new PropertyInjection($propertyName, $proValue, $proIsRef);
+
+        $propertyInjects[$propertyName] = $propertyInject;
+    }
+
+    return [$constructInject, $propertyInjects, $option];
+}</pre></td></tr></table>
+</div>
+</div>
+<p>解析<code>__construct</code>方法和传参，解析属性信息。</p>
+
+<p>回到<code>updateObjectDefinitionByDefinition</code>方法，将<code>__construct</code>和类属性信息注册到<code>ObjectDefinition</code>对象上，到这里<code>parseDefinitions</code>方法执行完毕。</p>
+
+<p>回到<code>Container</code>类的<code>init</code>方法，接下来调用了<code>initializeBeans</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Initialize beans
+    *
+    * @throws InvalidArgumentException
+    * @throws ReflectionException
+    */
+private function initializeBeans(): void
+{
+    /* @var ObjectDefinition $objectDefinition */
+    foreach ($this-&gt;objectDefinitions as $beanName =&gt; $objectDefinition) {
+        $scope = $objectDefinition-&gt;getScope();
+        // Exclude request
+        if ($scope === Bean::REQUEST) {
+            $this-&gt;requestDefinitions[$beanName] = $objectDefinition;
+            unset($this-&gt;objectDefinitions[$beanName]);
+            continue;
+        }
+
+        // Exclude session
+        if ($scope === Bean::SESSION) {
+            $this-&gt;sessionDefinitions[$beanName] = $objectDefinition;
+            unset($this-&gt;objectDefinitions[$beanName]);
+            continue;
+        }
+
+        // New bean
+        $this-&gt;newBean($beanName);
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>对于<code>scope</code>不为<code>Bean::REQUEST</code>和<code>Bean::SESSION</code>的，调用<code>newBean</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Initialize beans
+    *
+    * @param string $beanName
+    * @param string $id
+    *
+    * @return object
+    * @throws ReflectionException
+    */
+private function newBean(string $beanName, string $id = &#39;&#39;)
+{
+    // First, check bean whether has been create.
+    if (isset($this-&gt;singletonPool[$beanName]) || isset($this-&gt;prototypePool[$beanName])) {
+        return $this-&gt;get($beanName);
+    }
+
+    // Get object definition
+    $objectDefinition = $this-&gt;getNewObjectDefinition($beanName);
+
+    $scope     = $objectDefinition-&gt;getScope();
+    $alias     = $objectDefinition-&gt;getAlias();
+    $className = $objectDefinition-&gt;getClassName();
+
+    // Cache reflection class info
+    Reflections::cache($className);
+
+    // Before initialize bean
+    $this-&gt;beforeInit($beanName, $className, $objectDefinition);
+
+    $constructArgs   = [];
+    $constructInject = $objectDefinition-&gt;getConstructorInjection();
+    if ($constructInject !== null) {
+        $constructArgs = $this-&gt;getConstructParams($constructInject, $id);
+    }
+
+    $propertyInjects = $objectDefinition-&gt;getPropertyInjections();
+
+    // Proxy class
+    if ($this-&gt;handler) {
+        $className = $this-&gt;handler-&gt;classProxy($className);
+    }
+
+    $reflectionClass = new ReflectionClass($className);
+    $reflectObject   = $this-&gt;newInstance($reflectionClass, $constructArgs);
+
+    // Inject properties values
+    $this-&gt;newProperty($reflectObject, $reflectionClass, $propertyInjects, $id);
+
+    // Alias
+    if (!empty($alias)) {
+        $this-&gt;aliases[$alias] = $beanName;
+    }
+
+    // Call init method if exist
+    if ($reflectionClass-&gt;hasMethod(self::INIT_METHOD)) {
+        $reflectObject-&gt;{self::INIT_METHOD}();
+    }
+
+    return $this-&gt;setNewBean($beanName, $scope, $reflectObject, $id);
+}</pre></td></tr></table>
+</div>
+</div>
+<p>通过反射实例化<code>Bean</code>对应的类，注册对应的属性。</p>
+
+<p>如果类存在<code>self::INIT_METHOD</code>方法，执行此方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * @param string $beanName
+    * @param string $scope
+    * @param object $object
+    * @param string $id
+    *
+    * @return object
+    */
+private function setNewBean(string $beanName, string $scope, $object, string $id = &#39;&#39;)
+{
+    switch ($scope) {
+        case Bean::SINGLETON: // Singleton
+            $this-&gt;singletonPool[$beanName] = $object;
+            break;
+        case Bean::PROTOTYPE:
+            $this-&gt;prototypePool[$beanName] = $object;
+            // Clone it
+            $object = clone $object;
+            break;
+        case Bean::REQUEST:
+            $this-&gt;requestPool[$id][$beanName] = $object;
+            break;
+        case Bean::SESSION:
+            $this-&gt;sessionPool[$id][$beanName] = $object;
+            break;
+    }
+
+    return $object;
+}</pre></td></tr></table>
+</div>
+</div>
+<p><code>setNewBean</code>方法，根据对应的scope信息，将实例化后的反射类注册到对应的类属性上。</p>
+
+<p>到这里<code>BeanProcessor</code>类就执行完了。</p>
+</div>
+
+        </article>
+
+        
+            
+            
+            
+                <ul class="post-copyright">
+                    <li class="post-copyright-author">作者：<a href="https://liudon.xyz" target="_blank">liudon</a></li>
+                    
+                        <li class="post-copyright-link">链接：<a href="/posts/swoft-bean-processor-analysis/" target="_blank">https://liudon.xyz/posts/swoft-bean-processor-analysis/</a></li>
+                    
+                    
+                        <li class="post-copyright-license">版权：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC BY-NC-SA 4.0</a></li>
+                    
+                </ul>
+            
+        
+
+        
+            <div class="updated-badge-container"><div title="Updated @ 2019-09-27 12:19:57 UTC" style="cursor:help;display:inline-block">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2019-09-27</text><text x="915" y="140" textLength="650" transform="scale(.1)">2019-09-27</text></g></svg></div></div>
+        
+
+        
+
+        
+            
+            
+                <div class="related-posts">
+                    <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+                    <ul class="related-list">
+                        
+                            <li class="related-item">
+                                <a href="/posts/swoft-console-processor-analysis/" class="related-link">Swoft 框架运行分析（五） —— ConsoleProcessor模块分析</a>
+                            </li>
+                        
+                            <li class="related-item">
+                                <a href="/posts/swoft-event-processor-analysis/" class="related-link">Swoft 框架运行分析（四） —— EventProcessor模块分析</a>
+                            </li>
+                        
+                            <li class="related-item">
+                                <a href="/posts/swoft-anaotion-processor-analysis/" class="related-link">Swoft 框架运行分析（二） —— AnnotationProcessor模块分析</a>
+                            </li>
+                        
+                            <li class="related-item">
+                                <a href="/posts/swoft-execution-analysis/" class="related-link">Swoft 框架运行分析（一）</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+        
+
+        
+            
+                <div class="post-tags">
+                    
+                        
+                        
+                            
+                            <a href="/tags/swoft/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>Swoft</a>
+                        
+                    
+                </div>
+            
+        
+
+        
+            <footer class="minimal-footer">
+                
+                    
+                    <div class="post-tag"><a href="/tags/swoft/" rel="tag" class="post-tag-link">#swoft</a></div>
+                
+                
+                
+                    
+                
+            </footer>
+        
+
+        
+
+        
+            
+                
+                
+            
+            
+            
+            
+                <ul class="post-nav">
+                    
+                        <li class="post-nav-prev">
+                            <a href="/posts/curl-cost-time-long/" rel="prev">< 一个Curl的耗时长的问题</a>
+                        </li>
+                    
+                    
+                        <li class="post-nav-next">
+                            <a href="/posts/swoft-anaotion-processor-analysis/" rel="next">Swoft 框架运行分析（二） —— AnnotationProcessor模块分析 ></a>
+                        </li>
+                    
+                </ul>
+            
+        
+
+        
+        
+    </div>
+</main>
+
+            
+    <a href="#" class="back-to-top"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            
+                
+            
+            
+
+            
+                
+            
+            
+
+            
+                
+            
+            
+
+            <div class="site-info">© 2011–2019<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>liudon</div>
+
+            
+                <div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank">MemE</a></div>
+            
+
+            
+                <div class="site-copyright"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC BY-NC-SA 4.0</a></div>
+            
+
+            
+        </div>
+    </footer>
+
+        </div>
+    </body>
+    <script src="/js/meme.min.5523549ad6e0623b279bdccbfe3ebf3035624bba0d6dcda2272d63da1a43ed83.js" integrity="sha256-VSNUmtbgYjsnm9zL/j6/MDViS7oNbc2iJy1j2hpD7YM=" data-no-instant></script><script data-no-instant>InstantClick.init();</script>
+
+    
+        <script data-no-instant>
+            InstantClick.on('change', function () {
+                const theme = localStorage.getItem('theme');
+                if (theme === "dark") {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000');
+                    document.getElementById("theme-toggle").innerHTML = "🌙";
+
+                    var els = [].slice.apply(document.getElementsByClassName("chroma"));
+                    for (var i = 0; i < els.length; i++) {
+                        els[i].className = els[i].className.replace(/ *\bchroma\b/g, "chroma-dark");
+                    }
+                } else if (theme === "light") {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff');
+                    document.getElementById("theme-toggle").innerHTML = "🌞";
+
+                    var els = [].slice.apply(document.getElementsByClassName("chroma-dark"));
+                    for (var i = 0; i < els.length; i++) {
+                        els[i].className = els[i].className.replace(/ *\bchroma-dark\b/g, "chroma");
+                    }
+                }
+            });
+        </script>
+    
+
+
+
+
+
+</html>

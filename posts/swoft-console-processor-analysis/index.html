@@ -1,0 +1,2524 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article# fb: http://ogp.me/ns/fb#"><meta name="theme-color" content="#fff" />
+        <script>
+            const theme = localStorage.getItem('theme');
+            if (theme === "dark") {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000');
+            } else if (theme === "light") {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff');
+            }
+        </script>
+
+    <meta charset="UTF-8" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    
+    <meta name="renderer" content="webkit" />
+
+    <meta name="generator" content="Hugo 0.59.0-DEV" />
+
+    <title>Swoft 框架运行分析（五） —— ConsoleProcessor模块分析 | 流动</title>
+
+    <link rel="stylesheet" href="/css/meme.min.ffa4361d0228b34b408c4a5d389bc27a12516cd311efbca3d27f96a0ef0900f3.css" integrity="sha256-/6Q2HQIos0tAjEpdOJvCehJRbNMR77yj0n+WoO8JAPM=" data-instant-track /><style data-instant-track>html[data-theme='dark'] .post img {filter:invert(85%) hue-rotate(180deg)}.post-body h1,.post-body h2,.post-body h3,.post-body h4,.post-body h5,.post-body h6,.contents-title,.contents-title-indent {font-variant:small-caps}</style>
+
+    <link href="https://fonts.googleapis.com/css?family=EB+Garamond:400,400i,700,700i|Noto+Serif+SC:400,700|Source+Code+Pro:400,400i,700,700i|Cinzel+Decorative:700&display=swap&subset=chinese-simplified" rel="stylesheet" />
+
+    <meta name="author" content="liudon" />
+    
+    
+    <meta name="description" content="这里以Swoft启动http server为例。 php bin/swoft http:start 执行上述命令，启动http ser……" />
+    <meta name="keywords" content="swoft" />
+    
+    <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="流动" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="流动" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://liudon.xyz/posts/swoft-console-processor-analysis/" />
+
+
+
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": 2019-09-26T13:14:23&#43;08:00,
+        "dateModified": 2019-09-27T12:19:57&#43;00:00,
+        "url": https://liudon.xyz/posts/swoft-console-processor-analysis/,
+        "headline": Swoft 框架运行分析（五） —— ConsoleProcessor模块分析,
+        "description": 这里以Swoft启动http server为例。 php bin/swoft http:start 执行上述命令，启动http ser……,
+        "keywords": swoft,
+        "inLanguage" : "zh-CN",
+        "articleSection": posts,
+        "wordCount": 5452,
+        "image": https://liudon.xyz/icons/apple-touch-icon.png,
+        "author": {
+            "@type": "Person",
+            "email": i@liudon.org,
+            "image": https://liudon.xyz/icons/apple-touch-icon.png,
+            "url": https://liudon.xyz,
+            "name": liudon
+        },
+        "license": [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh),
+        "publisher": {
+            "@type": "Organization",
+            "name": 流动,
+            "logo": {
+                "@type": "ImageObject",
+                "url": https://liudon.xyz/icons/apple-touch-icon.png
+            },
+            "url": https://liudon.xyz/
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": https://liudon.xyz/
+        }
+    }
+</script>
+
+    
+
+
+
+<meta name="twitter:card" content="summary" />
+
+
+    
+
+
+
+
+
+
+<meta property="og:title" content="Swoft 框架运行分析（五） —— ConsoleProcessor模块分析" />
+<meta property="og:description" content="这里以Swoft启动http server为例。 php bin/swoft http:start 执行上述命令，启动http ser……" />
+<meta property="og:url" content="https://liudon.xyz/posts/swoft-console-processor-analysis/" />
+<meta property="og:site_name" content="流动" />
+<meta property="og:locale" content="zh-CN" /><meta property="og:image" content="https://liudon.xyz/icons/apple-touch-icon.png" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2019-09-26T13:14:23+08:00" />
+    <meta property="article:modified_time" content="2019-09-27T12:19:57+00:00" />
+    
+    
+    <meta property="article:section" content="posts" />
+    <meta property="article:tag" content="swoft" />
+
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        <div class="site-brand">
+            
+            <a href="/" class="brand">流动</a>
+            
+        </div>
+    </header>
+
+            
+    <nav class="nav">
+        <ul class="menu" id="menu">
+            
+            
+        </ul>
+    </nav>
+
+            
+            
+    
+        
+            
+        
+        
+        <div id="theme-toggle" onclick="modeSwitcher()">🌞</div>
+    
+
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+        <article class="content post">
+            
+            <h1 class="post-title">Swoft 框架运行分析（五） —— ConsoleProcessor模块分析</h1>
+
+            
+
+            
+                
+            
+
+            
+                <div class="post-meta">
+    
+        
+        <time datetime="2019-09-26T13:14:23+08:00" class="post-meta-item published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>2019-09-09</time>
+    
+    
+    
+    
+        
+        
+        
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>5452</span>
+    
+    
+        
+        <span class="post-meta-item readingtime"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>11&nbsp;分钟</span>
+    
+</div>
+            
+
+            
+
+
+                <div class="post-body"><blockquote>
+<p style="text-indent:0"><span class="drop-cap">这</span>里以Swoft启动http server为例。</p>
+
+<p>php bin/swoft http:start</p>
+
+<p>执行上述命令，启动http server。</p>
+</blockquote>
+
+<p>在前面第一篇文章的时候，提到了如何启动http服务。</p>
+
+<p>今天我们就来看一下http服务是如何启动的，具体实现就在<code>ConsoleProcess</code>这个模块。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Handle console
+    * @return bool
+    * @throws ReflectionException
+    * @throws ContainerException
+    */
+public function handle(): bool
+{
+    if (!$this-&gt;application-&gt;beforeConsole()) {
+        return false;
+    }
+
+    /** @var Router $router */
+    $router = bean(&#39;cliRouter&#39;);
+
+    // Register console routes
+    CommandRegister::register($router);
+
+    CLog::info(
+        &#39;Console command route registered (group %d, command %d)&#39;,
+        $router-&gt;groupCount(),
+        $router-&gt;count()
+    );
+
+    // Run console application
+    bean(&#39;cliApp&#39;)-&gt;run();
+
+    return $this-&gt;application-&gt;afterConsole();
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里调用了<code>bean</code>方法获取<code>Bean</code>实例，定义见<code>swoft-component-2.0.5\src\bean\src\Helper\Functions.php</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">if (!function_exists(&#39;bean&#39;)) {
+    /**
+     * Get bean by name
+     *
+     * @param string $name Bean name Or alias Or class name
+     *
+     * @return object|string|mixed
+     */
+    function bean(string $name)
+    {
+        if (BeanFactory::isSingleton(&#39;config&#39;)) {
+            return BeanFactory::getBean($name);
+        }
+
+        return sprintf(&#39;${%s}&#39;, $name);
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里调用了<code>BeanFactory</code>的<code>getBean</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Get object by name
+    *
+    * @param string $name Bean name Or alias Or class name
+    *
+    * @return object|mixed
+    */
+public static function getBean(string $name)
+{
+    return Container::getInstance()-&gt;get($name);
+}</pre></td></tr></table>
+</div>
+</div>
+<p>最终调用的是<code>Swoft\Bean\Container</code>下的<code>get</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Finds an entry of the container by its identifier and returns it.
+    *
+    * @param string $id Bean name Or alias Or class name
+    *
+    * When class name will return all of instance for class name
+    *
+    * @return object
+    * @throws InvalidArgumentException
+    */
+public function get($id)
+{
+    // It is singleton
+    if (isset($this-&gt;singletonPool[$id])) {
+        return $this-&gt;singletonPool[$id];
+    }
+
+    // Prototype by clone
+    if (isset($this-&gt;prototypePool[$id])) {
+        return clone $this-&gt;prototypePool[$id];
+    }
+
+    // Alias name
+    $aliasId = $this-&gt;aliases[$id] ?? &#39;&#39;;
+    if ($aliasId) {
+        return $this-&gt;get($aliasId);
+    }
+
+    // Class name
+    $classNames = $this-&gt;classNames[$id] ?? [];
+    if ($classNames) {
+        $id = end($classNames);
+        return $this-&gt;get($id);
+    }
+
+    // Interface
+    if (interface_exists($id)) {
+        $id = InterfaceRegister::getInterfaceInjectBean($id);
+        return $this-&gt;get($id);
+    }
+
+    // Not defined
+    if (!isset($this-&gt;objectDefinitions[$id])) {
+        throw new InvalidArgumentException(sprintf(&#39;The bean of %s is not defined&#39;, $id));
+    }
+
+    /* @var ObjectDefinition $objectDefinition */
+    $objectDefinition = $this-&gt;objectDefinitions[$id];
+
+    // Prototype
+    return $this-&gt;safeNewBean($objectDefinition-&gt;getName());
+}</pre></td></tr></table>
+</div>
+</div>
+<p>获取对应的<code>ObjectDefinition</code>实例，然后调用<code>safeNewBean</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Secure creation of beans
+    *
+    * @param string $beanName
+    * @param string $id
+    *
+    * @return object|mixed
+    */
+private function safeNewBean(string $beanName, string $id = &#39;&#39;)
+{
+    try {
+        return $this-&gt;newBean($beanName, $id);
+    } catch (Throwable $e) {
+        throw new InvalidArgumentException($e-&gt;getMessage(), 500, $e);
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里又调用了<code>newBean</code>方法，在上一篇文章里我们已经讲过这个方法，这里会返回实例化后的<code>Bean</code>类。</p>
+
+<p>那<code>cliRouter</code>对应的类是说明呢？这个定义在<code>swoft-component-2.0.5\src\console\src\AutoLoader.php</code>里。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * {@inheritDoc}
+    */
+public function beans(): array
+{
+    return [
+        &#39;cliApp&#39;    =&gt; [
+            &#39;class&#39;   =&gt; Application::class,
+            &#39;version&#39; =&gt; &#39;2.0.0&#39;
+        ],
+        &#39;cliRouter&#39; =&gt; [
+            &#39;class&#39; =&gt; Router::class,
+        ],
+        &#39;cliDispatcher&#39; =&gt; [
+            &#39;class&#39; =&gt; ConsoleDispatcher::class,
+        ],
+    ];
+}</pre></td></tr></table>
+</div>
+</div>
+<p>所以<code>$router = bean('cliRouter')</code>，返回的是一个<code>Swoft\Console\Router\Router</code>类。</p>
+
+<p>回到<code>ConsoleProcessor</code>类，接着看代码。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">CommandRegister::register($router);</pre></td></tr></table>
+</div>
+</div>
+<p>调用了<code>CommandRegister</code>类的<code>register</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * @param Router $router
+    * @throws ReflectionException
+    */
+public static function register(Router $router): void
+{
+    $maxLen  = 12;
+    $groups  = [];
+    $docOpts = [
+        &#39;allow&#39; =&gt; [&#39;example&#39;]
+    ];
+    $defInfo = [
+        &#39;example&#39;     =&gt; &#39;&#39;,
+        &#39;description&#39; =&gt; &#39;No description message&#39;,
+    ];
+
+    foreach (self::$commands as $class =&gt; $mapping) {
+        $names = [];
+        $group = $mapping[&#39;group&#39;];
+        // Set ID aliases
+        $router-&gt;setIdAliases($mapping[&#39;idAliases&#39;]);
+        // Set group name aliases
+        $router-&gt;setGroupAliases($group, $mapping[&#39;aliases&#39;]);
+
+        $refInfo = Swoft::getReflection($class);
+        $mhdInfo = $refInfo[&#39;methods&#39;] ?? [];
+        $grpOpts = $mapping[&#39;options&#39;] ?? [];
+
+        foreach ($mapping[&#39;commands&#39;] as $method =&gt; $route) {
+            // $method = $route[&#39;method&#39;];
+            $cmdDesc = $route[&#39;desc&#39;];
+            $command = $route[&#39;command&#39;];
+
+            $idLen = strlen($group . $command);
+            if ($idLen &gt; $maxLen) {
+                $maxLen = $idLen;
+            }
+
+            $cmdExam = &#39;&#39;;
+            if (!empty($mhdInfo[$method][&#39;comments&#39;])) {
+                $tagInfo = DocBlock::getTags($mhdInfo[$method][&#39;comments&#39;], $docOpts, $defInfo);
+                $cmdDesc = $cmdDesc ?: Str::firstLine($tagInfo[&#39;description&#39;]);
+                $cmdExam = $tagInfo[&#39;example&#39;];
+            }
+
+            $route[&#39;group&#39;]   = $group;
+            $route[&#39;desc&#39;]    = ucfirst($cmdDesc);
+            $route[&#39;example&#39;] = $cmdExam;
+            $route[&#39;options&#39;] = self::mergeOptions($grpOpts, $route[&#39;options&#39;]);
+            // Append group option
+            $route[&#39;enabled&#39;]   = $mapping[&#39;enabled&#39;];
+            $route[&#39;coroutine&#39;] = $mapping[&#39;coroutine&#39;];
+
+            $router-&gt;map($group, $command, [$class, $method], $route);
+            $names[] = $command;
+        }
+
+        $groupExam = &#39;&#39;;
+        $groupDesc = $mapping[&#39;desc&#39;];
+        if (!empty($refInfo[&#39;comments&#39;])) {
+            $tagInfo   = DocBlock::getTags($refInfo[&#39;comments&#39;], $docOpts, $defInfo);
+            $groupDesc = $groupDesc ?: Str::firstLine($tagInfo[&#39;description&#39;]);
+            $groupExam = $tagInfo[&#39;example&#39;];
+        }
+
+        $groups[$group] = [
+            &#39;names&#39;   =&gt; $names,
+            &#39;desc&#39;    =&gt; ucfirst($groupDesc),
+            &#39;class&#39;   =&gt; $class,
+            &#39;alias&#39;   =&gt; $mapping[&#39;alias&#39;],
+            &#39;aliases&#39; =&gt; $mapping[&#39;aliases&#39;],
+            &#39;example&#39; =&gt; $groupExam,
+        ];
+    }
+
+    $router-&gt;setGroups($groups);
+    // +1 because router-&gt;delimiter
+    $router-&gt;setKeyWidth($maxLen + 1);
+    // clear data
+    self::$commands = [];
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里遍历了类属性<code>$commands</code>注册路由。</p>
+
+<p>那么<code>$commands</code>这个属性是哪里来的呢？</p>
+
+<p>既然开头我们说的是http服务是怎么启动的，这里我们就以<code>http-server</code>来举例，找到<code>swoft-component-2.0.5\src\http-server\src\Command\HttpServerCommand.php</code>文件。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&lt;?php declare(strict_types=1);
+
+namespace Swoft\Http\Server\Command;
+
+use ReflectionException;
+use Swoft;
+use Swoft\Bean\Exception\ContainerException;
+use Swoft\Console\Annotation\Mapping\Command;
+use Swoft\Console\Annotation\Mapping\CommandMapping;
+use Swoft\Console\Annotation\Mapping\CommandOption;
+use Swoft\Console\Helper\Show;
+use Swoft\Http\Server\HttpServer;
+use Swoft\Server\Command\BaseServerCommand;
+use Swoft\Server\Exception\ServerException;
+use function bean;
+use function input;
+use function output;
+
+/**
+ * Provide some commands to manage the swoft HTTP server
+ *
+ * @since 2.0
+ *
+ * @Command(&#34;http&#34;, alias=&#34;httpsrv&#34;, coroutine=false)
+ * @example
+ *  {fullCmd}:start     Start the http server
+ *  {fullCmd}:stop      Stop the http server
+ */
+class HttpServerCommand extends BaseServerCommand
+{
+    /**
+     * Start the http server
+     *
+     * @CommandMapping(usage=&#34;{fullCommand} [-d|--daemon]&#34;)
+     * @CommandOption(&#34;daemon&#34;, short=&#34;d&#34;, desc=&#34;Run server on the background&#34;, type=&#34;bool&#34;, default=&#34;false&#34;)
+     *
+     * @throws ReflectionException
+     * @throws ContainerException
+     * @throws ServerException
+     * @example
+     *   {fullCommand}
+     *   {fullCommand} -d
+     *
+     */
+    public function start(): void
+    {
+        $server = $this-&gt;createServer();
+
+        // Check if it has started
+        if ($server-&gt;isRunning()) {
+            $masterPid = $server-&gt;getPid();
+            output()-&gt;writeln(&#34;&lt;error&gt;The HTTP server have been running!(PID: {$masterPid})&lt;/error&gt;&#34;);
+            return;
+        }
+
+        // Startup settings
+        $this-&gt;configStartOption($server);
+
+        $settings = $server-&gt;getSetting();
+        // Setting
+        $workerNum = $settings[&#39;worker_num&#39;];
+
+        // Server startup parameters
+        $mainHost = $server-&gt;getHost();
+        $mainPort = $server-&gt;getPort();
+        $modeName = $server-&gt;getModeName();
+        $typeName = $server-&gt;getTypeName();
+
+        // Http
+        $panel = [
+            &#39;HTTP&#39; =&gt; [
+                &#39;listen&#39; =&gt; $mainHost . &#39;:&#39; . $mainPort,
+                &#39;type&#39;   =&gt; $typeName,
+                &#39;mode&#39;   =&gt; $modeName,
+                &#39;worker&#39; =&gt; $workerNum,
+            ],
+        ];
+
+        // Port Listeners
+        $panel = $this-&gt;appendPortsToPanel($server, $panel);
+
+        Show::panel($panel);
+
+        output()-&gt;writeln(&#39;&lt;success&gt;HTTP server start success !&lt;/success&gt;&#39;);
+
+        // Start the server
+        $server-&gt;start();
+    }
+
+    /**
+     * Reload worker processes
+     *
+     * @CommandMapping(usage=&#34;{fullCommand} [-t]&#34;)
+     * @CommandOption(&#34;t&#34;, desc=&#34;Only to reload task processes, default to reload worker and task&#34;)
+     *
+     * @throws ReflectionException
+     * @throws ContainerException
+     */
+    public function reload(): void
+    {
+        $server = $this-&gt;createServer();
+        $script = input()-&gt;getScript();
+
+        // Check if it has started
+        if (!$server-&gt;isRunning()) {
+            output()-&gt;writeln(&#39;&lt;error&gt;The HTTP server is not running! cannot reload&lt;/error&gt;&#39;);
+            return;
+        }
+
+        output()-&gt;writef(&#39;&lt;info&gt;Server %s is reloading&lt;/info&gt;&#39;, $script);
+
+        if ($reloadTask = input()-&gt;hasOpt(&#39;t&#39;)) {
+            Show::notice(&#39;Will only reload task worker&#39;);
+        }
+
+        if (!$server-&gt;reload($reloadTask)) {
+            Show::error(&#39;The swoole server worker process reload fail!&#39;);
+            return;
+        }
+
+        output()-&gt;writef(&#39;&lt;success&gt;HTTP server %s reload success&lt;/success&gt;&#39;, $script);
+    }
+
+    /**
+     * Stop the currently running server
+     *
+     * @CommandMapping()
+     *
+     * @throws ReflectionException
+     * @throws ContainerException
+     */
+    public function stop(): void
+    {
+        $server = $this-&gt;createServer();
+
+        // Check if it has started
+        if (!$server-&gt;isRunning()) {
+            output()-&gt;writeln(&#39;&lt;error&gt;The HTTP server is not running! cannot stop.&lt;/error&gt;&#39;);
+            return;
+        }
+
+        // Do stopping.
+        $server-&gt;stop();
+    }
+
+    /**
+     * Restart the http server
+     *
+     * @CommandMapping(usage=&#34;{fullCommand} [-d|--daemon]&#34;,)
+     * @CommandOption(&#34;daemon&#34;, short=&#34;d&#34;, desc=&#34;Run server on the background&#34;)
+     *
+     * @throws ReflectionException
+     * @throws ContainerException
+     * @example
+     *  {fullCommand}
+     *  {fullCommand} -d
+     */
+    public function restart(): void
+    {
+        $server = $this-&gt;createServer();
+
+        // Check if it has started
+        if ($server-&gt;isRunning()) {
+            $success = $server-&gt;stop();
+
+            if (!$success) {
+                output()-&gt;error(&#39;Stop the old server failed!&#39;);
+                return;
+            }
+        }
+
+        output()-&gt;writef(&#39;&lt;success&gt;Server HTTP restart success !&lt;/success&gt;&#39;);
+        $server-&gt;startWithDaemonize();
+    }
+
+    /**
+     * @return HttpServer
+     * @throws ReflectionException
+     * @throws ContainerException
+     */
+    private function createServer(): HttpServer
+    {
+        $script  = input()-&gt;getScript();
+        $command = $this-&gt;getFullCommand();
+
+        /** @var HttpServer $server */
+        $server = bean(&#39;httpServer&#39;);
+        $server-&gt;setScriptFile(Swoft::app()-&gt;getPath($script));
+        $server-&gt;setFullCommand($command);
+
+        return $server;
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>通过<a href="https://www.swoft.org/docs/2.x/zh-CN/annotation/usage.html" target="_blank">Swoft文档</a>，我们可以看到这里分别使用了类注解和方法注解。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">@Command(&#34;http&#34;, alias=&#34;httpsrv&#34;, coroutine=false)
+@CommandMapping(usage=&#34;{fullCommand} [-d|--daemon]&#34;)
+@CommandOption(&#34;daemon&#34;, short=&#34;d&#34;, desc=&#34;Run server on the background&#34;, type=&#34;bool&#34;, default=&#34;false&#34;)
+...</pre></td></tr></table>
+</div>
+</div>
+<p>通过第二篇文章分析，我们知道这里会自动实例化对应的注解类。</p>
+
+<p>这里以<code>Swoft\Console\Annotation\Mapping\CommandMapping</code>这个注解为例，对应的注解解析类为<code>Swoft\Console\Annotation\Parser\CommandMappingParser</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&lt;?php declare(strict_types=1);
+
+namespace Swoft\Console\Annotation\Parser;
+
+use Swoft\Annotation\Annotation\Mapping\AnnotationParser;
+use Swoft\Annotation\Annotation\Parser\Parser;
+use Swoft\Annotation\Exception\AnnotationException;
+use Swoft\Console\Annotation\Mapping\CommandMapping;
+use Swoft\Console\CommandRegister;
+
+/**
+ * Class CommandMappingParser
+ *
+ * @since 2.0
+ * @AnnotationParser(CommandMapping::class)
+ */
+class CommandMappingParser extends Parser
+{
+    /**
+     * Parse object
+     *
+     * @param int            $type Class or Method or Property
+     * @param CommandMapping $annotation Annotation object
+     *
+     * @return array
+     * Return empty array is nothing to do!
+     * When class type return [$beanName, $className, $scope, $alias, $size] is to inject bean
+     * When property type return [$propertyValue, $isRef] is to reference value
+     */
+    public function parse(int $type, $annotation): array
+    {
+        if ($type !== self::TYPE_METHOD) {
+            throw new AnnotationException(&#39;`@CommandMapping` must be defined on class method!&#39;);
+        }
+
+        $method = $this-&gt;methodName;
+
+        // add route info for controller action
+        CommandRegister::addRoute($this-&gt;className, $method, [
+            &#39;command&#39; =&gt; $annotation-&gt;getName() ?: $method,
+            &#39;method&#39;  =&gt; $method,
+            &#39;alias&#39;   =&gt; $annotation-&gt;getAlias(),
+            &#39;aliases&#39; =&gt; $annotation-&gt;getAliases(),
+            &#39;desc&#39;    =&gt; $annotation-&gt;getDesc(),
+            &#39;usage&#39;   =&gt; $annotation-&gt;getUsage(),
+            // &#39;example&#39; =&gt; $annotation-&gt;getExample(),
+        ]);
+
+        return [];
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>看到这里，你应该可以猜到<code>CommandRegister</code>类的<code>$commands</code>是怎么来的了吧。</p>
+
+<p>我们看下<code>CommandRegister</code>类的<code>addRoute</code>方法，验证下想法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * @param string $class
+    * @param string $method
+    * @param array  $route
+    *
+    * @throws AnnotationException
+    */
+public static function addRoute(string $class, string $method, array $route): void
+{
+    self::checkClass($class);
+
+    // init some keys
+    $route[&#39;options&#39;]   = [];
+    $route[&#39;arguments&#39;] = [];
+    // save
+    self::$commands[$class][&#39;commands&#39;][$method] = $route;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>bingo，跟我们猜想的一模一样，这下我们也知道<code>CommandMapping</code>这个注解是用来注册终端的路由信息。</p>
+
+<p>回到<code>ConsoleProcessor</code>类，接着看代码。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">CLog::info(
+    &#39;Console command route registered (group %d, command %d)&#39;,
+    $router-&gt;groupCount(),
+    $router-&gt;count()
+);</pre></td></tr></table>
+</div>
+</div>
+<p>打印日志。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">// Run console application
+bean(&#39;cliApp&#39;)-&gt;run();</pre></td></tr></table>
+</div>
+</div>
+<p>感觉到了重头戏。</p>
+
+<p>根据前面的代码，我们知道<code>cliApp</code>这个<code>Bean</code>实例对应的类是<code>Swoft\Console\Application</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * @return void
+    * @throws ContainerException
+    */
+public function run(): void
+{
+    try {
+        Swoft::trigger(ConsoleEvent::RUN_BEFORE, $this);
+
+        // Prepare
+        $this-&gt;prepare();
+
+        // Get input command
+        $inputCommand = $this-&gt;input-&gt;getCommand();
+
+        if (!$inputCommand) {
+            $this-&gt;filterSpecialOption();
+        } else {
+            $this-&gt;doRun($inputCommand);
+        }
+
+        Swoft::trigger(ConsoleEvent::RUN_AFTER, $this, $inputCommand);
+    } catch (Throwable $e) {
+        /** @var ConsoleErrorDispatcher $errDispatcher */
+        $errDispatcher = BeanFactory::getSingleton(ConsoleErrorDispatcher::class);
+
+        // Handle request error
+        $errDispatcher-&gt;run($e);
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>通过<code>Swoft::trigger</code>，注册了<code>ConsoleEvent::RUN_BEFORE</code>和<code>ConsoleEvent::RUN_AFTER</code>两个事件。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">protected function prepare(): void
+{
+    $this-&gt;input  = \input();
+    $this-&gt;output = \output();
+
+    // load builtin comments vars
+    $this-&gt;setCommentsVars($this-&gt;commentsVars());
+}</pre></td></tr></table>
+</div>
+</div>
+<p><code>prepare</code>比较简单，这里声明了输入和输出两个类。注意哈，这个后面会用到。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$inputCommand = $this-&gt;input-&gt;getCommand();
+if (!$inputCommand) {
+    $this-&gt;filterSpecialOption();
+} else {
+    $this-&gt;doRun($inputCommand);
+}</pre></td></tr></table>
+</div>
+</div>
+<p>获取终端命令行下的输入，如果有输入执行<code>doRun</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * @param string $inputCmd
+    *
+    * @return void
+    * @throws ReflectionException
+    * @throws ContainerException
+    * @throws Throwable
+    */
+protected function doRun(string $inputCmd): void
+{
+    $output = $this-&gt;output;
+    /* @var Router $router */
+    $router = Swoft::getBean(&#39;cliRouter&#39;);
+    $result = $router-&gt;match($inputCmd);
+
+    // Command not found
+    if ($result[0] === Router::NOT_FOUND) {
+        $names = $router-&gt;getAllNames();
+        $output-&gt;liteError(&#34;The entered command &#39;{$inputCmd}&#39; is not exists!&#34;);
+
+        // find similar command names by similar_text()
+        if ($similar = Arr::findSimilar($inputCmd, $names)) {
+            $output-&gt;writef(&#34;\nMaybe what you mean is:\n    &lt;info&gt;%s&lt;/info&gt;&#34;, implode(&#39;, &#39;, $similar));
+        } else {
+            $this-&gt;showApplicationHelp(false);
+        }
+        return;
+    }
+
+    $info = $result[1];
+
+    // Only input a group name, display help for the group
+    if ($result[0] === Router::ONLY_GROUP) {
+        $this-&gt;showGroupHelp($info[&#39;group&#39;]);
+        return;
+    }
+
+    // Display help for a command
+    if ($this-&gt;input-&gt;getSameOpt([&#39;h&#39;, &#39;help&#39;])) {
+        $this-&gt;showCommandHelp($info);
+        return;
+    }
+
+    // Parse default options and arguments
+    $this-&gt;bindCommandFlags($info);
+    $this-&gt;input-&gt;setCommandId($info[&#39;cmdId&#39;]);
+
+    Swoft::triggerByArray(ConsoleEvent::DISPATCH_BEFORE, $this, $info);
+
+    // Call command handler
+    /** @var ConsoleDispatcher $dispatcher */
+    $dispatcher = Swoft::getSingleton(&#39;cliDispatcher&#39;);
+    $dispatcher-&gt;dispatch($info);
+
+    Swoft::triggerByArray(ConsoleEvent::DISPATCH_AFTER, $this, $info);
+}</pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$router = Swoft::getBean(&#39;cliRouter&#39;);
+$result = $router-&gt;match($inputCmd);</pre></td></tr></table>
+</div>
+</div>
+<p>获取<code>cliRouter</code>实例，根据输入匹配路由操作类。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Match route by input command
+    *
+    * @param array $params [$route]
+    *
+    * @return array
+    *
+    * [
+    *  status, info(array)
+    * ]
+    */
+public function match(...$params): array
+{
+    $delimiter = $this-&gt;delimiter;
+    $inputCmd  = trim($params[0], &#34;$delimiter &#34;);
+    $noSepChar = strpos($inputCmd, $delimiter) === false;
+
+    // If use command ID alias
+    if ($noSepChar &amp;&amp; isset($this-&gt;idAliases[$inputCmd])) {
+        $inputCmd = $this-&gt;idAliases[$inputCmd];
+        // Must re-check
+        $noSepChar = strpos($inputCmd, $delimiter) === false;
+    }
+
+    if ($noSepChar &amp;&amp; in_array($inputCmd, $this-&gt;defaultCommands, true)) {
+        $group   = $this-&gt;defaultGroup;
+        $command = $this-&gt;resolveCommandAlias($inputCmd);
+
+        // Only a group name
+    } elseif ($noSepChar) {
+        $group = $this-&gt;resolveGroupAlias($inputCmd);
+
+        if (isset($this-&gt;groups[$group])) {
+            return [self::ONLY_GROUP, [&#39;group&#39; =&gt; $group]];
+        }
+
+        return [self::NOT_FOUND];
+    } else {
+        $nameList = explode($delimiter, $inputCmd, 2);
+
+        if (count($nameList) === 2) {
+            [$group, $command] = $nameList;
+            // resolve command alias
+            $command = $this-&gt;resolveCommandAlias($command);
+        } else {
+            $command = &#39;&#39;;
+            // $command = $this-&gt;defaultCommand;
+            $group = $nameList[0];
+        }
+    }
+
+    $group = $this-&gt;resolveGroupAlias($group);
+    // build command ID
+    $commandID = $this-&gt;buildCommandID($group, $command);
+
+    if (isset($this-&gt;routes[$commandID])) {
+        $info = $this-&gt;routes[$commandID];
+        // append some info
+        $info[&#39;cmdId&#39;] = $commandID;
+
+        return [self::FOUND, $info];
+    }
+
+    if ($group &amp;&amp; isset($this-&gt;groups[$group])) {
+        return [self::ONLY_GROUP, [&#39;group&#39; =&gt; $group]];
+    }
+
+    return [self::NOT_FOUND];
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里会返回匹配后的路由信息。</p>
+
+<p>回到<code>doRun</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">// Command not found
+if ($result[0] === Router::NOT_FOUND) {
+    $names = $router-&gt;getAllNames();
+    $output-&gt;liteError(&#34;The entered command &#39;{$inputCmd}&#39; is not exists!&#34;);
+
+    // find similar command names by similar_text()
+    if ($similar = Arr::findSimilar($inputCmd, $names)) {
+        $output-&gt;writef(&#34;\nMaybe what you mean is:\n    &lt;info&gt;%s&lt;/info&gt;&#34;, implode(&#39;, &#39;, $similar));
+    } else {
+        $this-&gt;showApplicationHelp(false);
+    }
+    return;
+}
+
+$info = $result[1];
+
+// Only input a group name, display help for the group
+if ($result[0] === Router::ONLY_GROUP) {
+    $this-&gt;showGroupHelp($info[&#39;group&#39;]);
+    return;
+}
+
+// Display help for a command
+if ($this-&gt;input-&gt;getSameOpt([&#39;h&#39;, &#39;help&#39;])) {
+    $this-&gt;showCommandHelp($info);
+    return;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>根据返回的路由信息进行不同的处理。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">// Parse default options and arguments
+$this-&gt;bindCommandFlags($info);
+$this-&gt;input-&gt;setCommandId($info[&#39;cmdId&#39;]);
+
+Swoft::triggerByArray(ConsoleEvent::DISPATCH_BEFORE, $this, $info);</pre></td></tr></table>
+</div>
+</div>
+<p>绑定默认参数，注册<code>ConsoleEvent::DISPATCH_BEFORE</code>事件。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">// Call command handler
+/** @var ConsoleDispatcher $dispatcher */
+$dispatcher = Swoft::getSingleton(&#39;cliDispatcher&#39;);
+$dispatcher-&gt;dispatch($info);</pre></td></tr></table>
+</div>
+</div>
+<p>获取<code>cliDispatcher</code>的<code>Bean</code>实例，对应<code>Swoft\Console\ConsoleDispatcher</code>类，调用<code>dispatch</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * @param array $params
+    *
+    * @return void
+    * @throws ReflectionException
+    * @throws Throwable
+    */
+public function dispatch(...$params): void
+{
+    $route = $params[0];
+    // Handler info
+    [$className, $method] = $route[&#39;handler&#39;];
+
+    // Bind method params
+    $params = $this-&gt;getBindParams($className, $method);
+    $object = Swoft::getSingleton($className);
+
+    // Blocking running
+    if (!$route[&#39;coroutine&#39;]) {
+        $this-&gt;before(get_parent_class($object), $method);
+        PhpHelper::call([$object, $method], ...$params);
+        $this-&gt;after($method);
+        return;
+    }
+
+    // Hook php io function
+    Runtime::enableCoroutine();
+
+    // If in unit test env, has been in coroutine.
+    if (\defined(&#39;PHPUNIT_COMPOSER_INSTALL&#39;)) {
+        $this-&gt;executeByCo($object, $method, $params);
+        return;
+    }
+
+    // Coroutine running
+    srun(function () use ($object, $method, $params) {
+        $this-&gt;executeByCo($object, $method, $params);
+    });
+}</pre></td></tr></table>
+</div>
+</div>
+<p>获取路由对应的类和方法，通过<code>Swoft::getSingleton($className);</code>实例化对象。</p>
+
+<p>如果未开启协程，则用<code>PhpHelper::call([$object, $method], ...$params);</code>调用对应的方法。</p>
+
+<p>开启协程的话，使用<code>$this-&gt;executeByCo($object, $method, $params);</code>调用对应的方法。</p>
+
+<p>我们前面启动命令是<code>php bin/swoft http:start</code>，这里对应的类就是<code>Swoft\Http\Server\Command\HttpServerCommand</code>，方法就是<code>start</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Start the http server
+    *
+    * @CommandMapping(usage=&#34;{fullCommand} [-d|--daemon]&#34;)
+    * @CommandOption(&#34;daemon&#34;, short=&#34;d&#34;, desc=&#34;Run server on the background&#34;, type=&#34;bool&#34;, default=&#34;false&#34;)
+    *
+    * @throws ReflectionException
+    * @throws ContainerException
+    * @throws ServerException
+    * @example
+    *   {fullCommand}
+    *   {fullCommand} -d
+    *
+    */
+public function start(): void
+{
+    $server = $this-&gt;createServer();
+
+    // Check if it has started
+    if ($server-&gt;isRunning()) {
+        $masterPid = $server-&gt;getPid();
+        output()-&gt;writeln(&#34;&lt;error&gt;The HTTP server have been running!(PID: {$masterPid})&lt;/error&gt;&#34;);
+        return;
+    }
+
+    // Startup settings
+    $this-&gt;configStartOption($server);
+
+    $settings = $server-&gt;getSetting();
+    // Setting
+    $workerNum = $settings[&#39;worker_num&#39;];
+
+    // Server startup parameters
+    $mainHost = $server-&gt;getHost();
+    $mainPort = $server-&gt;getPort();
+    $modeName = $server-&gt;getModeName();
+    $typeName = $server-&gt;getTypeName();
+
+    // Http
+    $panel = [
+        &#39;HTTP&#39; =&gt; [
+            &#39;listen&#39; =&gt; $mainHost . &#39;:&#39; . $mainPort,
+            &#39;type&#39;   =&gt; $typeName,
+            &#39;mode&#39;   =&gt; $modeName,
+            &#39;worker&#39; =&gt; $workerNum,
+        ],
+    ];
+
+    // Port Listeners
+    $panel = $this-&gt;appendPortsToPanel($server, $panel);
+
+    Show::panel($panel);
+
+    output()-&gt;writeln(&#39;&lt;success&gt;HTTP server start success !&lt;/success&gt;&#39;);
+
+    // Start the server
+    $server-&gt;start();
+}</pre></td></tr></table>
+</div>
+</div>
+<p>这里先调用了<code>createServer</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * @return HttpServer
+    * @throws ReflectionException
+    * @throws ContainerException
+    */
+private function createServer(): HttpServer
+{
+    $script  = input()-&gt;getScript();
+    $command = $this-&gt;getFullCommand();
+
+    /** @var HttpServer $server */
+    $server = bean(&#39;httpServer&#39;);
+    $server-&gt;setScriptFile(Swoft::app()-&gt;getPath($script));
+    $server-&gt;setFullCommand($command);
+
+    return $server;
+}</pre></td></tr></table>
+</div>
+</div>
+<p>获取<code>httpServer</code>的<code>Bean</code>实例。</p>
+
+<p>框架定义在<code>swoft-component-2.0.5\src\http-server\src\AutoLoader.php</code>，这里声明了<code>onRequest</code>回调事件。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&#39;httpServer&#39;      =&gt; [
+    &#39;on&#39; =&gt; [
+        SwooleEvent::REQUEST =&gt; bean(RequestListener::class)
+    ]
+],</pre></td></tr></table>
+</div>
+</div>
+<p>业务定义在<code>swoft-2.0.5\app\bean.php</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&#39;httpServer&#39;        =&gt; [
+    &#39;class&#39;    =&gt; HttpServer::class,
+    &#39;port&#39;     =&gt; 18306,
+    &#39;listener&#39; =&gt; [
+        &#39;rpc&#39; =&gt; bean(&#39;rpcServer&#39;)
+    ],
+    &#39;process&#39;  =&gt; [
+//            &#39;monitor&#39; =&gt; bean(MonitorProcess::class)
+//            &#39;crontab&#39; =&gt; bean(CrontabProcess::class)
+    ],
+    &#39;on&#39;       =&gt; [
+//            SwooleEvent::TASK   =&gt; bean(SyncTaskListener::class),  // Enable sync task
+        SwooleEvent::TASK   =&gt; bean(TaskListener::class),  // Enable task must task and finish event
+        SwooleEvent::FINISH =&gt; bean(FinishListener::class)
+    ],
+    /* @see HttpServer::$setting */
+    &#39;setting&#39;  =&gt; [
+        &#39;task_worker_num&#39;       =&gt; 12,
+        &#39;task_enable_coroutine&#39; =&gt; true
+    ]
+],</pre></td></tr></table>
+</div>
+</div>
+<p><code>createServer</code>返回的是一个<code>Swoft\Http\Server\HttpServer</code>实例。</p>
+
+<p>回到<code>HttpServerCommand</code>类的<code>start</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">// Start the server
+$server-&gt;start();</pre></td></tr></table>
+</div>
+</div>
+<p>调用<code>Swoft\Http\Server\HttpServer</code>类的<code>start</code>方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Start server
+    *
+    * @throws ServerException
+    * @throws ContainerException
+    */
+public function start(): void
+{
+    $this-&gt;swooleServer = new \Swoole\Http\Server($this-&gt;host, $this-&gt;port, $this-&gt;mode, $this-&gt;type);
+    $this-&gt;startSwoole();
+}</pre></td></tr></table>
+</div>
+</div>
+<p>声明<code>Swoole\Http\Server</code>对象，调用<code>startSwoole</code>方法。</p>
+
+<p><code>Swoft\Http\Server\HttpServer</code>类继承自<code>Swoft\Server\Server</code>类，<code>startSwoole</code>方法定义在这个类。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/**
+    * Bind swoole event and start swoole server
+    *
+    * @throws ServerException
+    * @throws Swoft\Bean\Exception\ContainerException
+    */
+protected function startSwoole(): void
+{
+    if (!$this-&gt;swooleServer) {
+        throw new ServerException(&#39;You must to new server before start swoole!&#39;);
+    }
+
+    // Always enable coroutine hook on server
+    CLog::info(&#39;Swoole\Runtime::enableCoroutine&#39;);
+    Runtime::enableCoroutine();
+
+    Swoft::trigger(ServerEvent::BEFORE_SETTING, $this);
+
+    // Set settings
+    $this-&gt;swooleServer-&gt;set($this-&gt;setting);
+    // Update setting property
+    // $this-&gt;setSetting($this-&gt;swooleServer-&gt;setting);
+
+    // Before Add event
+    Swoft::trigger(ServerEvent::BEFORE_ADDED_EVENT, $this);
+
+    // Register events
+    $defaultEvents = $this-&gt;defaultEvents();
+    $swooleEvents  = array_merge($defaultEvents, $this-&gt;on);
+
+    // Add events
+    $this-&gt;addEvent($this-&gt;swooleServer, $swooleEvents, $defaultEvents);
+
+    //After add event
+    Swoft::trigger(ServerEvent::AFTER_ADDED_EVENT, $this);
+
+    // Before listener
+    Swoft::trigger(ServerEvent::BEFORE_ADDED_LISTENER, $this);
+
+    // Add port listener
+    $this-&gt;addListener();
+
+    // Before bind process
+    Swoft::trigger(ServerEvent::BEFORE_ADDED_PROCESS, $this);
+
+    // Add Process
+    Swoft::trigger(ServerEvent::ADDED_PROCESS, $this);
+
+    // After bind process
+    Swoft::trigger(ServerEvent::AFTER_ADDED_PROCESS, $this);
+
+    // Trigger event
+    Swoft::trigger(ServerEvent::BEFORE_START, $this, array_keys($swooleEvents));
+
+    // Storage server instance
+    self::$server = $this;
+
+    // Start swoole server
+    $this-&gt;swooleServer-&gt;start();
+}</pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$this-&gt;swooleServer-&gt;set($this-&gt;setting);</pre></td></tr></table>
+</div>
+</div>
+<p>设置<code>Swoole</code>运行配置。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">// Register events
+$defaultEvents = $this-&gt;defaultEvents();
+$swooleEvents  = array_merge($defaultEvents, $this-&gt;on);
+
+// Add events
+$this-&gt;addEvent($this-&gt;swooleServer, $swooleEvents, $defaultEvents);</pre></td></tr></table>
+</div>
+</div>
+<p>添加<code>Swoole</code>回调事件。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">// Add port listener
+$this-&gt;addListener();</pre></td></tr></table>
+</div>
+</div>
+<p>监听端口。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">// Start swoole server
+$this-&gt;swooleServer-&gt;start();</pre></td></tr></table>
+</div>
+</div>
+<p>启动<code>Swoole\Http\Server</code>服务。</p>
+
+<p>现在服务已经启动了，那<code>http请求</code>是怎么被处理的呢？</p>
+
+<p>这个我们下一篇再继续讲。</p>
+</div>
+
+        </article>
+
+        
+            
+            
+            
+                <ul class="post-copyright">
+                    <li class="post-copyright-author">作者：<a href="https://liudon.xyz" target="_blank">liudon</a></li>
+                    
+                        <li class="post-copyright-link">链接：<a href="/posts/swoft-console-processor-analysis/" target="_blank">https://liudon.xyz/posts/swoft-console-processor-analysis/</a></li>
+                    
+                    
+                        <li class="post-copyright-license">版权：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC BY-NC-SA 4.0</a></li>
+                    
+                </ul>
+            
+        
+
+        
+            <div class="updated-badge-container"><div title="Updated @ 2019-09-27 12:19:57 UTC" style="cursor:help;display:inline-block">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2019-09-27</text><text x="915" y="140" textLength="650" transform="scale(.1)">2019-09-27</text></g></svg></div></div>
+        
+
+        
+
+        
+            
+            
+                <div class="related-posts">
+                    <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+                    <ul class="related-list">
+                        
+                            <li class="related-item">
+                                <a href="/posts/swoft-event-processor-analysis/" class="related-link">Swoft 框架运行分析（四） —— EventProcessor模块分析</a>
+                            </li>
+                        
+                            <li class="related-item">
+                                <a href="/posts/swoft-bean-processor-analysis/" class="related-link">Swoft 框架运行分析（三） —— BeanProcessor模块分析</a>
+                            </li>
+                        
+                            <li class="related-item">
+                                <a href="/posts/swoft-anaotion-processor-analysis/" class="related-link">Swoft 框架运行分析（二） —— AnnotationProcessor模块分析</a>
+                            </li>
+                        
+                            <li class="related-item">
+                                <a href="/posts/swoft-execution-analysis/" class="related-link">Swoft 框架运行分析（一）</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+        
+
+        
+            
+                <div class="post-tags">
+                    
+                        
+                        
+                            
+                            <a href="/tags/swoft/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>Swoft</a>
+                        
+                    
+                </div>
+            
+        
+
+        
+            <footer class="minimal-footer">
+                
+                    
+                    <div class="post-tag"><a href="/tags/swoft/" rel="tag" class="post-tag-link">#swoft</a></div>
+                
+                
+                
+                    
+                
+            </footer>
+        
+
+        
+
+        
+            
+                
+                
+            
+            
+            
+            
+                <ul class="post-nav">
+                    
+                    
+                        <li class="post-nav-next">
+                            <a href="/posts/swoft-event-processor-analysis/" rel="next">Swoft 框架运行分析（四） —— EventProcessor模块分析 ></a>
+                        </li>
+                    
+                </ul>
+            
+        
+
+        
+        
+    </div>
+</main>
+
+            
+    <a href="#" class="back-to-top"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            
+                
+            
+            
+
+            
+                
+            
+            
+
+            
+                
+            
+            
+
+            <div class="site-info">© 2011–2019<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>liudon</div>
+
+            
+                <div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank">MemE</a></div>
+            
+
+            
+                <div class="site-copyright"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC BY-NC-SA 4.0</a></div>
+            
+
+            
+        </div>
+    </footer>
+
+        </div>
+    </body>
+    <script src="/js/meme.min.5523549ad6e0623b279bdccbfe3ebf3035624bba0d6dcda2272d63da1a43ed83.js" integrity="sha256-VSNUmtbgYjsnm9zL/j6/MDViS7oNbc2iJy1j2hpD7YM=" data-no-instant></script><script data-no-instant>InstantClick.init();</script>
+
+    
+        <script data-no-instant>
+            InstantClick.on('change', function () {
+                const theme = localStorage.getItem('theme');
+                if (theme === "dark") {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000');
+                    document.getElementById("theme-toggle").innerHTML = "🌙";
+
+                    var els = [].slice.apply(document.getElementsByClassName("chroma"));
+                    for (var i = 0; i < els.length; i++) {
+                        els[i].className = els[i].className.replace(/ *\bchroma\b/g, "chroma-dark");
+                    }
+                } else if (theme === "light") {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff');
+                    document.getElementById("theme-toggle").innerHTML = "🌞";
+
+                    var els = [].slice.apply(document.getElementsByClassName("chroma-dark"));
+                    for (var i = 0; i < els.length; i++) {
+                        els[i].className = els[i].className.replace(/ *\bchroma-dark\b/g, "chroma");
+                    }
+                }
+            });
+        </script>
+    
+
+
+
+
+
+</html>

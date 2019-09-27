@@ -1,150 +1,115 @@
-<?xml-stylesheet type="text/xsl" href="https://liudon.xyz/sitemap.xsl"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  
-  <url>
-    <loc>https://liudon.xyz/post/</loc>
-    <lastmod>2019-09-26T13:14:23+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
     <loc>https://liudon.xyz/tags/swoft/</loc>
-    <lastmod>2019-09-26T13:14:23+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://liudon.xyz/post/swoft-console-processor-analysis/</loc>
-    <lastmod>2019-09-26T13:14:23+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://liudon.xyz/posts/swoft-console-processor-analysis/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://liudon.xyz/tags/</loc>
-    <lastmod>2019-09-26T13:14:23+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://liudon.xyz/</loc>
-    <lastmod>2019-09-26T13:14:23+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://liudon.xyz/post/swoft-event-processor-analysis/</loc>
-    <lastmod>2019-09-26T13:02:18+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://liudon.xyz/posts/swoft-event-processor-analysis/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://liudon.xyz/tags/git/</loc>
-    <lastmod>2019-09-06T15:13:51+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://liudon.xyz/post/a-issues-of-git-submodule-update/</loc>
-    <lastmod>2019-09-06T15:13:51+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://liudon.xyz/posts/a-issues-of-git-submodule-update/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://liudon.xyz/tags/curl/</loc>
-    <lastmod>2019-09-04T11:07:46+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://liudon.xyz/tags/php/</loc>
-    <lastmod>2019-09-04T11:07:46+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://liudon.xyz/post/curl-cost-time-long/</loc>
-    <lastmod>2019-09-04T11:07:46+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://liudon.xyz/posts/curl-cost-time-long/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://liudon.xyz/post/swoft-bean-processor-analysis/</loc>
-    <lastmod>2019-09-02T18:29:06+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://liudon.xyz/posts/swoft-bean-processor-analysis/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://liudon.xyz/post/swoft-anaotion-processor-analysis/</loc>
-    <lastmod>2019-08-29T19:11:04+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://liudon.xyz/posts/swoft-anaotion-processor-analysis/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://liudon.xyz/post/swoft-execution-analysis/</loc>
-    <lastmod>2019-08-29T17:22:28+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://liudon.xyz/posts/swoft-execution-analysis/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://liudon.xyz/post/bcmath-and-exponential-notation/</loc>
-    <lastmod>2019-08-16T19:34:34+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://liudon.xyz/posts/bcmath-and-exponential-notation/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://liudon.xyz/tags/flink/</loc>
-    <lastmod>2019-03-28T13:00:50+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://liudon.xyz/post/flink-could-not-resolve-resourcemanager-address/</loc>
-    <lastmod>2019-03-28T13:00:50+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://liudon.xyz/posts/flink-could-not-resolve-resourcemanager-address/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://liudon.xyz/post/there-are-no-packages-available-for-installation/</loc>
-    <lastmod>2019-01-11T17:13:14+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://liudon.xyz/posts/there-are-no-packages-available-for-installation/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://liudon.xyz/about/</loc>
-    <lastmod>2019-01-10T14:11:09+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://liudon.xyz/post/the-first-post/</loc>
-    <lastmod>2019-01-09T15:17:04+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://liudon.xyz/posts/the-first-post/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://liudon.xyz/categories/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://liudon.xyz/archives/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://liudon.xyz/posts/</loc>
+    <lastmod>2019-09-27T12:19:57+00:00</lastmod>
   </url>
   
 </urlset>
