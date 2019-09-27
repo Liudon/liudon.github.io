@@ -16,23 +16,23 @@ env:
 # install - install any dependencies required
 install:
   - mkdir -p $HOME/src/hugo
-  - export TRAVIS_BUILD_DIR=$HOME/src/hugo
   - cd $HOME/src/hugo
   - go get github.com/magefile/mage
+  - go mod download || true
+  - mage -v test
+  - mage -v check
+  - mage -v hugo
 
 git:
   submodules: false
 
 before_script:
+    - cd $TRAVIS_BUILD_DIR
     - git submodule update --init --remote --recursive
     - rm -rf public 2> /dev/null
 
 # script - run the build script
 script:
-    - go mod download || true
-    - mage -v test
-    - mage -v check
-    - mage -v hugo
     - hugo
     - echo "$CNAME_URL" > public/CNAME
 
