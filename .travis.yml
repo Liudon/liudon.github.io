@@ -23,6 +23,7 @@ install:
   - go mod download
   - mage -v hugo
   - ./hugo version
+  - export GOPATH=$HOME/go
   - pwd
 
 git:
@@ -35,7 +36,8 @@ before_script:
 
 # script - run the build script
 script:
-    - hugo
+    - cd $TRAVIS_BUILD_DIR
+    - $HOME/src/hugo/hugo
     - echo "$CNAME_URL" > public/CNAME
 
 deploy:
