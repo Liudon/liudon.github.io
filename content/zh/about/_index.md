@@ -2,9 +2,6 @@
 title: "关于本站"
 date: 2019-01-10T14:11:09+08:00
 
-# you can close something for this content if you open it in config.toml.
-comment: false
-mathjax: false
 ---
 
 ## 域名的由来

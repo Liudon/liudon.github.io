@@ -1,108 +1,516 @@
-# This is a simple configuration.
-# If you want to see the full configuration, please check `full-config.toml` .
-# And see https://gohugo.io/getting-started/configuration/ .
+baseURL = "https://liudon.xyz/"
+theme = "meme"
+title = "liudon"
 
-baseURL = "https://liudon.xyz"
-title = "流动 - 生活就是一个流动的过程"
+defaultContentLanguage = "zh-cn"
+defaultContentLanguageInSubdir = false
+
+enableGitInfo = false
+
+pluralizeListTitles = false
+
+summaryLength = 42
+
 enableRobotsTXT = true
+
+pygmentsCodefences = true
+pygmentsUseClasses = true
+pygmentsCodefencesGuessSyntax = true
+pygmentsOptions = "linenos=table"
+
 enableEmoji = true
-theme = "jane"
 
-hasCJKLanguage = true     # has chinese/japanese/korean ? # 自动检测是否包含 中文\日文\韩文
-paginate = 5              # Number of articles displayed on the homepage  # 首页每页显示的文章数
-rssLimit = 20             # Limit Entry Count to Rss file # 限制 Rss 文章输出数量
-disqusShortname = ""      # disqus_shortname
-googleAnalytics = "UA-18074379-5"      # UA-XXXXXXXX-X
-copyright = ""            # default: author.name ↓        # 默认为下面配置的author.name ↓
+footnoteReturnLinkContents = "↩"
 
-# Highlight options.
-# See https://gohugo.io/content-management/syntax-highlighting/
-PygmentsCodeFences = true # Enable syntax highlighting with GitHub flavoured code fences
-PygmentsUseClasses = true # Use CSS classes to format highlighted code
-PygmentsCodefencesGuessSyntax = true
-PygmentsOptions = "linenos=table"
+paginate = 10
 
-# language support # en / zh-cn / other... translations present in i18n/
-defaultContentLanguage = "zh-cn"           # Default language to use
+[related]
+threshold = 80
+includeNewer = true
+toLower = true
+[[related.indices]]
+name = "tags"
+weight = 95
+[[related.indices]]
+name = "keywords"
+weight = 90
+[[related.indices]]
+name = "date"
+weight = 10
+pattern = "2006"
+
+[frontmatter]
+lastmod = ["lastmod", ":git", ":fileModTime", ":default"]
+
+[blackfriday]
+smartypants = false
+fractions = false
+hrefTargetBlank = true
+extensionsmask = ["hardLineBreak", "backslashLineBreak"]
+
 [languages.zh-cn]
-  languageCode = "zh-cn"
+languageName = "中文"
+contentDir = "content/zh"
+weight = 2
+languageCode = "zh-CN"
+hasCJKLanguage= true
+title = "流动"
+copyright = "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)"
 
-[author]                  # essential                     # 必需
-  name = "liudon"
+[[menu.home]]
+url = "/posts/"
+weight = 1
+pre = "internal"
+post = "grav"
+identifier = "life"
 
-[sitemap]                 # essential                     # 必需
-  changefreq = "weekly"
-  priority = 0.5
-  filename = "sitemap.xml"
+[[menu.home]]
+url = "/about/"
+weight = 2
+pre = "internal"
+post = "user-circle"
+identifier = "about"
 
-[[menu.main]]             # config your menu              # 配置目录
-  name = "Archives"
-  weight = 20
-  identifier = "archives"
-  url = "/post/"
-[[menu.main]]
-  name = "Tags"
-  weight = 30
-  identifier = "tags"
-  url = "/tags/"
-[[menu.main]]
-  name = "关于"
-  weight = 30
-  identifier = "about"
-  url = "/about/"
+# uglyURLs = true
+
+[permalinks]
+# life = "/:sections/:slug/"
+# tech = "/:sections/:slug/"
+#categories = "/categories/:slug/"
+tags = "/tags/:slug/"
+#series = "/series/:slug/"
+
+[taxonomies]
+#category = "categories"
+tag = "tags"
+#series = "series"
+
+[mediaTypes."application/atom+xml"]
+suffixes = ["xml"]
+
+[outputFormats.SectionsAtom]
+mediaType = "application/atom+xml"
+baseName = "atom"
+
+[outputFormats.SectionsRSS]
+mediaType = "application/rss+xml"
+baseName = "rss"
+# [outputFormats.NoUglyHTML]
+# mediaType = "text/html"
+# noUgly = "true"
+# [outputFormats.NoUglyRSS]
+# mediaType = "application/rss+xml"
+# noUgly = "true"
+# [outputFormats.NoUglyAtom]
+# mediaType = "application/atom+xml"
+# baseName = "atom"
+# noUgly = "true"
+
+# [outputs]
+# page = ["HTML"]
+# home = ["HTML", "Atom", "RSS", "SectionsAtom", "SectionsRSS"]
+# section = ["NoUglyHTML", "NoUglyRSS", "NoUglyAtom"]
+# # Not working below v0.57.0, see: https://github.com/gohugoio/hugo/issues/4528
+# taxonomyTerm = ["NoUglyHTML", "NoUglyRSS"]
+# taxonomy = ["NoUglyHTML", "NoUglyRSS"]
+
+[outputs]
+page = ["HTML"]
+home = ["HTML", "SectionsAtom", "SectionsRSS"]
+section = ["HTML"]
+# Not working below v0.57.0, see: https://github.com/gohugoio/hugo/issues/4528
+taxonomyTerm = ["HTML"]
+taxonomy = ["HTML"]
+
+[author]
+name = "liudon"
+email = "i@liudon.org"
+# Your description, Markdown supported, this theme noly
+motto = ""
+# Your avatar, URL, this theme noly
+avatar = "/icons/apple-touch-icon.png"
+# URL, this theme noly, Default: baseURL
+website = "https://liudon.xyz"
+twitter = ""
+facebook = ""
+
+# RSS & Atom limit
+[services.rss]
+limit = -1
 
 [params]
-  since = "2011"            # Site creation time          # 站点建立时间
-  homeFullContent = false   # if false, show post summaries on home page. Othewise show full content.
-  rssFullContent = true     # if false, Rss feed instead of the summary
+enableHeader = true
+displayHeaderInHome = true
 
-  # site info (optional)                                  # 站点信息（可选，不需要的可以直接注释掉）
-  logoTitle = "流动"        # default: the title value    # 默认值: 上面设置的title值
-  keywords = ["生活", "代码"]
-  description = "生活就是一个流动的过程."
+enableMenu = true
+displayMenuInHome = true
 
-  # The date format to use; for a list of valid formats, see https://gohugo.io/functions/format/
-  dateFormatToUse = "2006-01-02"
+# Use for Header, If true, Please put your SVG brand image to `SVG.toml`.
+# If false, will use your Site Title as fallback.
+# Unit: px
+siteBrandSVG = false
+siteBrandSVGWidth = 250
+siteBrandSVGHeight = 100
+siteBrandSVGFill = "#fff"
 
-  # show word count and read time ?                       # 是否显示字数统计与阅读时间
-  moreMeta = true
+# Unit: em
+siteBrandFontSize = 2
+siteBrandFontColor = "#fff"
 
-  # 一些全局开关，你也可以在每一篇内容的 front matter 中针对单篇内容关闭或开启某些功能，在 archetypes/default.md 查看更多信息。
-  # Some global options, you can also close or open something in front matter for a single post, see more information from `archetypes/default.md`.
-  toc = true                                                                            # 是否开启目录
-  photoswipe = true         # see https://github.com/dimsemenov/PhotoSwipe            # 是否启用PhotoSwipe（图片可点击）
-  contentCopyright = '<a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a>'
+# siteBrandBackgroundColor = "hsl(240, 8%, 12%)"
+siteBrandBackgroundImage = "linear-gradient(90deg, #f79533 0, #f37055 15%, #ef4e7b 30%, #a166ab 44%, #5073b8 58%, #1098ad 72%, #07b39b 86%, #6dba82 100%)"
 
-  # Link custom CSS and JS assets
-  #   (relative to /static/css and /static/js respectively)
-  customCSS = []            # if ['custom.css'], load '/static/css/custom.css' file
-  customJS = []             # if ['custom.js'], load '/static/js/custom.js' file
+# poetry, footage, posts
+homeLayout = "poetry"
 
-  [params.publicCDN]        # load these files from public cdn
-    # 启用公共CDN，需自行定义
-    enable = true
-    jquery = '<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>'
-    slideout = '<script src="//cdn.staticfile.org/slideout/1.0.1/slideout.min.js" crossorigin="anonymous"></script>'
-    photoswipe = '<script src="//cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"  crossorigin="anonymous"></script>'
-    photoswipeUI = '<script src="//cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js" crossorigin="anonymous"></script>'
-    photoswipeCSS = '<link rel="stylesheet" href="//cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css" crossorigin="anonymous">'
-    photoswipeSKIN = '<link rel="stylesheet" href="//cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.css" crossorigin="anonymous">'
+# Layout poetry settings
+# Markdown supported
+homePoetry = ["人生", "就是一个", "不断流动的过程"]
+# Unit: em
+homeLinksPadding = 1
 
-  [params.social]                                         # 社交链接
-    #a-email = "mailto:your@email.com"
-    #b-stack-overflow = "http://localhost:1313"
-    #c-twitter = "http://localhost:1313"
-    #d-facebook = "http://localhost:1313"
-    #e-linkedin = "http://localhost:1313"
-    #f-google = "http://localhost:1313"
-    #g-github = "http://localhost:1313"
-    #h-weibo = "http://localhost:1313"
-    #i-zhihu = "http://localhost:1313"
-    #j-douban = "http://localhost:1313"
-    #k-pocket = "http://localhost:1313"
-    #l-tumblr = "http://localhost:1313"
-    #m-instagram = "http://localhost:1313"
-    #n-gitlab = "http://localhost:1313"
-    #o-goodreads = "http://localhost:1313"
-    #p-coding = "http://localhost:1313"
-    #q-bilibili = "http://localhost:1313"
+# Layout footage settings
+homePoster = ""
+homeVideoWebm = ""
+homeVideoMp4 = ""
+homeLogo = ""
+homeLogoLink = ""
+homeTitle = ""
+homeMotto = ""
+homeDescription = ""
+homeKeywords = ""
+homeLinksDelimiter = ""
+
+# URL, For JSON-LD, Twitter Cards, Open Graph
+siteLogo = "/icons/apple-touch-icon.png"
+# For HTML meta
+siteDescription = "人生就是一个不断流动的过程"
+# If not set, will use site’s all taxonomy terms as default
+siteKeywords = []
+# Keep this format, change the number
+siteCreatedTime = "2011-01-11T20:17:43+00:00"
+# If you enable `twitterCards`, then add your Twitter username
+siteTwitter = ""
+# If you enable `openGraph`, then add your Facebook username
+siteFacebook = ""
+
+# Category
+# sections or categories
+# Note: You must delete `categories` in `taxonomies` if you set `sections`.
+categoryBy = "categories"
+
+# Categories Page
+# Note: You can NOT disable tree if you set categoryBy equal to `sections`.
+enableTree = true
+displayPosts = true
+displayPostsCount = true
+
+# Tags
+enableTagCloud = true
+fontUnit = "em"
+largestFontSize = 2.5
+smallestFontSize = 1
+
+# Unit: em
+# You can leave it empty ("") to fallback to default value: 42
+listWidth = 30
+displayListTitle = true
+# https://gohugo.io/functions/format/
+listDateFormat = "2006-01-01"
+# left / right
+listDatePosition = "right"
+groupByMonth = false
+chineseZodiac = true
+i18nYear = true
+i18nMonth = true
+
+# Taxonomy List
+displayTaxonomyTermCount = true
+
+# Override Hugo’s default value
+mainSections = ["posts"]
+
+# Post Sections
+postSections = ["posts"]
+
+# Feed
+feedSections = ["posts"]
+# If `true`, will add content to Atom; If `false`, won’t.
+# Note: By default, will add summary to Atom as `summary`,
+# and if Front Matter have a description, description
+# will override summary as `summary`
+includeContent = true
+
+# Dark Mode
+enableDarkMode = true
+defaultTheme = "light"
+# Note: If true and enableDarkMode equal to `true`,
+# users can still get Dark Mode if their device’s system
+# has enabled Dark Mode (`prefers-color-scheme: dark`).
+hideThemeToggle = false
+hideThemeToggleInHome = false
+# Useful for black and white images on a white background.
+# Bad for color images. I suggest you set `true` in post’s
+# Front Matter instead of here, unless all your images are
+# black and white on a white background. Also, you can set
+# `true` here and set `false` in Front Matter which will
+# override what you have set here.
+darkImage = true
+
+# Web App
+# https://realfavicongenerator.net/
+# Keep android-chrome-512x512.png, apple-touch-icon.png, mstile-150x150.png,
+# safari-pinned-tab.svg, favicon.ico, site.webmanifest and delete others
+# Move to ~/blog/static/icons/
+# Move favicon.ico site.webmanifest to ~/blog/static/
+# Rename site.webmanifest to manifest.json
+# See https://github.com/w3c/manifest/issues/689
+# See https://github.com/OneSignal/OneSignal-Website-SDK/issues/332
+# Check and Modify manifest.json (/icons path)
+themeColor = "#fff"
+themeColorDark = "#000"
+safariMaskColor = "#2a6df4"
+msApplicationTileColor = "#fff"
+
+# Head Meta, SEO & Social Discovery
+# Note that you must set openGraph to `true` if you set twitterCards to `true`,
+# or your Twitter Cards info would be incomplete.
+jsonLD = true
+openGraph = true
+twitterCards = true
+autoDetectImages = true
+
+# InstantClick
+enableInstantClick = true
+
+enableServiceWorker = false
+
+# I suggest you set `katex: true` in post’s Front Matter instead of here
+enableKaTeX = false
+
+enableComments = false
+enableDisqus = false
+disqusShortname = ""
+
+enableGoogleAnalytics = false
+# `gtag` or `analytics`
+trackingCodeType = "gtag"
+trackingID = ""
+
+googleSiteVerification = ""
+
+# https://developers.facebook.com/apps/
+# Used for Open Graph
+facebookAppID = ""
+
+# Post
+
+# Unit: second
+duration = 0.5
+
+# HSL color
+primaryColorLight = "220, 90%, 56%"
+primaryColorDark = "349, 75%, 51%"
+
+# Unit: em
+# You can leave it empty ("") to fallback to default value: 42
+postWidth = 32
+
+# Do NOT Change this value!
+# If one post is not original, set in that post’s Front Matter.
+original = true
+
+# Post Description
+displayPostDescription = true
+
+# Post Meta
+enablePostMeta = true
+# Works for home layout `posts` only
+enablePostMetaInHome = true
+postMetaDateFormat = "2006-01-01"
+displayPublishedDate = true
+publishedDateIcon = "calendar-alt"
+displayModifiedDate = false
+modifiedDateIcon = "calendar-check"
+# Note that it will not display if the date is zero (not set).
+displayExpiredDate = true
+expiredDateIcon = "calendar-times"
+displayCategory = true
+categoryIcon = "folder"
+categoryDelimiter = "/"
+displayWordCount = true
+wordCountIcon = "pencil-alt"
+displayReadingTime = true
+readingTimeIcon = "clock"
+
+# Table of Contents
+enableTOC = true
+displayTOCTitle = true
+linkHeadingsToTOC = true
+
+# Headings Anchor / Section Sign (Add section sign before headings)
+enableHeadingsAnchor = false
+# RegEX format, Defaut: 1-6 (1|2|3|4|5|6), h1-h6
+headingsOpt = ""
+# `anchorIcon` has a higher priority than `anchorSymbol`
+# Default: §
+anchorSymbol = "#"
+anchorIcon = "link"
+enableAnchorLink = true
+enableAnchorAutoHide = true
+
+# Image / Video
+# If true, will replace `title` with caption.
+enableCaption = true
+captionPrefix = "◎ "
+
+# Image Hosting
+# Only support absolute URLs relative to root,
+# eg: /../../*.jpg
+enableImageHost = false
+imageHostURL = "https://example.com/"
+# Use host URL for head meta tags also
+headAlso = false
+
+# Video Hosting
+# Only support absolute URLs relative to root,
+# eg: /../../*.mp4
+enableVideoHost = false
+videoHostURL = "https://example.com/"
+
+# Footnote
+# Footnote Ref with Square Brackets `[]`
+squareBrackets = true
+# If true, will replace `footnoteReturnLinkContents` with icon.
+footnoteReturnLinkIcon = "angle-up"
+# If true, the automatically added `<hr />` will be deleted.
+# (In fact, the separator you added will be removed. This
+# will be very useful if you prefer to add `---` to separate
+# the content from the footnote in the Markdown file.)
+insertHrBySelf = true
+
+# Markdown
+# New Markdown Syntax: Emphasis Point `..text..`
+enableEmphasisPoint = false
+
+# Typography
+# Fonts, Unit: px
+fontSize = 20
+# Unitless values: use this number multiplied by the element’s font size
+# Apply to post paragraph & toc only
+lineHeight = 1.618
+
+# Any value is not set, fallback to `fontFamilyBody` it will.
+# If you use SVG as your Site Brand, then leave this value empty.
+fontFamilySiteBrand = ""
+fontFamilyMenu = ""
+fontFamilyTitle = "'Cinzel Decorative', 'Noto Serif SC', serif"
+fontFamilyHeadings = "'Cinzel Decorative', 'Noto Serif SC', serif"
+fontFamilyCode = "'Source Code Pro', 'Noto Serif SC', monospace"
+fontFamilyQuote = ""
+fontFamilyTOC = ""
+fontFamilyCaption = ""
+fontFamilyFooter = ""
+fontFamilyBody = "'EB Garamond', 'Noto Serif SC', serif"
+
+# https://fonts.google.com/
+fontsLink = 'https://fonts.googleapis.com/css?family=EB+Garamond:400,400i,700,700i|Noto+Serif+SC:400,700|Source+Code+Pro:400,400i,700,700i|Cinzel+Decorative:700&display=swap&subset=chinese-simplified'
+
+enableChinesePunctuationGlyphCorrection = false
+
+# Post headings and contents title
+enableSmallCap = true
+
+# Post first paragraph
+enableDropCap = true
+# Every paragraph after `<hr />` or `---` in Markdown
+enableDropCapAfterHr = false
+deleteHrBeforeDropCap = false
+
+enableParagraphIndent = true
+# margin or indent, globe setting, Front Matter: indent
+paragraphStyle = "margin"
+
+enableJustify = false
+
+# Post Copyright
+enablePostCopyright = true
+displayPostCopyright = true
+
+enablePostUpdatedBadge = true
+displayUpdatedBadge = true
+enableBadgeTitle = true
+badgeTitlePrefix = "Updated @ "
+
+enablePostGitInfo = true
+displayPostGitInfo = true
+repoURL = "https://github.com/Liudon/liudon.github.io"
+# or https://github.com/reuixiy/meme-test/edit/master
+repoEditURL = "https://github.com/Liudon/liudon.github.io/blob/code"
+gitIcon = "code-branch"
+displayCommitHash = true
+displayCommitMessage = true
+msgIcon = "info"
+displayFeedback = true
+feedbackIcon = "question"
+feedbackText = "Feedback"
+displayEditLink = true
+editIcon = "edit"
+editText = "Edit Me?"
+
+# Related Posts
+enableRelatedPosts = true
+displayRelatedPosts = true
+relatedPostsNumber = 5
+relatedPostsIcon = "plus-circle"
+
+# Post tags
+enablePostTags = true
+postTagsIcon = "tag"
+
+# Post minimal footer
+enableMinimalFooter = true
+enableAboutPageMinimalFooter = true
+
+# Post nav
+# Note: Designed from a spatial perspective rather than
+#       a time perspective like most other themes do.
+#       Therefore, you will get a newer post if you click
+#       prev on the left; you will get a older post if
+#       you click next on the right.
+enablePostNav = true
+postNavInSection = false
+
+# Syntax Highlight
+enableHighlight = true
+
+# Back to Top
+enableBackToTop = true
+backToTopIcon = "arrow-up"
+displayBackToTopInHome = true
+
+# Footer
+# Note: Home layout `poetry`, `footage`, and 404 page have no footer.
+enableFooter = true
+displayCopyrightSymbol = true
+displaySiteCreatedYear = true
+iconBetweenYearAndAuthor = "heart"
+iconColor = "#f06292"
+iconAnimation = true
+displayPoweredBy = true
+displaySiteCopyright = true
+customFooter = ""
+
+# Multilingual
+enableLangToggle = true
+# Display LangToggle only when content is translated
+autoHideLangToggle = true
+hideLangToggleInHome = false
+
+# Style & Script
+enableFingerprint = true
+
+# 404
+fofPoster = ""
+fofVideoWebm = ""
+fofVideoMp4 = ""

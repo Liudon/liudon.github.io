@@ -7,6 +7,10 @@ language: go
 python:
     - master
 
+env:
+  global:
+  - HUGO_BUILD_TAGS="extended"
+
 # before_install
 # install - install any dependencies required
 install:
