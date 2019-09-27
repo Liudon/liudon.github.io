@@ -23,7 +23,6 @@ install:
   - go mod download
   - mage -v hugo
   - ./hugo version
-  - export GOPATH=$HOME/go
   - pwd
 
 git:
