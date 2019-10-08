@@ -295,7 +295,7 @@ disqusShortname = ""
 enableGoogleAnalytics = false
 # `gtag` or `analytics`
 trackingCodeType = "gtag"
-trackingID = ""
+trackingID = "UA-18074379-5"
 
 googleSiteVerification = ""
 
@@ -443,7 +443,7 @@ enableBadgeTitle = true
 badgeTitlePrefix = "Updated @ "
 
 enablePostGitInfo = true
-displayPostGitInfo = true
+displayPostGitInfo = false
 repoURL = "https://github.com/Liudon/liudon.github.io"
 # or https://github.com/reuixiy/meme-test/edit/master
 repoEditURL = "https://github.com/Liudon/liudon.github.io/blob/code"
