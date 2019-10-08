@@ -292,7 +292,7 @@ enableComments = false
 enableDisqus = false
 disqusShortname = ""
 
-enableGoogleAnalytics = false
+enableGoogleAnalytics = true
 # `gtag` or `analytics`
 trackingCodeType = "gtag"
 trackingID = "UA-18074379-5"
