@@ -395,10 +395,10 @@ enableEmphasisPoint = false
 
 # Typography
 # Fonts, Unit: px
-fontSize = 20
+fontSize = 16
 # Unitless values: use this number multiplied by the element’s font size
 # Apply to post paragraph & toc only
-lineHeight = 1.618
+lineHeight = 2
 
 # Any value is not set, fallback to `fontFamilyBody` it will.
 # If you use SVG as your Site Brand, then leave this value empty.
