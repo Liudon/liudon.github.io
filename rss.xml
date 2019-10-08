@@ -23,10 +23,64 @@
         
             <copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright>
         
-        <lastBuildDate>Fri, 27 Sep 2019 12:22:35 +0000</lastBuildDate>
+        <lastBuildDate>Tue, 08 Oct 2019 05:36:27 +0000</lastBuildDate>
         
             <atom:link rel="self" type="application/rss+xml" href="https://liudon.xyz/rss.xml" />
         
+        
+            <item>
+                <title>十一假期经历</title>
+                <link>https://liudon.xyz/posts/chinese-national-day/</link>
+                <guid isPermaLink="true">https://liudon.xyz/posts/chinese-national-day/</guid>
+                <pubDate>Tue, 08 Oct 2019 13:13:36 +0800</pubDate>
+                
+                    <author>i@liudon.org (liudon)</author>
+                
+                <copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright>
+                
+                    <description><![CDATA[<p>今年的十一火车票非常难抢，12306的候补订单，一直等到时间截止也没订上票。</p>
+
+<p>只好请了2天假，提前回家了，给自己也放个假休息一下。</p>
+
+<p>回家的几个经历：</p>
+
+<ol>
+<li><p>家里的老洗衣机光荣退休了，年龄比我都要大，爸妈舍不得换一直用着。</p>
+
+<p><img src="https://i.loli.net/2019/10/08/SkRx5uFwQ8Cliyq.jpg" alt="64F68D7789A8D877A41E6D694ABE5444.png" /></p></li>
+
+<li><p>村里今年也要通天然气了，各家各户都要拆煤炉，装壁挂炉，希望天然气供应不出问题。</p></li>
+
+<li><p>全家一起去了趟家门口的园博园，希望以后可以走的更远一些。</p></li>
+</ol>
+
+<p><img src="https://i.loli.net/2019/10/08/wfUv5Kb1LGEdNHc.jpg" alt="F69E19D28B34C163878F2A6E1A43E039.png" /></p>
+
+<ol>
+<li><p>娃确实是长大了，有了自己的想法，有自己的脾气了。</p>
+
+<blockquote>
+<p>背景：晚上开着灯，要睡觉了。
+我：睡觉吧。
+娃：爸爸，你说开着灯能睡觉吗？
+我：不能吧...（不知道她为啥问这个问题）
+娃：那你开着灯让我睡觉，我怎么睡呀！
+我：原来你在这里等着我呢啊...</p>
+</blockquote></li>
+</ol>
+
+<p>接下来，就努力工作吧。</p>
+]]></description>
+                
+                
+                
+                
+                
+                    
+                        
+                    
+                
+            </item>
         
             <item>
                 <title>Swoft 框架运行分析（五） —— ConsoleProcessor模块分析</title>
