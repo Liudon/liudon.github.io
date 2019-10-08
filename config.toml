@@ -419,7 +419,7 @@ fontsLink = 'https://fonts.googleapis.com/css?family=EB+Garamond:400,400i,700,70
 enableChinesePunctuationGlyphCorrection = false
 
 # Post headings and contents title
-enableSmallCap = true
+enableSmallCap = false
 
 # Post first paragraph
 enableDropCap = true
