@@ -65,7 +65,7 @@
         "@context": "https://schema.org",
         "@type": "WebPage",
         "datePublished": 2011-01-11T20:17:43&#43;00:00,
-        "dateModified": 2019-10-08T10:54:48&#43;00:00,
+        "dateModified": 2019-10-08T11:01:49&#43;00:00,
         "url": https://liudon.xyz/posts/,
         "name": 文章,
         "description": 人生就是一个不断流动的过程,
@@ -107,6 +107,21 @@
 <meta property="og:site_name" content="流动" />
 <meta property="og:locale" content="zh-CN" /><meta property="og:image" content="https://liudon.xyz/icons/apple-touch-icon.png" />
     <meta property="og:type" content="website" />
+        
+
+
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-18074379-5"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-18074379-5');
+    </script>
+
+
+
 </head>
 
     <body>
@@ -385,7 +400,14 @@
                 }
             });
         </script>
-    
+    <script data-no-instant>
+                InstantClick.on('change', function () {
+                    gtag('config', 'UA-18074379-5', {
+                        'page_path': location.pathname + location.search
+                    });
+                });
+            </script>
+        
 
 
 
