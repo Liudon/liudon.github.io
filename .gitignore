@@ -1,1 +1,8 @@
-/public/
+public
+resources
+
+# ipfs-deploy
+.env
+
+# Node.js
+node_modules

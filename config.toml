@@ -6,6 +6,7 @@ defaultContentLanguage = "zh-cn"
 defaultContentLanguageInSubdir = false
 
 enableGitInfo = true
+relativeURLs = true
 
 pluralizeListTitles = false
 
