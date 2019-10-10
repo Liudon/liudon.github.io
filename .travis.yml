@@ -15,7 +15,7 @@ install:
   - git clone https://github.com/gohugoio/hugo.git
   - cd hugo
   - go install --tags extended
-  - ./hugo version
+  - hugo version
   - pwd
 
 git:
@@ -29,7 +29,7 @@ before_script:
 # script - run the build script
 script:
     - cd $TRAVIS_BUILD_DIR
-    - $HOME/src/hugo/hugo
+    - hugo
     - echo "$CNAME_URL" > public/CNAME
 
 deploy:
