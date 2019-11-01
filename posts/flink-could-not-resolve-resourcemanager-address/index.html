@@ -213,22 +213,7 @@
 </div>
             
 
-            
-
-
-                <nav class="contents">
-<h2 id="contents" class="contents-title">目录</h2><ol class="toc">
-<li>
-<ol>
-<li>
-<ol>
-<li><a id="contents:问题表现" href="#问题表现">问题表现</a></li>
-<li><a id="contents:问题原因" href="#问题原因">问题原因：</a></li>
-<li><a id="contents:解决办法" href="#解决办法">解决办法：</a></li>
-</ol></li>
-</ol></li>
-</ol>
-</nav><div class="post-body">
+            <div class="post-body">
 
 <p style="text-indent:0"><span class="drop-cap">什</span>么是Flink。</p>
 
@@ -240,7 +225,7 @@
 
 <p>这里使用<code>单机模式</code>。</p>
 
-<h4 id="问题表现"><a href="#contents:问题表现" class="headings">问题表现</a></h4>
+<h4 id="问题表现">问题表现</h4>
 
 <p>启动Flink</p>
 <div class="highlight"><div class="chroma">
@@ -293,7 +278,7 @@ Starting taskexecutor daemon on host VM_80_180_centos.</pre></td></tr></table>
 
 <p><img src="https://wx2.sinaimg.cn/large/63c9befaly1g1igknr8lyj21ae09874j.jpg" alt="flink no task" /></p>
 
-<h4 id="问题原因"><a href="#contents:问题原因" class="headings">问题原因：</a></h4>
+<h4 id="问题原因">问题原因：</h4>
 
 <p><img src="https://wx2.sinaimg.cn/large/63c9befaly1g1igoreyi9j20oz04mdg7.jpg" alt="taskmanager.host" /></p>
 
@@ -318,7 +303,7 @@ PING VM_80_180_centos (100.125.80.180) 56(84) bytes of data.
 
 <p>这里jobmanager和taskmanager绑定的ip不一样，导致出错。</p>
 
-<h4 id="解决办法"><a href="#contents:解决办法" class="headings">解决办法：</a></h4>
+<h4 id="解决办法">解决办法：</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt">1
@@ -534,6 +519,7 @@ taskmanager.host: localhost</pre></td></tr></table>
                 });
             </script>
         
+
 
 
 

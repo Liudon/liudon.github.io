@@ -213,26 +213,9 @@
 </div>
             
 
-            
+            <div class="post-body">
 
-
-                <nav class="contents">
-<h2 id="contents" class="contents-title">目录</h2><ol class="toc">
-<li>
-<ol>
-<li>
-<ol>
-<li><a id="contents:背景" href="#背景">背景</a></li>
-<li><a id="contents:问题" href="#问题">问题</a></li>
-<li><a id="contents:问题重现" href="#问题重现">问题重现</a></li>
-<li><a id="contents:问题分析" href="#问题分析">问题分析</a></li>
-<li><a id="contents:问题解决" href="#问题解决">问题解决</a></li>
-</ol></li>
-</ol></li>
-</ol>
-</nav><div class="post-body">
-
-<h4 id="背景"><a href="#contents:背景" class="headings">背景</a></h4>
+<h4 id="背景">背景</h4>
 
 <p style="text-indent:0"><span class="drop-cap">1</span>月份的时候，用<code>hugo</code>搭了这套博客系统。</p>
 
@@ -251,7 +234,7 @@
 	url = https://github.com/xianmin/hugo-theme-jane.git</pre></td></tr></table>
 </div>
 </div>
-<h4 id="问题"><a href="#contents:问题" class="headings">问题</a></h4>
+<h4 id="问题">问题</h4>
 
 <p>最近几天更新完文章后，发现首页显示出了问题。</p>
 
@@ -263,7 +246,7 @@
 
 <p>但是<code>travis-ci</code>每次都是通过<code>git submodule update --init --recursive</code>更新子仓库代码的，为什么会不是最新的代码呢。</p>
 
-<h4 id="问题重现"><a href="#contents:问题重现" class="headings">问题重现</a></h4>
+<h4 id="问题重现">问题重现</h4>
 
 <p>接下来，我们用一个新的仓库，来模拟重现一下。</p>
 
@@ -642,13 +625,13 @@ Submodule path &#39;typecho&#39;: checked out &#39;b0c4cc77a7f8f04661fb9f75d4ba6
 <p>更新子仓库代码，这里可以看到最终<code>checkout</code>的版本为<code>b0c4cc77a7f8f04661fb9f75d4ba6d4d7915b0f1</code>，与前面提交时的版本一致。</p></li>
 </ol>
 
-<h4 id="问题分析"><a href="#contents:问题分析" class="headings">问题分析</a></h4>
+<h4 id="问题分析">问题分析</h4>
 
 <p><code>git submodule add</code>的时候，会记录当时引入时子仓库的版本id。</p>
 
 <p><code>git submodule update --init --recursive</code>，会检出引入时的仓库版本，这就是为啥代码没有更新了。</p>
 
-<h4 id="问题解决"><a href="#contents:问题解决" class="headings">问题解决</a></h4>
+<h4 id="问题解决">问题解决</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -910,6 +893,7 @@ Submodule path &#39;typecho&#39;: checked out &#39;5dcc8f4e91cc724ba82aba5b9e795
                 });
             </script>
         
+
 
 
 
