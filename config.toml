@@ -345,7 +345,7 @@ displayReadingTime = true
 readingTimeIcon = "clock"
 
 # Table of Contents
-enableTOC = true
+enableTOC = false
 displayTOCTitle = true
 linkHeadingsToTOC = true
 
