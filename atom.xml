@@ -4,7 +4,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="zh-CN">
     <title type="text">流动</title>
     <subtitle type="html">人生就是一个不断流动的过程</subtitle>
-    <updated>2019-11-01T07:19:48+00:00</updated>
+    <updated>2019-11-14T11:18:54+00:00</updated>
     <id>https://liudon.xyz/</id>
     <link rel="alternate" type="text/html" href="https://liudon.xyz/" />
     <link rel="self" type="application/atom+xml" href="https://liudon.xyz/atom.xml" />
@@ -17,10 +17,76 @@
     <rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights>
     <generator uri="https://gohugo.io/" version="0.60.0-DEV">Hugo</generator>
         <entry>
+            <title type="text">检测网站支持的SSL/TLS协议版本</title>
+            <link rel="alternate" type="text/html" href="https://liudon.xyz/posts/how-to-check-what-ssl-tls-versions-are-available-for-a-website/" />
+            <id>https://liudon.xyz/posts/how-to-check-what-ssl-tls-versions-are-available-for-a-website/</id>
+            <updated>2019-11-14T11:15:19+00:00</updated>
+            <published>2019-11-14T14:48:08+08:00</published>
+            <author>
+                    <name>liudon</name>
+                    <uri>https://liudon.xyz</uri>
+                    <email>i@liudon.org</email>
+                    </author>
+            <rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights>
+    
+    <summary type="html"><![CDATA[Chrome 72及以上版本不支持TLS 1.0和TLS 1.1，访问TLS 1.0或1.1证书的站点……]]></summary>
+            
+                <content type="html"><![CDATA[<blockquote>
+<p>Chrome 72及以上版本不支持TLS 1.0和TLS 1.1，访问TLS 1.0或1.1证书的站点会告警，但不阻止用户访问站点。</p>
+</blockquote>
+
+<p>为了解决Chrome的这个问题，今天升级了下Nginx的TLS协议版本，这里记录一下如何检测支持的协议版本。</p>
+
+<ol>
+<li><p>检测是否支持TLSv1</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">openssl s_client -connect [ip or 域名]:443 -tls1</pre></td></tr></table>
+</div>
+</div></li>
+
+<li><p>检测是否支持TLSv1.1</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">openssl s_client -connect [ip or 域名]:443 -tls1_1</pre></td></tr></table>
+</div>
+</div></li>
+
+<li><p>检测是否支持TLSv1.2</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">openssl s_client -connect [ip or 域名]:443 -tls1_2</pre></td></tr></table>
+</div>
+</div></li>
+</ol>
+
+<p>参考资料：<a href="https://support.plesk.com/hc/en-us/articles/115004991834-How-to-check-what-SSL-TLS-versions-are-available-for-a-website-" target="_blank">How to check what SSL/TLS versions are available for a website?</a></p>
+]]></content>
+            
+            
+            
+            
+            
+                
+                    
+                
+            
+        </entry>
+    
+        <entry>
             <title type="text">记一次难忘的手术经历</title>
             <link rel="alternate" type="text/html" href="https://liudon.xyz/posts/an-unforgettable-surgical-experience/" />
             <id>https://liudon.xyz/posts/an-unforgettable-surgical-experience/</id>
-            <updated>2019-11-01T07:16:07+00:00</updated>
+            <updated>2019-11-14T11:15:19+00:00</updated>
             <published>2019-10-28T19:03:31+08:00</published>
             <author>
                     <name>liudon</name>
