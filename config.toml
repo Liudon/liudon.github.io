@@ -30,4 +30,4 @@ link = "/index.xml"
 
 [[params.socials]]
 name = "About"
-link = "/about/me"
+link = "/about/me/"
