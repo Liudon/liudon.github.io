@@ -22,7 +22,7 @@ extraHead = '<style>article { max-width: 1180px; }</style>'
 #mainSections = ["posts"]
 lazyImage = true
 description = ""
-staticPrefix = "https://cdn.jsdelivr.net/gh/Liudon/liudon.github.io"
+#staticPrefix = "https://cdn.jsdelivr.net/gh/liudon/liudon.github.io@master"
 
 [[params.socials]]
 name = "RSS"
