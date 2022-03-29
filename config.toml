@@ -1,4 +1,4 @@
-baseURL = "https://liudon.xyz"
+baseURL = "https://liudon.com"
 languageCode = "en-us"
 title = "流动"
 theme = "yinyang"
@@ -8,7 +8,7 @@ canonifyURLs = true
 
 [author]
   name = "Liudon"
-  homepage = "https://liudon.xyz/"
+  homepage = "https://liudon.com/"
 
 [languages]
   [languages.cn]
