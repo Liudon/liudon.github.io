@@ -1,6 +1,6 @@
 [build]
   publish = "public"
-  command = "sed -i '' 's/liudon.com/liudon.xyz/g' config.toml && npm run build && npm run ipfs-deploy"
+  command = "sed -i 's/liudon.com/liudon.xyz/g' config.toml && npm run build && npm run ipfs-deploy"
 
 [context.production.environment]
   HUGO_VERSION = "0.58.3"
