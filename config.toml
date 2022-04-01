@@ -31,3 +31,6 @@ link = "/index.xml"
 [[params.socials]]
 name = "About"
 link = "/about/me/"
+
+[params]
+extraHead = '<script async src="https://www.googletagmanager.com/gtag/js?id=G-G9ZDJQN9E2"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-G9ZDJQN9E2');</script>'
