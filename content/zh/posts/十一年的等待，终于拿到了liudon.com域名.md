@@ -1,5 +1,5 @@
 ---
-title: "我终于拿到了心系的域名"
+title: "十一年的等待，终于拿到了liudon.com域名"
 date: 2022-04-01T01:24:05+08:00
 draft: false
 ---
