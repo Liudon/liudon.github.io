@@ -5,7 +5,8 @@ theme = "yinyang"
 DefaultContentLanguage = "cn"
 enableRobotsTXT = true
 canonifyURLs = true
-keywords="流动,博客,liudon"
+keywords="流动,博客,liudon,生活,技术"
+description="生活就是一个流动的过程"
 
 [author]
   name = "Liudon"
