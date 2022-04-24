@@ -1,0 +1,39 @@
+---
+title: "自己动手，更换thinkpad x1硬盘"
+date: 2022-04-22T08:04:18+08:00
+draft: false
+tags: ["thinkpad","SSD","硬盘","三星"]
+---
+
+电脑突然没法用了，提示"A disk read error occurred"的错误。
+
+![491650584526_.pic](https://blog-1251768242.cos.ap-shanghai.myqcloud.com/img/491650584526_.pic.jpg)
+
+多次重启也不行，感觉是硬盘挂了。
+
+机器去年过保了，之前有过在售后维护的经历，费用不低，这次决定自己动手。
+
+![WechatIMG64](https://blog-1251768242.cos.ap-shanghai.myqcloud.com/img/WechatIMG64.jpeg)
+
+一共就5个螺丝，打开后盖。
+
+![621650757850_.pic](https://blog-1251768242.cos.ap-shanghai.myqcloud.com/img/621650757850_.pic.jpg)
+
+可以看到电池旁边的螺丝，拧下取出电池。
+
+![631650757850_.pic](https://blog-1251768242.cos.ap-shanghai.myqcloud.com/img/631650757850_.pic.jpg)
+
+拧开硬盘上的固定螺丝，取出硬盘。
+
+![541650584531_.pic](https://blog-1251768242.cos.ap-shanghai.myqcloud.com/img/541650584531_.pic.jpg)
+
+印象里硬盘还是那种又大又厚的样子，没想到现在都这么小一块了。
+
+![WechatIMG55](https://blog-1251768242.cos.ap-shanghai.myqcloud.com/img/WechatIMG55.jpeg)
+
+我在京东买的[三星970 EVO Plus](https://u.jd.com/Zdch2qO)这款，顺利换上。
+
+![611650757849_.pic](https://blog-1251768242.cos.ap-shanghai.myqcloud.com/img/611650757849_.pic.jpg)
+
+重装系统，搞定，省了一笔，好开心。
+
