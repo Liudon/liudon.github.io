@@ -26,10 +26,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Checkout submodules
-        uses: textbook/git-checkout-submodule-action@master
-        with:
-          submodules: recursive
-          remote: true
+         run: git submodule update --init --recursive
 
       
       - name: Setup Hugo
