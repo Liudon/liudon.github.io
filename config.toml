@@ -23,7 +23,7 @@ description="生活就是一个流动的过程"
 extraHead = "<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-G9ZDJQN9E2\"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-G9ZDJQN9E2');</script><style>article { max-width: 1180px; }</style>"
 #mainSections = ["posts"]
 lazyImage = true
-#staticPrefix = "https://cdn.jsdelivr.net/gh/liudon/liudon.github.io@master"
+staticPrefix = "https://cdn.jsdelivr.net/gh/liudon/liudon.github.io@master"
 
 [[params.socials]]
 name = "RSS"
