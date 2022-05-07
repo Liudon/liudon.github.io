@@ -1,7 +1,12 @@
-{{ define "main"}}
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode }}" prefix="og: http://ogp.me/ns#">
+{{ partial "head.html" . }}
+
+<body>
     <main id="main">
       <div>
        <h1 id="title"><a href="{{ "/" | relURL }}">Go Home</a></h1>
       </div>
     </main>
-{{ end }}
+</body>
+</html>
