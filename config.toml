@@ -8,6 +8,16 @@ canonifyURLs = true
 keywords="流动,博客,liudon,生活,技术"
 description="生活就是一个流动的过程"
 
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    guessSyntax = true
+    noClasses = true
+    style = "tango"
+    tabWidth = 4
+
 [author]
   name = "Liudon"
   homepage = "https://liudon.com/"
