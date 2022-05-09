@@ -3,21 +3,49 @@
 {{ partial "head.html" . }}
 
 <style>
-  @keyframes typing {
-      from { width: 0 }
-  }
-  @keyframes caret {
-      50% { border-right-color: #000; }
-  }
-  .tip_404 {
-      font-size: 22px;
-      width: 20em;
-      white-space: nowrap;
-      overflow: hidden;
-      animation: typing 5s steps(15), caret .5s steps(1) 10;
-      border-right: 1px solid transparent;
-      
-  }
+:root {
+	/** This is the number of characters in the text */
+	--characters: 20;
+}
+.container {
+	height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: monospace;
+	font-size: 2em;
+}
+.type {
+	max-width: 0;
+	animation: typing 6s steps(var(--characters)) infinite;
+	white-space: nowrap;
+	overflow: hidden;
+}
+.container:after {
+	content: " |";
+	animation: blink 1s infinite;
+	animation-timing-function: step-end;
+}
+@keyframes typing {
+	75%,
+	100% {
+		max-width: calc(var(--characters) * 1ch);
+	}
+}
+@keyframes blink {
+	0% {
+		opacity: 1;
+	}
+	25% {
+		opacity: 0;
+	}
+	75% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 1;
+	}
+}
 </style>
 
 <body>
@@ -26,8 +54,8 @@
         {{ partial "header.html" . }}
       </div>
 
-      <div class="col-xs-12">
-       <span class="tip_404">404, page not found.</span>
+      <div class="col-xs-12 container">
+       <h1 class="type">404, page not found.</h1>
       </div>
     </div>
 </body>
