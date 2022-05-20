@@ -2,6 +2,7 @@
 title: "mysql中字符串和整型自动转换的问题"
 date: 2020-12-14T18:47:29+08:00
 draft: false
+tags: ["mysql"]
 ---
 
 表结构如下
