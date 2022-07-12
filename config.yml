@@ -1,0 +1,102 @@
+baseURL: "https://liudon.com/"
+languageCode: zh-cn
+title: 流动
+paginate: 10
+theme: PaperMod
+
+enableInlineShortcodes: true
+enableEmoji: true # 允许使用 Emoji 表情，建议 true
+enableRobotsTXT: true # 允许爬虫抓取到搜索引擎，建议 true
+
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+
+hasCJKLanguage: true # 自动检测是否包含 中文日文韩文 如果文章中使用了很多中文引号的话可以开启
+
+googleAnalytics: UA-123-45
+
+minify:
+  disableXML: true
+  minifyOutput: true
+
+params:
+  env: production # to enable google analytics, opengraph, twitter-cards and schema.
+  title: 流动
+  description: "生活就是一个流动的过程"
+  keywords: [流动,博客,liudon,生活,技术]
+  author: Liudon
+  DateFormat: "2006-01-02"
+  defaultTheme: auto # dark, light
+  disableThemeToggle: false
+
+  ShowReadingTime: true
+  ShowShareButtons: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: false
+  ShowWordCount: true
+
+  ShowToc: true # 显示目录
+  TocOpen: true # 自动展开目录
+
+  assets:
+    disableHLJS: true # to disable highlight.js
+
+  label:
+    text: "流动"
+
+  # home-info mode
+  homeInfoParams:
+    Title: "Hi there \U0001F44B"
+    Content: Welcome to my blog
+
+  socialIcons:
+    - name: github
+      url: "https://github.com/liudon"
+    - name: email
+      url: "mailto:i@liudon.org"
+
+  analytics:
+    google:
+      SiteVerificationTag: "G-G9ZDJQN9E2"
+
+  cover:
+    hidden: false # hide everywhere but not in structured data
+    hiddenInList: false # hide on list pages and home
+    hiddenInSingle: false # hide on single page
+
+  # for search
+  # https://fusejs.io/api/options.html
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+    location: 0
+    distance: 1000
+    threshold: 0.4
+    minMatchCharLength: 0
+    keys: ["title", "content"]
+menu:
+  main:
+    - identifier: tags
+      name: Tags
+      url: /tags/
+      weight: 10
+    - identifier: rss
+      name: RSS
+      url: /index.xml/
+      weight: 20
+    - identifier: about
+      name: About
+      url: /about/
+      weight: 30
+# Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
+pygmentsUseClasses: false
+markup:
+  highlight:
+    noClasses: true
+    # anchorLineNos: true
+    codeFences: true
+    guessSyntax: true
+    lineNos: true
+    style: monokai
