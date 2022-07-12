@@ -14,7 +14,7 @@ buildExpired: false
 
 hasCJKLanguage: true # 自动检测是否包含 中文日文韩文 如果文章中使用了很多中文引号的话可以开启
 
-googleAnalytics: UA-123-45
+googleAnalytics: G-G9ZDJQN9E2
 
 minify:
   disableXML: true
@@ -31,7 +31,7 @@ params:
   disableThemeToggle: false
 
   ShowReadingTime: true
-  ShowShareButtons: true
+  ShowShareButtons: false
   ShowPostNavLinks: true
   ShowBreadCrumbs: true
   ShowCodeCopyButtons: false
@@ -84,7 +84,7 @@ menu:
       weight: 10
     - identifier: rss
       name: RSS
-      url: /index.xml/
+      url: /index.xml
       weight: 20
     - identifier: about
       name: About
