@@ -78,18 +78,26 @@ params:
     keys: ["title", "content"]
 menu:
   main:
+    - identifier: home
+      name: Home
+      url: /
+      weight: 10
+    - identifier: archives
+      name: Archives
+      url: /archives/
+      weight: 20
     - identifier: tags
       name: Tags
       url: /tags/
-      weight: 10
+      weight: 20
     - identifier: rss
       name: RSS
       url: /index.xml
-      weight: 20
+      weight: 30
     - identifier: about
       name: About
       url: /about/
-      weight: 30
+      weight: 40
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: false
 markup:
