@@ -28,6 +28,21 @@
 .post-content pre code {
     max-height: 40rem;
 }
+
+.post-content .highlight pre {
+    tab-size: 4 !important;
+}
+
+.post-content .highlight:not(table), .post-content pre {
+    box-shadow: 1px 5px 5px 1px rgb(144 164 174 / 60%);
+    border-radius: var(--radius);
+}
+
+.dark .post-content .highlight:not(table), .post-content pre {
+    box-shadow: 1px 5px 5px 1px rgb(5 10 15 / 60%);
+    border-radius: var(--radius);
+}
+
 /* 图片居中 */
 .post-content img {
     margin: auto;
