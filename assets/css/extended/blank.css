@@ -27,6 +27,7 @@
 /* 代码块 - 最大高度 */
 .post-content pre code {
     max-height: 40rem;
+    font-family: Consolas,Monaco,SFMono-Regular,Andale Mono,Liberation Mono,Ubuntu Mono,Menlo,monospace;
 }
 
 .post-content .highlight pre {
