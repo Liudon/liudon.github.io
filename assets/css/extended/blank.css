@@ -4,10 +4,13 @@
     --primary: #212121;  /* rgb(30, 30, 30); */
     --content: #333333;  /* rgb(31, 31, 31); */
     --code-bg: rgba(175, 184, 193, 0.2); /* rgb(245, 245, 245); */
+    --hljs-bg: #282C34;
 }
 .dark {
     --code-bg: rgba(175, 184, 193, 0.2); /* rgb(55, 56, 62); */
+    --hljs-bg: #1c1c1c;
 }
+
 /* 链接样式 */
 .post-content a {
     color: #0969da;
