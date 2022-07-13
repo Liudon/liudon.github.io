@@ -96,13 +96,13 @@ menu:
       name: Tags
       url: /tags/
       weight: 20
-    - identifier: rss
-      name: RSS
-      url: /index.xml
-      weight: 30
     - identifier: about
       name: About
       url: /about/
+      weight: 30
+    - identifier: search
+      name: 🔍
+      url: /search/
       weight: 40
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: false
