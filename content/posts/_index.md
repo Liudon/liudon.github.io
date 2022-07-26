@@ -1,3 +1,4 @@
 +++
-title = "文章"
+title: "文章"
+comments: true
 +++
