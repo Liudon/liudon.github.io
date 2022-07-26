@@ -42,7 +42,7 @@ params:
   ShowBreadCrumbs: false
   ShowCodeCopyButtons: true
   ShowWordCount: true
-  comments: true
+  comments: false
 
   ShowToc: true # 显示目录
   TocOpen: true # 自动展开目录
