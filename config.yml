@@ -48,6 +48,9 @@ params:
 
   assets:
     disableHLJS: true # to disable highlight.js
+    
+  twikoo:
+    version: 1.5.11
 
   label:
     text: "流动"
