@@ -8,5 +8,5 @@
   Cache-Control: public, max-age=86400
 https://liudon.pages.dev/*
   X-Robots-Tag: noindex
-https://liudon-github-io.pages.dev/
+https://liudon-github-io.pages.dev/*
   X-Robots-Tag: noindex
