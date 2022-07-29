@@ -1,4 +1,4 @@
-*
+/*
   strict-transport-security: max-age=10886400; includeSubDomains; preload
 
 https://liudon-github-io.pages.dev/*
