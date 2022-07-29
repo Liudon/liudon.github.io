@@ -1,4 +1,4 @@
-https://liudon.pages.dev/*
-  X-Robots-Tag: noindex
+strict-transport-security: max-age=10886400; includeSubDomains; preload
+
 https://liudon-github-io.pages.dev/*
   X-Robots-Tag: noindex
