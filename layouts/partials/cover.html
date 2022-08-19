@@ -29,7 +29,7 @@
         {{- if $addLink }}<a href="{{ (.Params.cover.image) | absURL }}" target="_blank"
             rel="noopener noreferrer">{{ end -}}
             <picture>
-              <source type="image/webp" srcset="{{ (.Params.cover.image) | absURL }}/webp">
+              <source type="image/webp" srcset="{{ (.Params.cover.image) | absURL }}/webp" {{- if (.Params.cover.width) }}width="{{ (.Params.cover.width) }}"{{ end -}} {{- if (.Params.cover.height) }}height="{{ (.Params.cover.height) }}"{{ end -}}>
               <img loading="lazy" alt="{{ $alt }}" src="{{ (.Params.cover.image) | absURL }}">
             </picture>
     {{- end }}
