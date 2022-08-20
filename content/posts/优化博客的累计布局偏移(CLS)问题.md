@@ -80,7 +80,7 @@ tags:
 
 基于`markdown`语法的图片代码，是不支持宽高参数的。
 
-还好`hugo`支持shortcode，其中就有`figure`语法。
+还好`hugo`支持shortcode，其中就有`figure`语法，支持配置宽高参数。
 
 {{< figure src="https://static.liudon.com/img/figure-code.png" alt="figure.html code" width="2022" height="1336" >}}
 
