@@ -105,4 +105,8 @@ tags:
     {{- if .Get "link" }}</a>{{ end -}}
 ```
 
+![]()
+
+{{< figure src="https://static.liudon.com/img/gtmetrix-result.png" alt="gtmetrix-result" width="2078" height="758" >}}
+
 至此累计布局偏移(CLS)问题解决了，同时也支持了响应式图片。
