@@ -85,6 +85,24 @@ tags:
 
 我们使用`figure`语法插入图片，指定图片宽高。
 
-`figure`解析模板我也进行了改进，类似`cover.html`模板，也通过对象存储图片处理支持了webp响应式图片，具体参考[我的文件](https://github.com/Liudon/liudon.github.io/blob/code/layouts/shortcodes/figure.html)。
+`figure`解析模板我也进行了改进，类似`cover.html`模板，也通过对象存储图片处理支持了webp响应式图片，核心代码如下，完整代码参考[我的文件](https://github.com/Liudon/liudon.github.io/blob/code/layouts/shortcodes/figure.html)。
 
-至此博客的`CLS`问题解决了，同时也支持了响应式图片。
+```
+    {{- if .Get "link" -}}
+        <a href="{{ .Get "link" }}"{{ with .Get "target" }} target="{{ . }}"{{ end }}{{ with .Get "rel" }} rel="{{ . }}"{{ end }}>
+    {{- end }}
+    <picture>
+        <source type="image/webp" srcset="{{ .Get "src" }}/webp" {{- with .Get "width" }} width="{{ . }}"{{ end -}}
+        {{- with .Get "height" }} height="{{ . }}"{{ end -}}>
+        <img loading="lazy" src="{{ .Get "src" }}{{- if eq (.Get "align") "center" }}#center{{- end }}"
+         {{- if or (.Get "alt") (.Get "caption") }}
+         alt="{{ with .Get "alt" }}{{ . }}{{ else }}{{ .Get "caption" | markdownify| plainify }}{{ end }}"
+         {{- end -}}
+         {{- with .Get "width" }} width="{{ . }}"{{ end -}}
+         {{- with .Get "height" }} height="{{ . }}"{{ end -}}
+        /> <!-- Closing img tag -->
+    </picture>
+    {{- if .Get "link" }}</a>{{ end -}}
+```
+
+至此累计布局偏移(CLS)问题解决了，同时也支持了响应式图片。
