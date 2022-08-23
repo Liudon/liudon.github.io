@@ -13,13 +13,13 @@ date: 2019-10-08T13:13:36+08:00
 
 1. 家里的老洗衣机光荣退休了，年龄比我都要大，爸妈舍不得换一直用着。
 
-    ![64F68D7789A8D877A41E6D694ABE5444.png](https://i.loli.net/2019/10/08/SkRx5uFwQ8Cliyq.jpg "服役了30年的洗衣机")
+    ![64F68D7789A8D877A41E6D694ABE5444.png](https://static.liudon.com/SkRx5uFwQ8Cliyq.jpg "服役了30年的洗衣机")
 
 2. 村里今年也要通天然气了，各家各户都要拆煤炉，装壁挂炉，希望天然气供应不出问题。
 
 3. 全家一起去了趟家门口的园博园，希望以后可以走的更远一些。
 
-    ![F69E19D28B34C163878F2A6E1A43E039.png](https://i.loli.net/2019/10/08/wfUv5Kb1LGEdNHc.jpg "园博园")
+    ![F69E19D28B34C163878F2A6E1A43E039.png](https://static.liudon.com/wfUv5Kb1LGEdNHc.jpg "园博园")
 
 4. 娃确实是长大了，有了自己的想法，有自己的脾气了。
 
