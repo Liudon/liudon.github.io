@@ -44,11 +44,11 @@ Starting taskexecutor daemon on host VM_80_180_centos.
 
 访问Flink的web页面，发现task数全为0.
 
-![flink no task](https://wx2.sinaimg.cn/large/63c9befaly1g1igknr8lyj21ae09874j.jpg)
+![flink no task](https://static.liudon.com/63c9befaly1g1igknr8lyj21ae09874j.jpg)
 
 #### 问题原因：
 
-![taskmanager.host](https://wx2.sinaimg.cn/large/63c9befaly1g1igoreyi9j20oz04mdg7.jpg)
+![taskmanager.host](https://static.liudon.com/63c9befaly1g1igoreyi9j20oz04mdg7.jpg)
 
 Flink的taskmanager.host默认为空，会使用hostname。
 
@@ -75,4 +75,4 @@ taskmanager.host: localhost
 
 保存退出，然后重新启动Flink，这个时候在web端就可以看到有可用task了。
 
-![flink web](https://wx1.sinaimg.cn/large/63c9befaly1g1ih665ffjj21a709374r.jpg)
+![flink web](https://static.liudon.com/63c9befaly1g1ih665ffjj21a709374r.jpg)
