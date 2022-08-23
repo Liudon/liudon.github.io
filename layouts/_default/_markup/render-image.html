@@ -1,12 +1,12 @@
 {{- $item := getJSON .Destination "?imageInfo&t=" now.Unix -}}
 
-{{- $Destination := .Destination -}}
+{{- $Destination := .Destination || safeURL -}}
 {{- $Text := .Text -}}
 {{- $title := .Title -}}
 
 {{- with $item }}
 <picture>
-    <source type="image/webp" srcset="{{ $Destination || safeURL }}/webp" width="{{ .width }}" height="{{ .height }}">
-    <img loading="lazy" src="{{ $Destination || safeURL  }}" alt="{{ $Text }}" {{ with $Title}} title="{{ . }}" {{ end }} width="{{ .width }}" height="{{ .height }}" />
+    <source type="image/webp" srcset="{{ $Destination }}/webp" width="{{ .width }}" height="{{ .height }}">
+    <img loading="lazy" src="{{ $Destination }}" alt="{{ $Text }}" {{ with $Title}} title="{{ . }}" {{ end }} width="{{ .width }}" height="{{ .height }}" />
 </picture>
 {{- end -}}
