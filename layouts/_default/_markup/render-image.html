@@ -1,6 +1,6 @@
 {{- $item := getJSON .Destination "?imageInfo&t=" now.Unix -}}
 
-{{- $Destination := .Destination | safeURL -}}
+{{- $Destination := .Destination -}}
 {{- $Text := .Text -}}
 {{- $title := .Title -}}
 
