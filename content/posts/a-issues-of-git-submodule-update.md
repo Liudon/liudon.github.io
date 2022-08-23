@@ -140,13 +140,13 @@ jane主题是通过`git submodule`引入的，`.gitmodules`文件内容。
     [root@VM_81_18_centos test]# 
     ```
 
-    ![提交后Github显示](https://user-images.githubusercontent.com/5969707/64412246-9050f100-d0c1-11e9-893a-f9b0766533ad.png)
+    ![提交后Github显示](https://static.liudon.com/64412246-9050f100-d0c1-11e9-893a-f9b0766533ad.png)
 
     提交后，在github上子仓库后面会多显示一个`@xxxxx`，这里就是引用的`commitId`，对应到前面`git diff`最后一行。
 
     点击查看[提交记录](https://github.com/Liudon/test/commit/5b11d515db8ad8d299ef1691f115590e0015c3b7)。
 
-    ![提交记录](https://user-images.githubusercontent.com/5969707/64412419-e4f46c00-d0c1-11e9-8c2d-6fa1581529f3.png)
+    ![提交记录](https://static.liudon.com/64412419-e4f46c00-d0c1-11e9-8c2d-6fa1581529f3.png)
 
     本次提交的`commitId`为`5b11d515db8ad8d299ef1691f115590e0015c3b7`，子仓库typecho单独记录了引入时的`commitId`，为`b0c4cc77a7f8f04661fb9f75d4ba6d4d7915b0f1`，对应的[提交记录](https://github.com/Liudon/typecho/tree/b0c4cc77a7f8f04661fb9f75d4ba6d4d7915b0f1)。
 
