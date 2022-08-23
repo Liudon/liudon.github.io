@@ -26,12 +26,16 @@
         <img loading="lazy" src="{{ (path.Join .RelPermalink .Params.cover.image) | absURL }}" alt="{{ $alt }}">
         {{- end }}
     {{- else }}{{/* For absolute urls and external links, no img processing here */}}
-        {{- if $addLink }}<a href="{{ (.Params.cover.image) | absURL }}" target="_blank"
+        {{- $item := getJSON .Params.cover.image "?imageInfo&t=" now.Unix -}}
+        {{- $coverUrl := .Params.cover.image -}}
+        {{- with $item }}
+        {{- if $addLink }}<a href="{{ $coverUrl | absURL }}" target="_blank"
             rel="noopener noreferrer">{{ end -}}
             <picture>
-              <source type="image/webp" srcset="{{ (.Params.cover.image) | absURL }}/webp" {{- if (.Params.cover.width) }}width="{{ (.Params.cover.width) }}"{{ end -}} {{- if (.Params.cover.height) }}height="{{ (.Params.cover.height) }}"{{ end -}}>
-              <img loading="lazy" alt="{{ $alt }}" src="{{ (.Params.cover.image) | absURL }}" {{- if (.Params.cover.width) }}width="{{ (.Params.cover.width) }}"{{ end -}} {{- if (.Params.cover.height) }}height="{{ (.Params.cover.height) }}"{{ end -}}>
+              <source type="image/webp" srcset="{{ $coverUrl | absURL }}/webp" width="{{ .width }}" height="{{ .height }}">
+              <img loading="lazy" alt="{{ $alt }}" src="{{ $coverUrl | absURL }}" width="{{ .width }}" height="{{ .height }}">
             </picture>
+        {{- end }}
     {{- end }}
     {{- if $addLink }}</a>{{ end -}}
     {{/*  Display Caption  */}}

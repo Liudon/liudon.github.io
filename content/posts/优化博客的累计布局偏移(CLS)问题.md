@@ -15,13 +15,13 @@ tags:
 
 偶然看到苏卡卡大佬的[CLS优化文章](https://blog.skk.moe/post/fix-blog-cls/)，拿自己博客也测试了下，发现也存在同样的问题。
 
-{{< figure src="https://static.liudon.com/img/lighthouse_result.png" alt="Lighthouse测试报告" width="1038" height="1144" >}}
+![Lighthouse测试报告](https://static.liudon.com/img/lighthouse_result.png)
 
 根据苏卡卡大佬的文章，分析页面是由于文章封面的图片缺少宽高导致出现CLS问题。
 
 为了解决这个问题，需要指定封面的宽高参数。
 
-{{< figure src="https://static.liudon.com/img/cover-code.png" alt="cover.html code" width="2020" height="1468" >}}
+![cover.html code](https://static.liudon.com/img/cover-code.png)
 
 根据`PagerMod`主题的`cover.html`文件代码，使用绝对地址的情况没有配置宽高参数。
 
@@ -57,7 +57,7 @@ tags:
 
     图片我放到了腾讯云对象存储上，通过图片处理支持了`webp`格式图片。
 
-    {{< figure src="https://static.liudon.com/img/cos-img-process.png" alt="cos-img-process" width="1590" height="752" >}}
+    ![cos-img-process](https://static.liudon.com/img/cos-img-process.png)
 
 3. 新增`css`配置
 
@@ -82,7 +82,7 @@ tags:
 
 还好`hugo`支持shortcode，其中就有`figure`语法，支持配置宽高参数。
 
-{{< figure src="https://static.liudon.com/img/figure-code.png" alt="figure.html code" width="2022" height="1336" >}}
+![figure.html code](https://static.liudon.com/img/figure-code.png)
 
 我们使用`figure`语法插入图片，指定图片宽高。
 
@@ -106,6 +106,6 @@ tags:
     {{- if .Get "link" }}</a>{{ end -}}
 ```
 
-{{< figure src="https://static.liudon.com/img/gtmetrix-result.png" alt="gtmetrix-result" width="2078" height="758" >}}
+![gtmetrix-result](https://static.liudon.com/img/gtmetrix-result.png)
 
 至此累计布局偏移(CLS)问题解决了，同时也支持了响应式图片。
