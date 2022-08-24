@@ -9,6 +9,8 @@ tags:
 - PagerMod
 ---
 
+此文已过期，优化方案参考[累计布局偏移修复方案改进 —— 自动生成图片宽高](https://liudon.com/posts/hugo-auto-generate-image-width-and-height/).
+
 #### 问题表现
 
 7月份将博客部署由`Github`迁移到`Cloudflare`后，开始关注博客的性能问题。
