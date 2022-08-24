@@ -112,8 +112,6 @@ tags:
 
 > {{</* figure src="https://static.liudon.com/img/cover-code.png" alt="cover.html code" width="2020" height="1468" */>}}
 
-*记得去掉#字符，这里为了防止解析为图片特意加上的。*
-
 ![gtmetrix-result](https://static.liudon.com/img/gtmetrix-result.png)
 
 至此累计布局偏移(CLS)问题解决了，同时也支持了响应式图片。
