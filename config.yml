@@ -67,9 +67,9 @@ params:
     - name: email
       url: "mailto:i@liudon.org"
 
-  analytics:
-    google:
-      SiteVerificationTag: "G-G9ZDJQN9E2"
+  # analytics:
+  #  google:
+  #    SiteVerificationTag: "G-G9ZDJQN9E2"
 
   cover:
     hidden: false # hide everywhere but not in structured data
