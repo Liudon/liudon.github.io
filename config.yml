@@ -14,7 +14,7 @@ buildExpired: false
 
 hasCJKLanguage: true # 自动检测是否包含 中文日文韩文 如果文章中使用了很多中文引号的话可以开启
 
-googleAnalytics: G-G9ZDJQN9E2
+# googleAnalytics: G-G9ZDJQN9E2
 
 minify:
   disableXML: true
