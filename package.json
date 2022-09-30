@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/Liudon/liudon.github.io#readme",
   "devDependencies": {
-    "ipfs-deploy": "^7.11.1"
+    "ipfs-deploy": "^12.0.1"
   }
 }
