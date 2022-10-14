@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "hugo --gc --minify --cleanDestinationDir",
-    "ipfs-deploy": "./node_modules/ipfs-deploy/bin/ipfs-deploy.js -p filebase public public -u pinata -d cloudflare -C -O"
+    "ipfs-deploy": "ipfs-deploy -p filebase public public -u pinata -d cloudflare -C -O"
   },
   "repository": {
     "type": "git",
