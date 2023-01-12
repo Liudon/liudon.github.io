@@ -3,6 +3,11 @@ title: "2022年终总结"
 date: 2023-01-12T07:21:20+08:00
 draft: false
 tags: ["年终总结"]
+cover:
+    image: "https://static.liudon.com/img/%E6%88%91%E6%98%AF%E5%B0%8F%E5%AD%A6%E7%94%9F.jpg"
+    alt: "我是小学生"
+    caption: "我是小学生"
+    hidden: true
 ---
 
 2022年已经过去1周多了，记录一下我的2022年。
