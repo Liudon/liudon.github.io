@@ -1,0 +1,47 @@
+---
+title: "第一次清理键盘"
+date: 2023-01-16T14:43:38+08:00
+draft: false
+tags:
+    - 自己动手
+---
+
+19年生日的时候，媳妇送了一款flico的机械键盘。
+
+这次搬家后，想着年前清理下键盘，实在是太脏了。
+
+周五下班，带上键盘回家。
+
+![](https://static.liudon.com/img/202301161450523.jpeg)
+
+键盘全貌，上面好多油。
+
+![](https://static.liudon.com/img/202301161450514.jpeg)
+
+开拆。
+
+![](https://static.liudon.com/img/202301161450505.jpeg)
+
+手还是太慢，上工具吧。
+
+
+![](https://static.liudon.com/img/202301161450497.jpeg)
+
+全部拆完。
+
+
+![](https://static.liudon.com/img/202301161450488.jpeg)
+
+内部特写。
+
+![](https://static.liudon.com/img/202301161450480.jpeg)
+
+清理出来的灰屑、头发，这键盘见证了我的发迹线变化
+
+![](https://static.liudon.com/img/202301161450468.jpeg)
+
+终于清理干净了。
+
+![](https://static.liudon.com/img/202301161450456.jpeg)
+
+复原，又可以咔咔写代码了。
