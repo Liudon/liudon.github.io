@@ -1,6 +1,6 @@
 baseURL: "https://liudon.com/"
 languageCode: zh-cn
-title: 编码记录
+title: 流动
 paginate: 10
 theme: PaperMod
 
@@ -28,7 +28,7 @@ outputs:
 
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
-  title: 编码记录
+  title: 流动
   description: "生活就是一个流动的过程"
   keywords: [流动,博客,liudon,生活,技术]
   author: Liudon
