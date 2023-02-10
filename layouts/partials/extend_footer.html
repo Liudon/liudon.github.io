@@ -10,17 +10,57 @@
 
   gtag('config', 'G-G9ZDJQN9E2');
 
-  if (document.readyState === 'complete') {
-    t = window.performance.getEntriesByType("navigation")[0]
+  var performance = window.performance,
+        t = performance.getEntriesByType("navigation")[0]
+        startTime = useNewPerformanceAPI ? t.startTime : t.navigationStart,
+        filterNumber = function (num) { return isNaN(num) || num == Infinity || num < 0 ? void 0 : num; };
 
-    startTime = t.startTime
-
-    gtag('event', 'timing_complete', {
-    'name': 'Page Load Time',
-    'value': t.loadEventStart - startTime,
-    'event_category': 'Page Loading Time'
-    });
-
-    console.log(t)
-  }
+    // sendGA: collect data and send.
+    function sendGA() {
+        gtag('event', 'timing_complete', {
+            'name': 'Page Load Time',
+            'value': filterNumber(t.loadEventStart - startTime || 0),
+            'event_category': 'Page Loading Time'
+            });
+        gtag('event', 'timing_complete', {
+            'name': 'Page Load Time',
+            'value': filterNumber(t.domainLookupEnd - t.domainLookupStart || 0),
+            'event_category': 'DNS Time'
+            });
+        gtag('event', 'timing_complete', {
+            'name': 'Page Load Time',
+            'value': filterNumber(t.responseEnd - t.responseStart || 0),
+            'event_category': 'Page Dowenload Time'
+            });
+        gtag('event', 'timing_complete', {
+            'name': 'Page Load Time',
+            'value': filterNumber(t.redirectEnd - t.redirectStart || 0),
+            'event_category': 'Redirect Time'
+            });
+        gtag('event', 'timing_complete', {
+            'name': 'Page Load Time',
+            'value': filterNumber(t.connectEnd - t.connectStart || 0),
+            'event_category': 'TCP Time'
+            });
+        gtag('event', 'timing_complete', {
+            'name': 'Page Load Time',
+            'value': filterNumber(t.responseStart - t.requestStart || 0),
+            'event_category': 'Server Response Time'
+            });
+        gtag('event', 'timing_complete', {
+            'name': 'Page Load Time',
+            'value': filterNumber(t.domInteractive - t.domLoading || 0),
+            'event_category': 'DOM Interactive Time'
+            });
+        gtag('event', 'timing_complete', {
+            'name': 'Page Load Time',
+            'value': filterNumber(t.domContentLoadedEventStart - startTime || 0),
+            'event_category': 'Content Loading Time'
+            });
+    }
+    if (document.readyState === 'complete') {
+        sendGA();
+    } else {
+        window.addEventListener('load', sendGA);
+    }
 </script>
