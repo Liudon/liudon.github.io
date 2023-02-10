@@ -9,4 +9,16 @@
   gtag('js', new Date());
 
   gtag('config', 'G-G9ZDJQN9E2');
+
+  if (document.readyState === 'complete') {
+    t = window.performance.getEntriesByType("navigation")[0]
+
+    startTime = t.startTime
+
+    gtag('event', 'timing_complete', {
+    'name': 'Page Load Time',
+    'value': t.loadEventStart - startTime,
+    'event_category': 'Page Loading Time'
+    });
+  }
 </script>
