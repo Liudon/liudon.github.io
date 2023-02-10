@@ -12,7 +12,7 @@
 
   var performance = window.performance,
         t = performance.getEntriesByType("navigation")[0]
-        startTime = useNewPerformanceAPI ? t.startTime : t.navigationStart,
+        startTime = t.startTime,
         filterNumber = function (num) { return isNaN(num) || num == Infinity || num < 0 ? void 0 : num; };
 
     // sendGA: collect data and send.
