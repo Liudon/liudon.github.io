@@ -1,5 +1,5 @@
 ---
-title: "新冠疫情后的第一个新年"
+title: "新冠疫情后的第一个春节"
 date: 2023-02-16T20:56:38+08:00
 draft: false
 ---
@@ -18,14 +18,28 @@ draft: false
 
 ![回家](https://static.liudon.com/20230216210359.jpg)
 
+回家啦。
+
 ![赶集](https://static.liudon.com/20230216210413.jpg)
+
+赶大集。
 
 ![烧火](https://static.liudon.com/20230216210442.jpg)
 
+烧火。
+
 ![放烟花](https://static.liudon.com/20230216210418.jpg)
+
+放烟花。
 
 ![抓鸟](https://static.liudon.com/20230216210424.jpg)
 
+抓鸟。
+
 ![放孔明灯](https://static.liudon.com/20230216210436.jpg)
 
+放孔明灯。
+
 ![蹭饭](https://static.liudon.com/20230216210431.jpg)
+
+邻居家蹭饭。
