@@ -49,7 +49,7 @@ jobs:
         run: | 
           echo "${{ secrets.SSHKEY }}" > ../privkey
           chmod 600 ../privkey
-          ssh -o StrictHostKeyChecking=no root -i ../privkey -L 5001:localhost:5001 -fTN
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSHHOST }} -i ../privkey -L 5001:localhost:5001 -fTN
       - name: ipfs upload
         uses: aquiladev/ipfs-action@master
         id: deploy
