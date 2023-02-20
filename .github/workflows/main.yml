@@ -44,3 +44,20 @@ jobs:
           force_orphan: true
           publish_dir: ./public
           cname: liudon.com
+      - name: Connect to ssh in BG
+        timeout-minutes: 2
+        run: | 
+          echo "${{ secrets.SSHKEY }}" > ../privkey
+          chmod 600 ../privkey
+          ssh -o StrictHostKeyChecking=no root -i ../privkey -L 5001:localhost:5001 -fTN
+      - name: ipfs upload
+        uses: aquiladev/ipfs-action@master
+        id: deploy
+        timeout-minutes: 2
+        with:
+          path: ./public
+          service: ipfs
+          verbose: true
+          host: localhost
+          port: 5001
+          protocol: http
