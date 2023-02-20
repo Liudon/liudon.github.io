@@ -61,4 +61,4 @@ jobs:
           host: localhost
           port: 5001
           protocol: http
-          key: k51qzi5uqu5djx9olgjcibdiurrr09w75v6rdfx0cvwye295k787masw5f0d9d
+          key: ${{ secrets.IPFSKEY }}
