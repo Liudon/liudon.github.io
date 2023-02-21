@@ -68,7 +68,7 @@ jobs:
       - name: ipfs upload to filebase
         uses: aquiladev/ipfs-action@master
         with:
-          path: ./build
+          path: ./public
           service: filebase
           filebaseBucket: ${{ secrets.FILEBASE_BUCKET }}
           filebaseKey: ${{ secrets.FILEBASE_KEY }}
