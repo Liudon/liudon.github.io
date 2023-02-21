@@ -44,20 +44,14 @@ jobs:
           force_orphan: true
           publish_dir: ./public
           cname: liudon.com
-      - name: ipfs upload to filebase
-        uses: aquiladev/ipfs-action@v1
-        with:
-          path: ./build
-          service: filebase
-          filebaseBucket: ${{ secrets.FILEBASE_BUCKET }}
-          filebaseKey: ${{ secrets.FILEBASE_KEY }}
-          filebaseSecret: ${{ secrets.FILEBASE_SECRET }}
+
       - name: Connect to ssh in BG
         timeout-minutes: 2
         run: | 
           echo "${{ secrets.SSHKEY }}" > ../privkey
           chmod 600 ../privkey
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSHHOST }} -i ../privkey -L 5001:localhost:5001 -fTN
+
       - name: ipfs upload
         uses: aquiladev/ipfs-action@master
         id: deploy
@@ -70,3 +64,12 @@ jobs:
           port: 5001
           protocol: http
           key: self
+      
+      - name: ipfs upload to filebase
+        uses: aquiladev/ipfs-action@master
+        with:
+          path: ./build
+          service: filebase
+          filebaseBucket: ${{ secrets.FILEBASE_BUCKET }}
+          filebaseKey: ${{ secrets.FILEBASE_KEY }}
+          filebaseSecret: ${{ secrets.FILEBASE_SECRET }}
