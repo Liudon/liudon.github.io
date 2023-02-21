@@ -44,6 +44,11 @@ jobs:
           force_orphan: true
           publish_dir: ./public
           cname: liudon.com
+          
+      - name: generate robots.txt
+        run: |
+          echo "User-agent: *" > ./public/robots.txt
+          echo "Disallow: /" >> ./public/robots.txt
 
       - name: Connect to ssh in BG
         timeout-minutes: 2
