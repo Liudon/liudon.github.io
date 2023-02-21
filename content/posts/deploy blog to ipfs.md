@@ -136,6 +136,6 @@ tags:
     - 添加DNS TXT记录,名称为`_dnslink`，值为`dnslink=/ipns/上一步日志里到ipns值`.
     - 添加DNS CNNANE记录,名称为`你的域名`，值为`gateway.ipfs.io`.
 
-    ![DNS解析](https://static.liudon.com/dns%20record.png)
+![DNS解析](https://static.liudon.com/dns%20record.png)
 
 从年前开始想怎么做成自动化,到今天终于跑通搞定了.😁😁😁
