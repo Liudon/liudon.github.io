@@ -13,6 +13,8 @@ tags:
 
 照惯例,先上演示.[访问我的IPFS博客](https://liudon.xyz)
 
+欢迎各位pin我的博客， `ipfs pin add /ipns/liudon.xyz`
+
 ```
 curl 'https://liudon.xyz' -I
 HTTP/2 200 
