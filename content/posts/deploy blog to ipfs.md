@@ -7,6 +7,11 @@ tags:
 - ipfs
 - github
 - cloudflare
+cover:
+    image: "https://static.liudon.com/20230222122431.png"
+    alt: "将博客部署到星际文件系统(IPFS)"
+    caption: "将博客部署到星际文件系统(IPFS)"
+    hidden: true
 ---
 
 > IPFS（InterPlanetary File System）中文称为星际文件系统，是一个旨在实现文件的分布式存储、共享和持久化的网络传输协议。
