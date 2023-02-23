@@ -125,6 +125,10 @@ alt-svc: h3=":443"; ma=86400, h3-29=":443"; ma=86400
 
 #### 2. GitHub Actions配置
 
+博客我使用的`Hugo`，原有的工作流方案见[将博客部署到Cloudflare Pages](https://liudon.com/posts/deploy-blog-to-cloudflare-pages/)。
+
+完整的工作流配置见[main.yml](完整配置可参考[main.yml](https://github.com/Liudon/liudon.github.io/blob/code/.github/workflows/main.yml))。
+
 - 添加如下变量到Actions secrets
 
     ```
@@ -132,7 +136,7 @@ alt-svc: h3=":443"; ma=86400, h3-29=":443"; ma=86400
     SSHHOST ssh用户@VPS机器IP,类似root@127.0.0.1
     ```
 
-- 更新yaml配置文件,添加如下任务.完整配置可参考[main.yml](https://github.com/Liudon/liudon.github.io/blob/code/.github/workflows/main.yml)
+- 更新yaml配置文件,添加如下任务.
 
     ```
        - name: Connect to ssh in BG
