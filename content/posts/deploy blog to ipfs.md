@@ -179,7 +179,7 @@ alt-svc: h3=":443"; ma=86400, h3-29=":443"; ma=86400
 
 在`Cloudflare`上添加解析:
 
-- 添加DNS TXT记录,名称为`_dnslink`，值为`dnslink=/ipns/上一步日志里到ipns值`.
+- 添加DNS TXT记录,名称为`_dnslink`，值为`dnslink=/ipns/12D3KooWKvJ9Y4D5X4R3ajuc7tVtQWXZMG4iiMCFtay8frM66o4c`，将这里的`12D3KooWKvJ9Y4D5X4R3ajuc7tVtQWXZMG4iiMCFtay8frM66o4c`改为上一步日志里到ipns值。
 - 添加DNS CNNANE记录,名称为`你的域名`，值为`gateway.ipfs.io`.
 
 ![DNS解析](https://static.liudon.com/dns%20record.png)
