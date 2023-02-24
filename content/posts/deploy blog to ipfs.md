@@ -111,6 +111,8 @@ alt-svc: h3=":443"; ma=86400, h3-29=":443"; ma=86400
     WantedBy=multi-user.target
     ```
 
+    注意打开`--enable-namesys-pubsub`参数，不然IPNS更新生效很慢。
+
     将上述代码保存到`/usr/lib/systemd/system/ipfs.service`文件.
 
     启动进程.
@@ -182,8 +184,23 @@ alt-svc: h3=":443"; ma=86400, h3-29=":443"; ma=86400
 
 ![DNS解析](https://static.liudon.com/dns%20record.png)
 
+#### 4. 开启相对路径
+
+经[Livid大佬](https://github.com/livid)提醒，[公共网关访问时存在相对路径问题](https://zu1k.com/posts/tutorials/p2p/ipfs-easy-use/)。
+
+我用的`Hugo`，配置文件里打开`relativeURLs`配置。
+
+```
+relativeURLs: true
+```
+
 从年前开始想怎么做成自动化,到今天终于跑通搞定了.😁😁😁
 
 ![VPS主机运行情况](https://static.liudon.com/20230222080123.png)
 
 两天跑了14G流量,每月的流量资源包基本够用了.
+
+参考资料：
+
+[IPFS 日用优化指南](https://zu1k.com/posts/tutorials/p2p/ipfs-easy-use/)
+[参考配置](https://github.com/UnifiedPush/documentation/blob/karmanyaahm-patch-3/config.toml)
