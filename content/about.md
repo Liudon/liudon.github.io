@@ -20,6 +20,6 @@ ShowBreadCrumbs: false
 #### 朋友们
 
 
-{{friend name="Sukka's Blog" url="https://blog.skk.moe" logo="https://cdn.skk.moe/avatar/96x96.png" word="童话只美在真实却从不续写"}}
+{{< friend name="Sukka's Blog" url="https://blog.skk.moe" logo="https://cdn.skk.moe/avatar/96x96.png" word="童话只美在真实却从不续写" >}}
 
-{{friend name="Dvel’s Blog" url="https://dvel.me" logo="https://dvel.me/avatar.png" word="Less is More."}}
+{{< friend name="Dvel’s Blog" url="https://dvel.me" logo="https://dvel.me/avatar.png" word="Less is More." >}}
