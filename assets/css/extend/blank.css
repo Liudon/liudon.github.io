@@ -222,3 +222,29 @@ img {
 figure {
     background-color: var(--code-bg);
 }
+
+.friendinfo {
+    text-overflow: ellipsis;
+    font-size: 70%;
+    color: var(--primary);
+}
+
+@media screen and (max-width: 600px) {
+    .friendinfo {
+        display: none;
+    }
+    .frienddivleft {
+        width: 84px;
+        margin: auto;
+    }
+    .frienddivright {
+        height: 100%;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .friendname {
+        font-size: 18px;
+    }
+}
