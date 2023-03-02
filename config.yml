@@ -105,10 +105,14 @@ menu:
       name: About
       url: /about/
       weight: 30
+    - identifier: link
+      name: Link
+      url: /link/
+      weight: 40
     - identifier: search
       name: 🔍
       url: /search/
-      weight: 40
+      weight: 50
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: false
 markup:
