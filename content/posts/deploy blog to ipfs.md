@@ -14,6 +14,8 @@ cover:
     hidden: true
 ---
 
+在这篇文章，我将会介绍如何利用`Github Actions`将`hugo`博客自动部署到`IPFS`上，并通过自定义域名访问`IPFS`上的文件。
+
 > IPFS（InterPlanetary File System）中文称为星际文件系统，是一个旨在实现文件的分布式存储、共享和持久化的网络传输协议。
 
 照惯例,先上演示.[访问我的IPFS博客](https://liudon.xyz)
