@@ -37,11 +37,7 @@ outputs:
     home:
         - HTML
         - RSS
-        - JSON # is necessary
-    section:
-    - HTML
-    - RSS
-    - jsonfeed
+        - jsonfeed
 
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
@@ -60,6 +56,8 @@ params:
   ShowCodeCopyButtons: true
   ShowWordCount: true
   comments: true
+
+  showFullTextinJSONFeed: true
 
   ShowToc: true # 显示目录
   TocOpen: true # 自动展开目录
