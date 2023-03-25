@@ -57,11 +57,13 @@
             {{- end }}
             {{- end }}
             "date_published": {{ .Date.Format "2006-01-02T15:04:05Z07:00" | jsonify }},
-            "tags":[
-            {{- with delimit .Params.tags "\", \"" -}}
-            "{{.}}"
-            {{ end }}
-            ]
+            {{- $tags := slice -}}
+            {{ with .Params.tags }}
+            {{ range . }}
+            {{ $tags = $tags | append (. | jsonify) }}
+            {{end}}
+            {{end}}
+            "tags": [{{ delimit $tags ", " }}]
         }
         {{- end }}
         {{- end }}
