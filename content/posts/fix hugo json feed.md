@@ -155,3 +155,5 @@ params:
 
     showFullTextinJSONFeed: true # jsonfeed开启全文输出
 ```
+
+参考资料：[How to add JSON Feed support to Hugo](https://foosel.net/til/how-to-add-json-feed-support-to-hugo/)
