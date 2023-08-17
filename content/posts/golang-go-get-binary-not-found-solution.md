@@ -27,7 +27,7 @@ protoc-gen-go: program not found or is not executable
 #### 解决
 
 > Starting in Go 1.17, installing executables with go get is deprecated. go install may be used instead.
-
+>
 > In a future Go release, go get will no longer build packages; it will only be used to add, update, or remove dependencies in go.mod. Specifically, go get will act as if the -d flag were enabled.
 >
 > https://docs.studygolang.com/doc/go-get-install-deprecation
