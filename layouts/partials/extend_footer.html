@@ -2,20 +2,18 @@
 京ICP备13029522号-2</a></span>
 </footer>
 
-<script src="//liudon.com/analytics/vue.js" defer></script>
-<script defer>
+<script src="//liudon.com/analytics/vue.js" async></script>
+<script src="//tokinx.github.io/ViewImage/view-image.min.js" async></script>
+<script>
   function initViewImage() {
     window.ViewImage && ViewImage.init('.post-content img');
   }
 
-  function loadScript(url, callback) {
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = url + '?callback=' + callback;
-    document.body.appendChild(script);
+  if (document.readyState === 'complete') {
+    initViewImage();
+  } else {
+    window.addEventListener('load', initViewImage);
   }
-
-  loadScript('//tokinx.github.io/ViewImage/view-image.min.js', 'initViewImage');
 
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
