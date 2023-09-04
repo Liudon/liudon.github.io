@@ -3,7 +3,9 @@
 </footer>
 
 <script src="https://liudon.com/analytics/vue.js" async></script>
+<script src="//tokinx.github.io/ViewImage/view-image.min.js" async></script>
 <script>
+  window.ViewImage && ViewImage.init('.post-content img');
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
