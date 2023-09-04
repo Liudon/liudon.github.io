@@ -5,3 +5,9 @@
 .post-content p:has(> picture:nth-child(6)){column-count:4;}
 .post-content p:has(> picture:nth-child(2)) picture{display:inherit;}
 .post-content p:has(> picture:nth-child(6)) picture{margin-bottom:8px;}
+
+/*外层定义了img的宽高，导致灯箱的鼠标关闭有问题，这里重置掉外层定义的宽高属性*/
+.view-image-lead img {
+    width: unset !important;
+    height: unset !important;
+}
