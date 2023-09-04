@@ -3,9 +3,20 @@
 </footer>
 
 <script src="//liudon.com/analytics/vue.js" defer></script>
-<script src="//tokinx.github.io/ViewImage/view-image.min.js" defer></script>
 <script defer>
-  window.ViewImage && ViewImage.init('.post-content img');
+  function initViewImage() {
+    window.ViewImage && ViewImage.init('.post-content img');
+  }
+
+  function loadScript(url, callback) {
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = url + '?callback=' + callback;
+    document.body.appendChild(script);
+  }
+
+  loadScript('//tokinx.github.io/ViewImage/view-image.min.js', 'initViewImage');
+
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
