@@ -1,3 +1,7 @@
+body {
+    font-family: "LXGW WenKai Screen", sans-serif;
+}
+
 /* # Markdown 风格 */
 /* 标题、正文、行内代码 - 颜色 */
 :root {
@@ -219,8 +223,18 @@ img {
     height:auto;
 }
 
-figure {
+/* figure {
     background-color: var(--code-bg);
+} */
+
+.post-content figure>figcaption {
+    color: var(--primary);
+    font-size: 12px;
+    margin: 8px 0 16px;
+}
+
+figure figcaption:before {
+    content: "◎ ";
 }
 
 .friendurl {
