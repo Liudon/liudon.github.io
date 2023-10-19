@@ -39,7 +39,7 @@ tags:
 
 ![CORS报错](https://static.liudon.com/img/20231019190935.png)
 
-一般跨域错误都是返回头里缺少跨域相关的字段导致，因为决定使用`Netlify`来新增返回头规避。
+一般跨域错误都是返回头里缺少跨域相关的字段导致，因此决定使用`Netlify`来新增返回头规避。
 
 仓库下新增`netlify.toml`文件，针对根目录返回跨域头，内容如下。
 
@@ -74,7 +74,7 @@ tags:
 因为`Netlify`也支持`Rewrite`转发，所以决定还是通过`netlify.toml`文件增加转发配置解决，内容如下：
 
 ```
-[[redirects__]]
+[[redirects]]
   from = "/"
   to = "/.netlify/functions/twikoo"
   status = 200
