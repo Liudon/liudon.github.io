@@ -43,7 +43,7 @@ jobs:
       - name: Update config.yml version
         uses: fjogeleit/yaml-update-action@main
         with:
-          valueFile: 'config.yaml'
+          valueFile: 'config.yml'
           propertyPath: 'params.twikoo.version'
           value: ${{ steps.twikoo.outputs.version }}
           commitChange: true
