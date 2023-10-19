@@ -34,18 +34,17 @@ jobs:
           hugo-version: 'latest'
 
       - name: Get twikoo version
-        id: twikoo
         run: |
-          version=curl -s https://raw.githubusercontent.com/Liudon/twikoo-netlify/main/package.json | jq -r '.dependencies."twikoo-netlify"'
+          version=`curl -s https://raw.githubusercontent.com/Liudon/twikoo-netlify/main/package.json | jq -r '.dependencies."twikoo-netlify"'`
           echo "Twikoo version: $version"
-          echo "::set-output name=twikoo_version::$VERSION"
+          echo "twikoo_version=$version" >> $GITHUB_OUTPUT
 
       - name: Update config.yml version
         uses: fjogeleit/yaml-update-action@main
         with:
           valueFile: 'config.yml'
           propertyPath: 'params.twikoo.version'
-          value: ${{ steps.twikoo.outputs.version }}
+          value: ${{ twikoo_version }}
           commitChange: true
         
       - name: Build
