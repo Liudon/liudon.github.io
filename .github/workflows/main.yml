@@ -32,6 +32,21 @@ jobs:
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: 'latest'
+
+      - name: Get twikoo version
+        id: twikoo
+        run: |
+          version=curl -s https://raw.githubusercontent.com/Liudon/twikoo-netlify/main/package.json | jq -r '.dependencies."twikoo-netlify"'
+          echo "Twikoo version: $version"
+          echo "::set-output name=twikoo_version::$VERSION"
+
+      - name: Update config.yml version
+        uses: fjogeleit/yaml-update-action@main
+        with:
+          valueFile: 'config.yaml'
+          propertyPath: 'params.twikoo.version'
+          value: ${{ steps.twikoo.outputs.version }}
+          commitChange: true
         
       - name: Build
         run: hugo --gc --minify --cleanDestinationDir 
