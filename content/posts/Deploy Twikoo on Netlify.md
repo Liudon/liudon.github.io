@@ -29,7 +29,7 @@ tags:
 
 注意，正确的仓库是`https://github.com/twikoojs/twikoo-netlify`。
 
-![Netlify部署Twikoo](https://twikoo.js.org/assets/netlify-3.4f565e5d.png)
+![Netlify部署Twikoo](https://static.liudon.com/img/netlify-3.4f565e5d.png)
 
 使用同一个`MongoDB`，配置原来的地址，这样已有的评论也不会丢。
 
