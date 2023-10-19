@@ -15,7 +15,7 @@ tags:
 
 #### 背景
 
-博客之前通过`Vercel`接入了`Twikoo`评论系统，但是最近发现加载很慢。
+博客之前通过`Vercel`部署了`Twikoo`评论系统，但是最近发现加载很慢。
 
 看[Twikoo官网文档](https://twikoo.js.org/backend.html)，`Netlify`比`Vercel`国内访问会更优一些，于是搞了一把迁移。
 
