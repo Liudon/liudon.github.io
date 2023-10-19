@@ -225,4 +225,6 @@ params:
 
 `####`内代码即为获取版本号，更新`config.tml`版本号逻辑，然后再进行`hugo`部署。
 
+需要将`https://raw.githubusercontent.com/Liudon/twikoo-netlify/main/package.json`这个url里的`Liudon/twikoo-netlify`改为你的仓库名。
+
 这下后面`Twikoo`官方更新版本，博客的`Twikoo`也会跟着自动更新。
