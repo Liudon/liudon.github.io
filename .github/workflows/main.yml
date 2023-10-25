@@ -101,6 +101,8 @@ jobs:
           curl -s -L https://github.com/usk81/easyindex-cli/releases/download/v1.0.6/easyindex-cli_1.0.6_linux_amd64.tar.gz | tar xz
           ls -l
           chmod +x ./easyindex-cli
-          output=`./easyindex-cli google publish updated -C ./credentials.json -d -c ./url.csv`
-          echo $output
+          ./easyindex-cli google publish updated -d -C ./credentials.json https://liudon.com
           echo "done"
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
