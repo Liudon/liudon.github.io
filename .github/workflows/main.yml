@@ -96,10 +96,11 @@ jobs:
 
       - name: easyindex
         run: |
-          echo '${{ secrets.GOOGLE_INDEXING_API_TOKEN }}' > ./token.json
-          wget -O- https://github.com/usk81/easyindex-cli/releases/download/v1.0.6/easyindex-cli_1.0.6_linux_amd64.tar.gz | tar xz
+          echo '${{ secrets.GOOGLE_INDEXING_API_TOKEN }}' > ./credentials.json
+          echo 'https://liudon.com' > ./url.csv
+          curl -s -L https://github.com/usk81/easyindex-cli/releases/download/v1.0.6/easyindex-cli_1.0.6_linux_amd64.tar.gz | tar xz
           ls -l
           chmod +x ./easyindex-cli
-          output=`./easyindex-cli google publish updated -d -C ./token.json https://liudon.com`
+          output=`./easyindex-cli google publish updated -C ./credentials.json -d -c ./url.csv`
           echo $output
           echo "done"
