@@ -60,3 +60,5 @@ tags:
           chmod +x ./easyindex-cli
           ./easyindex-cli google -d -c ./url.csv
     ```
+
+    ![](https://static.liudon.com/img/20231027200238.png)
