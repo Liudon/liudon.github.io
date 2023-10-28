@@ -34,13 +34,28 @@ tags:
 
     ![](https://static.liudon.com/img/20231027194753.png)
 
-    创建完，默认是没有密钥的，点击后面的三个点按钮，选择管理密钥。
+    创建完，默认是没有密钥的，记住账号的邮箱地址，后面要用到。
+    
+    点击后面的三个点按钮，选择管理密钥。
 
     点击添加密钥->新建密钥，选择`JSON`格式，点击创建会下载一个文件，这里后面会用到。
 
     回到首页，点击`API和服务`，点击`启用API和服务`，搜索框输入`Indexing`，选择`Web Search Indexing API`，点击启用即可。
 
-2. 配置`Github Action`
+2. 将服务账号关联到`Google Search Console`
+
+    进入[Google Search Console控制台](https://search.google.com/)，选择你的网站。
+
+    找到设置里的用户和权限，点击添加用户。
+
+    ![](https://static.liudon.com/img/202310280923031.png)
+
+    ```
+    邮箱地址：填写第一步分配的邮箱地址
+    权限：选择拥有者
+    ```
+
+3. 配置`Github Action`
 
     - 添加`Secret`变量，变量key为`GOOGLE_INDEXING_API_TOKEN`，值为前面下载文件的内容。
 
