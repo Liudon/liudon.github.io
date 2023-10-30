@@ -50,7 +50,7 @@ jobs:
 
       - name: Download css
         run: |
-          curl -o assets/css/lxgwwenkaiscreen.min.css https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreen.min.css
+          curl -o assets/css/extended/lxgwwenkaiscreen.min.css https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreen.min.css
 
       - name: Build
         run: hugo --gc --minify --cleanDestinationDir 
