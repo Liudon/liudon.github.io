@@ -47,7 +47,11 @@ jobs:
           propertyPath: 'params.twikoo.version'
           value: ${{ steps.twikoo.outputs.twikoo_version }}
           commitChange: true
-        
+
+      - name: Download css
+        run: |
+          curl -o assets/css/lxgwwenkaiscreen.min.css https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreen.min.css
+
       - name: Build
         run: hugo --gc --minify --cleanDestinationDir 
         
@@ -60,7 +64,7 @@ jobs:
           publish_dir: ./public
           cname: liudon.com
           
-      - name: generate robots.txt
+      - name: Generate robots.txt
         run: |
           echo "User-agent: *" > ./public/robots.txt
           echo "Disallow: /" >> ./public/robots.txt
@@ -72,7 +76,7 @@ jobs:
           chmod 600 ../privkey
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSHHOST }} -i ../privkey -L 5001:localhost:5001 -fTN
 
-      - name: ipfs upload
+      - name: IPFS upload
         uses: aquiladev/ipfs-action@master
         id: deploy
         timeout-minutes: 2
@@ -85,7 +89,7 @@ jobs:
           protocol: http
           key: self
       
-      - name: ipfs upload to filebase
+      - name: IPFS upload to filebase
         uses: aquiladev/ipfs-action@master
         with:
           path: ./public
@@ -94,7 +98,7 @@ jobs:
           filebaseKey: ${{ secrets.FILEBASE_KEY }}
           filebaseSecret: ${{ secrets.FILEBASE_SECRET }}
 
-      - name: easyindex
+      - name: Easyindex
         run: |
           echo '${{ secrets.GOOGLE_INDEXING_API_TOKEN }}' > ./credentials.json
 
