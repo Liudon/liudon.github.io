@@ -50,14 +50,12 @@ jobs:
 
       - name: Download css
         run: |
-          cdn_url="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.7.0/"
-          download_path="assets/css"
-          extended_path="$download_path/extended"
-          mkdir -p "${download_path}/files/"
-
-          curl -s -o "${extended_path}/lxgwwenkaiscreen.min.css" "${cdn_url}lxgwwenkaiscreen.min.css"
-          grep -o 'url([^)]*)' "${extended_path}/lxgwwenkaiscreen.min.css" | sed 's/url(\(.*\))/\1/g' | while read line; do curl -s -o "${download_path}/${line}" "${cdn_url}${line}"; done
-
+          curl -s -o "assets/css/extended/lxgwwenkaiscreen.min.css" "https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreen.min.css"
+          { echo ":root {"; echo "    --lxgwwenkai-domain: "https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.7.0/";"; echo "}"; cat assets/css/extended/lxgwwenkaiscreen.min.css; } > temp.css 
+          echo temp.css
+          mv temp.css assets/css/extended/lxgwwenkaiscreen.min.css
+          sed -i 's#url(files/#url(var(--lxgwwenkai-domain)/files/#g' "assets/css/extended/lxgwwenkaiscreen.min.css"
+    
       - name: Build
         run: hugo --gc --minify --cleanDestinationDir 
         
