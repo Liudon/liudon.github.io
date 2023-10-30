@@ -50,7 +50,12 @@ jobs:
 
       - name: Download css
         run: |
-          curl -o assets/css/extended/lxgwwenkaiscreen.min.css https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreen.min.css
+          cdn_url="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.7.0/"
+          download_path="assets/css"
+          extended_path="$download_path/extended"
+
+          curl -o "{$extended_path}/lxgwwenkaiscreen.min.css" "{$cdn_url}lxgwwenkaiscreen.min.css"
+          grep -o 'url([^)]*)' "{$extended_path}/lxgwwenkaiscreen.min.css" | sed 's/url(\(.*\))/\1/g' | while read line; do curl -o "$download_path/$line" "{$cdn_url}{$line}"; done
 
       - name: Build
         run: hugo --gc --minify --cleanDestinationDir 
