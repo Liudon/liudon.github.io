@@ -47,14 +47,6 @@ jobs:
           propertyPath: 'params.twikoo.version'
           value: ${{ steps.twikoo.outputs.twikoo_version }}
           commitChange: true
-
-      - name: Download css
-        run: |
-          curl -s -o "assets/css/extended/lxgwwenkaiscreen.min.css" "https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreen.min.css"
-          { echo ":root {"; echo "    --lxgwwenkai-domain: "https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.7.0/";"; echo "}"; cat assets/css/extended/lxgwwenkaiscreen.min.css; } > temp.css 
-          echo temp.css
-          mv temp.css assets/css/extended/lxgwwenkaiscreen.min.css
-          sed -i 's#url(files/#url(var(--lxgwwenkai-domain)/files/#g' assets/css/extended/lxgwwenkaiscreen.min.css
     
       - name: Build
         run: hugo --gc --minify --cleanDestinationDir 
