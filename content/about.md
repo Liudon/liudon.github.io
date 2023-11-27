@@ -24,3 +24,5 @@ ShowBreadCrumbs: false
 {{< friend name="Dvel’s Blog" url="https://dvel.me" logo="https://dvel.me/avatar.png" word="Less is More." >}}
 
 {{< friend name="林木木木木木" url="https://immmmm.com/" logo="https://cdn.sep.cc/avatar/ba83fa02fc4b2ba621514941307e21be?d=identicon" word="木木木木木">}}
+
+{{< friend name="涛叔" url="https://taoshu.in/" logo="https://taoshu.in/favicon.ico" word="涛叔">}}
