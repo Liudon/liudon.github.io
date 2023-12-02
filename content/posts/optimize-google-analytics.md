@@ -133,4 +133,6 @@ enScroll=!1,enFdl=!1,extCurrent=void 0,filename=void 0,targetText=void 0,splitOr
 </script>
 ```
 
-说说看，访问速度快了吗？
+#### 效果
+
+![](/img/gtmetrix report.png)
