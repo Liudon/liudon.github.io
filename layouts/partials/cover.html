@@ -13,9 +13,9 @@
     {{- $addLink := (and site.Params.cover.linkFullImages (not $.IsHome)) }}
     {{- $cover := (.Resources.ByType "image").GetMatch (printf "*%s*" (.Params.cover.image)) }}
     {{- if $cover -}}{{/* i.e it is present in page bundle */}}
-        {{- if $responsiveImages -}}
         {{- if $addLink }}<a href="{{ (path.Join .RelPermalink .Params.cover.image) | absURL }}" target="_blank"
             rel="noopener noreferrer">{{ end -}}
+        {{- if $responsiveImages -}}
         <picture>
         {{- if hugo.IsExtended -}}
         <source type="image/webp" srcset="
