@@ -1,0 +1,34 @@
+{{- $respSizes := slice 320 640 960 1280 1600 1920 -}}
+{{- $dataSzes := "(min-width: 1024px) 100vw, 50vw" -}}
+
+{{- $holder := "GIP" -}}
+{{- $hint := "photo" -}}
+{{- $filter := "box" -}}
+
+{{- $Destination := .Destination -}}
+{{- $Text := .Text -}}
+{{- $Title := .Title -}}
+
+{{ with .Page.Resources.GetMatch .Destination }}
+{{ $src := . }}
+{{ $width := .Width }}
+<picture>
+	<source type="image/webp" srcset="
+	{{- with $respSizes -}}
+		{{- range $i, $e := . -}}
+			{{- if ge $width . -}}
+				{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x webp " $hint " " $filter) ).RelPermalink | absURL }} {{ . }}w
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}" sizes="{{ $dataSzes }}" />
+	<source type="image/jpeg" srcset="
+	{{- with $respSizes -}}
+		{{- range $i, $e := . -}}
+			{{- if ge $width . -}}
+				{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x jpg " $filter) ).RelPermalink | absURL}} {{ . }}w
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}" sizes="{{ $dataSzes }}" />
+	<img src="{{ $Destination | safeURL }}" width="{{ .Width }}" height="{{ .Height }}" alt="{{ $Text }}" title="{{ $Title }}" loading="lazy" />
+</picture>
+{{ end }}
