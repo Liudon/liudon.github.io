@@ -38,6 +38,7 @@
 
         <img loading="lazy" src="{{ $cover.Permalink }}" alt="{{ $alt }}" 
             width="{{ $cover.Width }}" height="{{ $cover.Height }}">
+        </picture>
         {{- else }}{{/* Unprocessable image or responsive images disabled */}}
         <img loading="lazy" src="{{ (path.Join .RelPermalink .Params.cover.image) | absURL }}" alt="{{ $alt }}">
         {{- end }}
