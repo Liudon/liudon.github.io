@@ -14,7 +14,7 @@
 	<source type="image/webp" srcset="
 	{{- with $respSizes -}}
 		{{- range $i, $e := . -}}
-			{{- if ge $src.width . -}}
+			{{- if ge $src.Width . -}}
 				{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x webp " $hint " " $filter) ).RelPermalink | absURL }} {{ . }}w
 			{{- end -}}
 		{{- end -}}
@@ -22,7 +22,7 @@
 	<source type="image/jpeg" srcset="
 	{{- with $respSizes -}}
 		{{- range $i, $e := . -}}
-			{{- if ge $src.width . -}}
+			{{- if ge $src.Width . -}}
 				{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x jpg " $filter) ).RelPermalink | absURL}} {{ . }}w
 			{{- end -}}
 		{{- end -}}
