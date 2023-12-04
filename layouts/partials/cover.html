@@ -1,3 +1,10 @@
+{{- $respSizes := slice 320 640 960 1280 1600 1920 -}}
+{{- $dataSzes := "(min-width: 1024px) 100vw, 50vw" -}}
+
+{{- $holder := "GIP" -}}
+{{- $hint := "photo" -}}
+{{- $filter := "box" -}}
+
 {{- with .cxt}} {{/* Apply proper context from dict */}}
 {{- if (and .Params.cover.image (not $.isHidden)) }}
 {{- $alt := (.Params.cover.alt | default .Params.cover.caption | plainify) }}
@@ -8,34 +15,35 @@
     {{- if $cover -}}{{/* i.e it is present in page bundle */}}
         {{- if $addLink }}<a href="{{ (path.Join .RelPermalink .Params.cover.image) | absURL }}" target="_blank"
             rel="noopener noreferrer">{{ end -}}
-        {{- $sizes := (slice "360" "480" "720" "1080" "1500") }}
-        {{- $processableFormats := (slice "jpg" "jpeg" "png" "tif" "bmp" "gif") -}}
+        <picture>
         {{- if hugo.IsExtended -}}
-            {{- $processableFormats = $processableFormats | append "webp" -}}
+        <source type="image/webp" srcset="
+        {{- with $respSizes -}}
+            {{- range $i, $e := . -}}
+                {{- if ge $cover.Width . -}}
+                    {{- if $i }}, {{ end -}}{{- ($cover.Resize (print . "x webp " $hint " " $filter) ).RelPermalink | absURL }} {{ . }}w
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}" sizes="{{ $dataSzes }}" />
         {{- end -}}
-        {{- $prod := (hugo.IsProduction | or (eq site.Params.env "production")) }}
-        {{- if (and (in $processableFormats $cover.MediaType.SubType) ($responsiveImages) (eq $prod true)) }}
-        <img loading="lazy" srcset="{{- range $size := $sizes -}}
-                        {{- if (ge $cover.Width $size) -}}
-                        {{ printf "%s %s" (($cover.Resize (printf "%sx" $size)).Permalink) (printf "%sw ," $size) -}}
-                        {{ end }}
-                    {{- end -}}{{$cover.Permalink }} {{printf "%dw" ($cover.Width)}}" 
-            sizes="(min-width: 768px) 720px, 100vw" src="{{ $cover.Permalink }}" alt="{{ $alt }}" 
+        <source type="image/jpeg" srcset="
+        {{- with $respSizes -}}
+            {{- range $i, $e := . -}}
+                {{- if ge $cover.Width . -}}
+                    {{- if $i }}, {{ end -}}{{- ($cover.Resize (print . "x jpg " $filter) ).RelPermalink | absURL}} {{ . }}w
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}" sizes="{{ $dataSzes }}" />
+
+        <img loading="lazy" src="{{ $cover.Permalink }}" alt="{{ $alt }}" 
             width="{{ $cover.Width }}" height="{{ $cover.Height }}">
         {{- else }}{{/* Unprocessable image or responsive images disabled */}}
         <img loading="lazy" src="{{ (path.Join .RelPermalink .Params.cover.image) | absURL }}" alt="{{ $alt }}">
         {{- end }}
     {{- else }}{{/* For absolute urls and external links, no img processing here */}}
-        {{- $item := getJSON .Params.cover.image "?imageInfo&t=" now.Unix -}}
-        {{- $coverUrl := .Params.cover.image -}}
-        {{- with $item }}
-        {{- if $addLink }}<a href="{{ $coverUrl | absURL }}" target="_blank"
+         {{- if $addLink }}<a href="{{ (.Params.cover.image) | absURL }}" target="_blank"
             rel="noopener noreferrer">{{ end -}}
-            <picture>
-              <source type="image/webp" srcset="{{ $coverUrl | absURL }}/webp" width="{{ .width }}" height="{{ .height }}">
-              <img loading="lazy" alt="{{ $alt }}" src="{{ $coverUrl | absURL }}" width="{{ .width }}" height="{{ .height }}">
-            </picture>
-        {{- end }}
+            <img loading="lazy" src="{{ (.Params.cover.image) | absURL }}" alt="{{ $alt }}">
     {{- end }}
     {{- if $addLink }}</a>{{ end -}}
     {{/*  Display Caption  */}}

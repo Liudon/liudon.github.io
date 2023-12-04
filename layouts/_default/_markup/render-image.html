@@ -11,6 +11,7 @@
 
 {{ with $src := .Page.Resources.GetMatch .Destination }}
 <picture>
+	{{- if hugo.IsExtended -}}
 	<source type="image/webp" srcset="
 	{{- with $respSizes -}}
 		{{- range $i, $e := . -}}
@@ -19,6 +20,7 @@
 			{{- end -}}
 		{{- end -}}
 	{{- end -}}" sizes="{{ $dataSzes }}" />
+	{{- end -}}
 	<source type="image/jpeg" srcset="
 	{{- with $respSizes -}}
 		{{- range $i, $e := . -}}

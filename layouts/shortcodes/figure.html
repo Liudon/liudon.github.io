@@ -21,6 +21,7 @@
     {{- end }}
     {{ with $src := $.Page.Resources.GetMatch (.Get "src") }}
     <picture>
+        {{- if hugo.IsExtended -}}
         <source type="image/webp" srcset="
         {{- with $respSizes -}}
             {{- range $i, $e := . -}}
@@ -29,6 +30,7 @@
                 {{- end -}}
             {{- end -}}
         {{- end -}}" sizes="{{ $dataSzes }}" />
+        {{- end -}}
         <source type="image/jpeg" srcset="
         {{- with $respSizes -}}
             {{- range $i, $e := . -}}
@@ -41,8 +43,8 @@
          {{- if or ($alt) ($caption) }}
          alt="{{ with $alt }}{{ . }}{{ else }}{{ $caption | markdownify| plainify }}{{ end }}"
          {{- end -}}
-         {{- with $width }} width="{{ . }}"{{ end -}}
-         {{- with $height }} height="{{ . }}"{{ end -}}
+         {{- with $width -}} width="{{ . }}"{{- end -}}
+         {{- with $height -}} height="{{ . }}"{{- end -}}
         /> <!-- Closing img tag -->
     </picture>
     {{ end }}
