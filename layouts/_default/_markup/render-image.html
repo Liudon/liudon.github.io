@@ -9,14 +9,12 @@
 {{- $Text := .Text -}}
 {{- $Title := .Title -}}
 
-{{ with .Page.Resources.GetMatch .Destination }}
-{{ $src := . }}
-{{ $width := .Width }}
+{{ with $src := .Page.Resources.GetMatch .Destination }}
 <picture>
 	<source type="image/webp" srcset="
 	{{- with $respSizes -}}
 		{{- range $i, $e := . -}}
-			{{- if ge $width . -}}
+			{{- if ge $src.width . -}}
 				{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x webp " $hint " " $filter) ).RelPermalink | absURL }} {{ . }}w
 			{{- end -}}
 		{{- end -}}
@@ -24,7 +22,7 @@
 	<source type="image/jpeg" srcset="
 	{{- with $respSizes -}}
 		{{- range $i, $e := . -}}
-			{{- if ge $width . -}}
+			{{- if ge $src.width . -}}
 				{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x jpg " $filter) ).RelPermalink | absURL}} {{ . }}w
 			{{- end -}}
 		{{- end -}}
