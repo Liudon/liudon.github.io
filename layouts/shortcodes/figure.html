@@ -5,7 +5,12 @@
 {{- $hint := "photo" -}}
 {{- $filter := "box" -}}
 
-{{ $item := . }}
+{{ $src := .Get "src" }}
+{{ $align := .Get "align" }}
+{{ $alt := .Get "alt" }}
+{{ $caption := .Get "caption" }}
+{{ $width := .Get "width" }}
+{{ $height := .Get "height" }}
 
 <figure{{ if or (.Get "class") (eq (.Get "align") "center") }} class="
            {{- if eq (.Get "align") "center" }}align-center {{ end }}
@@ -32,12 +37,12 @@
                 {{- end -}}
             {{- end -}}
         {{- end -}}" sizes="{{ $dataSzes }}" />
-        <img loading="lazy" src="{{ $item.Get "src" }}{{- if eq ($item.Get "align") "center" }}#center{{- end }}"
-         {{- if or ($item.Get "alt") ($item.Get "caption") }}
-         alt="{{ with $item.Get "alt" }}{{ . }}{{ else }}{{ $item.Get "caption" | markdownify| plainify }}{{ end }}"
+        <img loading="lazy" src="{{ $src }}{{- if eq ($align) "center" }}#center{{- end }}"
+         {{- if or ($alt) ($caption) }}
+         alt="{{ with $alt }}{{ . }}{{ else }}{{ $caption | markdownify| plainify }}{{ end }}"
          {{- end -}}
-         {{- with $item.Get "width" }} width="{{ . }}"{{ end -}}
-         {{- with $item.Get "height" }} height="{{ . }}"{{ end -}}
+         {{- with $width }} width="{{ . }}"{{ end -}}
+         {{- with $height }} height="{{ . }}"{{ end -}}
         /> <!-- Closing img tag -->
     </picture>
     {{ end }}
