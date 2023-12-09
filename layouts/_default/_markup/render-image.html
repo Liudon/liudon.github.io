@@ -9,26 +9,30 @@
 {{- $Text := .Text -}}
 {{- $Title := .Title -}}
 
+{{- $responsiveImages := (.Page.Params.responsiveImages | default site.Params.responsiveImages) | default true }}
+
 {{ with $src := .Page.Resources.GetMatch .Destination }}
-<picture>
-	{{- if hugo.IsExtended -}}
-	<source type="image/webp" srcset="
-	{{- with $respSizes -}}
-		{{- range $i, $e := . -}}
-			{{- if ge $src.Width . -}}
-				{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x webp " $hint " " $filter) ).RelPermalink | absURL }} {{ . }}w
+	{{- if $responsiveImages -}}
+		<picture>
+			{{- if and hugo.IsExtended (ne $src.MediaType.Type "image/webp") -}}
+			<source type="image/webp" srcset="
+			{{- with $respSizes -}}
+				{{- range $i, $e := . -}}
+					{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x webp " $hint " " $filter) ).RelPermalink | absURL }} {{ . }}w
+				{{- end -}}
+			{{- end -}}" sizes="{{ $dataSzes }}" />
 			{{- end -}}
-		{{- end -}}
-	{{- end -}}" sizes="{{ $dataSzes }}" />
-	{{- end -}}
-	<source type="image/jpeg" srcset="
-	{{- with $respSizes -}}
-		{{- range $i, $e := . -}}
-			{{- if ge $src.Width . -}}
-				{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x jpg " $filter) ).RelPermalink | absURL}} {{ . }}w
-			{{- end -}}
-		{{- end -}}
-	{{- end -}}" sizes="{{ $dataSzes }}" />
-	<img src="{{ $Destination | safeURL }}" width="{{ .Width }}" height="{{ .Height }}" alt="{{ $Text }}" title="{{ $Title }}" loading="lazy" />
-</picture>
+			<source type="{{ $src.MediaType.Type }}" srcset="
+			{{- with $respSizes -}}
+				{{- range $i, $e := . -}}
+					{{- if ge $src.Width . -}}
+						{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x jpg " $filter) ).RelPermalink | absURL}} {{ . }}w
+					{{- end -}}
+				{{- end -}}
+			{{- end -}}, {{$src.Permalink }} {{printf "%dw" ($src.Width)}}" sizes="{{ $dataSzes }}" />
+			<img src="{{ $Destination | safeURL }}" width="{{ .Width }}" height="{{ .Height }}" alt="{{ $Text }}" title="{{ $Title }}" loading="lazy" />
+		</picture>
+	{{- else }}
+		<img src="{{ $Destination | safeURL }}" width="{{ $src.Width }}" height="{{ $src.Height }}" alt="{{ $Text }}" title="{{ $Title }}" loading="lazy" />
+	{{- end }}
 {{ end }}

@@ -17,24 +17,22 @@
             rel="noopener noreferrer">{{ end -}}
         {{- if $responsiveImages -}}
         <picture>
-        {{- if hugo.IsExtended -}}
+        {{- if and hugo.IsExtended (ne $cover.MediaType.Type "image/webp") -}}
         <source type="image/webp" srcset="
         {{- with $respSizes -}}
             {{- range $i, $e := . -}}
-                {{- if ge $cover.Width . -}}
-                    {{- if $i }}, {{ end -}}{{- ($cover.Resize (print . "x webp " $hint " " $filter) ).RelPermalink | absURL }} {{ . }}w
-                {{- end -}}
+                {{- if $i }}, {{ end -}}{{- ($cover.Resize (print . "x webp " $hint " " $filter) ).RelPermalink | absURL }} {{ . }}w
             {{- end -}}
         {{- end -}}" sizes="{{ $dataSzes }}" />
         {{- end -}}
-        <source type="image/jpeg" srcset="
+        <source type="{{ $cover.MediaType.Type }}" srcset="
         {{- with $respSizes -}}
             {{- range $i, $e := . -}}
                 {{- if ge $cover.Width . -}}
                     {{- if $i }}, {{ end -}}{{- ($cover.Resize (print . "x jpg " $filter) ).RelPermalink | absURL}} {{ . }}w
                 {{- end -}}
             {{- end -}}
-        {{- end -}}" sizes="{{ $dataSzes }}" />
+        {{- end -}}, {{$cover.Permalink }} {{printf "%dw" ($cover.Width)}}" sizes="{{ $dataSzes }}" />
 
         <img loading="lazy" src="{{ $cover.Permalink }}" alt="{{ $alt }}" 
             width="{{ $cover.Width }}" height="{{ $cover.Height }}">
