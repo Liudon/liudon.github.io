@@ -183,6 +183,7 @@ content/
     {{ $alt := .Get "alt" }}
     {{ $caption := .Get "caption" }}
 
+    /*内容图片响应式开关配置，默认为true*/
     {{- $responsiveImages := (.Page.Params.responsiveImages | default site.Params.responsiveImages) | default true }}
 
     <figure{{ if or (.Get "class") (eq (.Get "align") "center") }} class="
