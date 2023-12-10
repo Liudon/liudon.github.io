@@ -76,6 +76,7 @@ content/
     {{- $Text := .Text -}}
     {{- $Title := .Title -}}
 
+    /*内容图片响应式开关配置，默认为true*/
     {{- $responsiveImages := (.Page.Params.responsiveImages | default site.Params.responsiveImages) | default true }}
 
     {{ with $src := .Page.Resources.GetMatch .Destination }}
@@ -120,6 +121,7 @@ content/
     {{- if (and .Params.cover.image (not $.isHidden)) }}
     {{- $alt := (.Params.cover.alt | default .Params.cover.caption | plainify) }}
     <figure class="entry-cover">
+        /*封面响应式图片配置开关，默认为true*/
         {{- $responsiveImages := (.Params.cover.responsiveImages | default site.Params.cover.responsiveImages) | default true }}
         {{- $addLink := (and site.Params.cover.linkFullImages (not $.IsHome)) }}
         {{- $cover := (.Resources.ByType "image").GetMatch (printf "*%s*" (.Params.cover.image)) }}
@@ -274,3 +276,5 @@ buildExpired: false
 
 timeout: 60s // 调大此处的时间即可
 ```
+
+终于知道为啥`PagerMod`主题默认只有封面下才有生成不同规格的逻辑了。
