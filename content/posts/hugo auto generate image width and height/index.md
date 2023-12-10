@@ -15,6 +15,8 @@ cover:
     hidden: true
 ---
 
+本站已不再采用本方案，新方案见[使用Hugo实现响应式和优化的图片](/posts/responsive-and-optimized-images-with-hugo/)
+
 #### 遗留的问题
 
 上一篇文章讲了我是如何解决博客累计布局偏移的问题，但是这个方案存在一个很大的问题。
