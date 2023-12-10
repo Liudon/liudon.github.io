@@ -40,7 +40,8 @@ ERROR Failed to get JSON resource "https://static.***.com/SkRx5uFwQ8Cliyq.jpg?im
 
 下面以我使用的[PaperMod主题](https://github.com/adityatelange/hugo-PaperMod/)为例，讲下如何通过`image processing`实现图片响应式优化。
 
-`image processing`需要用到`Page bundles`，所以**文章目录结构需要调整**。
+`image processing`需要用到`Page bundles`，所以**文章目录结构需要调整**，
+将一篇文章的资源（md文件，图片等）放在一个目录下。
 
 ```
 content/
@@ -55,8 +56,6 @@ content/
 │       └── index.md
 ```
 
-将同一篇文章的资源（md文件，图片等）放在一个目录下。
-
 目录结构调整完毕后，接下来修改图片显示文件代码。
 
 这里需要生成`webp`格式图片，所以**需要使用`hugo`的extended版本**。
@@ -66,7 +65,7 @@ content/
 - _default/_markup/render-image.html，对应markdown图片语法解析。
 
     ```
-    {{- $respSizes := slice 480 720 1080 -}}
+    {{- $respSizes := slice 480 720 1080 -}} /*生成的图片规格*/
     {{- $dataSzes := "(min-width: 768px) 720px, 100vw" -}}
 
     {{- $holder := "GIP" -}}
