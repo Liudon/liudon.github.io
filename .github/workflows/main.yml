@@ -48,6 +48,11 @@ jobs:
           propertyPath: 'params.twikoo.version'
           value: ${{ steps.twikoo.outputs.twikoo_version }}
           commitChange: true
+
+      - name: Compress Image
+        run: |
+          apt-get install libavif-dev
+          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec sh -c 'avifenc "$1" "${1%.*}.avif"' _ {} \;
     
       - name: Build
         run: hugo --gc --minify --cleanDestinationDir 
