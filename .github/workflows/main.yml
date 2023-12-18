@@ -51,7 +51,7 @@ jobs:
 
       - name: Compress Image
         run: |
-          sudo apt-get install libavif-dev
+          sudo apt-get install -y libavif-dev
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec sh -c 'avifenc "$1" "${1%.*}.avif"' _ {} \;
     
       - name: Build
