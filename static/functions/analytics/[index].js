@@ -1,3 +1,7 @@
 export async function onRequest(context) {
-    return context.env.analytics.fetch(context.request);
+    try {
+        return context.env.analytics.fetch(context.request);
+    } catch(e) {
+        return new Response(`${e.message}\n${e.stack}`, { status: 500 }); 
+    }
 }
