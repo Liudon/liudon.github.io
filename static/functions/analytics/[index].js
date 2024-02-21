@@ -12,6 +12,7 @@ async function postHandler(context) {
     const COLLECT_PATH = 'analytics/post';
     const DOMAIN = context.request.headers.get('host');
 
+    const url = context.request.url;
     const cf_ip = context.request.headers.get('CF-Connecting-IP');
     const cf_country = context.request.cf.country;
     const ga_url = url.replace(`${DOMAIN}/${COLLECT_PATH}`, `${GA_DOMAIN}/${GA_COLLECT_PATH}`) + `&up.IP=${cf_ip}&up.IPCountry=${cf_country}`
