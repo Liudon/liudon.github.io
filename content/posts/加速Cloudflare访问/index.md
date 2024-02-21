@@ -35,7 +35,7 @@ Cloudflare Page已经提供了一个cname域名A，形如xxx.pages.dev。
 
 1. `Cloudflare Page`添加新域名解析
 
-    这个域名是为了给国内CDN回源使用，与博客当前域名不同即可，新的这个域名的NS解析必须得是`Cloudflare`！
+    这个域名是为了给国内CDN回源使用，与博客当前域名不同即可。
 
     ![Cloudflare Page添加域名](page.png)
 
