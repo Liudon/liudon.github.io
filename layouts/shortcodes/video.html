@@ -2,7 +2,7 @@
            {{- if eq (.Get "align") "center" }}align-center {{ end }}
            {{- with .Get "class" }}{{ . }}{{- end }}"
 {{- end -}}>
-    <video src="{{ .Get "src" }}" controls>
+    <video src={{ .Get "src" }} controls>
     你的浏览器不支持 <code>video</code> 标签。
     </video>
 </figure>
