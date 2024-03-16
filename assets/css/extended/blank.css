@@ -221,6 +221,11 @@ img {
     height:auto;
 }
 
+video {
+    width:100%;
+    height:auto;
+}
+
 /* figure {
     background-color: var(--code-bg);
 } */
