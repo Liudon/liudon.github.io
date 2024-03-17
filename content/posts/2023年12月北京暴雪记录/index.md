@@ -66,7 +66,7 @@ draft: false
 
 早上坐公交到地铁站。
 
-
+{{< video src="QWh2AALxlx08aXnxzCB201041200h2nD0E018.mp4" >}}
 
 霍营地铁站盛况，人挤满了整个通道。
 
