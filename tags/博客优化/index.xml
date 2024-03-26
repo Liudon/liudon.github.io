@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>博客优化 on 流动</title>
+    <link>https://liudon.com/tags/%E5%8D%9A%E5%AE%A2%E4%BC%98%E5%8C%96/</link>
+    <description>Recent content in 博客优化 on 流动</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 21 Feb 2024 20:25:49 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/%E5%8D%9A%E5%AE%A2%E4%BC%98%E5%8C%96/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>加速Cloudflare访问</title>
+      <link>https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/</link>
+      <pubDate>Wed, 21 Feb 2024 20:25:49 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/</guid>
+      <description>背景 这是当前的博客架构，文件保存在Github仓库，通过Cloudflare Page提供访问。 众所周知，在国内，Cloudflare的CDN</description>
+    </item>
+    <item>
+      <title>使用Hugo实现响应式和优化的图片</title>
+      <link>https://liudon.com/posts/responsive-and-optimized-images-with-hugo/</link>
+      <pubDate>Sun, 10 Dec 2023 08:29:05 +0800</pubDate>
+      <guid>https://liudon.com/posts/responsive-and-optimized-images-with-hugo/</guid>
+      <description>继续我们的博客优化之旅，本篇内容我们将介绍如何使用Hugo实现响应式和优化的图片。 问题 在之前文章里，通过腾讯云数据万象实现了图片优化能力，具</description>
+    </item>
+    <item>
+      <title>加速Google Analytics</title>
+      <link>https://liudon.com/posts/optimize-google-analytics/</link>
+      <pubDate>Sat, 02 Dec 2023 09:25:49 +0800</pubDate>
+      <guid>https://liudon.com/posts/optimize-google-analytics/</guid>
+      <description>起因 Google Analytics是一款优秀的流量分析服务，集成方便，使用简单。 最近在优化页面访问速度，发现Google Analytics是一个优化点</description>
+    </item>
+    <item>
+      <title>累计布局偏移修复方案改进 —— 自动生成图片宽高</title>
+      <link>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</link>
+      <pubDate>Wed, 24 Aug 2022 12:37:22 +0800</pubDate>
+      <guid>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</guid>
+      <description>本站已不再采用本方案，新方案见使用Hugo实现响应式和优化的图片 遗留的问题 上一篇文章讲了我是如何解决博客累计布局偏移的问题，但是这个方案存在</description>
+    </item>
+    <item>
+      <title>优化博客的累计布局偏移(CLS)问题</title>
+      <link>https://liudon.com/posts/fix-blog-cls/</link>
+      <pubDate>Sat, 20 Aug 2022 07:27:22 +0800</pubDate>
+      <guid>https://liudon.com/posts/fix-blog-cls/</guid>
+      <description>此文已过期，优化方案参考累计布局偏移修复方案改进 —— 自动生成图片宽高. 问题表现 7月份将博客部署由Github迁移到Cloudflare后，开</description>
+    </item>
+  </channel>
+</rss>
