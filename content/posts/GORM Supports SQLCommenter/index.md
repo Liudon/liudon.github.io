@@ -167,3 +167,5 @@ func main() {
     db.Create(&Product{Code: "D42", Price: 100})
 }
 ```
+
+阻塞了两天的问题，终于解决了！😁😁😁
