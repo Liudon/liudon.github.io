@@ -146,9 +146,11 @@ main.go
 package main
 
 import (
+    "context"
     "plugins"
 
-	gorm "gorm.io/gorm"
+    gorm "gorm.io/gorm"
+    "github.com/google/uuid"
 )
 
 
@@ -165,6 +167,10 @@ func main() {
     db.Use(plugins.NewCommentClausePlugin())
 
     db.Create(&Product{Code: "D42", Price: 100})
+
+    // 传入context，指定rid
+    ctx := context.WithValue(context.Background(), "rid", uuid.New().String())
+    db.WithContext(ctx).Create(&Product{Code: "D42", Price: 100})
 }
 ```
 
