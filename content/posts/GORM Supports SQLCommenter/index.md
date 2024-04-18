@@ -104,7 +104,8 @@ func AddAnnotation(db *gorm.DB) {
 		return
 	}
 
-	rid := ""
+	rid := "xx"
+	// 从context上下文里取rid信息
 	if v, ok := db.Statement.Context.Value("rid").(string); ok {
 		rid = v
 	}
