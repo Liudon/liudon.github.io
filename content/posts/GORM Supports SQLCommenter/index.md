@@ -169,3 +169,5 @@ func main() {
 ```
 
 阻塞了两天的问题，终于解决了！😁😁😁
+
+[how gorm generates sql](https://liudon.com/posts/how-gorm-generates-sql/)
