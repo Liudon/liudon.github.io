@@ -772,3 +772,5 @@ func (s Select) MergeClause(clause *Clause) {
 这是`Select`类型的`Clause`定义，是不是一下就清楚了。
 
 `gorm`通过`callback`里注册`Clause`，在`Clause`里实现了sql拼接操作。
+
+看了几回源码，这次总算是搞清楚了。
