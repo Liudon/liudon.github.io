@@ -1,7 +1,7 @@
 baseURL: "https://liudon.com/"
 languageCode: zh-cn
 title: 流动
-paginate: 10
+paginate: 20
 theme: PaperMod
 
 enableInlineShortcodes: true
