@@ -88,7 +88,7 @@ Host: liudon.org
 Origin: null
 Referer: https://www.baidu.com/
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36
-``
+```
 
 ![location](location.png)
 
@@ -106,38 +106,38 @@ Origin: null
 
 经过一番搜索，终于找到了一些资料。
 
-```
-The Origin header value may be null in a number of cases, including (non-exhaustively):
 
-Origins whose scheme is not one of http, https, ftp, ws, wss, or gopher (including blob, file and data).
-Cross-origin images and media data, including that in <img>, <video> and <audio> elements.
-Documents created programmatically using createDocument(), generated from a data: URL, or that do not have a creator browsing context.
-Redirects across origins.
-iframes with a sandbox attribute that doesn't contain the value allow-same-origin.
-Responses that are network errors.
-Referrer-Policy set to no-referrer for non-cors request modes (e.g. simple form posts).
+> The Origin header value may be null in a number of cases, including (non-exhaustively):
+> 
+> Origins whose scheme is not one of http, https, ftp, ws, wss, or gopher (including blob, file and data).
+> Cross-origin images and media data, including that in <img>, <video> and <audio> elements.
+> Documents created programmatically using createDocument(), generated from a data: URL, or that do not have a creator browsing context.
+> Redirects across origins.
+> iframes with a sandbox attribute that doesn't contain the value allow-same-origin.
+> Responses that are network errors.
+> Referrer-Policy set to no-referrer for non-cors request modes (e.g. simple form posts).
 
 出自 https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin#description
 
-A request request has a redirect-tainted origin if these steps return true:
-
-Let lastURL be null.
-
-For each url of request’s URL list:
-
-If lastURL is null, then set lastURL to url and continue.
-
-If url’s origin is not same origin with lastURL’s origin and request’s origin is not same origin with lastURL’s origin, then return true.
-
-Set lastURL to url.
-Return false.
-Serializing a request origin, given a request request, is to run these steps:
-
-If request has a redirect-tainted origin, then return "null".
-
-Return request’s origin, serialized.
+> A request request has a redirect-tainted origin if these steps return true:
+> 
+> Let lastURL be null.
+> 
+> For each url of request’s URL list:
+> 
+> If lastURL is null, then set lastURL to url and continue.
+> 
+> If url’s origin is not same origin with lastURL’s origin and request’s origin is not same origin with lastURL’s origin, then return true.
+>
+> Set lastURL to url.
+> Return false.
+> Serializing a request origin, given a request request, is to run these steps:
+> 
+> If request has a redirect-tainted origin, then return "null".
+> 
+> Return request’s origin, serialized.
 
 出自 https://fetch.spec.whatwg.org/#concept-request-tainted-origin
-```
 
-简单说就是如果302跳转的域与上一次请求域不同的话，将Origin设置为`null`。
+
+简单说就是如果302跳转的域与上一次请求域不同的话，就会将Origin设置为`null`。
