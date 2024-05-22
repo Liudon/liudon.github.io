@@ -34,7 +34,7 @@ https://blog.cloudflare.com/cloudflares-public-ipfs-gateways-and-supporting-inte
 
 #### 方案调研
 
-经过一番搜索，找到了一篇[自建IPFS Gateway`关的资料](https://railway.app/template/PhPjgz)，里面用到了[bifrost-gateway](https://github.com/ipfs/bifrost-gateway)组件。
+经过一番搜索，找到了一篇[自建IPFS Gateway网关的资料](https://railway.app/template/PhPjgz)，里面用到了[bifrost-gateway](https://github.com/ipfs/bifrost-gateway)组件。
 
 ```
 To run against a compatible, local trustless gateway provided by Kubo or IPFS Desktop:
