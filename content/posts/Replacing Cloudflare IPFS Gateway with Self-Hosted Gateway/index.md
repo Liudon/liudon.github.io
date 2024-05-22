@@ -98,7 +98,7 @@ $ PROXY_GATEWAY_URL="http://127.0.0.1:8080" ./bifrost-gateway
 
 验证可行，不过我记得`Kubo`默认就有网关服务的，试一下直接通过`Kubo`默认网关的情况。
 
-*Kubo默认网关地址为http://127.0.0.1:8080*
+*Kubo默认网关地址为http://127.0.0.1:8080，注意不要对外网提供8080端口访问，否则会被别人当成公共网关使用*
 
 ```
 $ curl 'http://127.0.0.1:8080/' -H"Host:liudon.xyz" -I
@@ -151,7 +151,7 @@ server {
 
     location / {
             proxy_pass http://127.0.0.1:8080;
-            proxy_set_header Host $host;
+            proxy_set_header Host $host; // 注意这里要传递反代的域名信息，限制只能访问我们自己dnslink对应的资源
     }
 
     access_log /var/log/nginx/liudon.xyz.access.log;
