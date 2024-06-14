@@ -1,5 +1,5 @@
 ---
-title: "解决 "undeclared name: any (requires version go1.18 or later)" 编译错误"
+title: "解决 \"undeclared name: any (requires version go1.18 or later)\" 编译错误"
 date: 2024-06-14T20:41:20+08:00
 draft: false
 tags: ["go","protoc"]
