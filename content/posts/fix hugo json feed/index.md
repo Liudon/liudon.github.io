@@ -148,6 +148,7 @@ outputs:
     home:
         - HTML
         - RSS
+        - json # fusejs搜索依赖index.json，不要漏掉这个配置
         - jsonfeed # 开启jsonfeed
 
 params:
