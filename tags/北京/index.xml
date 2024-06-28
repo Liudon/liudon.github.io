@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>北京 on 流动</title>
+    <link>https://liudon.com/tags/%E5%8C%97%E4%BA%AC/</link>
+    <description>Recent content in 北京 on 流动</description>
+    <generator>Hugo -- 0.128.0</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 20 May 2022 19:17:57 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/%E5%8C%97%E4%BA%AC/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>疫情下的生活</title>
+      <link>https://liudon.com/posts/%E7%96%AB%E6%83%85%E4%B8%8B%E7%9A%84%E7%94%9F%E6%B4%BB/</link>
+      <pubDate>Fri, 20 May 2022 19:17:57 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E7%96%AB%E6%83%85%E4%B8%8B%E7%9A%84%E7%94%9F%E6%B4%BB/</guid>
+      <description>不知不觉，北京这一波疫情已经一个月了，目前还是每天50例左右新增。 昨天看新闻，基本没有社会面新增了，感觉要解封了。 没想到今天直接被打脸，封控</description>
+    </item>
+  </channel>
+</rss>

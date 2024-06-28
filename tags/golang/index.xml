@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Golang on 流动</title>
+    <link>https://liudon.com/tags/golang/</link>
+    <description>Recent content in Golang on 流动</description>
+    <generator>Hugo -- 0.128.0</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 17 Aug 2023 09:20:50 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>解决Golang使用go get安装包后找不到可执行文件的问题</title>
+      <link>https://liudon.com/posts/golang-go-get-binary-not-found-solution/</link>
+      <pubDate>Thu, 17 Aug 2023 09:20:50 +0800</pubDate>
+      <guid>https://liudon.com/posts/golang-go-get-binary-not-found-solution/</guid>
+      <description>背景 编译流水线代码 go get google.golang.org/protobuf/cmd/protoc-gen-go@latest protoc -I=./zzz --proto_path=./xx --go_out=./abc --go_opt=paths=xx.proto ... go build -o xxx 在go升级到1.20.1版本后，执行报错。 protoc-gen-go: program not found or is not executable 解决 Starting in Go 1.17, installing executables with go get is deprecated. go install may be used instead.</description>
+    </item>
+    <item>
+      <title>Golang解析json的一个问题</title>
+      <link>https://liudon.com/posts/golang%E8%A7%A3%E6%9E%90json%E7%9A%84%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Fri, 20 May 2022 21:18:23 +0800</pubDate>
+      <guid>https://liudon.com/posts/golang%E8%A7%A3%E6%9E%90json%E7%9A%84%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98/</guid>
+      <description>业务模块从php迁移到golang下了，最近遇到一个golang下json解析的问题： 请求接口，按返回包字段判断请求成功与否。 伪代码如下： package</description>
+    </item>
+  </channel>
+</rss>

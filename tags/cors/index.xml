@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Cors on 流动</title>
+    <link>https://liudon.com/tags/cors/</link>
+    <description>Recent content in Cors on 流动</description>
+    <generator>Hugo -- 0.128.0</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 17 May 2024 20:13:57 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/cors/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>302跳转的跨域问题(CORS)</title>
+      <link>https://liudon.com/posts/the-cors-issue-with-302-redirect/</link>
+      <pubDate>Fri, 17 May 2024 20:13:57 +0800</pubDate>
+      <guid>https://liudon.com/posts/the-cors-issue-with-302-redirect/</guid>
+      <description>302跳转的跨域问题 场景一：302不返回跨域头 请求 GET /302 HTTP/1.1 Host: liudon.xyz Origin: https://www.baidu.com User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 返回 HTTP/1.1 200 OK Cache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0 Cf-Ray: 88535773eaf5107e-HKG Content-Length: 143 Content-Type: text/html Date: Fri, 17 May 2024</description>
+    </item>
+  </channel>
+</rss>
