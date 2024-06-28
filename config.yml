@@ -39,6 +39,7 @@ outputs:
     home:
         - HTML
         - RSS
+        - json
         - jsonfeed
 
 params:
