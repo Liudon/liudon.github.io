@@ -13,6 +13,8 @@ tags:
 
 > 在本篇文章里，我会介绍如何在Netlify上部署Twikoo评论系统，如何接入到静态博客Hugo，以及如何实现Twikoo系统版本自动更新。
 
+*2024年7月30日更新：因为[Github接口策略调整](https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting)，原有的匿名通过接口获取版本号方法失效，已更改为带token方式请求接口获取版本号，详见workflow里Get twikoo version步骤配置。*
+
 #### 背景
 
 博客之前通过`Vercel`部署了`Twikoo`评论系统，但是最近发现加载很慢。
@@ -145,10 +147,14 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: update version
+        env:
+          github_token: ${{ secrets.TOKEN }}
         run: |
-          response=$(curl -s https://api.github.com/repos/twikoojs/twikoo/releases/latest)
+          response=$(curl -sf -H "Authorization: token $github_token" -H "Accept: application/vnd.github+json" https://api.github.com/repos/twikoojs/twikoo/releases/latest)
           version=$(echo $response | jq -r '.tag_name')
-          sed -i "s/\"twikoo-netlify\": \".*\"/\"twikoo-netlify\": \"$version\"/" package.json
+          if [ -n "$version" ]; then
+            sed -i "s/\"twikoo-netlify\": \".*\"/\"twikoo-netlify\": \"$version\"/" package.json
+          fi
         shell: bash
         
       # Runs a set of commands using the runners shell
