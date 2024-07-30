@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>三星 on 流动</title>
+    <link>https://liudon.com/tags/%E4%B8%89%E6%98%9F/</link>
+    <description>Recent content in 三星 on 流动</description>
+    <generator>Hugo -- 0.130.0</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 22 Apr 2022 08:04:18 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/%E4%B8%89%E6%98%9F/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>自己动手，更换thinkpad x1硬盘</title>
+      <link>https://liudon.com/posts/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%9B%B4%E6%8D%A2thinkpad-x1%E7%A1%AC%E7%9B%98/</link>
+      <pubDate>Fri, 22 Apr 2022 08:04:18 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%9B%B4%E6%8D%A2thinkpad-x1%E7%A1%AC%E7%9B%98/</guid>
+      <description>电脑突然没法用了，提示&amp;quot;A disk read error occurred&amp;quot;的错误。 多次重启也不行，感觉是硬盘挂了。 机器去年过保了，之前有过在售后</description>
+    </item>
+  </channel>
+</rss>

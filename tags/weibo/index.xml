@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Weibo on 流动</title>
+    <link>https://liudon.com/tags/weibo/</link>
+    <description>Recent content in Weibo on 流动</description>
+    <generator>Hugo -- 0.130.0</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 07 Oct 2023 13:17:57 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/weibo/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>利用Github Actions定时抓取微博</title>
+      <link>https://liudon.com/posts/using-github-actions-to-schedule-weibo-scraping/</link>
+      <pubDate>Sat, 07 Oct 2023 13:17:57 +0800</pubDate>
+      <guid>https://liudon.com/posts/using-github-actions-to-schedule-weibo-scraping/</guid>
+      <description>背景 在微博上关注了一些用户，比如tk教主，月风。 但是有些内容过段时间不可见了，所以希望可以定时抓取微博归档备份下来。 实现方案 整体思路：利用G</description>
+    </item>
+  </channel>
+</rss>

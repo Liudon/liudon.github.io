@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Go on 流动</title>
+    <link>https://liudon.com/tags/go/</link>
+    <description>Recent content in Go on 流动</description>
+    <generator>Hugo -- 0.130.0</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 14 Jun 2024 20:41:20 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/go/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>解决 &#34;undeclared name: any (requires version go1.18 or later)&#34; 编译错误</title>
+      <link>https://liudon.com/posts/solving-undeclared-name-any-requires-version-go1.18-or-later-compilation-error/</link>
+      <pubDate>Fri, 14 Jun 2024 20:41:20 +0800</pubDate>
+      <guid>https://liudon.com/posts/solving-undeclared-name-any-requires-version-go1.18-or-later-compilation-error/</guid>
+      <description>$ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest $ $ protoc-gen-go --version protoc-gen-go v1.34.2 $ $ sh make.sh user.pb.go:123:45: undeclared name: any (requires version go1.18 or later) $ 流水线编译报错，其中make.sh文件代码： ... protoc -I=./ --proto_path=./ --go_out=./ --go_opt=paths=source_relative user.proto ... go build 同样的代码在本机编译就没问题</description>
+    </item>
+  </channel>
+</rss>

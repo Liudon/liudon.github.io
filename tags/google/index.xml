@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Google on 流动</title>
+    <link>https://liudon.com/tags/google/</link>
+    <description>Recent content in Google on 流动</description>
+    <generator>Hugo -- 0.130.0</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 27 Oct 2023 19:32:24 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/google/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>使用Google Indexing API加速博客收录</title>
+      <link>https://liudon.com/posts/how-to-use-google-indexing-api-to-speed-up-blog-indexing/</link>
+      <pubDate>Fri, 27 Oct 2023 19:32:24 +0800</pubDate>
+      <guid>https://liudon.com/posts/how-to-use-google-indexing-api-to-speed-up-blog-indexing/</guid>
+      <description>对于一个新站点来说，总是想着能让搜索引擎快点收录网站内容。 今天，我们就来介绍一种利用Google Indexing API接口，通过Github Actions</description>
+    </item>
+  </channel>
+</rss>
