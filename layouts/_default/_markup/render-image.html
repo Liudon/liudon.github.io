@@ -20,7 +20,7 @@
 		{{- if gt (index $respSizes 0) $src.Width -}}
 			{{- $respSizes = slice $src.Width -}}
 		{{- end -}}
-		<picture t="">
+		<picture>
 			{{- range $imageType := $imageTypes -}}
 			<source type="image/{{ $imageType }}" srcset="
 			{{- with $respSizes -}}
