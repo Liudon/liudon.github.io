@@ -30,8 +30,8 @@
 					{{- end -}}
 				{{- end -}}
 			{{- end -}}, {{$src.Permalink }} {{printf "%dw" ($src.Width)}}" sizes="{{ $dataSzes }}" />
-			<img src="{{ $Destination | safeURL }}" width="{{ .Width }}" height="{{ .Height }}" alt="{{ $Text }}" title="{{ $Title }}" loading="lazy" />
 			{{- end -}}
+			<img src="{{ $Destination | safeURL }}" width="{{ .Width }}" height="{{ .Height }}" alt="{{ $Text }}" title="{{ $Title }}" loading="lazy" />
 		</picture>
 	{{- else }}
 		<img src="{{ $Destination | safeURL }}" width="{{ $src.Width }}" height="{{ $src.Height }}" alt="{{ $Text }}" title="{{ $Title }}" loading="lazy" />
