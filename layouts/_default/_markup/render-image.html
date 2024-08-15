@@ -1,5 +1,5 @@
-{{- $respSizes := slice 720 1080 -}}
-{{- $dataSzes := "(min-width: 768px) 1080px, 100vw" -}}
+{{- $respSizes := slice 1080 -}}
+{{- $dataSizes := "(min-width: 768px) 1080px, 100vw" -}}
 
 {{- $holder := "GIP" -}}
 {{- $hint := "photo" -}}
@@ -13,14 +13,14 @@
 
 {{ with $src := .Page.Resources.GetMatch .Destination }}
 	{{- if $responsiveImages -}}
-		<picture>
-			{{- $imageTypes := slice $src.MediaType.SubType -}}
-			{{- if and hugo.IsExtended (ne $src.MediaType.Type "image/webp") -}}
-				{{- $imageTypes = $imageTypes | append "webp" -}}
-			{{- end -}}
-			{{- if gt (index $respSizes 0) $src.Width -}}
-				{{- $respSizes = slice $src.Width -}}
-			{{- end -}}
+		{{- $imageTypes := slice $src.MediaType.SubType -}}
+		{{- if and hugo.IsExtended (ne $src.MediaType.Type "image/webp") -}}
+			{{- $imageTypes = $imageTypes | append "webp" -}}
+		{{- end -}}
+		{{- if gt (index $respSizes 0) $src.Width -}}
+			{{- $respSizes = slice $src.Width -}}
+		{{- end -}}
+		<picture t="">
 			{{- range $imageType := $imageTypes -}}
 			<source type="image/{{ $imageType }}" srcset="
 			{{- with $respSizes -}}
@@ -29,7 +29,7 @@
 						{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x " $imageType " " $filter) ).RelPermalink | absURL}} {{ . }}w
 					{{- end -}}
 				{{- end -}}
-			{{- end -}}, {{$src.Permalink }} {{printf "%dw" ($src.Width)}}" sizes="{{ $dataSzes }}" />
+			{{- end -}}" sizes="{{ $dataSizes }}" />
 			{{- end -}}
 			<img src="{{ $Destination | safeURL }}" width="{{ .Width }}" height="{{ .Height }}" alt="{{ $Text }}" title="{{ $Title }}" loading="lazy" />
 		</picture>
