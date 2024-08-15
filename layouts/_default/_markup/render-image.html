@@ -16,7 +16,7 @@
 		<picture>
 			{{- $imageTypes := slice $src.MediaType.SubType -}}
 			{{- if and hugo.IsExtended (ne $src.MediaType.Type "image/webp") -}}
-				{{- $imageTypes = append $imageTypes "webp" -}}
+				{{- $imageTypes = $imageTypes | append "webp" -}}
 			{{- end -}}
 			{{- if gt (index $respSizes 0) $src.Width -}}
 				{{- $respSizes = slice $src.Width -}}
