@@ -22,11 +22,11 @@
 				{{- $respSizes = slice $src.Width -}}
 			{{- end -}}
 			{{- range $imageType := $imageTypes -}}
-			<source type="{{ $imageType }}" srcset="
+			<source type="image/{{ $imageType }}" srcset="
 			{{- with $respSizes -}}
 				{{- range $i, $e := . -}}
 					{{- if ge $src.Width . -}}
-						{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x jpg " $filter) ).RelPermalink | absURL}} {{ . }}w
+						{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x " $imageType " " $filter) ).RelPermalink | absURL}} {{ . }}w
 					{{- end -}}
 				{{- end -}}
 			{{- end -}}, {{$src.Permalink }} {{printf "%dw" ($src.Width)}}" sizes="{{ $dataSzes }}" />
