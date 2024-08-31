@@ -54,7 +54,7 @@ jobs:
           wget 'https://github.com/kornelski/cavif-rs/releases/download/v1.5.4/cavif-1.5.4.zip'
           unzip cavif-1.5.4.zip
           sudo mv ./linux-generic/cavif /bin
-          # find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec cavif {} \;
+          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec cavif {} \;
     
       - name: Build
         run: hugo --gc --minify --cleanDestinationDir 
