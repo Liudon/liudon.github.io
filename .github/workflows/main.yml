@@ -81,7 +81,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSHHOST }} -i ../privkey -L 5001:localhost:5001 -fTN
 
       - name: IPFS upload
-        uses: aquiladev/ipfs-action@master
+        uses: Liudon/ipfs-action@master
         id: deploy
         timeout-minutes: 2
         with:
