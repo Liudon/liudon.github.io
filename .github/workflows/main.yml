@@ -94,7 +94,7 @@ jobs:
           key: self
       
       - name: IPFS upload to filebase
-        uses: aquiladev/ipfs-action@master
+        uses: filebase/ipfs-action@master
         with:
           path: ./public
           service: filebase
