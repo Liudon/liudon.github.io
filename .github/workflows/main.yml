@@ -98,6 +98,7 @@ jobs:
         with:
           path: ./public
           service: filebase
+          pinName: ipfs-action
           filebaseBucket: ${{ secrets.FILEBASE_BUCKET }}
           filebaseKey: ${{ secrets.FILEBASE_KEY }}
           filebaseSecret: ${{ secrets.FILEBASE_SECRET }}
