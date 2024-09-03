@@ -31,9 +31,15 @@ mediaTypes:
 outputFormats:
   jsonfeed:
     mediaType: application/feed+json
-    baseName: feed
+    baseName: index
     rel: alternate
     isPlainText: true
+  json:
+    mediaType: application/json
+    baseName: search
+    rel: alternate
+    isPlainText: true
+
 
 outputs:
     home:
