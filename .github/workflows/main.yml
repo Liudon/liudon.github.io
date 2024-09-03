@@ -102,6 +102,7 @@ jobs:
           filebaseBucket: ${{ secrets.FILEBASE_BUCKET }}
           filebaseKey: ${{ secrets.FILEBASE_KEY }}
           filebaseSecret: ${{ secrets.FILEBASE_SECRET }}
+          key: ipfs-action
 
       - name: Easyindex
         run: |
