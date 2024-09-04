@@ -1,5 +1,5 @@
 ---
-title: "让你的IPFS站点持久在线：接入Filebase的Names服务"
+title: "让你的IPFS站点持久在线：接入Filebase的Names(IPNS)服务"
 date: 2024-09-04T22:39:37+08:00
 draft: false
 tags:
@@ -8,7 +8,7 @@ tags:
 - github
 ---
 
-本文会介绍如何接入`filebase`的`IPNS`服务，使你的`IPFS`站点永久在线。
+本文会介绍如何接入`filebase`的Names(IPNS)服务，使你的`IPFS`站点持久在线。
 
 #### 背景
 
