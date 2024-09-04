@@ -1,5 +1,5 @@
 ---
-title: "保证你的IPFS站点永久在线：接入Filebase的IPNS"
+title: "让你的IPFS站点持久在线：接入Filebase的Names服务"
 date: 2024-09-04T22:39:37+08:00
 draft: false
 tags:
