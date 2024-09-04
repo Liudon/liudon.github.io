@@ -1,5 +1,5 @@
 ---
-title: "Keep Your Ipfs Site Online With Filebase Ipns"
+title: "保证你的IPFS站点永久在线：接入Filebase的IPNS"
 date: 2024-09-04T22:39:37+08:00
 draft: false
 tags:
