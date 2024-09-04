@@ -120,7 +120,7 @@ Import Existing Private Key (Optional)：填入第一步的base64内容
 
 确定提交。
 
-#### 修改workflow
+##### 修改workflow
 
 ```
 - name: IPFS upload to filebase
@@ -159,7 +159,7 @@ Upload to IPFS finished successfully {
 }
 ```
 
-#### 更新DNSlink
+##### 更新DNSlink
 
 更新域名的dnslink值：
 
