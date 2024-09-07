@@ -12,4 +12,4 @@
 	url = https://github.com/adityatelange/hugo-PaperMod.git
 [submodule "themes/cactus"]
 	path = themes/cactus
-	url = git@github.com:Liudon/hugo-theme-cactus.git
+	url = https://github.com/Liudon/hugo-theme-cactus.git
