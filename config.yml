@@ -2,7 +2,7 @@ baseURL: "https://liudon.com/"
 languageCode: zh-cn
 title: 流动
 paginate: 20
-theme: cactus
+theme: PaperMod
 
 enableInlineShortcodes: true
 enableEmoji: true # 允许使用 Emoji 表情，建议 true
@@ -124,10 +124,22 @@ menu:
       name: Posts
       url: /posts/
       weight: 20
+    - identifier: archives
+      name: Archives
+      url: /archives/
+      weight: 20
+    - identifier: tags
+      name: Tags
+      url: /tags/
+      weight: 20
     - identifier: about
       name: About
       url: /about/
       weight: 30
+    - identifier: search
+      name: 🔍
+      url: /search/
+      weight: 40
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: false
 markup:
