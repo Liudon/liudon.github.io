@@ -7,7 +7,7 @@ ShowBreadCrumbs: false
 
 大家好，欢迎访问我的博客。
 
-## 建站缘由
+#### 建站缘由
 
 大学期间，被人忽悠报了一个计算机培训班，误打误撞的进入了互联网行业。
 
@@ -20,13 +20,13 @@ ShowBreadCrumbs: false
 本站使用`hugo`生成，存储在`Github`上，通过[Cloudflare Pages](https://liudon.com/posts/deploy-blog-to-cloudflare-pages/)和[IPFS](https://liudon.com/posts/deploy-blog-to-ipfs/)部署访问。
 
 
-## 关于本人
+#### 关于本人
 
 喜欢做梦、已婚的80后男生。
 
 如果您有意见或建议，欢迎您通过`i@liudon.org`联系我。
 
-## 朋友们
+#### 朋友们
 
 {{< friend name="Sukka's Blog" url="https://blog.skk.moe" logo="https://cdn.skk.moe/avatar/96x96.png" word="童话只美在真实却从不续写" >}}
 
