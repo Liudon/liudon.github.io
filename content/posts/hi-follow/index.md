@@ -3,7 +3,7 @@ title: "Hi Follow"
 date: 2024-09-17T00:53:38+08:00
 draft: false
 tags:
--follow
+- follow
 ---
 
 > Follow:  Next generation information browser.
