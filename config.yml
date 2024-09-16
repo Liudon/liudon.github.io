@@ -65,8 +65,7 @@ params:
   ShowWordCount: true
   comments: true
 
-  icpCode: "京ICP备13029522号-2"
-
+  ShowFullTextinRSS: true
   showFullTextinJSONFeed: true
 
   ShowToc: true # 显示目录
