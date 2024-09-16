@@ -1,5 +1,5 @@
 ---
-title: "Hi Follow"
+title: "你好 Follow"
 date: 2024-09-17T00:53:38+08:00
 draft: false
 tags:
@@ -31,5 +31,10 @@ ShowFullTextinRSS: true
 从木木大佬那里看到，可以认证自己的Feed，我也来搞一下我的。
 
 ```
-This message is used to verify that this feed (feedId:55815884011044914) belongs to me (userId:56204227179125760). Join me in enjoying the next generation information browser https://follow.is.
+This message is used to verify that this feed (feedId:55815884011044914) belongs to me (userId:56204227179125760). 
+Join me in enjoying the next generation information browser https://follow.is.
 ```
+
+咱也是带标的了。
+
+![认证](20240917-012132.png)
