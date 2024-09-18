@@ -8,9 +8,7 @@ tags:
 
 中午的时候，突然收到一条消息，打开一看，提示我的`Google Adsense`审核通过了。
 
-偶然发现`Google Adsense`里居然有42美金，想起来是之前[老博客](https://liudon.org)加的广告。
-
-![the balance of google adsense](20240916-233121.png)
+偶然发现`Google Adsense`里居然有40美金，想起来是之前[老博客](https://liudon.org)加的广告。
 
 看着[新博客](https://liudon.com)每天也有了一些访问，打算申请`Google Adsense`，补充些维护成本。
 
