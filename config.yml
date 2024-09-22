@@ -131,6 +131,10 @@ menu:
       name: Tags
       url: /tags/
       weight: 20
+    - identifier: workouts
+      name: Workouts
+      url: /workouts/
+      weight: 20
     - identifier: about
       name: About
       url: /about/
