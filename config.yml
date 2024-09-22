@@ -125,7 +125,7 @@ menu:
       weight: 20
     - identifier: workouts
       name: Workouts
-      url: /workouts/
+      url: https://workout.liudon.com
       weight: 20
     - identifier: about
       name: About
