@@ -123,14 +123,6 @@ menu:
       name: Posts
       url: /posts/
       weight: 20
-    - identifier: archives
-      name: Archives
-      url: /archives/
-      weight: 20
-    - identifier: tags
-      name: Tags
-      url: /tags/
-      weight: 20
     - identifier: workouts
       name: Workouts
       url: /workouts/
