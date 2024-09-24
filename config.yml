@@ -90,6 +90,8 @@ params:
       url: "https://github.com/liudon"
     - name: email
       url: "mailto:i@liudon.org"
+    - name: rss
+      url: "https://liudon.com/index.xml"
 
   # analytics:
   #  google:
