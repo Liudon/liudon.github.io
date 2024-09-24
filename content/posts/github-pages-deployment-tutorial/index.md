@@ -34,9 +34,9 @@ tags:
 
 ![github-pages-deploy-flow](20240924-214938.png)
 
-按我的理解，这里最终访问的文件内容是存在`master`分支下的。
+按我的理解，这里最终访问的文件内容是存在`gh-page`分支下的。
 
-但是实际部署完`running_page`项目后，我发现并没有出现`gp-pages`分支，但是`Github Pages`却可以正常访问。
+但是实际部署完`running_page`项目后，我发现并没有出现`gh-page`分支，但是`Github Pages`却可以正常访问。
 
 有点不可思议，这个访问的数据是在哪里的呢？
 
