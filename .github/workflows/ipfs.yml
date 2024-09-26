@@ -3,37 +3,7 @@ name: Publish IPFS
 # Controls when the action will run.
 on:
   workflow_dispatch:
-    ssh_host:
-        required: true
-        type: string
-    ssh_key:
-        required: true
-        type: string
-    filebase_bucket:
-        required: true
-        type: string
-    filebase_key:
-        required: true
-        type: string
-    filebase_secret:
-        required: true
-        type: string
   workflow_call:
-    ssh_host:
-        required: true
-        type: string
-    ssh_key:
-        required: true
-        type: string
-    filebase_bucket:
-        required: true
-        type: string
-    filebase_key:
-        required: true
-        type: string
-    filebase_secret:
-        required: true
-        type: string
 
 permissions:
   contents: read
@@ -80,9 +50,9 @@ jobs:
       - name: Connect to ssh in BG
         timeout-minutes: 2
         run: | 
-          echo "${{ inputs.ssh_key }}" > ../privkey
+          echo "${{ secrets.SSHKEY }}" > ../privkey
           chmod 600 ../privkey
-          ssh -o StrictHostKeyChecking=no ${{ inputs.ssh_host }} -i ../privkey -L 5001:localhost:5001 -fTN
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSHHOST }} -i ../privkey -L 5001:localhost:5001 -fTN
 
       - name: IPFS upload
         uses: filebase/ipfs-action@master
@@ -103,7 +73,7 @@ jobs:
           path: ./public
           service: filebase
           pinName: ipfs-action
-          filebaseBucket: ${{ inputs.filebase_bucket }}
-          filebaseKey: ${{ inputs.filebase_key }}
-          filebaseSecret: ${{ inputs.filebase_secret }}
+          filebaseBucket: ${{ secrets.FILEBASE_BUCKET }}
+          filebaseKey: ${{ secrets.FILEBASE_KEY }}
+          filebaseSecret: ${{ secrets.FILEBASE_SECRET }}
           key: ipfs-action
