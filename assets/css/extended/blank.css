@@ -341,3 +341,10 @@ figure figcaption:before {
         font-size: 18px;	
     }	
 }	
+
+.post-copyright {
+    margin: 2em 0;
+    padding: 0.5em 1em;
+    border-left: 3px solid #ff1700;
+    list-style: none;background: var(--code-bg);
+}
