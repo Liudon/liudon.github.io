@@ -38,7 +38,9 @@ jobs:
         with:
           # if your default branches is not master, please change it here
           ref: code
-          submodules: 'recursive'
+
+      - name: Checkout submodules
+        run: git submodule update --init --recursive --remote
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
