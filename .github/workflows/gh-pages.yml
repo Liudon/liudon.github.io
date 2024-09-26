@@ -42,7 +42,7 @@ jobs:
 
       - name: Build
         run: |
-          ls -l ./themes/
+          ls -l ./
           hugo --gc --minify --cleanDestinationDir
 
       - name: Upload artifact
