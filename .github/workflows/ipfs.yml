@@ -62,7 +62,9 @@ jobs:
           commitChange: false
 
       - name: Build
-        run: hugo --gc --minify --cleanDestinationDir
+        run: |
+          cat ./config.yml
+          hugo --gc --minify --cleanDestinationDir
 
       - name: Generate robots.txt
         run: |
