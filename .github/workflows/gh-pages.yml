@@ -53,12 +53,6 @@ jobs:
           ls -l ./
           hugo --gc --minify --cleanDestinationDir
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload dist repository
-          path: './public'
-
       - name: Push
         uses: peaceiris/actions-gh-pages@v4
         with:
