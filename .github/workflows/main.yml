@@ -13,6 +13,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+concurrency:
+  group: deploy-pages
+  cancel-in-progress: true
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -29,7 +33,6 @@ jobs:
       - name: Get twikoo version
         id: twikoo
         run: |
-          ls -l ./.github/workflows
           version=$(curl -s https://raw.githubusercontent.com/Liudon/twikoo-netlify/main/package.json | jq -r '.dependencies."twikoo-netlify"')
           echo "Twikoo version: $version"
           echo "twikoo_version=$version" >> $GITHUB_OUTPUT
@@ -59,7 +62,7 @@ jobs:
     name: Build and Publish IPFS
     uses: ./.github/workflows/ipfs.yml
     needs:
-      - start
+      - github_pages
 
   end:
     runs-on: ubuntu-latest
@@ -77,4 +80,4 @@ jobs:
           chmod +x ./easyindex-cli
           ./easyindex-cli google -d -c ./url.csv
     needs:
-      - github_pages
+      - ipfs
