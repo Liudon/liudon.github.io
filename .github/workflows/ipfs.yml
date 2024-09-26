@@ -3,6 +3,17 @@ name: Publish IPFS
 # Controls when the action will run.
 on:
   workflow_dispatch:
+    secrets:
+      SSHHOST:
+        required: true
+      SSHKEY:
+        required: true
+      FILEBASE_BUCKET:
+        required: true
+      FILEBASE_KEY:
+        required: true
+      FILEBASE_SECRET:
+        required: true
   workflow_call:
 
 permissions:
