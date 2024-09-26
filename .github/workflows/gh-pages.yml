@@ -3,7 +3,13 @@ name: Publish GitHub Pages
 # Controls when the action will run.
 on:
   workflow_dispatch:
+    secrets:
+      TOKEN:
+        required: true
   workflow_call:
+    secrets:
+      TOKEN:
+        required: true
 
 permissions:
   contents: read
@@ -51,6 +57,11 @@ jobs:
           # Upload dist repository
           path: './public'
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Push
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          publish_branch: master
+          force_orphan: true
+          publish_dir: ./public
+          cname: liudon.com
