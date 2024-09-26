@@ -29,6 +29,7 @@ jobs:
       - name: Get twikoo version
         id: twikoo
         run: |
+          ls -l ./.github/workflows
           version=$(curl -s https://raw.githubusercontent.com/Liudon/twikoo-netlify/main/package.json | jq -r '.dependencies."twikoo-netlify"')
           echo "Twikoo version: $version"
           echo "twikoo_version=$version" >> $GITHUB_OUTPUT
