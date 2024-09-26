@@ -15,6 +15,17 @@ on:
       FILEBASE_SECRET:
         required: true
   workflow_call:
+    secrets:
+      SSHHOST:
+        required: true
+      SSHKEY:
+        required: true
+      FILEBASE_BUCKET:
+        required: true
+      FILEBASE_KEY:
+        required: true
+      FILEBASE_SECRET:
+        required: true
 
 permissions:
   contents: read
