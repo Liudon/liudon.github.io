@@ -57,12 +57,18 @@ jobs:
   ipfs:
     name: Build and Publish IPFS
     uses: ./.github/workflows/ipfs.yml
+    env: 
+      SSH_HOST: ${{ secrets.SSHHOST }}
+      SSH_KEY: ${{ secrets.SSHKEY }}
+      FILEBASE_BUCKET: ${{ secrets.FILEBASE_BUCKET }}
+      FILEBASE_KEY: ${{ secrets.FILEBASE_KEY }}
+      FILEBASE_SECRET: ${{ secrets.FILEBASE_SECRET }}
     with:
-      ssh_host: ${{ secrets.SSHHOST }}
-      ssh_key: ${{ secrets.SSHKEY }} 
-      filebase_bucket: ${{ secrets.FILEBASE_BUCKET }}
-      filebase_key: ${{ secrets.FILEBASE_KEY }}
-      filebase_secret: ${{ secrets.FILEBASE_SECRET }}
+      ssh_host: ${{ env.SSHHOST }}
+      ssh_key: ${{ env.SSHKEY }} 
+      filebase_bucket: ${{ env.FILEBASE_BUCKET }}
+      filebase_key: ${{ env.FILEBASE_KEY }}
+      filebase_secret: ${{ env.FILEBASE_SECRET }}
     needs:
       - start
 
