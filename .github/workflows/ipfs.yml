@@ -58,7 +58,7 @@ jobs:
         with:
           valueFile: 'config.yml'
           propertyPath: 'params.robotsNoIndex'
-          value: true
+          value: "!!bool 'true'"
           commitChange: false
 
       - name: Build
