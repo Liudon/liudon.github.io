@@ -58,7 +58,7 @@ jobs:
     name: Build and Publish IPFS
     uses: ./.github/workflows/ipfs.yml
     needs:
-      - github_pages
+      - start
 
   end:
     runs-on: ubuntu-latest
@@ -76,4 +76,4 @@ jobs:
           chmod +x ./easyindex-cli
           ./easyindex-cli google -d -c ./url.csv
     needs:
-      - ipfs
+      - github_pages

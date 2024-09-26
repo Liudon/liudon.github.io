@@ -37,6 +37,7 @@ jobs:
           valueFile: 'config.yml'
           propertyPath: 'params.robotsNoIndex'
           value: true
+          commitChange: false
 
       - name: Build
         run: hugo --gc --minify --cleanDestinationDir
