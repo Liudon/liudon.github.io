@@ -25,14 +25,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Checkout submodules
-        run: git submodule update --init --recursive --remote
-
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
-        with:
-          hugo-version: 'latest'
-          extended: true
 
       - name: Get twikoo version
         id: twikoo
@@ -49,60 +41,18 @@ jobs:
           value: ${{ steps.twikoo.outputs.twikoo_version }}
           commitChange: true
 
-      - name: Compress Image
-        run: |
-          wget 'https://github.com/kornelski/cavif-rs/releases/download/v1.5.4/cavif-1.5.4.zip'
-          unzip cavif-1.5.4.zip
-          sudo mv ./linux-generic/cavif /bin
-          # find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec cavif {} \;
-    
-      - name: Build
-        run: hugo --gc --minify --cleanDestinationDir 
-        
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.TOKEN }}
-          publish_branch: master
-          force_orphan: true
-          publish_dir: ./public
-          cname: liudon.com
+      # - name: Compress Image
+      #   run: |
+      #     wget 'https://github.com/kornelski/cavif-rs/releases/download/v1.5.4/cavif-1.5.4.zip'
+      #     unzip cavif-1.5.4.zip
+      #     sudo mv ./linux-generic/cavif /bin
+      #     # find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec cavif {} \;
           
-      - name: Generate robots.txt
-        run: |
-          echo "User-agent: *" > ./public/robots.txt
-          echo "Disallow: /" >> ./public/robots.txt
+      - name: Build and Publish Github Pages
+        uses: ./.github/workflows/gh-pages.yml
 
-      - name: Connect to ssh in BG
-        timeout-minutes: 2
-        run: | 
-          echo "${{ secrets.SSHKEY }}" > ../privkey
-          chmod 600 ../privkey
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSHHOST }} -i ../privkey -L 5001:localhost:5001 -fTN
-
-      - name: IPFS upload
-        uses: filebase/ipfs-action@master
-        id: deploy
-        timeout-minutes: 2
-        with:
-          path: ./public
-          service: ipfs
-          verbose: true
-          host: localhost
-          port: 5001
-          protocol: http
-          key: ipfs-action
-      
-      - name: IPFS upload to filebase
-        uses: filebase/ipfs-action@master
-        with:
-          path: ./public
-          service: filebase
-          pinName: ipfs-action
-          filebaseBucket: ${{ secrets.FILEBASE_BUCKET }}
-          filebaseKey: ${{ secrets.FILEBASE_KEY }}
-          filebaseSecret: ${{ secrets.FILEBASE_SECRET }}
-          key: ipfs-action
+      - name: Build and Publish IPFS
+        uses: ./.github/workflows/ipfs.yml
 
       - name: Easyindex
         run: |

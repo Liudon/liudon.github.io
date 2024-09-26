@@ -68,6 +68,8 @@ params:
   ShowFullTextinRSS: true
   showFullTextinJSONFeed: true
 
+  robotsNoIndex: false
+
   ShowToc: true # 显示目录
   TocOpen: true # 自动展开目录
 
