@@ -13,6 +13,14 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+
+env: 
+  SSH_HOST: ${{ secrets.SSHHOST }}
+  SSH_KEY: ${{ secrets.SSHKEY }}
+  FILEBASE_BUCKET: ${{ secrets.FILEBASE_BUCKET }}
+  FILEBASE_KEY: ${{ secrets.FILEBASE_KEY }}
+  FILEBASE_SECRET: ${{ secrets.FILEBASE_SECRET }}
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -57,12 +65,6 @@ jobs:
   ipfs:
     name: Build and Publish IPFS
     uses: ./.github/workflows/ipfs.yml
-    env: 
-      SSH_HOST: ${{ secrets.SSHHOST }}
-      SSH_KEY: ${{ secrets.SSHKEY }}
-      FILEBASE_BUCKET: ${{ secrets.FILEBASE_BUCKET }}
-      FILEBASE_KEY: ${{ secrets.FILEBASE_KEY }}
-      FILEBASE_SECRET: ${{ secrets.FILEBASE_SECRET }}
     with:
       ssh_host: ${{ env.SSHHOST }}
       ssh_key: ${{ env.SSHKEY }} 
