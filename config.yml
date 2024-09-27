@@ -73,7 +73,7 @@ params:
   ShowWordCount: true
   comments: true
 
-  ShowFullTextinRSS: true
+  # ShowFullTextinRSS: true
   showFullTextinJSONFeed: true
 
   robotsNoIndex: false
