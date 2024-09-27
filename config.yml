@@ -1,7 +1,6 @@
 baseURL: "https://liudon.com/"
 languageCode: zh-cn
 title: 流动
-paginate: 20
 theme: PaperMod
 
 enableInlineShortcodes: true
@@ -16,6 +15,9 @@ buildExpired: false
 timeout: 60s
 
 hasCJKLanguage: true # 自动检测是否包含 中文日文韩文 如果文章中使用了很多中文引号的话可以开启
+
+pagination:
+  pagerSize: 20
 
 # googleAnalytics: G-G9ZDJQN9E2
 
