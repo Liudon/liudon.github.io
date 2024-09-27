@@ -21,7 +21,7 @@ const host = window.location.host
 if (host !== 'blog.liudon.xyz' && ! host.startsWith('liudon.') && ! host.startsWith('localhost') && ! host.startsWith('127.0.0.1')) {
     document.body.innerHTML = [
         '<div style="margin: auto;">',
-        '<h1>即将在2秒后跳转到本人博客: https://liudon.com。</h1>',
+        '<h1>当前页面并非本人博客，即将在2秒后跳转到本人博客: https://liudon.com。</h1>',
         '<br />',
         '</div>',
     ].join('')
