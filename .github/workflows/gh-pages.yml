@@ -53,11 +53,12 @@ jobs:
           ls -l ./
           hugo --gc --minify --cleanDestinationDir
 
-      - name: Push
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.TOKEN }}
-          publish_branch: master
-          force_orphan: true
-          publish_dir: ./public
-          cname: liudon.com
+          # Upload dist repository
+          path: './public'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

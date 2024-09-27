@@ -55,14 +55,6 @@ jobs:
           hugo-version: 'latest'
           extended: true
 
-      - name: Update config.yml
-        uses: fjogeleit/yaml-update-action@main
-        with:
-          valueFile: 'config.yml'
-          propertyPath: 'params.robotsNoIndex'
-          value: "!!bool 'true'"
-          commitChange: false
-
       - name: Build
         run: |
           hugo --gc --minify --cleanDestinationDir
