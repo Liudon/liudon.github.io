@@ -48,12 +48,6 @@ outputs:
       - html
       - RSS
       - jsonfeed
-    section:
-      - html
-    taxonomy:
-      - html
-    term:
-      - html
 
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
