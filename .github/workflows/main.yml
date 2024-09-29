@@ -48,10 +48,12 @@ jobs:
       #     sudo mv ./linux-generic/cavif /bin
       #     # find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec cavif {} \;
 
+      - uses: mfinelli/setup-imagemagick@v5
       - name: Compress Image
-        uses: jruipinto/ImageMagick-action@v1
-        with: 
-          command: find ./content/posts/ -type f ( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" ) -exec sh -c 'for img; do convert "$img" "${img%.*}.webp" && convert "$img" "${img%.*}.avif"; done' sh {} +
+        run: |
+          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick convert {} {}.webp \;
+          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick convert {} {}.avif \;
+          ls -l ./content/posts/building-a-workout-page/
 
   github_pages:
     name: Build and Publish Github Pages
