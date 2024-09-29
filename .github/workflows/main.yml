@@ -48,11 +48,12 @@ jobs:
       #     sudo mv ./linux-generic/cavif /bin
       #     # find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec cavif {} \;
 
-      - uses: mfinelli/setup-imagemagick@v5
       - name: Compress Image
         run: |
-          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick convert {} {}.webp \;
-          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick convert {} {}.avif \;
+          sudo apt-get update
+          sudo apt-get install -y imagemagick libheif-dev
+          find ./content/posts/building-a-workout-page/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick {} {}.webp \;
+          find ./content/posts/building-a-workout-page/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick {} {}.avif \;
           ls -l ./content/posts/building-a-workout-page/
 
   github_pages:
