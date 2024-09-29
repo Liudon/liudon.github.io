@@ -48,6 +48,11 @@ jobs:
       #     sudo mv ./linux-generic/cavif /bin
       #     # find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec cavif {} \;
 
+      - name: Compress Image
+        uses: jruipinto/ImageMagick-action@v1
+        with: 
+          command: find ./content/posts -type f $ -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" $ -exec sh -c 'convert "$1" "${1%.*}.webp" && convert "$1" "${1%.*}.avif"' _ {} \;
+
   github_pages:
     name: Build and Publish Github Pages
     uses: ./.github/workflows/gh-pages.yml
