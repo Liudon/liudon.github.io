@@ -52,8 +52,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick libheif-dev
-          find ./content/posts/building-a-workout-page/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec /usr/bin/magick {} {}.webp \;
-          find ./content/posts/building-a-workout-page/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec /usr/bin/magick {} {}.avif \;
+          find ./content/posts/building-a-workout-page/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} {}.webp \;
+          find ./content/posts/building-a-workout-page/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} {}.avif \;
           ls -l ./content/posts/building-a-workout-page/
 
   github_pages:
