@@ -51,7 +51,7 @@ jobs:
       - name: Compress Image
         uses: jruipinto/ImageMagick-action@v1
         with: 
-          command: find ./content/posts -type f $ -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" $ -exec sh -c 'convert "$1" "${1%.*}.webp" && convert "$1" "${1%.*}.avif"' _ {} \;
+          command: find ./content/posts/ -type f $ -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" $ -exec sh -c 'for img; do convert "$img" "${img%.*}.webp" && convert "$img" "${img%.*}.avif"; done' _ {} +
 
   github_pages:
     name: Build and Publish Github Pages
