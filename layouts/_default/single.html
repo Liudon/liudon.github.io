@@ -38,7 +38,7 @@
   <footer class="post-footer">
     <ul class="post-copyright">
         <li><strong>文章作者：</strong><a rel="author" href="//liudon.com">Liudon</a></li>
-        <li style="word-break:break-all"><strong>文章链接：</strong><a href="{{ .Permalink | absURL }}">{{ url.QueryUnescape .Permalink }}</a></li>
+        <li style="word-break:break-all"><strong>文章链接：</strong><a href="{{ .Permalink | absURL }}">{{ .Permalink }}</a></li>
         <li><strong>版权声明：</strong>本站采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 协议，完整转载请注明来自 <a href="//liudon.com">流动</a></li>
     </ul>
     {{- $tags := .Language.Params.Taxonomies.tag | default "tags" }}
