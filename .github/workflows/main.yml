@@ -13,10 +13,15 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  start:
+  build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -77,21 +82,7 @@ jobs:
           force_orphan: true
           publish_dir: ./public
           cname: liudon.com
-  ipfs:
-    name: Build and Publish IPFS
-    uses: ./.github/workflows/ipfs.yml
-    secrets:
-      SSHHOST: ${{ secrets.SSHHOST }}
-      SSHKEY: ${{ secrets.SSHKEY }}
-      FILEBASE_BUCKET: ${{ secrets.FILEBASE_BUCKET }}
-      FILEBASE_KEY: ${{ secrets.FILEBASE_KEY }}
-      FILEBASE_SECRET: ${{ secrets.FILEBASE_SECRET }}
-    needs:
-      - start
 
-  end:
-    runs-on: ubuntu-latest
-    steps:
       - name: Easyindex
         run: |
           echo '${{ secrets.GOOGLE_INDEXING_API_TOKEN }}' > ./credentials.json
@@ -104,5 +95,39 @@ jobs:
           curl -s -L https://github.com/usk81/easyindex-cli/releases/download/v1.0.6/easyindex-cli_1.0.6_linux_amd64.tar.gz | tar xz
           chmod +x ./easyindex-cli
           ./easyindex-cli google -d -c ./url.csv
-    needs:
-      - start
+          
+      - name: Generate robots.txt
+        run: |
+          echo "User-agent: *" > ./public/robots.txt
+          echo "Disallow: /" >> ./public/robots.txt
+
+      - name: Connect to ssh in BG
+        timeout-minutes: 2
+        run: | 
+          echo "${{ secrets.SSHKEY }}" > ../privkey
+          chmod 600 ../privkey
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSHHOST }} -i ../privkey -L 5001:localhost:5001 -fTN
+
+      - name: IPFS upload
+        uses: filebase/ipfs-action@master
+        id: deploy
+        timeout-minutes: 2
+        with:
+          path: ./public
+          service: ipfs
+          verbose: true
+          host: localhost
+          port: 5001
+          protocol: http
+          key: ipfs-action
+      
+      - name: IPFS upload to filebase
+        uses: filebase/ipfs-action@master
+        with:
+          path: ./public
+          service: filebase
+          pinName: ipfs-action
+          filebaseBucket: ${{ secrets.FILEBASE_BUCKET }}
+          filebaseKey: ${{ secrets.FILEBASE_KEY }}
+          filebaseSecret: ${{ secrets.FILEBASE_SECRET }}
+          key: ipfs-action
