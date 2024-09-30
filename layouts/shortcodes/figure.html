@@ -29,7 +29,7 @@
             {{- end -}}
             {{- range $imageType := $imageTypes -}}
             <source type="image/{{ $imageType }}" srcset="
-                {{- $compressedImage := printf "%s_1080x.%s" $Destination $imageType -}}
+                {{- $compressedImage := printf "%s_1080x.%s" $src $imageType -}}
                 {{- $cmSrc := $Page.Resources.GetMatch $compressedImage -}}
                 {{- if $cmSrc -}}
                     {{ $cmSrc.RelPermalink | absURL}} 1080w
