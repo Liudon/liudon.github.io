@@ -35,7 +35,7 @@
                     {{ $cmSrc.RelPermalink | absURL}} 1080w
                 {{- else -}}
                     // hugo not support avif format
-                    {{ if ne $imageType "avif" }}
+                    {{ if (ne $imageType "avif") }}
                         {{- with $respSizes -}}
                             {{- range $i, $e := . -}}
                                 {{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x " $imageType $hint " " $filter) ).RelPermalink | absURL }} {{ . }}w
