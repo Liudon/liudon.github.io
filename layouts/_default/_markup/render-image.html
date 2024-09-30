@@ -16,6 +16,7 @@
 	{{- if $responsiveImages -}}
 		{{- $imageTypes := slice -}}
 		{{- if and hugo.IsExtended (ne $src.MediaType.Type "image/webp") -}}
+			{{- $imageTypes = $imageTypes | append "avif" -}} <!-- avif need the first -->
 			{{- $imageTypes = $imageTypes | append "webp" -}}
 		{{- end -}}
 		{{- if gt (index $respSizes 0) $src.Width -}}
@@ -29,7 +30,7 @@
 			{{- if $cmSrc -}}
 				{{ $cmSrc.RelPermalink | absURL}} 1080w
 			{{- else -}}
-				// hugo not support avif format
+				<!-- hugo not support avif format -->
 				{{ if ne $imageType "avif" }}
 					{{- with $respSizes -}}
 						{{- range $i, $e := . -}}
