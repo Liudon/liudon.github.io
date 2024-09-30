@@ -55,8 +55,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick libheif-dev
-          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} {}.webp \;
-          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} {}.avif \;
+          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} -resize 1080x\> {}.webp \;
+          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} -resize 1080x\> {}.avif \;
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
