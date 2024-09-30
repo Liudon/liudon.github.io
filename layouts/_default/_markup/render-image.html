@@ -17,17 +17,23 @@
 		{{- if and hugo.IsExtended (ne $src.MediaType.Type "image/webp") -}}
 			{{- $imageTypes = $imageTypes | append "webp" -}}
 		{{- end -}}
-		{{- $imageTypes = $imageTypes | append $src.MediaType.SubType -}}
 		{{- if gt (index $respSizes 0) $src.Width -}}
 			{{- $respSizes = slice $src.Width -}}
 		{{- end -}}
 		<picture>
 			{{- range $imageType := $imageTypes -}}
 			<source type="image/{{ $imageType }}" srcset="
-			{{- with $respSizes -}}
-				{{- range $i, $e := . -}}
-					{{- if ge $src.Width . -}}
-						{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x " $imageType " " $filter) ).RelPermalink | absURL}} {{ . }}w
+			{{- compressedImage := printf "%s_1080x.%s" .Destination $imageType -}}
+			{{- $cmSrc := .Page.Resources.GetMatch $compressedImage -}}
+			{{- if $cmSrc -}}
+				{{ $cmSrc.RelPermalink | absURL}} 1080w
+			{{- else -}}
+				{{- $imageTypes = $imageTypes | append $src.MediaType.SubType -}}
+				{{- with $respSizes -}}
+					{{- range $i, $e := . -}}
+						{{- if ge $src.Width . -}}
+							{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x " $imageType " " $filter) ).RelPermalink | absURL}} {{ . }}w
+						{{- end -}}
 					{{- end -}}
 				{{- end -}}
 			{{- end -}}" sizes="{{ $dataSizes }}" />
