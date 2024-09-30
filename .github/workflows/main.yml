@@ -42,7 +42,7 @@ jobs:
           valueFile: 'config.yml'
           propertyPath: 'params.twikoo.version'
           value: ${{ steps.twikoo.outputs.twikoo_version }}
-          commitChange: true
+          commitChange: false
 
       # - name: Compress Image
       #   run: |
@@ -56,7 +56,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y imagemagick libheif-dev
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} -resize 1080x\> {}.webp \;
-          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} -resize 1080x\> {}.avif \;
+          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} -resize 1080x\> -quality 75 -define webp:image-hint=photo {}.avif \;
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
