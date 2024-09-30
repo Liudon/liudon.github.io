@@ -1,5 +1,5 @@
 ---
-title: "当Hugo遇上AVIF，加速图片加载"
+title: "当Hugo遇上AVIF，优化图片加载"
 date: 2024-09-30T22:01:45+08:00
 draft: false
 tags:
