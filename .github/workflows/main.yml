@@ -26,6 +26,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout submodules
+        run: git submodule update --init --recursive --remote
+
       - name: Get twikoo version
         id: twikoo
         run: |
@@ -54,9 +57,6 @@ jobs:
           sudo apt-get install -y imagemagick libheif-dev
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} {}.webp \;
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} {}.avif \;
-
-      - name: Checkout submodules
-        run: git submodule update --init --recursive --remote
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
