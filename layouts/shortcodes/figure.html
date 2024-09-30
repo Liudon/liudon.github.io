@@ -10,6 +10,8 @@
 {{ $alt := .Get "alt" }}
 {{ $caption := .Get "caption" }}
 
+{{ $Page := .Page }}
+
 {{- $responsiveImages := (.Page.Params.responsiveImages | default site.Params.responsiveImages) | default true }}
 
 <figure{{ if or (.Get "class") (eq (.Get "align") "center") }} class="
@@ -30,7 +32,7 @@
             {{- range $imageType := $imageTypes -}}
             <source type="image/{{ $imageType }}" srcset="
                 {{- $compressedImage := printf "%s_1080x.%s" $src $imageType -}}
-                {{- $cmSrc := $.Page.Resources.GetMatch $compressedImage -}}
+                {{- $cmSrc := $Page.Resources.GetMatch $compressedImage -}}
                 {{- if $cmSrc -}}
                     {{ $cmSrc.RelPermalink | absURL}} 1080w
                 {{- else -}}
