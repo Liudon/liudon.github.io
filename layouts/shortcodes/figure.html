@@ -30,15 +30,18 @@
             {{- range $imageType := $imageTypes -}}
             <source type="image/{{ $imageType }}" srcset="
                 {{- $compressedImage := printf "%s_1080x.%s" $src $imageType -}}
-                {{- $cmSrc := $Page.Resources.GetMatch $compressedImage -}}
+                {{- $cmSrc := $.Page.Resources.GetMatch $compressedImage -}}
                 {{- if $cmSrc -}}
                     {{ $cmSrc.RelPermalink | absURL}} 1080w
                 {{- else -}}
-                    {{- with $respSizes -}}
-                        {{- range $i, $e := . -}}
-                            {{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x " $imageType $hint " " $filter) ).RelPermalink | absURL }} {{ . }}w
-                        {{- end -}}
-                    {{- end -}}" sizes="{{ $dataSzes }}" />
+                    // hugo not support avif format
+                    {{ if ne $imageType "avif" }}
+                        {{- with $respSizes -}}
+                            {{- range $i, $e := . -}}
+                                {{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x " $imageType $hint " " $filter) ).RelPermalink | absURL }} {{ . }}w
+                            {{- end -}}
+                        {{- end -}}" sizes="{{ $dataSzes }}" />
+                    {{- end -}}
                 {{- end -}}
             {{- end -}}
         {{- end }}
