@@ -36,15 +36,17 @@
                 {{- if $cmSrc -}}
                     {{ $cmSrc.RelPermalink | absURL}} 1080w
                 {{- else -}}
-                    // hugo not support avif format
-                    {{ if (ne $imageType "avif") }}
-                        {{- with $respSizes -}}
-                            {{- range $i, $e := . -}}
-                                {{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x " $imageType $hint " " $filter) ).RelPermalink | absURL }} {{ . }}w
-                            {{- end -}}
-                        {{- end -}}" sizes="{{ $dataSzes }}" />
-                    {{- end -}}
-                {{- end -}}
+                // hugo not support avif format
+				{{ if ne $imageType "avif" }}
+					{{- with $respSizes -}}
+						{{- range $i, $e := . -}}
+							{{- if ge $src.Width . -}}
+								{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x " $imageType " " $filter) ).RelPermalink | absURL}} {{ . }}w
+							{{- end -}}
+						{{- end -}}
+					{{- end -}}
+				{{ end }}
+			{{- end -}}" sizes="{{ $dataSizes }}" />
             {{- end -}}
         {{- end }}
         <img loading="lazy" src="{{ $src }}{{- if eq ($align) "center" }}#center{{- end }}"
