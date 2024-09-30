@@ -10,7 +10,7 @@ tags:
     - github
 ---
 
-![avif-on-hugo](avif-on-hugo.svg)
+![avif-on-hugo](avif-on-hugo.png)
 
 这篇文章会介绍基于Github Workflow使用ImageMagick生成AVIF图片，来优化Hugo站点的加载速度。
 
