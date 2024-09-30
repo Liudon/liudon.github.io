@@ -105,4 +105,4 @@ jobs:
           chmod +x ./easyindex-cli
           ./easyindex-cli google -d -c ./url.csv
     needs:
-      - github_pages
+      - start
