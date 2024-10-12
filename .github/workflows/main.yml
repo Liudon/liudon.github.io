@@ -58,6 +58,7 @@ jobs:
 
       - name: Compress Image
         run: |
+          sudo apt-get install -y libfuse2
           wget https://download.imagemagick.org/archive/binaries/magick
           chmod +x magick
           sudo mv magick /usr/local/bin/
