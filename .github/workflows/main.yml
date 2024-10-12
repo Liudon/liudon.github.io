@@ -61,7 +61,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y imagemagick libheif-dev
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} -pointsize 48 -fill "#FFFFFF" -font ./static/ArchitectsDaughter-Regular.ttf -gravity south -annotate +0+10 "@liudon\nhttps://liudon.com" -resize 1080x\> -quality 75 -define webp:image-hint=photo {}_1080x.webp \;
-          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} -verbose -pointsize 48 -fill rgba(255,255,255,0.7) -font ./static/ArchitectsDaughter-Regular.ttf -gravity south -annotate +0+10 "@liudon\nhttps://liudon.com" -resize 1080x\> {}_1080x.avif \;
+          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} -verbose -pointsize 48 -fill "#FFFFFF" -font ./static/ArchitectsDaughter-Regular.ttf -gravity south -annotate +0+10 "@liudon\nhttps://liudon.com" -resize 1080x\> {}_1080x.avif \;
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
