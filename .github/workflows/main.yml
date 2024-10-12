@@ -59,13 +59,26 @@ jobs:
       - name: Compress Image
         run: |
           sudo apt-get update
-          sudo apt-get install -y imagemagick libheif-dev
+          sudo apt-get install -y build-essential libx11-dev libxext-dev zlib1g-dev \
+              libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev liblcms2-dev \
+              libopenexr-dev libtiff-dev libraw-dev libheif-dev libde265-dev \
+              libfftw3-dev libglib2.0-dev libwebp-dev
 
-          convert --version
+          wget https://download.imagemagick.org/ImageMagick/download/ImageMagick.tar.gz
+          tar xvzf ImageMagick.tar.gz
+          cd ImageMagick-7.*
+          ./configure
+          make
+          sudo make install
+          sudo ldconfig /usr/local/lib
 
-          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} -pointsize 48 -fill "#909090" -font ./static/ArchitectsDaughter-Regular.ttf -gravity south -annotate +0+20 "@liudon\nhttps://liudon.com" -resize 1080x\> {} \;
-          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} -quality 75 -define webp:image-hint=photo {}_1080x.webp \;
-          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} {}_1080x.avif \;
+          magick --version
+
+          cd ../
+
+          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick {} -pointsize 48 -fill "#909090" -font ./static/ArchitectsDaughter-Regular.ttf -gravity south -annotate +0+20 "@liudon\nhttps://liudon.com" -resize 1080x\> {} \;
+          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick {} -quality 75 -define webp:image-hint=photo {}_1080x.webp \;
+          find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick {} {}_1080x.avif \;
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
