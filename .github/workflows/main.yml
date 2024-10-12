@@ -58,10 +58,17 @@ jobs:
 
       - name: Compress Image
         run: |
-          sudo apt-get install -y libfuse2
-          wget https://download.imagemagick.org/archive/binaries/magick
-          chmod +x magick
-          sudo mv magick /usr/local/bin/
+          wget https://download.imagemagick.org/ImageMagick/download/ImageMagick.tar.gz
+          tar xvzf ImageMagick.tar.gz
+          cd ImageMagick-7.*
+          ./configure
+          make
+          sudo make install
+          sudo ldconfig /usr/local/lib
+
+          magick --version
+
+          cd ../
 
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick {} -pointsize 48 -fill "#FFFFFF" -font ./static/ArchitectsDaughter-Regular.ttf -gravity south -annotate +0+10 "@liudon\nhttps://liudon.com" -resize 1080x\> -quality 75 -define webp:image-hint=photo {}_1080x.webp \;
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick {} -verbose -pointsize 48 -fill "#FFFFFF" -font ./static/ArchitectsDaughter-Regular.ttf -gravity south -annotate +0+10 "@liudon\nhttps://liudon.com" -resize 1080x\> {}_1080x.avif \;
