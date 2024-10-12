@@ -63,8 +63,6 @@ jobs:
 
           convert --version
 
-          cd ../
-
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} -pointsize 48 -fill "#909090" -font ./static/ArchitectsDaughter-Regular.ttf -gravity south -annotate +0+20 "@liudon\nhttps://liudon.com" -resize 1080x\> {} \;
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} -quality 75 -define webp:image-hint=photo {}_1080x.webp \;
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec convert {} {}_1080x.avif \;
