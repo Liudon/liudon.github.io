@@ -3,7 +3,7 @@ title: "使用 ImageMagick 自动添加水印，保护图片版权"
 date: 2024-10-12T23:32:31+08:00
 draft: false
 tags:
-    - imagemagic
+    - imagemagick
     - github
     - 版权
 ---
@@ -70,6 +70,15 @@ run: |
 
 2. 将处理后的原图生成webp和avif格式文件
 
-*注意，通过`sudo apt-get install -y imagemagick libheif-dev`安装的ImageMagick版本是6.x，转换过程会有些问题，所以这里改为了通过源码编译最新7.x版本。*
+*注意，通过`sudo apt-get install -y imagemagick libheif-dev`安装的ImageMagick版本是6.x，转换过程会有些问题，所以这里改为了通过源码编译最新7.x版本，编译的时间略久一些。*
+
+```
+Version: ImageMagick 7.1.1-39 Q16-HDRI x86_64 22428 https://imagemagick.org
+Copyright: (C) 1999 ImageMagick Studio LLC
+License: https://imagemagick.org/script/license.php
+Features: Cipher DPC HDRI OpenMP(4.5) 
+Delegates (built-in): bzlib djvu fontconfig freetype heic jbig jng jp2 jpeg lcms lqr lzma openexr png raw tiff webp x xml zlib zstd
+Compiler: gcc (11.4)
+```
 
 好了，这样后续提交Github后，Workflow就会自动利用ImageMagick帮我们处理图片了。
