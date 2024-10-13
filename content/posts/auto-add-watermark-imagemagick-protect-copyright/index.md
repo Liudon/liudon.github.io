@@ -20,7 +20,7 @@ tags:
 
 ## 实现
 
-思路其实和之前图片压缩一样，还是在Github Action里使用ImageMagick工具进行添加水印操作。
+思路其实和之前图片压缩一样，还是在Github Action里使用ImageMagick工具进行添加水印操作，不依赖第三方云服务。
 
 [workflow代码](https://github.com/Liudon/liudon.github.io/blob/code/.github/workflows/main.yml)：
 
@@ -63,7 +63,9 @@ run: |
     -fill #909090 代表水印颜色
     -pointsize 48 代表水印文字大小
     -font ./static/ArchitectsDaughter-Regular.ttf 代表水印字体，我使用了ArchitectsDaughter字体，提前下载到了git仓库
-    @liudon\nhttps://liudon.com 代表文本水印内容
+    @liudon\nhttps://liudon.com 代表文本水印内容，\n表示换行
+    -gravity south 水印位置，九宫格位置
+    -annotate +0+20 水印偏移
     ```
 
     [水印字体文件下载](https://fonts.google.com/specimen/Architects+Daughter)
