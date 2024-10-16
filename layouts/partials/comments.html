@@ -22,15 +22,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twikoo/{{ .Site.Params.twikoo.version }}/twikoo.all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <!-- {{- $twikoojs := resources.Get "js/twikoo.all.min.js" }}
-    {{- if not site.Params.assets.disableFingerprinting }}
-    {{- $twikoo := (slice $twikoojs ) | resources.Concat "assets/js/twikoo.js" | fingerprint }}
-    <script crossorigin="anonymous" src="{{ $twikoo.RelPermalink }}" integrity="{{ $twikoo.Data.Integrity }}"></script>
-    {{- else }}
-    {{- $twikoo := (slice $twikoojs ) | resources.Concat "assets/js/twikoo.js" }}
-    <script crossorigin="anonymous" src="{{ $twikoo.RelPermalink }}"></script>
-    {{- end }} -->
-
     <!-- <script>window.TWIKOO_MAGIC_PATH="共用评论区的名称"</script> -->
 
     <script>
