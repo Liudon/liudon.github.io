@@ -79,7 +79,7 @@ jobs:
           sudo apt-get install -y build-essential libx11-dev libxext-dev zlib1g-dev \
               libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev liblcms2-dev \
               libopenexr-dev libtiff-dev libraw-dev libheif-dev libde265-dev \
-              libfftw3-dev libglib2.0-dev libwebp-dev
+              libfftw3-dev libglib2.0-dev libwebp-dev libavif-dev libaom-dev
 
           wget 'https://imagemagick.org/archive/binaries/magick'
           chmod +x magick
