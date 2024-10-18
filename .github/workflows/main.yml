@@ -74,6 +74,9 @@ jobs:
 
           # cd ../
 
+          sudo apt update
+          sudo apt install fuse
+
           wget 'https://imagemagick.org/archive/binaries/magick'
           chmod +x magick
           sudo mv magick /usr/local/bin/
