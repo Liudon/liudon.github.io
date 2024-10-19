@@ -1,0 +1,217 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Swoft 框架运行分析（一） | 流动</title>
+<meta name=keywords content="Swoft"><meta name=description content="
+Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。
+
+以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。
+刚开始看的时候，感觉自己像个原始人，完全看不懂。"><meta name=author content="Liudon"><link rel=canonical href=https://liudon.com/posts/swoft-execution-analysis/><link crossorigin=anonymous href=../../assets/css/stylesheet.e58f8d6490878616473ed87168c3eb74d2244f30c48b524628d7c7a321c62e4e.css integrity="sha256-5Y+NZJCHhhZHPthxaMPrdNIkTzDEi1JGKNfHoyHGLk4=" rel="preload stylesheet" as=style><link rel=icon href=https://liudon.com/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://liudon.com/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://liudon.com/favicon-32x32.png><link rel=apple-touch-icon href=https://liudon.com/apple-touch-icon.png><link rel=mask-icon href=https://liudon.com/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://liudon.com/posts/swoft-execution-analysis/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous></script><meta property="og:title" content="Swoft 框架运行分析（一）"><meta property="og:description" content="
+Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。
+
+以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。
+刚开始看的时候，感觉自己像个原始人，完全看不懂。"><meta property="og:type" content="article"><meta property="og:url" content="https://liudon.com/posts/swoft-execution-analysis/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2019-08-29T17:22:28+08:00"><meta property="article:modified_time" content="2019-08-29T17:22:28+08:00"><meta property="og:site_name" content="流动"><meta name=twitter:card content="summary"><meta name=twitter:title content="Swoft 框架运行分析（一）"><meta name=twitter:description content="
+Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。
+
+以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。
+刚开始看的时候，感觉自己像个原始人，完全看不懂。"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"文章","item":"https://liudon.com/posts/"},{"@type":"ListItem","position":2,"name":"Swoft 框架运行分析（一）","item":"https://liudon.com/posts/swoft-execution-analysis/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Swoft 框架运行分析（一）","name":"Swoft 框架运行分析（一）","description":" Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。\n以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。\n刚开始看的时候，感觉自己像个原始人，完全看不懂。\n","keywords":["Swoft"],"articleBody":" Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。\n以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。\n刚开始看的时候，感觉自己像个原始人，完全看不懂。\n官方文档没有介绍Swoft的实现，网上的一些文章跟当前版本代码已经不一致了。\n自己花了一周时间，终于梳理清楚了，看完更觉得自己是个原始人了。\n使用的框架组件版本为：\nswoft-2.0.5 swoft-component-2.0.5 这里以Swoft启动http server为例。\nphp bin/swoft http:start 执行上述命令，启动http server。\n这里执行的是bin/swoft文件。\n#!/usr/bin/env php \u003c?php declare(strict_types=1); // Bootstrap require_once __DIR__ . '/bootstrap.php'; Swoole\\Coroutine::set([ 'max_coroutine' =\u003e 300000, ]); // Run application (new \\App\\Application())-\u003erun(); 这里引入bootstrap.php文件，引入composer自动加载文件。\n\u003c?php // Composer autoload require_once dirname(__DIR__) . '/vendor/autoload.php'; 然后执行Swoft\\App\\Application类下的run方法。\n\u003c?php declare(strict_types=1); namespace App; use Swoft\\SwoftApplication; use function date_default_timezone_set; /** * Class Application * * @since 2.0 */ class Application extends SwoftApplication { protected function beforeInit(): void { parent::beforeInit(); date_default_timezone_set('Asia/Shanghai'); } } 这里继承了Swoft\\SwoftApplication类，这里只粘贴了部分代码。\n/** * Swoft application * * @since 2.0 */ class SwoftApplication implements SwoftInterface, ApplicationInterface { /** * Class constructor. * * @param array $config */ public function __construct(array $config = []) { // Check runtime env SwoftHelper::checkRuntime(); // Storage as global static property. Swoft::$app = $this; // Before init $this-\u003ebeforeInit(); // Init console logger $this-\u003einitCLogger(); // Can setting properties by array if ($config) { ObjectHelper::init($this, $config); } // Init application $this-\u003einit(); CLog::info('Project path is %s', $this-\u003ebasePath); // After init $this-\u003eafterInit(); } protected function init(): void { // Init system path aliases $this-\u003efindBasePath(); $this-\u003esetSystemAlias(); $processors = $this-\u003eprocessors(); $this-\u003eprocessor = new ApplicationProcessor($this); $this-\u003eprocessor-\u003eaddFirstProcessor(...$processors); } /** * Run application */ public function run(): void { if (!$this-\u003ebeforeRun()) { return; } $this-\u003eprocessor-\u003ehandle(); } /** * @return ProcessorInterface[] */ protected function processors(): array { return [ new EnvProcessor($this), new ConfigProcessor($this), new AnnotationProcessor($this), new BeanProcessor($this), new EventProcessor($this), new ConsoleProcessor($this), ]; } __construct方法里检查运行环境，初始化日志组件，然后调用了init方法。\ninit方法里声明了processor对象。\nprocessors方法定义了Swoft框架的6个Processor对象。\nrun方法里直接调用processor对象的handler方法。\n\u003c?php namespace Swoft\\Processor; use Swoft\\Stdlib\\Helper\\ArrayHelper; use function get_class; /** * Application processor * @since 2.0 */ class ApplicationProcessor extends Processor { /** * @var ProcessorInterface[] */ private $processors = []; /** * Handle application processors */ public function handle(): bool { $disabled = $this-\u003eapplication-\u003egetDisabledProcessors(); foreach ($this-\u003eprocessors as $processor) { $class = get_class($processor); // If is disabled, skip handle. if (isset($disabled[$class])) { continue; } $processor-\u003ehandle(); } return true; } /** * Add first processor * * @param Processor[] $processor * @return bool */ public function addFirstProcessor(Processor ...$processor): bool { array_unshift($this-\u003eprocessors, ... $processor); return true; } /** * Add last processor * * @param Processor[] $processor * * @return bool */ public function addLastProcessor(Processor ...$processor): bool { array_push($this-\u003eprocessors, ... $processor); return true; } /** * Add processors * * @param int $index * @param Processor[] $processors * * @return bool */ public function addProcessor(int $index, Processor ...$processors): bool { ArrayHelper::insert($this-\u003eprocessors, $index, ...$processors); return true; } } addFirstProcessor方法把process对象赋值给$this-\u003eprocessors。\nhandle方法遍历processors对象，循环执行handle方法。\nSwoft的核心逻辑都是靠上面定义的6个Processor模块实现的，接下来一个一个分析。\n","wordCount":"966","inLanguage":"en","datePublished":"2019-08-29T17:22:28+08:00","dateModified":"2019-08-29T17:22:28+08:00","author":{"@type":"Person","name":"Liudon"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://liudon.com/posts/swoft-execution-analysis/"},"publisher":{"@type":"Organization","name":"流动","logo":{"@type":"ImageObject","url":"https://liudon.com/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://liudon.com/ accesskey=h title="流动 (Alt + H)">流动</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://liudon.com/ title=Home><span>Home</span></a></li><li><a href=https://liudon.com/posts/ title=Posts><span>Posts</span></a></li><li><a href=https://workout.liudon.com title=Workouts><span>Workouts</span>&nbsp;<svg fill="none" shape-rendering="geometricPrecision" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" height="12" width="12"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></a></li><li><a href=https://liudon.com/about/ title=About><span>About</span></a></li><li><a href=https://liudon.com/search/ title="🔍 (Alt + /)" accesskey=/><span>🔍</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Swoft 框架运行分析（一）</h1><div class=post-meta><span title='2019-08-29 17:22:28 +0800 +0800'>2019-08-29</span>&nbsp;·&nbsp;2 min&nbsp;·&nbsp;966 words&nbsp;·&nbsp;Liudon</div></header><div class=post-content><blockquote><p>Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。</p></blockquote><p>以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。</p><p>刚开始看的时候，感觉自己像个原始人，完全看不懂。</p><p>官方文档没有介绍Swoft的实现，网上的一些文章跟当前版本代码已经不一致了。</p><p>自己花了一周时间，终于梳理清楚了，看完更觉得自己是个原始人了。</p><p>使用的框架组件版本为：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>swoft-2.0.5
+</span></span><span style=display:flex><span>swoft-component-2.0.5
+</span></span></code></pre></div><p>这里以Swoft启动http server为例。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>php bin/swoft http:start
+</span></span></code></pre></div><p>执行上述命令，启动http server。</p><p>这里执行的是bin/swoft文件。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>#!/usr/bin/env php
+</span></span><span style=display:flex><span>&lt;?php declare(strict_types=1);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>// Bootstrap
+</span></span><span style=display:flex><span>require_once __DIR__ . &#39;/bootstrap.php&#39;;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Swoole\Coroutine::set([
+</span></span><span style=display:flex><span>    &#39;max_coroutine&#39; =&gt; 300000,
+</span></span><span style=display:flex><span>]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>// Run application
+</span></span><span style=display:flex><span>(new \App\Application())-&gt;run();
+</span></span></code></pre></div><p>这里引入<code>bootstrap.php</code>文件，引入composer自动加载文件。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>&lt;</span><span style=color:#960050;background-color:#1e0010>?</span>php
+</span></span><span style=display:flex><span><span style=color:#f92672>//</span> Composer autoload
+</span></span><span style=display:flex><span>require_once dirname(__DIR__) <span style=color:#f92672>.</span> <span style=color:#e6db74>&#39;/vendor/autoload.php&#39;</span>;
+</span></span></code></pre></div><p>然后执行<code>Swoft\App\Application</code>类下的<code>run</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>&lt;</span><span style=color:#960050;background-color:#1e0010>?</span>php declare(strict_types<span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>namespace App;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>use Swoft\SwoftApplication;
+</span></span><span style=display:flex><span>use function date_default_timezone_set;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> Class Application
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>since <span style=color:#ae81ff>2.0</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> Application <span style=color:#66d9ef>extends</span> SwoftApplication
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    protected function beforeInit(): void
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        parent::beforeInit();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        date_default_timezone_set(<span style=color:#e6db74>&#39;Asia/Shanghai&#39;</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里继承了<code>Swoft\SwoftApplication</code>类，这里只粘贴了部分代码。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> Swoft application
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>since <span style=color:#ae81ff>2.0</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> SwoftApplication implements SwoftInterface, ApplicationInterface
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Class constructor<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param array <span style=color:#f92672>$</span>config
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function __construct(array <span style=color:#f92672>$</span>config <span style=color:#f92672>=</span> [])
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Check runtime env
+</span></span><span style=display:flex><span>        SwoftHelper::checkRuntime();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Storage as global <span style=color:#66d9ef>static</span> property<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>        Swoft::<span style=color:#f92672>$</span>app <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Before init
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>beforeInit();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Init console logger
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>initCLogger();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Can setting properties by array
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>config) {
+</span></span><span style=display:flex><span>            ObjectHelper::init(<span style=color:#f92672>$</span>this, <span style=color:#f92672>$</span>config);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Init application
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>init();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        CLog::info(<span style=color:#e6db74>&#39;Project path is &lt;info&gt;</span><span style=color:#e6db74>%s</span><span style=color:#e6db74>&lt;/info&gt;&#39;</span>, <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>basePath);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> After init
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>afterInit();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    protected function init(): void
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Init system path aliases
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>findBasePath();
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>setSystemAlias();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>processors <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>processors();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>processor <span style=color:#f92672>=</span> new ApplicationProcessor(<span style=color:#f92672>$</span>this);
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>processor<span style=color:#f92672>-&gt;</span>addFirstProcessor(<span style=color:#f92672>...$</span>processors);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Run application
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function run(): void
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!$</span>this<span style=color:#f92672>-&gt;</span>beforeRun()) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>processor<span style=color:#f92672>-&gt;</span>handle();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> ProcessorInterface[]
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    protected function processors(): array
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> [
+</span></span><span style=display:flex><span>            new EnvProcessor(<span style=color:#f92672>$</span>this),
+</span></span><span style=display:flex><span>            new ConfigProcessor(<span style=color:#f92672>$</span>this),
+</span></span><span style=display:flex><span>            new AnnotationProcessor(<span style=color:#f92672>$</span>this),
+</span></span><span style=display:flex><span>            new BeanProcessor(<span style=color:#f92672>$</span>this),
+</span></span><span style=display:flex><span>            new EventProcessor(<span style=color:#f92672>$</span>this),
+</span></span><span style=display:flex><span>            new ConsoleProcessor(<span style=color:#f92672>$</span>this),
+</span></span><span style=display:flex><span>        ];
+</span></span><span style=display:flex><span>    }
+</span></span></code></pre></div><p><code>__construct</code>方法里检查运行环境，初始化日志组件，然后调用了<code>init</code>方法。</p><p><code>init</code>方法里声明了<code>processor</code>对象。</p><p><code>processors</code>方法定义了Swoft框架的6个Processor对象。</p><p><code>run</code>方法里直接调用<code>processor</code>对象的<code>handler</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>&lt;</span><span style=color:#960050;background-color:#1e0010>?</span>php
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>namespace Swoft\Processor;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>use Swoft\Stdlib\Helper\ArrayHelper;
+</span></span><span style=display:flex><span>use function get_class;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> Application processor
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>since <span style=color:#ae81ff>2.0</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> ApplicationProcessor <span style=color:#66d9ef>extends</span> Processor
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> ProcessorInterface[]
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    private <span style=color:#f92672>$</span>processors <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Handle application processors
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function handle(): <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>disabled <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>application<span style=color:#f92672>-&gt;</span>getDisabledProcessors();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        foreach (<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>processors as <span style=color:#f92672>$</span>processor) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span><span style=color:#66d9ef>class</span> <span style=color:#f92672>=</span> get_class(<span style=color:#f92672>$</span>processor);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>//</span> If is disabled, skip handle<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>disabled[<span style=color:#f92672>$</span><span style=color:#66d9ef>class</span>])) {
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>continue</span>;
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>processor<span style=color:#f92672>-&gt;</span>handle();
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> true;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Add first processor
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param Processor[] <span style=color:#f92672>$</span>processor
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function addFirstProcessor(Processor <span style=color:#f92672>...$</span>processor): <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        array_unshift(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>processors, <span style=color:#f92672>...</span> <span style=color:#f92672>$</span>processor);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> true;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Add last processor
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param Processor[] <span style=color:#f92672>$</span>processor
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function addLastProcessor(Processor <span style=color:#f92672>...$</span>processor): <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        array_push(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>processors, <span style=color:#f92672>...</span> <span style=color:#f92672>$</span>processor);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> true;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Add processors
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param <span style=color:#a6e22e>int</span>         <span style=color:#f92672>$</span>index
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param Processor[] <span style=color:#f92672>$</span>processors
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function addProcessor(<span style=color:#a6e22e>int</span> <span style=color:#f92672>$</span>index, Processor  <span style=color:#f92672>...$</span>processors): <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        ArrayHelper::insert(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>processors, <span style=color:#f92672>$</span>index, <span style=color:#f92672>...$</span>processors);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> true;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><code>addFirstProcessor</code>方法把process对象赋值给<code>$this->processors</code>。</p><p><code>handle</code>方法遍历<code>processors</code>对象，循环执行<code>handle</code>方法。</p><p>Swoft的核心逻辑都是靠上面定义的6个Processor模块实现的，接下来一个一个分析。</p></div><footer class=post-footer><ul class=post-tags><li><a href=https://liudon.com/tags/swoft/>Swoft</a></li></ul><nav class=paginav><a class=prev href=https://liudon.com/posts/swoft-anaotion-processor-analysis/><span class=title>« Prev</span><br><span>Swoft 框架运行分析（二） —— AnnotationProcessor模块分析</span>
+</a><a class=next href=https://liudon.com/posts/bcmath-and-exponential-notation/><span class=title>Next »</span><br><span>BCMath 与 科学计数</span></a></nav></footer><div><div class=post_ads><ins class=adsbygoogle style=display:block data-ad-client=ca-pub-4739645989170648 data-ad-slot=5019102040 data-ad-format=auto data-full-width-responsive=true></ins><script>window.addEventListener("load",function(){(adsbygoogle=window.adsbygoogle||[]).push({})})</script></div><div class=pagination__title><span class=pagination__title-h style=font-size:20px>💬评论</span><hr></div><div id=tcomment></div><script src=https://cdnjs.cloudflare.com/ajax/libs/twikoo/1.6.39/twikoo.all.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script>twikoo.init({envId:"https://comment.liudon.com",el:"#tcomment",lang:"zh-CN",region:"ap-shanghai",path:window.TWIKOO_MAGIC_PATH||window.location.pathname})</script></div></article></main><footer class=footer><span>&copy; 2024 <a href=https://liudon.com/>流动</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg></a><footer class=footer style=margin-top:-20px;padding-top:0><span><a href=https://beian.miit.gov.cn target=_blank>京ICP备13029522号-2</a></span></footer><script src=//tokinx.github.io/ViewImage/view-image.min.js async></script><script>function initViewImage(){window.ViewImage&&ViewImage.init(".post-content img")}document.readyState==="complete"?initViewImage():window.addEventListener("load",initViewImage)</script><script>const host=window.location.host;host!=="blog.liudon.xyz"&&!host.startsWith("liudon.")&&!host.startsWith("localhost")&&!host.startsWith("127.0.0.1")&&(document.body.innerHTML=['<div style="margin: auto;">',"<h1>当前页面并非本人博客，即将在2秒后跳转到本人博客: https://liudon.com。</h1>","<br />","</div>"].join(""),document.body.style=["background-color: white;","color: black;","text-align: center;","font-size: 50px;","width: 100vw;","height: 100vh;","display: flex;"].join(""),setTimeout(()=>{window.location.href="https://liudon.com"},2e3))</script><script>enScroll=!1,enFdl=!1,extCurrent=void 0,filename=void 0,targetText=void 0,splitOrigin=void 0;const lStor=localStorage,sStor=sessionStorage,doc=document,docEl=document.documentElement,docBody=document.body,docLoc=document.location,w=window,s=screen,nav=navigator||{},extensions=["pdf","xls","xlsx","doc","docx","txt","rtf","csv","exe","key","pps","ppt","pptx","7z","pkg","rar","gz","zip","avi","mov","mp4","mpe","mpeg","wmv","mid","midi","mp3","wav","wma"];function a(e,t,n,o){const j="G-G9ZDJQN9E2",r=()=>Math.floor(Math.random()*1e9)+1,c=()=>Math.floor(Date.now()/1e3),F=()=>(sStor._p||(sStor._p=r()),sStor._p),E=()=>r()+"."+c(),_=()=>(lStor.cid_v4||(lStor.cid_v4=E()),lStor.cid_v4),m=lStor.getItem("cid_v4"),v=()=>m?void 0:enScroll==!0?void 0:"1",p=()=>(sStor.sid||(sStor.sid=c()),sStor.sid),O=()=>{if(!sStor._ss)return sStor._ss="1",sStor._ss;if(sStor.getItem("_ss")=="1")return void 0},a="1",g=()=>{if(sStor.sct)if(enScroll==!0)return sStor.sct;else x=+sStor.getItem("sct")+ +a,sStor.sct=x;else sStor.sct=a;return sStor.sct},i=docLoc.search,b=new URLSearchParams(i),h=["q","s","search","query","keyword"],y=h.some(e=>i.includes("&"+e+"=")||i.includes("?"+e+"=")),u=()=>y==!0?"view_search_results":enScroll==!0?"scroll":enFdl==!0?"file_download":"page_view",f=()=>enScroll==!0?"90":void 0,C=()=>{if(u()=="view_search_results"){for(let e of b)if(h.includes(e[0]))return e[1]}else return void 0},d=encodeURIComponent,k=e=>{let t=[];for(let n in e)e.hasOwnProperty(n)&&e[n]!==void 0&&t.push(d(n)+"="+d(e[n]));return t.join("&")},A=!1,S="https://liudon.com/analytics/post",M=k({tid:j,_p:F(),v:"2",sr:(s.width*w.devicePixelRatio+"x"+s.height*w.devicePixelRatio).toString(),ul:(nav.language||void 0).toLowerCase(),cid:_(),_fv:v(),_s:"1",dl:docLoc.origin+docLoc.pathname+i,dt:doc.title||void 0,dr:doc.referrer||void 0,sid:p(),sct:g(),seg:"1",en:u(),"epn.percent_scrolled":f(),"ep.search_term":C(),"ep.file_extension":e||void 0,"ep.file_name":t||void 0,"ep.link_text":n||void 0,"ep.link_url":o||void 0,_ss:O(),_dbg:A?1:void 0}),l=S+"?"+M;if(nav.sendBeacon)nav.sendBeacon(l);else{let e=new XMLHttpRequest;e.open("POST",l,!0)}}a();function sPr(){return(docEl.scrollTop||docBody.scrollTop)/((docEl.scrollHeight||docBody.scrollHeight)-docEl.clientHeight)*100}doc.addEventListener("scroll",sEv,{passive:!0});function sEv(){const e=sPr();if(e<90)return;enScroll=!0,a(),doc.removeEventListener("scroll",sEv,{passive:!0}),enScroll=!1}document.addEventListener("DOMContentLoaded",function(){let e=document.getElementsByTagName("a");for(let t=0;t<e.length;t++)if(e[t].getAttribute("href")!=null){const n=e[t].getAttribute("href"),s=n.substring(n.lastIndexOf("/")+1),o=s.split(".").pop();(e[t].hasAttribute("download")||extensions.includes(o))&&e[t].addEventListener("click",fDl,{passive:!0})}});function fDl(e){enFdl=!0;const t=e.currentTarget.getAttribute("href"),n=t.substring(t.lastIndexOf("/")+1),s=n.split(".").pop(),o=n.replace("."+s,""),i=e.currentTarget.text,r=t.replace(docLoc.origin,"");a(s,o,i,r),enFdl=!1}</script><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>
