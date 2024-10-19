@@ -84,13 +84,15 @@ jobs:
           wget 'https://imagemagick.org/archive/binaries/magick'
           chmod +x magick
           sudo mv magick /usr/local/bin/
-          sudo ldconfig /usr/local/lib
+          sudo ldconfig
 
           magick --version
 
           magick -list format | grep AVIF
 
           ldconfig -p | grep heif
+
+          ldd $(which magick) | grep heif
 
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick {} -pointsize 48 -fill "#909090" -font ./static/ArchitectsDaughter-Regular.ttf -gravity south -annotate +0+20 "@liudon\nhttps://liudon.com" -resize 1080x\> {} \;
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick {} -quality 75 -define webp:image-hint=photo {}_1080x.webp \;
