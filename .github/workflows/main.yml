@@ -86,6 +86,8 @@ jobs:
           sudo mv magick /usr/local/bin/
           sudo ldconfig
 
+          export LD_LIBRARY_PATH=/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+
           magick --version
 
           magick -list format | grep AVIF
@@ -93,8 +95,6 @@ jobs:
           ldconfig -p | grep heif
 
           magick -list configure
-
-          ls /usr/lib/ImageMagick-7.1.1/modules-Q16HDRI/coders
 
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick {} -pointsize 48 -fill "#909090" -font ./static/ArchitectsDaughter-Regular.ttf -gravity south -annotate +0+20 "@liudon\nhttps://liudon.com" -resize 1080x\> {} \;
           find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec magick {} -quality 75 -define webp:image-hint=photo {}_1080x.webp \;
