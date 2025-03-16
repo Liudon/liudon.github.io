@@ -3,8 +3,8 @@ title: "Wrenai Local Llm Usage Guide"
 date: 2025-03-16T17:28:10+08:00
 draft: false
 tags:
--wrenAI
--llm
+- wrenAI
+- llm
 ---
 
 > Open-source GenBI AI Agent that empowers data-driven teams to chat with their data to generate Text-to-SQL, charts, spreadsheets, reports, and BI.
