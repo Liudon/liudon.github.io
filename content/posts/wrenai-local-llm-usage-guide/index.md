@@ -1,5 +1,5 @@
 ---
-title: "Wrenai Local Llm Usage Guide"
+title: "wrenAI本地LLM模型部署"
 date: 2025-03-16T17:28:10+08:00
 draft: false
 tags:
