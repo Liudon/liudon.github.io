@@ -277,3 +277,8 @@ curl -L https://github.com/Canner/WrenAI/releases/latest/download/wren-launcher-
 
 部署完成后，通过浏览器访问http://部署机器IP:3000访问WrenAI服务。
 
+### 限制
+
+MySQL当前仅支持8.0以上版本；
+
+纯CPU硬件下一次提问耗时在15分钟以上，腾讯云GPU计算型GN7 - 8核 32G下一次提问耗时在5分钟左右。
