@@ -30,10 +30,9 @@ tags: ["爬山","遛娃"]
 
 下山直奔新街口，到老西安饭庄，来个羊肉泡馍。
 
-![](WechatIMG168.jpg)
-
 可能是自己掰的馍不够小，感觉没有那么入味，并没有很惊艳。
 
+![](WechatIMG168.jpg)
 ![](WechatIMG169.jpg)
 ![](WechatIMG170.jpg)
 
