@@ -86,7 +86,7 @@ var DefaultTransport RoundTripper = &Transport{
 }
 ```
 
-这里指定了最大空闲连接未100，未指定单个host的最大空闲连接。
+这里指定了最大空闲连接为100，未指定单个host的最大空闲连接。
 
 ```
 func (t *Transport) maxIdleConnsPerHost() int {
