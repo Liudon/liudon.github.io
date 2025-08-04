@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Swoft on 流动</title>
+    <link>https://liudon.com/tags/swoft/</link>
+    <description>Recent content in Swoft on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 26 Sep 2019 13:14:23 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/swoft/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Swoft 框架运行分析（五） —— ConsoleProcessor模块分析</title>
+      <link>https://liudon.com/posts/swoft-console-processor-analysis/</link>
+      <pubDate>Thu, 26 Sep 2019 13:14:23 +0800</pubDate>
+      <guid>https://liudon.com/posts/swoft-console-processor-analysis/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;这里以Swoft启动http server为例。&lt;/p&gt;
+&lt;p&gt;php bin/swoft http:start&lt;/p&gt;
+&lt;p&gt;执行上述命令，启动http server。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;在前面第一篇文章的时候，提到了如何启动http服务。&lt;/p&gt;
+&lt;p&gt;今天我们就来看一下http服务是如何启动的，具体实现就在&lt;code&gt;ConsoleProcess&lt;/code&gt;这个模块。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Swoft 框架运行分析（四） —— EventProcessor模块分析</title>
+      <link>https://liudon.com/posts/swoft-event-processor-analysis/</link>
+      <pubDate>Thu, 26 Sep 2019 13:02:18 +0800</pubDate>
+      <guid>https://liudon.com/posts/swoft-event-processor-analysis/</guid>
+      <description>&lt;p&gt;今天我们来看一下&lt;code&gt;EventProcessor&lt;/code&gt;的实现。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;/**&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; Handle event register
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;bool&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*/&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;public function handle(): &lt;span style=&#34;color:#a6e22e&#34;&gt;bool&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#f92672&#34;&gt;!$&lt;/span&gt;this&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;application&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;beforeEvent()) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        CLog::warning(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Stop event processor by beforeEvent return false&amp;#39;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; false;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;/**&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; EventManager &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;eventManager &lt;span style=&#34;color:#f92672&#34;&gt;*/&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;eventManager &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; bean(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;eventManager&amp;#39;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    [&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;count1, &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;count2] &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; ListenerRegister::register(&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;eventManager);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    CLog::info(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Event manager initialized(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%d&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; listener, &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%d&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; subscriber)&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;count1, &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;count2);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;//&lt;/span&gt; Trigger a app init event
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;this&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;application&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;afterEvent();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;获取&lt;code&gt;eventManager&lt;/code&gt;的&lt;code&gt;Bean&lt;/code&gt;实例，对应为&lt;code&gt;Swoft\Event\Manager\EventManager&lt;/code&gt;类。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Swoft 框架运行分析（三） —— BeanProcessor模块分析</title>
+      <link>https://liudon.com/posts/swoft-bean-processor-analysis/</link>
+      <pubDate>Mon, 02 Sep 2019 18:29:06 +0800</pubDate>
+      <guid>https://liudon.com/posts/swoft-bean-processor-analysis/</guid>
+      <description>&lt;p&gt;今天讲一下&lt;code&gt;BeanProcessor&lt;/code&gt;模块，先看一下&lt;code&gt;handle&lt;/code&gt;方法实现。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;/**&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; Handle bean
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;bool&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;throws ReflectionException
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;throws AnnotationException
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*/&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;public function handle(): &lt;span style=&#34;color:#a6e22e&#34;&gt;bool&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#f92672&#34;&gt;!$&lt;/span&gt;this&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;application&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;beforeBean()) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; false;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;handler     &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; new BeanHandler();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;definitions &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;this&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;getDefinitions();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;parsers     &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; AnnotationRegister::getParsers();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;annotations &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; AnnotationRegister::getAnnotations();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    BeanFactory::addDefinitions(&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;definitions);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    BeanFactory::addAnnotations(&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;annotations);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    BeanFactory::addParsers(&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;parsers);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    BeanFactory::setHandler(&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;handler);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    BeanFactory::init();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;/*&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; Config &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;config&lt;span style=&#34;color:#f92672&#34;&gt;*/&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;config &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; BeanFactory::getBean(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;config&amp;#39;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    CLog::info(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;config path=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%s&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;config&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;getPath());
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    CLog::info(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;config env=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%s&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;config&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;getEnv());
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;stats &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; BeanFactory::getStats();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    CLog::info(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Bean is initialized(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%s&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;)&amp;#39;&lt;/span&gt;, SwoftHelper::formatStats(&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;stats));
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;this&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;application&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;afterBean();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;先通过&lt;code&gt;getDefinitions&lt;/code&gt;方法获取所有的Bean定义。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Swoft 框架运行分析（二） —— AnnotationProcessor模块分析</title>
+      <link>https://liudon.com/posts/swoft-anaotion-processor-analysis/</link>
+      <pubDate>Thu, 29 Aug 2019 19:11:04 +0800</pubDate>
+      <guid>https://liudon.com/posts/swoft-anaotion-processor-analysis/</guid>
+      <description>&lt;p&gt;上一篇介绍了，&lt;code&gt;SwoftApplication&lt;/code&gt;里定义了6个Processor对象。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;protected function processors(): array
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        return [
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            new EnvProcessor($this),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            new ConfigProcessor($this),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            new AnnotationProcessor($this),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            new BeanProcessor($this),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            new EventProcessor($this),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            new ConsoleProcessor($this),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        ];
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;所有的Processor实现都在&lt;code&gt;framework\src\Processor&lt;/code&gt;目录下。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Swoft 框架运行分析（一）</title>
+      <link>https://liudon.com/posts/swoft-execution-analysis/</link>
+      <pubDate>Thu, 29 Aug 2019 17:22:28 +0800</pubDate>
+      <guid>https://liudon.com/posts/swoft-execution-analysis/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。&lt;/p&gt;
+&lt;p&gt;刚开始看的时候，感觉自己像个原始人，完全看不懂。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

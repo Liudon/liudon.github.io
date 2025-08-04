@@ -1,0 +1,241 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>wrenAI本地LLM模型部署 | 流动</title><meta name=keywords content="wrenAI,llm"><meta name=description content="
+Open-source GenBI AI Agent that empowers data-driven teams to chat with their data to generate Text-to-SQL, charts, spreadsheets, reports, and BI.
+WrenAI 是一个开源的Text-SQL 的工具，通过导入数据库结构，通过提问的方式生成SQL。
+
+
+
+		
+
+"><meta name=author content="Liudon"><link rel=canonical href=https://liudon.com/posts/wrenai-local-llm-usage-guide/><link crossorigin=anonymous href=../../assets/css/stylesheet.c2b4102602461aaea01497bf2f89d3d4096e9005f6ac8a7e60b27e335724b916.css integrity="sha256-wrQQJgJGGq6gFJe/L4nT1AlukAX2rIp+YLJ+M1ckuRY=" rel="preload stylesheet" as=style><link rel=icon href=https://liudon.com/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://liudon.com/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://liudon.com/favicon-32x32.png><link rel=apple-touch-icon href=https://liudon.com/apple-touch-icon.png><link rel=mask-icon href=https://liudon.com/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://liudon.com/posts/wrenai-local-llm-usage-guide/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous></script><meta property="og:url" content="https://liudon.com/posts/wrenai-local-llm-usage-guide/"><meta property="og:site_name" content="流动"><meta property="og:title" content="wrenAI本地LLM模型部署"><meta property="og:description" content=" Open-source GenBI AI Agent that empowers data-driven teams to chat with their data to generate Text-to-SQL, charts, spreadsheets, reports, and BI.
+WrenAI 是一个开源的Text-SQL 的工具，通过导入数据库结构，通过提问的方式生成SQL。"><meta property="og:locale" content="zh-cn"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2025-03-16T17:28:10+08:00"><meta property="article:modified_time" content="2025-03-16T17:28:10+08:00"><meta property="article:tag" content="WrenAI"><meta property="article:tag" content="Llm"><meta name=twitter:card content="summary"><meta name=twitter:title content="wrenAI本地LLM模型部署"><meta name=twitter:description content="
+Open-source GenBI AI Agent that empowers data-driven teams to chat with their data to generate Text-to-SQL, charts, spreadsheets, reports, and BI.
+WrenAI 是一个开源的Text-SQL 的工具，通过导入数据库结构，通过提问的方式生成SQL。
+
+
+
+		
+
+"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"文章","item":"https://liudon.com/posts/"},{"@type":"ListItem","position":2,"name":"wrenAI本地LLM模型部署","item":"https://liudon.com/posts/wrenai-local-llm-usage-guide/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"wrenAI本地LLM模型部署","name":"wrenAI本地LLM模型部署","description":" Open-source GenBI AI Agent that empowers data-driven teams to chat with their data to generate Text-to-SQL, charts, spreadsheets, reports, and BI.\nWrenAI 是一个开源的Text-SQL 的工具，通过导入数据库结构，通过提问的方式生成SQL。\n","keywords":["wrenAI","llm"],"articleBody":" Open-source GenBI AI Agent that empowers data-driven teams to chat with their data to generate Text-to-SQL, charts, spreadsheets, reports, and BI.\nWrenAI 是一个开源的Text-SQL 的工具，通过导入数据库结构，通过提问的方式生成SQL。\n出于安全考虑，我们使用本地llm模型进行部署。\n部署ollama 参考安装文档：https://hub.docker.com/r/ollama/ollama\ncurl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \\ | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \\ | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \\ | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list sudo apt-get update sudo apt-get install -y nvidia-container-toolkit sudo nvidia-ctk runtime configure --runtime=docker sudo systemctl restart docker docker run -d --gpus=all -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama 部署对应模型\ndocker exec -it ollama ollama run nomic-embed-text:latest docker exec -it ollama ollama run phi4:14b 部署完成后，需要在安全组里放开11434端口访问。\n部署WrenAI 参考官方文档：https://docs.getwren.ai/oss/installation/custom_llm\n创建本地配置目录\nmkdir -p ~/.wrenai 配置目录下新增.env文件，内容如下：\nCOMPOSE_PROJECT_NAME=wrenai PLATFORM=linux/amd64 PROJECT_DIR=/root/.wrenai # service port WREN_ENGINE_PORT=8080 WREN_ENGINE_SQL_PORT=7432 WREN_AI_SERVICE_PORT=5555 WREN_UI_PORT=3000 IBIS_SERVER_PORT=8000 WREN_UI_ENDPOINT=http://wren-ui:${WREN_UI_PORT} LLM_PROVIDER=litellm_llm GENERATION_MODEL=phi4:14b // 自定义LLM模型 LLM_OLLAMA_URL=http://部署机器IP:11434 EMBEDDER_OLLAMA_URL=http://部署机器IP:11434 OPENAI_API_KEY=sk-***** EMBEDDER_PROVIDER=litellm_embedder EMBEDDING_MODEL=nomic-embed-text // embedding模型 EMBEDDING_MODEL_DIMENSION=768 # ai service settings QDRANT_HOST=qdrant SHOULD_FORCE_DEPLOY=1 # vendor keys LLM_OPENAI_API_KEY= EMBEDDER_OPENAI_API_KEY= LLM_AZURE_OPENAI_API_KEY= EMBEDDER_AZURE_OPENAI_API_KEY= QDRANT_API_KEY= # version # CHANGE THIS TO THE LATEST VERSION WREN_PRODUCT_VERSION=0.15.3 WREN_ENGINE_VERSION=0.13.1 WREN_AI_SERVICE_VERSION=0.15.9 IBIS_SERVER_VERSION=0.13.1 WREN_UI_VERSION=0.20.1 WREN_BOOTSTRAP_VERSION=0.1.5 # user id (uuid v4) USER_UUID= # for other services POSTHOG_API_KEY=phc_nhF32aj4xHXOZb0oqr2cn4Oy9uiWzz6CCP4KZmRq9aE POSTHOG_HOST=https://app.posthog.com TELEMETRY_ENABLED=true # this is for telemetry to know the model, i think ai-service might be able to provide a endpoint to get the information #GENERATION_MODEL=gpt-4o-mini LANGFUSE_SECRET_KEY= LANGFUSE_PUBLIC_KEY= # the port exposes to the host # OPTIONAL: change the port if you have a conflict HOST_PORT=3000 AI_SERVICE_FORWARD_PORT=5555 # Wren UI EXPERIMENTAL_ENGINE_RUST_VERSION=false 配置目录下新增config.yaml文件，内容如下：\n# you should rename this file to config.yaml and put it in ~/.wrenai # please pay attention to the comments starting with # and adjust the config accordingly type: llm provider: litellm_llm timeout: 600 models: - api_base: http://部署机器IP:11434/v1 # change this to your ollama host, api_base should be /v1 model: openai/phi4:14b # openai/ kwargs: n: 1 temperature: 0 --- type: embedder provider: litellm_embedder models: - model: openai/nomic-embed-text # put your ollama embedder model name here api_base: http://部署机器IP:11434/v1 # change this to your ollama host, url should be timeout: 120 # 如果是CPU模式，需要调大这个超时时间 --- type: engine provider: wren_ui endpoint: http://wren-ui:3000 --- type: document_store provider: qdrant location: http://qdrant:6333 embedding_model_dim: 768 # put your embedding model dimension here timeout: 120 recreate_index: false --- # the format of llm and embedder should be . such as litellm_llm.gpt-4o-2024-08-06 # the pipes may be not the latest version, please refer to the latest version: https://raw.githubusercontent.com/canner/WrenAI//docker/config.example.yaml type: pipeline pipes: - name: db_schema_indexing embedder: litellm_embedder.openai/nomic-embed-text document_store: qdrant - name: historical_question_indexing embedder: litellm_embedder.openai/nomic-embed-text document_store: qdrant - name: table_description_indexing embedder: litellm_embedder.openai/nomic-embed-text document_store: qdrant - name: db_schema_retrieval llm: litellm_llm.openai/phi4:14b embedder: litellm_embedder.openai/nomic-embed-text document_store: qdrant - name: historical_question_retrieval embedder: litellm_embedder.openai/nomic-embed-text document_store: qdrant - name: sql_generation llm: litellm_llm.openai/phi4:14b engine: wren_ui - name: sql_correction llm: litellm_llm.openai/phi4:14b engine: wren_ui - name: followup_sql_generation llm: litellm_llm.openai/phi4:14b engine: wren_ui - name: sql_summary llm: litellm_llm.openai/phi4:14b - name: sql_answer llm: litellm_llm.openai/phi4:14b engine: wren_ui - name: sql_breakdown llm: litellm_llm.openai/phi4:14b engine: wren_ui - name: sql_expansion llm: litellm_llm.openai/phi4:14b engine: wren_ui - name: sql_explanation llm: litellm_llm.openai/phi4:14b - name: sql_regeneration llm: litellm_llm.openai/phi4:14b engine: wren_ui - name: semantics_description llm: litellm_llm.openai/phi4:14b - name: relationship_recommendation llm: litellm_llm.openai/phi4:14b engine: wren_ui - name: question_recommendation llm: litellm_llm.openai/phi4:14b - name: question_recommendation_db_schema_retrieval llm: litellm_llm.openai/phi4:14b embedder: litellm_embedder.openai/nomic-embed-text document_store: qdrant - name: question_recommendation_sql_generation llm: litellm_llm.openai/phi4:14b engine: wren_ui - name: chart_generation llm: litellm_llm.openai/phi4:14b - name: chart_adjustment llm: litellm_llm.openai/phi4:14b - name: intent_classification llm: litellm_llm.openai/phi4:14b embedder: litellm_embedder.openai/nomic-embed-text document_store: qdrant - name: data_assistance llm: litellm_llm.openai/phi4:14b - name: sql_pairs_indexing document_store: qdrant embedder: litellm_embedder.openai/nomic-embed-text - name: sql_pairs_deletion document_store: qdrant embedder: litellm_embedder.openai/nomic-embed-text - name: sql_pairs_retrieval document_store: qdrant embedder: litellm_embedder.openai/nomic-embed-text llm: litellm_llm.openai/phi4:14b - name: preprocess_sql_data llm: litellm_llm.openai/phi4:14b - name: sql_executor engine: wren_ui - name: sql_question_generation llm: litellm_llm.openai/phi4:14b - name: sql_generation_reasoning llm: litellm_llm.openai/phi4:14b --- settings: column_indexing_batch_size: 50 table_retrieval_size: 10 table_column_retrieval_size: 100 allow_using_db_schemas_without_pruning: false query_cache_maxsize: 1000 query_cache_ttl: 3600 langfuse_host: https://cloud.langfuse.com langfuse_enable: true logging_level: DEBUG development: true 下载部署shell，执行安装： https://docs.getwren.ai/oss/installation#using-wren-ai-launcher\ncurl -L https://github.com/Canner/WrenAI/releases/latest/download/wren-launcher-linux.tar.gz | tar -xz \u0026\u0026 ./wren-launcher-linux 选择Custom模式，点击确定，部署成功。\n记得防火墙放通3000端口访问。\n部署完成后，通过浏览器访问http://部署机器IP:3000访问WrenAI服务。\n限制 MySQL当前仅支持8.0以上版本；\n纯CPU硬件下一次提问耗时在15分钟以上，腾讯云GPU计算型GN7 - 8核 32G下一次提问耗时在5分钟左右。\n","wordCount":"1169","inLanguage":"en","datePublished":"2025-03-16T17:28:10+08:00","dateModified":"2025-03-16T17:28:10+08:00","author":{"@type":"Person","name":"Liudon"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://liudon.com/posts/wrenai-local-llm-usage-guide/"},"publisher":{"@type":"Organization","name":"流动","logo":{"@type":"ImageObject","url":"https://liudon.com/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://liudon.com/ accesskey=h title="流动 (Alt + H)">流动</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://liudon.com/ title=Home><span>Home</span></a></li><li><a href=https://liudon.com/posts/ title=Posts><span>Posts</span></a></li><li><a href=https://workout.liudon.com title=Workouts><span>Workouts</span>&nbsp;
+<svg fill="none" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" height="12" width="12"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></a></li><li><a href=https://liudon.com/about/ title=About><span>About</span></a></li><li><a href=https://liudon.com/search/ title="🔍 (Alt + /)" accesskey=/><span>🔍</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">wrenAI本地LLM模型部署</h1><div class=post-meta><span title='2025-03-16 17:28:10 +0800 +0800'>2025-03-16</span>&nbsp;·&nbsp;3 min&nbsp;·&nbsp;1169 words&nbsp;·&nbsp;Liudon</div></header><aside id=toc-container class="toc-container wide"><div class=toc><details open><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><ul><li><a href=#%e9%83%a8%e7%bd%b2ollama aria-label=部署ollama>部署ollama</a></li><li><a href=#%e9%83%a8%e7%bd%b2wrenai aria-label=部署WrenAI>部署WrenAI</a></li><li><a href=#%e9%99%90%e5%88%b6 aria-label=限制>限制</a></li></ul></div></details></div></aside><script>let activeElement,elements;window.addEventListener("DOMContentLoaded",function(){checkTocPosition(),elements=document.querySelectorAll("h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]"),activeElement=elements[0];const t=encodeURI(activeElement.getAttribute("id")).toLowerCase();document.querySelector(`.inner ul li a[href="#${t}"]`).classList.add("active")},!1),window.addEventListener("resize",function(){checkTocPosition()},!1),window.addEventListener("scroll",()=>{activeElement=Array.from(elements).find(e=>{if(getOffsetTop(e)-window.pageYOffset>0&&getOffsetTop(e)-window.pageYOffset<window.innerHeight/2)return e})||activeElement,elements.forEach(e=>{const t=encodeURI(e.getAttribute("id")).toLowerCase();e===activeElement?document.querySelector(`.inner ul li a[href="#${t}"]`).classList.add("active"):document.querySelector(`.inner ul li a[href="#${t}"]`).classList.remove("active")})},!1);const main=parseInt(getComputedStyle(document.body).getPropertyValue("--article-width"),10),toc=parseInt(getComputedStyle(document.body).getPropertyValue("--toc-width"),10),gap=parseInt(getComputedStyle(document.body).getPropertyValue("--gap"),10);function checkTocPosition(){const e=document.body.scrollWidth;e-main-toc*2-gap*4>0?document.getElementById("toc-container").classList.add("wide"):document.getElementById("toc-container").classList.remove("wide")}function getOffsetTop(e){if(!e.getClientRects().length)return 0;let t=e.getBoundingClientRect(),n=e.ownerDocument.defaultView;return t.top+n.pageYOffset}</script><div class=post-content><blockquote><p>Open-source GenBI AI Agent that empowers data-driven teams to chat with their data to generate Text-to-SQL, charts, spreadsheets, reports, and BI.</p></blockquote><p>WrenAI 是一个开源的Text-SQL 的工具，通过导入数据库结构，通过提问的方式生成SQL。</p><p><picture><source type=image/avif srcset="https://liudon.com/posts/wrenai-local-llm-usage-guide/wren_workflow.png_1080x.avif 1080w" sizes="(min-width: 768px) 1080px, 100vw"><source type=image/webp srcset="https://liudon.com/posts/wrenai-local-llm-usage-guide/wren_workflow.png_1080x.webp 1080w" sizes="(min-width: 768px) 1080px, 100vw"><img src=wren_workflow.png width=1080 height=437 alt title loading=lazy></picture></p><p>出于安全考虑，我们使用本地llm模型进行部署。</p><h3 id=部署ollama>部署ollama<a hidden class=anchor aria-hidden=true href=#部署ollama>#</a></h3><p>参考安装文档：https://hub.docker.com/r/ollama/ollama</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span>curl <span style=color:#f92672>-</span>fsSL https:<span style=color:#f92672>//</span>nvidia<span style=color:#f92672>.</span>github<span style=color:#f92672>.</span>io<span style=color:#f92672>/</span>libnvidia<span style=color:#f92672>-</span>container<span style=color:#f92672>/</span>gpgkey \
+</span></span><span style=display:flex><span>    <span style=color:#f92672>|</span> sudo gpg <span style=color:#f92672>--</span>dearmor <span style=color:#f92672>-</span>o <span style=color:#f92672>/</span>usr<span style=color:#f92672>/</span>share<span style=color:#f92672>/</span>keyrings<span style=color:#f92672>/</span>nvidia<span style=color:#f92672>-</span>container<span style=color:#f92672>-</span>toolkit<span style=color:#f92672>-</span>keyring<span style=color:#f92672>.</span>gpg
+</span></span><span style=display:flex><span>curl <span style=color:#f92672>-</span>s <span style=color:#f92672>-</span>L https:<span style=color:#f92672>//</span>nvidia<span style=color:#f92672>.</span>github<span style=color:#f92672>.</span>io<span style=color:#f92672>/</span>libnvidia<span style=color:#f92672>-</span>container<span style=color:#f92672>/</span>stable<span style=color:#f92672>/</span>deb<span style=color:#f92672>/</span>nvidia<span style=color:#f92672>-</span>container<span style=color:#f92672>-</span>toolkit<span style=color:#f92672>.</span>list \
+</span></span><span style=display:flex><span>    <span style=color:#f92672>|</span> sed <span style=color:#e6db74>&#39;s#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g&#39;</span> \
+</span></span><span style=display:flex><span>    <span style=color:#f92672>|</span> sudo tee <span style=color:#f92672>/</span>etc<span style=color:#f92672>/</span>apt<span style=color:#f92672>/</span>sources<span style=color:#f92672>.</span>list<span style=color:#f92672>.</span>d<span style=color:#f92672>/</span>nvidia<span style=color:#f92672>-</span>container<span style=color:#f92672>-</span>toolkit<span style=color:#f92672>.</span>list
+</span></span><span style=display:flex><span>sudo apt<span style=color:#f92672>-</span>get update
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sudo apt<span style=color:#f92672>-</span>get install <span style=color:#f92672>-</span>y nvidia<span style=color:#f92672>-</span>container<span style=color:#f92672>-</span>toolkit
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sudo nvidia<span style=color:#f92672>-</span>ctk runtime configure <span style=color:#f92672>--</span>runtime<span style=color:#f92672>=</span>docker
+</span></span><span style=display:flex><span>sudo systemctl restart docker
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>docker run <span style=color:#f92672>-</span>d <span style=color:#f92672>--</span>gpus<span style=color:#f92672>=</span>all <span style=color:#f92672>-</span>v ollama:<span style=color:#f92672>/</span>root<span style=color:#f92672>/.</span>ollama <span style=color:#f92672>-</span>p <span style=color:#ae81ff>11434</span>:<span style=color:#ae81ff>11434</span> <span style=color:#f92672>--</span>name ollama ollama<span style=color:#f92672>/</span>ollama
+</span></span></code></pre></div><p>部署对应模型</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>docker exec -it ollama ollama run nomic-embed-text:latest
+</span></span><span style=display:flex><span>docker exec -it ollama ollama run phi4:14b
+</span></span></code></pre></div><p>部署完成后，需要在安全组里放开11434端口访问。</p><h3 id=部署wrenai>部署WrenAI<a hidden class=anchor aria-hidden=true href=#部署wrenai>#</a></h3><p>参考官方文档：https://docs.getwren.ai/oss/installation/custom_llm</p><p>创建本地配置目录</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>mkdir -p ~/.wrenai
+</span></span></code></pre></div><p>配置目录下新增.env文件，内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>COMPOSE_PROJECT_NAME=wrenai
+</span></span><span style=display:flex><span>PLATFORM=linux/amd64
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>PROJECT_DIR=/root/.wrenai
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span># service port
+</span></span><span style=display:flex><span>WREN_ENGINE_PORT=8080
+</span></span><span style=display:flex><span>WREN_ENGINE_SQL_PORT=7432
+</span></span><span style=display:flex><span>WREN_AI_SERVICE_PORT=5555
+</span></span><span style=display:flex><span>WREN_UI_PORT=3000
+</span></span><span style=display:flex><span>IBIS_SERVER_PORT=8000
+</span></span><span style=display:flex><span>WREN_UI_ENDPOINT=http://wren-ui:${WREN_UI_PORT}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>LLM_PROVIDER=litellm_llm
+</span></span><span style=display:flex><span>GENERATION_MODEL=phi4:14b // 自定义LLM模型
+</span></span><span style=display:flex><span>LLM_OLLAMA_URL=http://部署机器IP:11434
+</span></span><span style=display:flex><span>EMBEDDER_OLLAMA_URL=http://部署机器IP:11434
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>OPENAI_API_KEY=sk-*****
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>EMBEDDER_PROVIDER=litellm_embedder
+</span></span><span style=display:flex><span>EMBEDDING_MODEL=nomic-embed-text // embedding模型
+</span></span><span style=display:flex><span>EMBEDDING_MODEL_DIMENSION=768
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span># ai service settings
+</span></span><span style=display:flex><span>QDRANT_HOST=qdrant
+</span></span><span style=display:flex><span>SHOULD_FORCE_DEPLOY=1
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span># vendor keys
+</span></span><span style=display:flex><span>LLM_OPENAI_API_KEY=
+</span></span><span style=display:flex><span>EMBEDDER_OPENAI_API_KEY=
+</span></span><span style=display:flex><span>LLM_AZURE_OPENAI_API_KEY=
+</span></span><span style=display:flex><span>EMBEDDER_AZURE_OPENAI_API_KEY=
+</span></span><span style=display:flex><span>QDRANT_API_KEY=
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span># version
+</span></span><span style=display:flex><span># CHANGE THIS TO THE LATEST VERSION
+</span></span><span style=display:flex><span>WREN_PRODUCT_VERSION=0.15.3
+</span></span><span style=display:flex><span>WREN_ENGINE_VERSION=0.13.1
+</span></span><span style=display:flex><span>WREN_AI_SERVICE_VERSION=0.15.9
+</span></span><span style=display:flex><span>IBIS_SERVER_VERSION=0.13.1
+</span></span><span style=display:flex><span>WREN_UI_VERSION=0.20.1
+</span></span><span style=display:flex><span>WREN_BOOTSTRAP_VERSION=0.1.5
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span># user id (uuid v4)
+</span></span><span style=display:flex><span>USER_UUID=
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span># for other services
+</span></span><span style=display:flex><span>POSTHOG_API_KEY=phc_nhF32aj4xHXOZb0oqr2cn4Oy9uiWzz6CCP4KZmRq9aE
+</span></span><span style=display:flex><span>POSTHOG_HOST=https://app.posthog.com
+</span></span><span style=display:flex><span>TELEMETRY_ENABLED=true
+</span></span><span style=display:flex><span># this is for telemetry to know the model, i think ai-service might be able to provide a endpoint to get the information
+</span></span><span style=display:flex><span>#GENERATION_MODEL=gpt-4o-mini
+</span></span><span style=display:flex><span>LANGFUSE_SECRET_KEY=
+</span></span><span style=display:flex><span>LANGFUSE_PUBLIC_KEY=
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span># the port exposes to the host
+</span></span><span style=display:flex><span># OPTIONAL: change the port if you have a conflict
+</span></span><span style=display:flex><span>HOST_PORT=3000
+</span></span><span style=display:flex><span>AI_SERVICE_FORWARD_PORT=5555
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span># Wren UI
+</span></span><span style=display:flex><span>EXPERIMENTAL_ENGINE_RUST_VERSION=false
+</span></span></code></pre></div><p>配置目录下新增config.yaml文件，内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span># you should rename this file to config.yaml and put it in ~/.wrenai
+</span></span><span style=display:flex><span># please pay attention to the comments starting with # and adjust the config accordingly
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>type: llm
+</span></span><span style=display:flex><span>provider: litellm_llm
+</span></span><span style=display:flex><span>timeout: 600
+</span></span><span style=display:flex><span>models:
+</span></span><span style=display:flex><span>- api_base: http://部署机器IP:11434/v1  # change this to your ollama host, api_base should be &lt;ollama_url&gt;/v1
+</span></span><span style=display:flex><span>  model: openai/phi4:14b  # openai/&lt;ollama_model_name&gt;
+</span></span><span style=display:flex><span>  kwargs:
+</span></span><span style=display:flex><span>    n: 1
+</span></span><span style=display:flex><span>    temperature: 0
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span>type: embedder
+</span></span><span style=display:flex><span>provider: litellm_embedder
+</span></span><span style=display:flex><span>models:
+</span></span><span style=display:flex><span>- model: openai/nomic-embed-text  # put your ollama embedder model name here
+</span></span><span style=display:flex><span>  api_base: http://部署机器IP:11434/v1  # change this to your ollama host, url should be &lt;ollama_url&gt;
+</span></span><span style=display:flex><span>  timeout: 120 # 如果是CPU模式，需要调大这个超时时间
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span>type: engine
+</span></span><span style=display:flex><span>provider: wren_ui
+</span></span><span style=display:flex><span>endpoint: http://wren-ui:3000
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span>type: document_store
+</span></span><span style=display:flex><span>provider: qdrant
+</span></span><span style=display:flex><span>location: http://qdrant:6333
+</span></span><span style=display:flex><span>embedding_model_dim: 768  # put your embedding model dimension here
+</span></span><span style=display:flex><span>timeout: 120
+</span></span><span style=display:flex><span>recreate_index: false
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span># the format of llm and embedder should be &lt;provider&gt;.&lt;model_name&gt; such as litellm_llm.gpt-4o-2024-08-06
+</span></span><span style=display:flex><span># the pipes may be not the latest version, please refer to the latest version: https://raw.githubusercontent.com/canner/WrenAI/&lt;WRENAI_VERSION_NUMBER&gt;/docker/config.example.yaml
+</span></span><span style=display:flex><span>type: pipeline
+</span></span><span style=display:flex><span>pipes:
+</span></span><span style=display:flex><span>  - name: db_schema_indexing
+</span></span><span style=display:flex><span>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span style=display:flex><span>    document_store: qdrant
+</span></span><span style=display:flex><span>  - name: historical_question_indexing
+</span></span><span style=display:flex><span>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span style=display:flex><span>    document_store: qdrant
+</span></span><span style=display:flex><span>  - name: table_description_indexing
+</span></span><span style=display:flex><span>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span style=display:flex><span>    document_store: qdrant
+</span></span><span style=display:flex><span>  - name: db_schema_retrieval
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span style=display:flex><span>    document_store: qdrant
+</span></span><span style=display:flex><span>  - name: historical_question_retrieval
+</span></span><span style=display:flex><span>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span style=display:flex><span>    document_store: qdrant
+</span></span><span style=display:flex><span>  - name: sql_generation
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>    engine: wren_ui
+</span></span><span style=display:flex><span>  - name: sql_correction
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>    engine: wren_ui
+</span></span><span style=display:flex><span>  - name: followup_sql_generation
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>    engine: wren_ui
+</span></span><span style=display:flex><span>  - name: sql_summary
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>  - name: sql_answer
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>    engine: wren_ui
+</span></span><span style=display:flex><span>  - name: sql_breakdown
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>    engine: wren_ui
+</span></span><span style=display:flex><span>  - name: sql_expansion
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>    engine: wren_ui
+</span></span><span style=display:flex><span>  - name: sql_explanation
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>  - name: sql_regeneration
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>    engine: wren_ui
+</span></span><span style=display:flex><span>  - name: semantics_description
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>  - name: relationship_recommendation
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>    engine: wren_ui
+</span></span><span style=display:flex><span>  - name: question_recommendation
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>  - name: question_recommendation_db_schema_retrieval
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span style=display:flex><span>    document_store: qdrant
+</span></span><span style=display:flex><span>  - name: question_recommendation_sql_generation
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>    engine: wren_ui
+</span></span><span style=display:flex><span>  - name: chart_generation
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>  - name: chart_adjustment
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>  - name: intent_classification
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span style=display:flex><span>    document_store: qdrant
+</span></span><span style=display:flex><span>  - name: data_assistance
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>  - name: sql_pairs_indexing
+</span></span><span style=display:flex><span>    document_store: qdrant
+</span></span><span style=display:flex><span>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span style=display:flex><span>  - name: sql_pairs_deletion
+</span></span><span style=display:flex><span>    document_store: qdrant
+</span></span><span style=display:flex><span>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span style=display:flex><span>  - name: sql_pairs_retrieval
+</span></span><span style=display:flex><span>    document_store: qdrant
+</span></span><span style=display:flex><span>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>  - name: preprocess_sql_data
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>  - name: sql_executor
+</span></span><span style=display:flex><span>    engine: wren_ui
+</span></span><span style=display:flex><span>  - name: sql_question_generation
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>  - name: sql_generation_reasoning
+</span></span><span style=display:flex><span>    llm: litellm_llm.openai/phi4:14b
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span>settings:
+</span></span><span style=display:flex><span>  column_indexing_batch_size: 50
+</span></span><span style=display:flex><span>  table_retrieval_size: 10
+</span></span><span style=display:flex><span>  table_column_retrieval_size: 100
+</span></span><span style=display:flex><span>  allow_using_db_schemas_without_pruning: false
+</span></span><span style=display:flex><span>  query_cache_maxsize: 1000
+</span></span><span style=display:flex><span>  query_cache_ttl: 3600
+</span></span><span style=display:flex><span>  langfuse_host: https://cloud.langfuse.com
+</span></span><span style=display:flex><span>  langfuse_enable: true
+</span></span><span style=display:flex><span>  logging_level: DEBUG
+</span></span><span style=display:flex><span>  development: true
+</span></span></code></pre></div><p>下载部署shell，执行安装：
+<a href=https://docs.getwren.ai/oss/installation#using-wren-ai-launcher>https://docs.getwren.ai/oss/installation#using-wren-ai-launcher</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span>curl <span style=color:#f92672>-</span>L https:<span style=color:#f92672>//</span>github<span style=color:#f92672>.</span>com<span style=color:#f92672>/</span>Canner<span style=color:#f92672>/</span>WrenAI<span style=color:#f92672>/</span>releases<span style=color:#f92672>/</span>latest<span style=color:#f92672>/</span>download<span style=color:#f92672>/</span>wren<span style=color:#f92672>-</span>launcher<span style=color:#f92672>-</span>linux<span style=color:#f92672>.</span>tar<span style=color:#f92672>.</span>gz <span style=color:#f92672>|</span> tar <span style=color:#f92672>-</span>xz <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>./</span>wren<span style=color:#f92672>-</span>launcher<span style=color:#f92672>-</span>linux
+</span></span></code></pre></div><p>选择Custom模式，点击确定，部署成功。</p><p><picture><source type=image/avif srcset="https://liudon.com/posts/wrenai-local-llm-usage-guide/deploy_wrenai.png_1080x.avif 1080w" sizes="(min-width: 768px) 1080px, 100vw"><source type=image/webp srcset="https://liudon.com/posts/wrenai-local-llm-usage-guide/deploy_wrenai.png_1080x.webp 1080w" sizes="(min-width: 768px) 1080px, 100vw"><img src=deploy_wrenai.png width=1080 height=544 alt title loading=lazy></picture></p><p>记得防火墙放通3000端口访问。</p><p>部署完成后，通过浏览器访问http://部署机器IP:3000访问WrenAI服务。</p><h3 id=限制>限制<a hidden class=anchor aria-hidden=true href=#限制>#</a></h3><p>MySQL当前仅支持8.0以上版本；</p><p>纯CPU硬件下一次提问耗时在15分钟以上，腾讯云GPU计算型GN7 - 8核 32G下一次提问耗时在5分钟左右。</p></div><footer class=post-footer><ul class=post-tags><li><a href=https://liudon.com/tags/wrenai/>WrenAI</a></li><li><a href=https://liudon.com/tags/llm/>Llm</a></li></ul><nav class=paginav><a class=prev href=https://liudon.com/posts/heavy-snow-in-beijing/><span class=title>« Prev</span><br><span>北京的三月飞雪</span>
+</a><a class=next href=https://liudon.com/posts/the-trip-of-tianjin/><span class=title>Next »</span><br><span>天津一日游</span></a></nav></footer><div><div class=post_ads><ins class=adsbygoogle style=display:block data-ad-client=ca-pub-4739645989170648 data-ad-slot=5019102040 data-ad-format=auto data-full-width-responsive=true></ins><script>window.addEventListener("load",function(){(adsbygoogle=window.adsbygoogle||[]).push({})})</script></div><div class=pagination__title><span class=pagination__title-h style=font-size:20px>💬评论</span><hr></div><div id=tcomment></div><script src=https://cdnjs.cloudflare.com/ajax/libs/twikoo/1.6.41/twikoo.all.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script>twikoo.init({envId:"https://comment.liudon.com",el:"#tcomment",lang:"zh-CN",region:"ap-shanghai",path:window.TWIKOO_MAGIC_PATH||window.location.pathname})</script></div></article></main><footer class=footer><span>&copy; 2025 <a href=https://liudon.com/>流动</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg></a><footer class=footer style=margin-top:-20px;padding-top:0><span><a href=https://beian.miit.gov.cn target=_blank>京ICP备13029522号-2</a></span></footer><script src=//tokinx.github.io/ViewImage/view-image.min.js async></script><script>function initViewImage(){window.ViewImage&&ViewImage.init(".post-content img")}document.readyState==="complete"?initViewImage():window.addEventListener("load",initViewImage)</script><script>const host=window.location.host;host!=="blog.liudon.xyz"&&!host.startsWith("liudon.")&&!host.startsWith("localhost")&&!host.startsWith("127.0.0.1")&&(document.body.innerHTML=['<div style="margin: auto;">',"<h1>当前页面并非本人博客，即将在2秒后跳转到本人博客: https://liudon.com。</h1>","<br />","</div>"].join(""),document.body.style=["background-color: white;","color: black;","text-align: center;","font-size: 50px;","width: 100vw;","height: 100vh;","display: flex;"].join(""),setTimeout(()=>{window.location.href="https://liudon.com"},2e3))</script><script>enScroll=!1,enFdl=!1,extCurrent=0[0],filename=0[0],targetText=0[0],splitOrigin=0[0];const lStor=localStorage,sStor=sessionStorage,doc=document,docEl=document.documentElement,docBody=document.body,docLoc=document.location,w=window,s=screen,nav=navigator||{},extensions=["pdf","xls","xlsx","doc","docx","txt","rtf","csv","exe","key","pps","ppt","pptx","7z","pkg","rar","gz","zip","avi","mov","mp4","mpe","mpeg","wmv","mid","midi","mp3","wav","wma"];function a(e,t,n,o){const j="G-G9ZDJQN9E2",r=()=>Math.floor(Math.random()*1e9)+1,c=()=>Math.floor(Date.now()/1e3),F=()=>(sStor._p||(sStor._p=r()),sStor._p),E=()=>r()+"."+c(),_=()=>(lStor.cid_v4||(lStor.cid_v4=E()),lStor.cid_v4),m=lStor.getItem("cid_v4"),v=()=>m?0[0]:enScroll==!0?0[0]:"1",p=()=>(sStor.sid||(sStor.sid=c()),sStor.sid),O=()=>{if(!sStor._ss)return sStor._ss="1",sStor._ss;if(sStor.getItem("_ss")=="1")return 0[0]},a="1",g=()=>{if(sStor.sct)if(enScroll==!0)return sStor.sct;else x=+sStor.getItem("sct")+ +a,sStor.sct=x;else sStor.sct=a;return sStor.sct},i=docLoc.search,b=new URLSearchParams(i),h=["q","s","search","query","keyword"],y=h.some(e=>i.includes("&"+e+"=")||i.includes("?"+e+"=")),u=()=>y==!0?"view_search_results":enScroll==!0?"scroll":enFdl==!0?"file_download":"page_view",f=()=>enScroll==!0?"90":0[0],C=()=>{if(u()=="view_search_results"){for(let e of b)if(h.includes(e[0]))return e[1]}else return 0[0]},d=encodeURIComponent,k=e=>{let t=[];for(let n in e)e.hasOwnProperty(n)&&e[n]!==0[0]&&t.push(d(n)+"="+d(e[n]));return t.join("&")},A=!1,S="https://liudon.com/analytics/post",M=k({tid:j,_p:F(),v:"2",sr:(s.width*w.devicePixelRatio+"x"+s.height*w.devicePixelRatio).toString(),ul:(nav.language||0[0]).toLowerCase(),cid:_(),_fv:v(),_s:"1",dl:docLoc.origin+docLoc.pathname+i,dt:doc.title||0[0],dr:doc.referrer||0[0],sid:p(),sct:g(),seg:"1",en:u(),"epn.percent_scrolled":f(),"ep.search_term":C(),"ep.file_extension":e||0[0],"ep.file_name":t||0[0],"ep.link_text":n||0[0],"ep.link_url":o||0[0],_ss:O(),_dbg:A?1:0[0]}),l=S+"?"+M;if(nav.sendBeacon)nav.sendBeacon(l);else{let e=new XMLHttpRequest;e.open("POST",l,!0)}}a();function sPr(){return(docEl.scrollTop||docBody.scrollTop)/((docEl.scrollHeight||docBody.scrollHeight)-docEl.clientHeight)*100}doc.addEventListener("scroll",sEv,{passive:!0});function sEv(){const e=sPr();if(e<90)return;enScroll=!0,a(),doc.removeEventListener("scroll",sEv,{passive:!0}),enScroll=!1}document.addEventListener("DOMContentLoaded",function(){let e=document.getElementsByTagName("a");for(let t=0;t<e.length;t++)if(e[t].getAttribute("href")!=null){const n=e[t].getAttribute("href"),s=n.substring(n.lastIndexOf("/")+1),o=s.split(".").pop();(e[t].hasAttribute("download")||extensions.includes(o))&&e[t].addEventListener("click",fDl,{passive:!0})}});function fDl(e){enFdl=!0;const t=e.currentTarget.getAttribute("href"),n=t.substring(t.lastIndexOf("/")+1),s=n.split(".").pop(),o=n.replace("."+s,""),i=e.currentTarget.text,r=t.replace(docLoc.origin,"");a(s,o,i,r),enFdl=!1}</script><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

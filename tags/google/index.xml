@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Google on 流动</title>
+    <link>https://liudon.com/tags/google/</link>
+    <description>Recent content in Google on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 26 Sep 2024 22:18:23 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/google/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>博客被恶意镜像</title>
+      <link>https://liudon.com/posts/blog-malicious-mirroring/</link>
+      <pubDate>Thu, 26 Sep 2024 22:18:23 +0800</pubDate>
+      <guid>https://liudon.com/posts/blog-malicious-mirroring/</guid>
+      <description>&lt;h2 id=&#34;起因&#34;&gt;起因&lt;/h2&gt;
+&lt;p&gt;9月初的时候，在&lt;code&gt;Google Search Console&lt;/code&gt;里发现了一个外链，域名是&lt;code&gt;**.top&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;随手点过去看了下，发现居然跟我的博客内容一模一样，就是内容变成了繁体。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>使用Google Indexing API加速博客收录</title>
+      <link>https://liudon.com/posts/how-to-use-google-indexing-api-to-speed-up-blog-indexing/</link>
+      <pubDate>Fri, 27 Oct 2023 19:32:24 +0800</pubDate>
+      <guid>https://liudon.com/posts/how-to-use-google-indexing-api-to-speed-up-blog-indexing/</guid>
+      <description>&lt;p&gt;对于一个新站点来说，总是想着能让搜索引擎快点收录网站内容。&lt;/p&gt;
+&lt;p&gt;今天，我们就来介绍一种利用&lt;code&gt;Google Indexing API&lt;/code&gt;接口，通过&lt;code&gt;Github Actions&lt;/code&gt;实现部署时通知&lt;code&gt;Google&lt;/code&gt;抓取页面内容。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

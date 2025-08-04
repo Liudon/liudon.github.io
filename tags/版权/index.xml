@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>版权 on 流动</title>
+    <link>https://liudon.com/tags/%E7%89%88%E6%9D%83/</link>
+    <description>Recent content in 版权 on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 12 Oct 2024 23:32:31 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/%E7%89%88%E6%9D%83/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>使用 ImageMagick 自动添加水印，保护图片版权</title>
+      <link>https://liudon.com/posts/auto-add-watermark-imagemagick-protect-copyright/</link>
+      <pubDate>Sat, 12 Oct 2024 23:32:31 +0800</pubDate>
+      <guid>https://liudon.com/posts/auto-add-watermark-imagemagick-protect-copyright/</guid>
+      <description>&lt;h2 id=&#34;背景&#34;&gt;背景&lt;/h2&gt;
+&lt;p&gt;细心的朋友可能会发现，我的博客图片都带上了水印。&lt;/p&gt;
+&lt;p&gt;经过&lt;a href=&#34;https://liudon.com/posts/blog-malicious-mirroring/&#34;&gt;博客被恶意镜像&lt;/a&gt;这个事情后，我一直在思考如何防止内容被恶意盗用，尤其是博客里的一些图片。&lt;/p&gt;
+&lt;p&gt;在&lt;a href=&#34;https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/&#34;&gt;当Hugo遇上AVIF，优化图片加载&lt;/a&gt;这篇文章里，使用了ImageMagick工具做了图片压缩。&lt;/p&gt;
+&lt;p&gt;当时文章最后说留了个坑，其实就是今天的这篇内容，利用ImageMagick自动给图片添加水印。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

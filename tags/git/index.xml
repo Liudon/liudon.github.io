@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Git on 流动</title>
+    <link>https://liudon.com/tags/git/</link>
+    <description>Recent content in Git on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 06 Sep 2019 15:13:51 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/git/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>一个git submodule update引发的问题</title>
+      <link>https://liudon.com/posts/a-issues-of-git-submodule-update/</link>
+      <pubDate>Fri, 06 Sep 2019 15:13:51 +0800</pubDate>
+      <guid>https://liudon.com/posts/a-issues-of-git-submodule-update/</guid>
+      <description>&lt;h4 id=&#34;背景&#34;&gt;背景&lt;/h4&gt;
+&lt;p&gt;1月份的时候，用&lt;code&gt;hugo&lt;/code&gt;搭了这套博客系统。&lt;/p&gt;
+&lt;p&gt;本机写md文件，更新到&lt;code&gt;github&lt;/code&gt;，然后通过&lt;code&gt;travis-ci&lt;/code&gt;自动发布。&lt;/p&gt;
+&lt;p&gt;jane主题是通过&lt;code&gt;git submodule&lt;/code&gt;引入的，&lt;code&gt;.gitmodules&lt;/code&gt;文件内容。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

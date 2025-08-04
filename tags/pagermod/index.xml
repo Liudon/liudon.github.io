@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>PagerMod on 流动</title>
+    <link>https://liudon.com/tags/pagermod/</link>
+    <description>Recent content in PagerMod on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 24 Aug 2022 12:37:22 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/pagermod/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>累计布局偏移修复方案改进 —— 自动生成图片宽高</title>
+      <link>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</link>
+      <pubDate>Wed, 24 Aug 2022 12:37:22 +0800</pubDate>
+      <guid>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</guid>
+      <description>&lt;p&gt;本站已不再采用本方案，新方案见&lt;a href=&#34;../../posts/responsive-and-optimized-images-with-hugo/&#34;&gt;使用Hugo实现响应式和优化的图片&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;遗留的问题&#34;&gt;遗留的问题&lt;/h4&gt;
+&lt;p&gt;上一篇文章讲了我是如何解决博客累计布局偏移的问题，但是这个方案存在一个很大的问题。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;手动输入每张图片的宽高&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;这就要求每次插入图片后，需要手动查看图片宽高，修改插入代码，导致整个流程变得繁琐，无法自动化。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>优化博客的累计布局偏移(CLS)问题</title>
+      <link>https://liudon.com/posts/fix-blog-cls/</link>
+      <pubDate>Sat, 20 Aug 2022 07:27:22 +0800</pubDate>
+      <guid>https://liudon.com/posts/fix-blog-cls/</guid>
+      <description>&lt;p&gt;此文已过期，优化方案参考&lt;a href=&#34;https://liudon.com/posts/hugo-auto-generate-image-width-and-height/&#34;&gt;累计布局偏移修复方案改进 —— 自动生成图片宽高&lt;/a&gt;.&lt;/p&gt;
+&lt;h4 id=&#34;问题表现&#34;&gt;问题表现&lt;/h4&gt;
+&lt;p&gt;7月份将博客部署由&lt;code&gt;Github&lt;/code&gt;迁移到&lt;code&gt;Cloudflare&lt;/code&gt;后，开始关注博客的性能问题。&lt;/p&gt;
+&lt;p&gt;偶然看到苏卡卡大佬的&lt;a href=&#34;https://blog.skk.moe/post/fix-blog-cls/&#34;&gt;CLS优化文章&lt;/a&gt;，拿自己博客也测试了下，发现也存在同样的问题。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

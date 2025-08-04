@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Flink on 流动</title>
+    <link>https://liudon.com/tags/flink/</link>
+    <description>Recent content in Flink on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 28 Mar 2019 13:00:50 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/flink/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Flink Could Not Resolve Resourcemanager Address</title>
+      <link>https://liudon.com/posts/flink-could-not-resolve-resourcemanager-address/</link>
+      <pubDate>Thu, 28 Mar 2019 13:00:50 +0800</pubDate>
+      <guid>https://liudon.com/posts/flink-could-not-resolve-resourcemanager-address/</guid>
+      <description>&lt;p&gt;什么是Flink。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Apache Flink® - Stateful Computations over Data Streams&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;Flink安装参考(官方文档)[https://ci.apache.org/projects/flink/flink-docs-release-1.7/tutorials/local_setup.html]。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

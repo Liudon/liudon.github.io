@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Cloudflare Pages on 流动</title>
+    <link>https://liudon.com/tags/cloudflare-pages/</link>
+    <description>Recent content in Cloudflare Pages on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 29 Jul 2022 23:16:01 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/cloudflare-pages/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>将博客部署到Cloudflare Pages</title>
+      <link>https://liudon.com/posts/deploy-blog-to-cloudflare-pages/</link>
+      <pubDate>Fri, 29 Jul 2022 23:16:01 +0800</pubDate>
+      <guid>https://liudon.com/posts/deploy-blog-to-cloudflare-pages/</guid>
+      <description>&lt;p&gt;目前博客是部署到了&lt;code&gt;Github Pages&lt;/code&gt;上，具体实现见&lt;a href=&#34;https://liudon.com/posts/%E5%8D%9A%E5%AE%A2%E6%9E%B6%E6%9E%84%E8%AF%B4%E6%98%8E/&#34;&gt;博客架构说明&lt;/a&gt;。&lt;/p&gt;
+&lt;h4 id=&#34;缘由&#34;&gt;缘由&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;Github Pages&lt;/code&gt;部署有一个问题，就是不支持&lt;code&gt;HSTS&lt;/code&gt;。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;HTTP Strict Transport Security（通常简称为HSTS）是一个安全功能，它告诉浏览器只能通过 HTTPS 访问当前资源，而不是HTTP。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

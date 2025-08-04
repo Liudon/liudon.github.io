@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Hugo on 流动</title>
+    <link>https://liudon.com/tags/hugo/</link>
+    <description>Recent content in Hugo on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 30 Sep 2024 22:01:45 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>当Hugo遇上AVIF，优化图片加载</title>
+      <link>https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/</link>
+      <pubDate>Mon, 30 Sep 2024 22:01:45 +0800</pubDate>
+      <guid>https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/</guid>
+      <description>&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/avif-on-hugo.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/avif-on-hugo.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;avif-on-hugo.png&#34; width=&#34;1080&#34; height=&#34;328&#34; alt=&#34;avif-on-hugo&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;这篇文章会介绍基于Github Workflow使用ImageMagick生成AVIF图片，来优化Hugo站点的加载速度。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>使用Hugo实现响应式和优化的图片</title>
+      <link>https://liudon.com/posts/responsive-and-optimized-images-with-hugo/</link>
+      <pubDate>Sun, 10 Dec 2023 08:29:05 +0800</pubDate>
+      <guid>https://liudon.com/posts/responsive-and-optimized-images-with-hugo/</guid>
+      <description>&lt;p&gt;继续我们的&lt;a href=&#34;../../tags/%E5%8D%9A%E5%AE%A2%E4%BC%98%E5%8C%96/&#34;&gt;博客优化之旅&lt;/a&gt;，本篇内容我们将介绍如何使用&lt;code&gt;Hugo&lt;/code&gt;实现响应式和优化的图片。&lt;/p&gt;
+&lt;h4 id=&#34;问题&#34;&gt;问题&lt;/h4&gt;
+&lt;p&gt;在之前文章里，通过腾讯云数据万象实现了图片优化能力，具体的可参考文章&lt;a href=&#34;https://liudon.com/posts/hugo-auto-generate-image-width-and-height/&#34;&gt;累计布局偏移修复方案改进 —— 自动生成图片宽高&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;经过一段运行后，发现这里有一个弊端。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Run hugo --gc --minify --cleanDestinationDir
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Start building sites … 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hugo v0.119.0-b84644c008e0dc2c4b67bd69cccf87a41a03937e linux/amd64 BuildDate=2023-09-24T15:20:17Z VendorInfo=gohugoio
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ERROR Failed to get JSON resource &amp;#34;https://static.***.com/64412246-9050f100-d0c1-11e9-893a-f9b0766533ad.png?imageInfo&amp;amp;t=1698674110&amp;#34;: Get &amp;#34;https://static.***.com/64412246-9050f100-d0c1-11e9-893a-f9b0766533ad.png?imageInfo&amp;amp;t=1698674110&amp;#34;: stream error: stream ID 1; STREAM_CLOSED; received from peer
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ERROR Failed to get JSON resource &amp;#34;https://static.***.com/SkRx5uFwQ8Cliyq.jpg?imageInfo&amp;amp;t=1698674110&amp;#34;: Get &amp;#34;https://static.***.com/SkRx5uFwQ8Cliyq.jpg?imageInfo&amp;amp;t=1698674110&amp;#34;: stream error: stream ID 3; STREAM_CLOSED; received from peer
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;随着图片数量增多，因为需要调接口查询图片信息，这里构建耗时变长，同时也特别容易出现超时导致构建失败。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>使用Google Indexing API加速博客收录</title>
+      <link>https://liudon.com/posts/how-to-use-google-indexing-api-to-speed-up-blog-indexing/</link>
+      <pubDate>Fri, 27 Oct 2023 19:32:24 +0800</pubDate>
+      <guid>https://liudon.com/posts/how-to-use-google-indexing-api-to-speed-up-blog-indexing/</guid>
+      <description>&lt;p&gt;对于一个新站点来说，总是想着能让搜索引擎快点收录网站内容。&lt;/p&gt;
+&lt;p&gt;今天，我们就来介绍一种利用&lt;code&gt;Google Indexing API&lt;/code&gt;接口，通过&lt;code&gt;Github Actions&lt;/code&gt;实现部署时通知&lt;code&gt;Google&lt;/code&gt;抓取页面内容。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>在Netlify上部署Twikoo评论系统</title>
+      <link>https://liudon.com/posts/deploy-twikoo-on-netlify/</link>
+      <pubDate>Thu, 19 Oct 2023 19:46:32 +0800</pubDate>
+      <guid>https://liudon.com/posts/deploy-twikoo-on-netlify/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;在本篇文章里，我会介绍如何在Netlify上部署Twikoo评论系统，如何接入到静态博客Hugo，以及如何实现Twikoo系统版本自动更新。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;&lt;em&gt;2024年7月30日更新：因为&lt;a href=&#34;https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting&#34;&gt;Github接口策略调整&lt;/a&gt;，原有的匿名通过接口获取版本号方法失效，已更改为带token方式请求接口获取版本号，详见workflow里Get twikoo version步骤配置。&lt;/em&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>修正Hugo的JSON Feed格式</title>
+      <link>https://liudon.com/posts/fix-hugo-json-feed/</link>
+      <pubDate>Sat, 25 Mar 2023 14:11:18 +0800</pubDate>
+      <guid>https://liudon.com/posts/fix-hugo-json-feed/</guid>
+      <description>&lt;h4 id=&#34;问题背景&#34;&gt;问题背景&lt;/h4&gt;
+&lt;p&gt;前几天在&lt;a href=&#34;https://planetics.xyz/&#34;&gt;Planet&lt;/a&gt;里follow自己的&lt;a href=&#34;https://liudon.eth&#34;&gt;web3博客&lt;/a&gt;，遇到下面的错误。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/fix-hugo-json-feed/202303251415675.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/fix-hugo-json-feed/202303251415675.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;202303251415675.png&#34; width=&#34;716&#34; height=&#34;544&#34; alt=&#34;PlanetFeedError&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;经过Livid大佬提醒，说是网站的JSON Feed不是标准格式导致的。&lt;/p&gt;
+&lt;p&gt;因为我的已经修正没法截图，这里以&lt;a href=&#34;https://dvel.me/index.json&#34;&gt;dvel的博客&lt;/a&gt;举例，格式类似如下。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;[
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &amp;#34;content&amp;#34;: &amp;#34;用 ChatGPT 写一些小脚本真是太方便了。\nGPT-4 发布后试了试，还是蛮不错的，代码是 ChatGPT 生成的。\n几个来回就可以编写一个能正常使用的油猴脚本：\n（略，HTML 代码） 在 https://chdbits.co/bakatest.php 有如上内容。 我要为这个网页编写一个油猴脚本。 通过自动获取 ChatGPT 的 API 来解析此问题的答案，供用户参考。 将内容输出到 `#outer &amp;amp;gt; h1` 的下面，同时输出你提取到的问题内容和答案，以便我看看你是否提取正确。 获取错啦。 问题的获取路径是 `#outer &amp;amp;gt; form &amp;amp;gt; table &amp;amp;gt; tbody &amp;amp;gt; tr:nth-child(1) &amp;amp;gt; td` 选项的获取路径是 `#outer &amp;amp;gt; form &amp;amp;gt; table &amp;amp;gt; tbody &amp;amp;gt; tr:nth-child(2) &amp;amp;gt; td` 使用这个 API： ``` curl https://api.openai.com/v1/chat/completions \\ -H &amp;amp;#39;Content-Type: application/json&amp;amp;#39; \\ -H &amp;amp;#39;Authorization: Bearer YOUR_API_KEY&amp;amp;#39; \\ -d &amp;amp;#39;{ &amp;amp;#34;model&amp;amp;#34;: &amp;amp;#34;gpt-3.5-turbo&amp;amp;#34;, &amp;amp;#34;messages&amp;amp;#34;: [{&amp;amp;#34;role&amp;amp;#34;: &amp;amp;#34;user&amp;amp;#34;, &amp;amp;#34;content&amp;amp;#34;: &amp;amp;#34;Say this is a test!&amp;amp;#34;}], &amp;amp;#34;temperature&amp;amp;#34;: 0.7 }&amp;amp;#39; ``` 响应格式为： ``` { &amp;amp;#34;id&amp;amp;#34;:&amp;amp;#34;chatcmpl-abc123&amp;amp;#34;, &amp;amp;#34;object&amp;amp;#34;:&amp;amp;#34;chat.completion&amp;amp;#34;, &amp;amp;#34;created&amp;amp;#34;:1677858242, &amp;amp;#34;model&amp;amp;#34;:&amp;amp;#34;gpt-3.5-turbo-0301&amp;amp;#34;, &amp;amp;#34;usage&amp;amp;#34;:{ &amp;amp;#34;prompt_tokens&amp;amp;#34;:13, &amp;amp;#34;completion_tokens&amp;amp;#34;:7, &amp;amp;#34;total_tokens&amp;amp;#34;:20 }, &amp;amp;#34;choices&amp;amp;#34;:[ { &amp;amp;#34;message&amp;amp;#34;:{ &amp;amp;#34;role&amp;amp;#34;:&amp;amp;#34;assistant&amp;amp;#34;, &amp;amp;#34;content&amp;amp;#34;:&amp;amp;#34;\\n\\nThis is a test!&amp;amp;#34; }, &amp;amp;#34;finish_reason&amp;amp;#34;:&amp;amp;#34;stop&amp;amp;#34;, &amp;amp;#34;index&amp;amp;#34;:0 } ] } ``` 它没有最近的互联网数据，所以还是需要把 API 的使用方式发给它。\n然后它就帮我写好了，我不用复习 JavaScript，不用看油猴脚本的教程和文档，也不用查 @grant 等等标记是干嘛的。\n可以再继续要求它改进一些，比如换个输出位置，优化 prompt，自动选中正确回答，支持单选题和多选题等等。\n效果展示：\n安装： https://greasyfork.org/zh-CN/scripts/461944-chd-quiz-answer\n&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &amp;#34;permalink&amp;#34;: &amp;#34;https://dvel.me/posts/chd-quiz-answer/&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &amp;#34;summary&amp;#34;: &amp;#34;用 ChatGPT 写一些小脚本真是太方便了。\nGPT-4 发布后试了试，还是蛮不错的，代码是 ChatGPT 生成的。\n几个来回就可以编写一个能正常使用的油猴脚本：\n（略，HTML 代码） 在 https://chdbits.co/bakatest.php 有如上内容。 我要为这个网页编写一个油猴脚本。 通过自动获取 ChatGPT 的 API 来解析此问题的答案，供用户参考。 将内容输出到 `#outer &amp;amp;gt; h1` 的下面，同时输出你提取到的问题内容和答案，以便我看看你是否提取正确。 获取错啦。 问题的获取路径是 `#outer &amp;amp;gt; form &amp;amp;gt; table &amp;amp;gt; tbody &amp;amp;gt; tr:nth-child(1) &amp;amp;gt; td` 选项的获取路径是 `#outer &amp;amp;gt; form &amp;amp;gt; table &amp;amp;gt; tbody &amp;amp;gt; tr:nth-child(2) &amp;amp;gt; td` 使用这个 API： ``` curl https://api.openai.com/v1/chat/completions \\ -H &amp;amp;#39;Content-Type: application/json&amp;amp;#39; \\ -H &amp;amp;#39;Authorization: Bearer YOUR_API_KEY&amp;amp;#39; \\ -d &amp;amp;#39;{ &amp;amp;#34;model&amp;amp;#34;: &amp;amp;#34;gpt-3.5-turbo&amp;amp;#34;, &amp;amp;#34;messages&amp;amp;#34;: [{&amp;amp;#34;role&amp;amp;#34;: &amp;amp;#34;user&amp;amp;#34;, &amp;amp;#34;content&amp;amp;#34;: &amp;amp;#34;Say this is a test!&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &amp;#34;title&amp;#34;: &amp;#34;CHD 油猴脚本：每日签到自动答题&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  },
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;下面是一个&lt;code&gt;JSON Feed&lt;/code&gt;的示例，详细规范见&lt;a href=&#34;https://www.jsonfeed.org/&#34;&gt;jsonfeed.org&lt;/a&gt;。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>将博客部署到星际文件系统(IPFS)</title>
+      <link>https://liudon.com/posts/deploy-blog-to-ipfs/</link>
+      <pubDate>Tue, 21 Feb 2023 19:46:58 +0800</pubDate>
+      <guid>https://liudon.com/posts/deploy-blog-to-ipfs/</guid>
+      <description>&lt;p&gt;在这篇文章，我将会介绍如何利用&lt;code&gt;Github Actions&lt;/code&gt;将&lt;code&gt;hugo&lt;/code&gt;博客自动部署到&lt;code&gt;IPFS&lt;/code&gt;上，并通过自定义域名访问&lt;code&gt;IPFS&lt;/code&gt;上的文件。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;IPFS（InterPlanetary File System）中文称为星际文件系统，是一个旨在实现文件的分布式存储、共享和持久化的网络传输协议。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>累计布局偏移修复方案改进 —— 自动生成图片宽高</title>
+      <link>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</link>
+      <pubDate>Wed, 24 Aug 2022 12:37:22 +0800</pubDate>
+      <guid>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</guid>
+      <description>&lt;p&gt;本站已不再采用本方案，新方案见&lt;a href=&#34;../../posts/responsive-and-optimized-images-with-hugo/&#34;&gt;使用Hugo实现响应式和优化的图片&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;遗留的问题&#34;&gt;遗留的问题&lt;/h4&gt;
+&lt;p&gt;上一篇文章讲了我是如何解决博客累计布局偏移的问题，但是这个方案存在一个很大的问题。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;手动输入每张图片的宽高&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;这就要求每次插入图片后，需要手动查看图片宽高，修改插入代码，导致整个流程变得繁琐，无法自动化。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>将博客部署到Cloudflare Pages</title>
+      <link>https://liudon.com/posts/deploy-blog-to-cloudflare-pages/</link>
+      <pubDate>Fri, 29 Jul 2022 23:16:01 +0800</pubDate>
+      <guid>https://liudon.com/posts/deploy-blog-to-cloudflare-pages/</guid>
+      <description>&lt;p&gt;目前博客是部署到了&lt;code&gt;Github Pages&lt;/code&gt;上，具体实现见&lt;a href=&#34;https://liudon.com/posts/%E5%8D%9A%E5%AE%A2%E6%9E%B6%E6%9E%84%E8%AF%B4%E6%98%8E/&#34;&gt;博客架构说明&lt;/a&gt;。&lt;/p&gt;
+&lt;h4 id=&#34;缘由&#34;&gt;缘由&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;Github Pages&lt;/code&gt;部署有一个问题，就是不支持&lt;code&gt;HSTS&lt;/code&gt;。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;HTTP Strict Transport Security（通常简称为HSTS）是一个安全功能，它告诉浏览器只能通过 HTTPS 访问当前资源，而不是HTTP。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

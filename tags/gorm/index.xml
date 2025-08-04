@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Gorm on 流动</title>
+    <link>https://liudon.com/tags/gorm/</link>
+    <description>Recent content in Gorm on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 18 Apr 2024 21:25:24 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/gorm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GORM增加sqlcommenter特性</title>
+      <link>https://liudon.com/posts/gorm-supports-sqlcommenter/</link>
+      <pubDate>Thu, 18 Apr 2024 21:25:24 +0800</pubDate>
+      <guid>https://liudon.com/posts/gorm-supports-sqlcommenter/</guid>
+      <description>&lt;p&gt;什么是sqlcommenter？&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;sqlcommenter is a suite of middlewares/plugins that enable your ORMs to augment SQL statements before execution, with comments containing information about the code that caused its execution. This helps in easily correlating slow performance with source code and giving insights into backend database performance. In short it provides some observability into the state of your client-side applications and their impact on the database’s server-side.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>源码分析：GORM是如何生成sql的</title>
+      <link>https://liudon.com/posts/how-gorm-generates-sql/</link>
+      <pubDate>Thu, 18 Apr 2024 21:14:24 +0800</pubDate>
+      <guid>https://liudon.com/posts/how-gorm-generates-sql/</guid>
+      <description>&lt;p&gt;在&lt;code&gt;gorm&lt;/code&gt;下实现&lt;a href=&#34;https://google.github.io/sqlcommenter/&#34;&gt;sqlcommenter&lt;/a&gt;过程中，遇到一些问题，顺便把&lt;code&gt;gorm&lt;/code&gt;整个流程梳理了一遍，整理记录一下。&lt;/p&gt;
+&lt;p&gt;gorm使用示例&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;package main
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;import (
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;gorm.io/driver/mysql&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;gorm.io/gorm&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;type Product struct {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  gorm&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Model
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  Code  string
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  Price uint
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; main() {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;//&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;参考&lt;/span&gt; https:&lt;span style=&#34;color:#f92672&#34;&gt;//&lt;/span&gt;github&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;com&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;go&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;sql&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;driver&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;mysql&lt;span style=&#34;color:#75715e&#34;&gt;#dsn-data-source-name 获取详情&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  dsn :&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&amp;amp;parseTime=True&amp;amp;loc=Local&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  db, err :&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; gorm&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Open(mysql&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Open(dsn), &lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt;gorm&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Config{})
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; product Product
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  db&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;First(&lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt;product, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;//&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;根据整型主键查找&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;我们以&lt;code&gt;First&lt;/code&gt;查询为例，看一下是怎么转成具体sql的。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

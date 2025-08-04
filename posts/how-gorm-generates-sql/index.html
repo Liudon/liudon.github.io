@@ -1,0 +1,753 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>源码分析：GORM是如何生成sql的 | 流动</title><meta name=keywords content="gorm"><meta name=description content='在gorm下实现sqlcommenter过程中，遇到一些问题，顺便把gorm整个流程梳理了一遍，整理记录一下。
+gorm使用示例
+package main
+
+import (
+  "gorm.io/driver/mysql"
+  "gorm.io/gorm"
+)
+
+type Product struct {
+  gorm.Model
+  Code  string
+  Price uint
+}
+
+func main() {
+  // 参考 https://github.com/go-sql-driver/mysql#dsn-data-source-name 获取详情
+  dsn := "user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&amp;parseTime=True&amp;loc=Local"
+  db, err := gorm.Open(mysql.Open(dsn), &amp;gorm.Config{})
+  
+  var product Product
+  db.First(&amp;product, 1) // 根据整型主键查找
+}
+我们以First查询为例，看一下是怎么转成具体sql的。'><meta name=author content="Liudon"><link rel=canonical href=https://liudon.com/posts/how-gorm-generates-sql/><link crossorigin=anonymous href=../../assets/css/stylesheet.c2b4102602461aaea01497bf2f89d3d4096e9005f6ac8a7e60b27e335724b916.css integrity="sha256-wrQQJgJGGq6gFJe/L4nT1AlukAX2rIp+YLJ+M1ckuRY=" rel="preload stylesheet" as=style><link rel=icon href=https://liudon.com/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://liudon.com/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://liudon.com/favicon-32x32.png><link rel=apple-touch-icon href=https://liudon.com/apple-touch-icon.png><link rel=mask-icon href=https://liudon.com/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://liudon.com/posts/how-gorm-generates-sql/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous></script><meta property="og:url" content="https://liudon.com/posts/how-gorm-generates-sql/"><meta property="og:site_name" content="流动"><meta property="og:title" content="源码分析：GORM是如何生成sql的"><meta property="og:description" content='在gorm下实现sqlcommenter过程中，遇到一些问题，顺便把gorm整个流程梳理了一遍，整理记录一下。
+gorm使用示例
+package main import ( "gorm.io/driver/mysql" "gorm.io/gorm" ) type Product struct { gorm.Model Code string Price uint } func main() { // 参考 https://github.com/go-sql-driver/mysql#dsn-data-source-name 获取详情 dsn := "user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&amp;parseTime=True&amp;loc=Local" db, err := gorm.Open(mysql.Open(dsn), &amp;gorm.Config{}) var product Product db.First(&amp;product, 1) // 根据整型主键查找 } 我们以First查询为例，看一下是怎么转成具体sql的。'><meta property="og:locale" content="zh-cn"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2024-04-18T21:14:24+08:00"><meta property="article:modified_time" content="2024-04-18T21:14:24+08:00"><meta property="article:tag" content="Gorm"><meta name=twitter:card content="summary"><meta name=twitter:title content="源码分析：GORM是如何生成sql的"><meta name=twitter:description content='在gorm下实现sqlcommenter过程中，遇到一些问题，顺便把gorm整个流程梳理了一遍，整理记录一下。
+gorm使用示例
+package main
+
+import (
+  "gorm.io/driver/mysql"
+  "gorm.io/gorm"
+)
+
+type Product struct {
+  gorm.Model
+  Code  string
+  Price uint
+}
+
+func main() {
+  // 参考 https://github.com/go-sql-driver/mysql#dsn-data-source-name 获取详情
+  dsn := "user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&amp;parseTime=True&amp;loc=Local"
+  db, err := gorm.Open(mysql.Open(dsn), &amp;gorm.Config{})
+  
+  var product Product
+  db.First(&amp;product, 1) // 根据整型主键查找
+}
+我们以First查询为例，看一下是怎么转成具体sql的。'><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"文章","item":"https://liudon.com/posts/"},{"@type":"ListItem","position":2,"name":"源码分析：GORM是如何生成sql的","item":"https://liudon.com/posts/how-gorm-generates-sql/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"源码分析：GORM是如何生成sql的","name":"源码分析：GORM是如何生成sql的","description":"在gorm下实现sqlcommenter过程中，遇到一些问题，顺便把gorm整个流程梳理了一遍，整理记录一下。\ngorm使用示例\npackage main import ( \u0026#34;gorm.io/driver/mysql\u0026#34; \u0026#34;gorm.io/gorm\u0026#34; ) type Product struct { gorm.Model Code string Price uint } func main() { // 参考 https://github.com/go-sql-driver/mysql#dsn-data-source-name 获取详情 dsn := \u0026#34;user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4\u0026amp;parseTime=True\u0026amp;loc=Local\u0026#34; db, err := gorm.Open(mysql.Open(dsn), \u0026amp;gorm.Config{}) var product Product db.First(\u0026amp;product, 1) // 根据整型主键查找 } 我们以First查询为例，看一下是怎么转成具体sql的。\n","keywords":["gorm"],"articleBody":"在gorm下实现sqlcommenter过程中，遇到一些问题，顺便把gorm整个流程梳理了一遍，整理记录一下。\ngorm使用示例\npackage main import ( \"gorm.io/driver/mysql\" \"gorm.io/gorm\" ) type Product struct { gorm.Model Code string Price uint } func main() { // 参考 https://github.com/go-sql-driver/mysql#dsn-data-source-name 获取详情 dsn := \"user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4\u0026parseTime=True\u0026loc=Local\" db, err := gorm.Open(mysql.Open(dsn), \u0026gorm.Config{}) var product Product db.First(\u0026product, 1) // 根据整型主键查找 } 我们以First查询为例，看一下是怎么转成具体sql的。\n在finisher_api.go文件，声明了First方法。\n// First finds the first record ordered by primary key, matching given conditions conds func (db *DB) First(dest interface{}, conds ...interface{}) (tx *DB) { // 注册Order类型的Clause tx = db.Limit(1).Order(clause.OrderByColumn{ Column: clause.Column{Table: clause.CurrentTable, Name: clause.PrimaryKey}, }) // 这里如果有指定条件的话，注册一个Where类型的Clause if len(conds) \u003e 0 { if exprs := tx.Statement.BuildCondition(conds[0], conds[1:]...); len(exprs) \u003e 0 { tx.Statement.AddClause(clause.Where{Exprs: exprs}) } } tx.Statement.RaiseErrorOnNotFound = true tx.Statement.Dest = dest return tx.callbacks.Query().Execute(tx) } 在gorm.go文件，可以找到tx.callbacks定义。\ntype Config struct { ... callbacks *callbacks cacheStore *sync.Map } callbacks.go\n// callbacks gorm callbacks manager type callbacks struct { processors map[string]*processor } type processor struct { db *DB Clauses []string fns []func(*DB) callbacks []*callback } type callback struct { name string before string after string remove bool replace bool match func(*DB) bool handler func(*DB) processor *processor } // 返回query类型的processor func (cs *callbacks) Query() *processor { return cs.processors[\"query\"] } func (p *processor) Execute(db *DB) *DB { // call scopes for len(db.Statement.scopes) \u003e 0 { db = db.executeScopes() } var ( curTime = time.Now() stmt = db.Statement resetBuildClauses bool ) // 注意这里的stmt.BuildClauses，后面会用到这个信息 if len(stmt.BuildClauses) == 0 { stmt.BuildClauses = p.Clauses resetBuildClauses = true } if optimizer, ok := db.Statement.Dest.(StatementModifier); ok { optimizer.ModifyStatement(stmt) } // assign model values if stmt.Model == nil { stmt.Model = stmt.Dest } else if stmt.Dest == nil { stmt.Dest = stmt.Model } // parse model values if stmt.Model != nil { if err := stmt.Parse(stmt.Model); err != nil \u0026\u0026 (!errors.Is(err, schema.ErrUnsupportedDataType) || (stmt.Table == \"\" \u0026\u0026 stmt.TableExpr == nil \u0026\u0026 stmt.SQL.Len() == 0)) { if errors.Is(err, schema.ErrUnsupportedDataType) \u0026\u0026 stmt.Table == \"\" \u0026\u0026 stmt.TableExpr == nil { db.AddError(fmt.Errorf(\"%w: Table not set, please set it like: db.Model(\u0026user) or db.Table(\\\"users\\\")\", err)) } else { db.AddError(err) } } } // assign stmt.ReflectValue if stmt.Dest != nil { stmt.ReflectValue = reflect.ValueOf(stmt.Dest) for stmt.ReflectValue.Kind() == reflect.Ptr { if stmt.ReflectValue.IsNil() \u0026\u0026 stmt.ReflectValue.CanAddr() { stmt.ReflectValue.Set(reflect.New(stmt.ReflectValue.Type().Elem())) } stmt.ReflectValue = stmt.ReflectValue.Elem() } if !stmt.ReflectValue.IsValid() { db.AddError(ErrInvalidValue) } } // 根据优先级执行不同callback的回调方法 for _, f := range p.fns { f(db) } if stmt.SQL.Len() \u003e 0 { db.Logger.Trace(stmt.Context, curTime, func() (string, int64) { sql, vars := stmt.SQL.String(), stmt.Vars if filter, ok := db.Logger.(ParamsFilter); ok { sql, vars = filter.ParamsFilter(stmt.Context, stmt.SQL.String(), stmt.Vars...) } return db.Dialector.Explain(sql, vars...), db.RowsAffected }, db.Error) } if !stmt.DB.DryRun { stmt.SQL.Reset() stmt.Vars = nil } if resetBuildClauses { stmt.BuildClauses = nil } return db } 接下来，我们来看一下内置的callback是如何注册的。\nmysql.go\nvar ( // CreateClauses create clauses CreateClauses = []string{\"INSERT\", \"VALUES\", \"ON CONFLICT\"} // QueryClauses query clauses QueryClauses = []string{} // UpdateClauses update clauses UpdateClauses = []string{\"UPDATE\", \"SET\", \"WHERE\", \"ORDER BY\", \"LIMIT\"} // DeleteClauses delete clauses DeleteClauses = []string{\"DELETE\", \"FROM\", \"WHERE\", \"ORDER BY\", \"LIMIT\"} defaultDatetimePrecision = 3 ) ... func (dialector Dialector) Initialize(db *gorm.DB) (err error) { if dialector.DriverName == \"\" { dialector.DriverName = \"mysql\" } if dialector.DefaultDatetimePrecision == nil { dialector.DefaultDatetimePrecision = \u0026defaultDatetimePrecision } if dialector.Conn != nil { db.ConnPool = dialector.Conn } else { db.ConnPool, err = sql.Open(dialector.DriverName, dialector.DSN) if err != nil { return err } } withReturning := false if !dialector.Config.SkipInitializeWithVersion { err = db.ConnPool.QueryRowContext(context.Background(), \"SELECT VERSION()\").Scan(\u0026dialector.ServerVersion) if err != nil { return err } if strings.Contains(dialector.ServerVersion, \"MariaDB\") { dialector.Config.DontSupportRenameIndex = true dialector.Config.DontSupportRenameColumn = true dialector.Config.DontSupportForShareClause = true dialector.Config.DontSupportNullAsDefaultValue = true withReturning = checkVersion(dialector.ServerVersion, \"10.5\") } else if strings.HasPrefix(dialector.ServerVersion, \"5.6.\") { dialector.Config.DontSupportRenameIndex = true dialector.Config.DontSupportRenameColumn = true dialector.Config.DontSupportForShareClause = true dialector.Config.DontSupportDropConstraint = true } else if strings.HasPrefix(dialector.ServerVersion, \"5.7.\") { dialector.Config.DontSupportRenameColumn = true dialector.Config.DontSupportForShareClause = true dialector.Config.DontSupportDropConstraint = true } else if strings.HasPrefix(dialector.ServerVersion, \"5.\") { dialector.Config.DisableDatetimePrecision = true dialector.Config.DontSupportRenameIndex = true dialector.Config.DontSupportRenameColumn = true dialector.Config.DontSupportForShareClause = true dialector.Config.DontSupportDropConstraint = true } if strings.Contains(dialector.ServerVersion, \"TiDB\") { dialector.Config.DontSupportRenameColumnUnique = true } } // register callbacks callbackConfig := \u0026callbacks.Config{ CreateClauses: CreateClauses, QueryClauses: QueryClauses, UpdateClauses: UpdateClauses, DeleteClauses: DeleteClauses, } if !dialector.Config.DisableWithReturning \u0026\u0026 withReturning { if !utils.Contains(callbackConfig.CreateClauses, \"RETURNING\") { callbackConfig.CreateClauses = append(callbackConfig.CreateClauses, \"RETURNING\") } if !utils.Contains(callbackConfig.UpdateClauses, \"RETURNING\") { callbackConfig.UpdateClauses = append(callbackConfig.UpdateClauses, \"RETURNING\") } if !utils.Contains(callbackConfig.DeleteClauses, \"RETURNING\") { callbackConfig.DeleteClauses = append(callbackConfig.DeleteClauses, \"RETURNING\") } } // 注册默认callback callbacks.RegisterDefaultCallbacks(db, callbackConfig) for k, v := range dialector.ClauseBuilders() { db.ClauseBuilders[k] = v } return } callbacks.go\nvar ( createClauses = []string{\"INSERT\", \"VALUES\", \"ON CONFLICT\"} queryClauses = []string{\"SELECT\", \"FROM\", \"WHERE\", \"GROUP BY\", \"ORDER BY\", \"LIMIT\", \"FOR\"} updateClauses = []string{\"UPDATE\", \"SET\", \"WHERE\"} deleteClauses = []string{\"DELETE\", \"FROM\", \"WHERE\"} ) type Config struct { LastInsertIDReversed bool CreateClauses []string QueryClauses []string UpdateClauses []string DeleteClauses []string } func RegisterDefaultCallbacks(db *gorm.DB, config *Config) { enableTransaction := func(db *gorm.DB) bool { return !db.SkipDefaultTransaction } if len(config.CreateClauses) == 0 { config.CreateClauses = createClauses } if len(config.QueryClauses) == 0 { config.QueryClauses = queryClauses } if len(config.DeleteClauses) == 0 { config.DeleteClauses = deleteClauses } if len(config.UpdateClauses) == 0 { config.UpdateClauses = updateClauses } // 注册不同类型的callback createCallback := db.Callback().Create() createCallback.Match(enableTransaction).Register(\"gorm:begin_transaction\", BeginTransaction) createCallback.Register(\"gorm:before_create\", BeforeCreate) createCallback.Register(\"gorm:save_before_associations\", SaveBeforeAssociations(true)) createCallback.Register(\"gorm:create\", Create(config)) createCallback.Register(\"gorm:save_after_associations\", SaveAfterAssociations(true)) createCallback.Register(\"gorm:after_create\", AfterCreate) createCallback.Match(enableTransaction).Register(\"gorm:commit_or_rollback_transaction\", CommitOrRollbackTransaction) createCallback.Clauses = config.CreateClauses queryCallback := db.Callback().Query() queryCallback.Register(\"gorm:query\", Query) queryCallback.Register(\"gorm:preload\", Preload) queryCallback.Register(\"gorm:after_query\", AfterQuery) queryCallback.Clauses = config.QueryClauses deleteCallback := db.Callback().Delete() deleteCallback.Match(enableTransaction).Register(\"gorm:begin_transaction\", BeginTransaction) deleteCallback.Register(\"gorm:before_delete\", BeforeDelete) deleteCallback.Register(\"gorm:delete_before_associations\", DeleteBeforeAssociations) deleteCallback.Register(\"gorm:delete\", Delete(config)) deleteCallback.Register(\"gorm:after_delete\", AfterDelete) deleteCallback.Match(enableTransaction).Register(\"gorm:commit_or_rollback_transaction\", CommitOrRollbackTransaction) deleteCallback.Clauses = config.DeleteClauses updateCallback := db.Callback().Update() updateCallback.Match(enableTransaction).Register(\"gorm:begin_transaction\", BeginTransaction) updateCallback.Register(\"gorm:setup_reflect_value\", SetupUpdateReflectValue) updateCallback.Register(\"gorm:before_update\", BeforeUpdate) updateCallback.Register(\"gorm:save_before_associations\", SaveBeforeAssociations(false)) updateCallback.Register(\"gorm:update\", Update(config)) updateCallback.Register(\"gorm:save_after_associations\", SaveAfterAssociations(false)) updateCallback.Register(\"gorm:after_update\", AfterUpdate) updateCallback.Match(enableTransaction).Register(\"gorm:commit_or_rollback_transaction\", CommitOrRollbackTransaction) updateCallback.Clauses = config.UpdateClauses rowCallback := db.Callback().Row() rowCallback.Register(\"gorm:row\", RowQuery) rowCallback.Clauses = config.QueryClauses rawCallback := db.Callback().Raw() rawCallback.Register(\"gorm:raw\", RawExec) rawCallback.Clauses = config.QueryClauses } 到这里，默认callback就注册完成了，但是是如何转成对应sql的呢？\n别急，我们继续往下看。\n在RegisterDefaultCallbacks方法里注册了一个gorm:query类型的callback，对应的回调方法为Query。\nquery.go\nfunc Query(db *gorm.DB) { if db.Error == nil { // 调用BuildQuerySQL方法 BuildQuerySQL(db) if !db.DryRun \u0026\u0026 db.Error == nil { rows, err := db.Statement.ConnPool.QueryContext(db.Statement.Context, db.Statement.SQL.String(), db.Statement.Vars...) if err != nil { db.AddError(err) return } defer func() { db.AddError(rows.Close()) }() gorm.Scan(rows, db, 0) } } } func BuildQuerySQL(db *gorm.DB) { if db.Statement.Schema != nil { for _, c := range db.Statement.Schema.QueryClauses { db.Statement.AddClause(c) } } if db.Statement.SQL.Len() == 0 { db.Statement.SQL.Grow(100) clauseSelect := clause.Select{Distinct: db.Statement.Distinct} if db.Statement.ReflectValue.Kind() == reflect.Struct \u0026\u0026 db.Statement.ReflectValue.Type() == db.Statement.Schema.ModelType { var conds []clause.Expression for _, primaryField := range db.Statement.Schema.PrimaryFields { if v, isZero := primaryField.ValueOf(db.Statement.Context, db.Statement.ReflectValue); !isZero { conds = append(conds, clause.Eq{Column: clause.Column{Table: db.Statement.Table, Name: primaryField.DBName}, Value: v}) } } if len(conds) \u003e 0 { db.Statement.AddClause(clause.Where{Exprs: conds}) } } if len(db.Statement.Selects) \u003e 0 { clauseSelect.Columns = make([]clause.Column, len(db.Statement.Selects)) for idx, name := range db.Statement.Selects { if db.Statement.Schema == nil { clauseSelect.Columns[idx] = clause.Column{Name: name, Raw: true} } else if f := db.Statement.Schema.LookUpField(name); f != nil { clauseSelect.Columns[idx] = clause.Column{Name: f.DBName} } else { clauseSelect.Columns[idx] = clause.Column{Name: name, Raw: true} } } } else if db.Statement.Schema != nil \u0026\u0026 len(db.Statement.Omits) \u003e 0 { selectColumns, _ := db.Statement.SelectAndOmitColumns(false, false) clauseSelect.Columns = make([]clause.Column, 0, len(db.Statement.Schema.DBNames)) for _, dbName := range db.Statement.Schema.DBNames { if v, ok := selectColumns[dbName]; (ok \u0026\u0026 v) || !ok { clauseSelect.Columns = append(clauseSelect.Columns, clause.Column{Table: db.Statement.Table, Name: dbName}) } } } else if db.Statement.Schema != nil \u0026\u0026 db.Statement.ReflectValue.IsValid() { queryFields := db.QueryFields if !queryFields { switch db.Statement.ReflectValue.Kind() { case reflect.Struct: queryFields = db.Statement.ReflectValue.Type() != db.Statement.Schema.ModelType case reflect.Slice: queryFields = db.Statement.ReflectValue.Type().Elem() != db.Statement.Schema.ModelType } } if queryFields { stmt := gorm.Statement{DB: db} // smaller struct if err := stmt.Parse(db.Statement.Dest); err == nil \u0026\u0026 (db.QueryFields || stmt.Schema.ModelType != db.Statement.Schema.ModelType) { clauseSelect.Columns = make([]clause.Column, len(stmt.Schema.DBNames)) for idx, dbName := range stmt.Schema.DBNames { clauseSelect.Columns[idx] = clause.Column{Table: db.Statement.Table, Name: dbName} } } } } // inline joins fromClause := clause.From{} if v, ok := db.Statement.Clauses[\"FROM\"].Expression.(clause.From); ok { fromClause = v } if len(db.Statement.Joins) != 0 || len(fromClause.Joins) != 0 { if len(db.Statement.Selects) == 0 \u0026\u0026 len(db.Statement.Omits) == 0 \u0026\u0026 db.Statement.Schema != nil { clauseSelect.Columns = make([]clause.Column, len(db.Statement.Schema.DBNames)) for idx, dbName := range db.Statement.Schema.DBNames { clauseSelect.Columns[idx] = clause.Column{Table: db.Statement.Table, Name: dbName} } } specifiedRelationsName := make(map[string]interface{}) for _, join := range db.Statement.Joins { if db.Statement.Schema != nil { var isRelations bool // is relations or raw sql var relations []*schema.Relationship relation, ok := db.Statement.Schema.Relationships.Relations[join.Name] if ok { isRelations = true relations = append(relations, relation) } else { // handle nested join like \"Manager.Company\" nestedJoinNames := strings.Split(join.Name, \".\") if len(nestedJoinNames) \u003e 1 { isNestedJoin := true gussNestedRelations := make([]*schema.Relationship, 0, len(nestedJoinNames)) currentRelations := db.Statement.Schema.Relationships.Relations for _, relname := range nestedJoinNames { // incomplete match, only treated as raw sql if relation, ok = currentRelations[relname]; ok { gussNestedRelations = append(gussNestedRelations, relation) currentRelations = relation.FieldSchema.Relationships.Relations } else { isNestedJoin = false break } } if isNestedJoin { isRelations = true relations = gussNestedRelations } } } if isRelations { genJoinClause := func(joinType clause.JoinType, parentTableName string, relation *schema.Relationship) clause.Join { tableAliasName := relation.Name if parentTableName != clause.CurrentTable { tableAliasName = utils.NestedRelationName(parentTableName, tableAliasName) } columnStmt := gorm.Statement{ Table: tableAliasName, DB: db, Schema: relation.FieldSchema, Selects: join.Selects, Omits: join.Omits, } selectColumns, restricted := columnStmt.SelectAndOmitColumns(false, false) for _, s := range relation.FieldSchema.DBNames { if v, ok := selectColumns[s]; (ok \u0026\u0026 v) || (!ok \u0026\u0026 !restricted) { clauseSelect.Columns = append(clauseSelect.Columns, clause.Column{ Table: tableAliasName, Name: s, Alias: utils.NestedRelationName(tableAliasName, s), }) } } exprs := make([]clause.Expression, len(relation.References)) for idx, ref := range relation.References { if ref.OwnPrimaryKey { exprs[idx] = clause.Eq{ Column: clause.Column{Table: parentTableName, Name: ref.PrimaryKey.DBName}, Value: clause.Column{Table: tableAliasName, Name: ref.ForeignKey.DBName}, } } else { if ref.PrimaryValue == \"\" { exprs[idx] = clause.Eq{ Column: clause.Column{Table: parentTableName, Name: ref.ForeignKey.DBName}, Value: clause.Column{Table: tableAliasName, Name: ref.PrimaryKey.DBName}, } } else { exprs[idx] = clause.Eq{ Column: clause.Column{Table: tableAliasName, Name: ref.ForeignKey.DBName}, Value: ref.PrimaryValue, } } } } { onStmt := gorm.Statement{Table: tableAliasName, DB: db, Clauses: map[string]clause.Clause{}} for _, c := range relation.FieldSchema.QueryClauses { onStmt.AddClause(c) } if join.On != nil { onStmt.AddClause(join.On) } if cs, ok := onStmt.Clauses[\"WHERE\"]; ok { if where, ok := cs.Expression.(clause.Where); ok { where.Build(\u0026onStmt) if onSQL := onStmt.SQL.String(); onSQL != \"\" { vars := onStmt.Vars for idx, v := range vars { bindvar := strings.Builder{} onStmt.Vars = vars[0 : idx+1] db.Dialector.BindVarTo(\u0026bindvar, \u0026onStmt, v) onSQL = strings.Replace(onSQL, bindvar.String(), \"?\", 1) } exprs = append(exprs, clause.Expr{SQL: onSQL, Vars: vars}) } } } } return clause.Join{ Type: joinType, Table: clause.Table{Name: relation.FieldSchema.Table, Alias: tableAliasName}, ON: clause.Where{Exprs: exprs}, } } parentTableName := clause.CurrentTable for _, rel := range relations { // joins table alias like \"Manager, Company, Manager__Company\" nestedAlias := utils.NestedRelationName(parentTableName, rel.Name) if _, ok := specifiedRelationsName[nestedAlias]; !ok { fromClause.Joins = append(fromClause.Joins, genJoinClause(join.JoinType, parentTableName, rel)) specifiedRelationsName[nestedAlias] = nil } if parentTableName != clause.CurrentTable { parentTableName = utils.NestedRelationName(parentTableName, rel.Name) } else { parentTableName = rel.Name } } } else { fromClause.Joins = append(fromClause.Joins, clause.Join{ Expression: clause.NamedExpr{SQL: join.Name, Vars: join.Conds}, }) } } else { fromClause.Joins = append(fromClause.Joins, clause.Join{ Expression: clause.NamedExpr{SQL: join.Name, Vars: join.Conds}, }) } } db.Statement.AddClause(fromClause) } else { db.Statement.AddClauseIfNotExists(clause.From{}) } db.Statement.AddClauseIfNotExists(clauseSelect) // db.Statement.BuildClauses眼熟吗？还记得前面的stmt.BuildClauses吗？ db.Statement.Build(db.Statement.BuildClauses...) } } 重头戏终于来了，Query方法里调用了BuildQuerySQl，看名字也能猜到这里就是生成sql了，这里最终调用了db.Statement.Build方法。\nstatement.go\n// Build build sql with clauses names func (stmt *Statement) Build(clauses ...string) { var firstClauseWritten bool for _, name := range clauses { if c, ok := stmt.Clauses[name]; ok { if firstClauseWritten { stmt.WriteByte(' ') } firstClauseWritten = true if b, ok := stmt.DB.ClauseBuilders[name]; ok { b(c, stmt) } else { c.Build(stmt) } } } } 这里会根据statement的BuildCluauses属性，执行Clause的Build方法。\nclause.go\n// ClauseBuilder clause builder, allows to customize how to build clause type ClauseBuilder func(Clause, Builder) type Writer interface { WriteByte(byte) error WriteString(string) (int, error) } // Builder builder interface type Builder interface { Writer WriteQuoted(field interface{}) AddVar(Writer, ...interface{}) AddError(error) error } // Clause type Clause struct { Name string // WHERE BeforeExpression Expression AfterNameExpression Expression AfterExpression Expression Expression Expression Builder ClauseBuilder } // Build build clause func (c Clause) Build(builder Builder) { if c.Builder != nil { c.Builder(c, builder) } else if c.Expression != nil { if c.BeforeExpression != nil { c.BeforeExpression.Build(builder) builder.WriteByte(' ') } if c.Name != \"\" { builder.WriteString(c.Name) builder.WriteByte(' ') } if c.AfterNameExpression != nil { c.AfterNameExpression.Build(builder) builder.WriteByte(' ') } c.Expression.Build(builder) if c.AfterExpression != nil { builder.WriteByte(' ') c.AfterExpression.Build(builder) } } } 这里会执行对应Clause的Build方法。\n// Select select attrs when querying, updating, creating type Select struct { Distinct bool Columns []Column Expression Expression } func (s Select) Name() string { return \"SELECT\" } func (s Select) Build(builder Builder) { if len(s.Columns) \u003e 0 { if s.Distinct { builder.WriteString(\"DISTINCT \") } for idx, column := range s.Columns { if idx \u003e 0 { builder.WriteByte(',') } builder.WriteQuoted(column) } } else { builder.WriteByte('*') } } func (s Select) MergeClause(clause *Clause) { if s.Expression != nil { if s.Distinct { if expr, ok := s.Expression.(Expr); ok { expr.SQL = \"DISTINCT \" + expr.SQL clause.Expression = expr return } } clause.Expression = s.Expression } else { clause.Expression = s } } 这是Select类型的Clause定义，是不是一下就清楚了。\ngorm通过callback里注册Clause，在Clause里实现了sql拼接操作。\n看了几回源码，这次总算是搞清楚了。\n","wordCount":"2737","inLanguage":"en","datePublished":"2024-04-18T21:14:24+08:00","dateModified":"2024-04-18T21:14:24+08:00","author":{"@type":"Person","name":"Liudon"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://liudon.com/posts/how-gorm-generates-sql/"},"publisher":{"@type":"Organization","name":"流动","logo":{"@type":"ImageObject","url":"https://liudon.com/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://liudon.com/ accesskey=h title="流动 (Alt + H)">流动</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://liudon.com/ title=Home><span>Home</span></a></li><li><a href=https://liudon.com/posts/ title=Posts><span>Posts</span></a></li><li><a href=https://workout.liudon.com title=Workouts><span>Workouts</span>&nbsp;
+<svg fill="none" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" height="12" width="12"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></a></li><li><a href=https://liudon.com/about/ title=About><span>About</span></a></li><li><a href=https://liudon.com/search/ title="🔍 (Alt + /)" accesskey=/><span>🔍</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">源码分析：GORM是如何生成sql的</h1><div class=post-meta><span title='2024-04-18 21:14:24 +0800 +0800'>2024-04-18</span>&nbsp;·&nbsp;6 min&nbsp;·&nbsp;2737 words&nbsp;·&nbsp;Liudon</div></header><div class=post-content><p>在<code>gorm</code>下实现<a href=https://google.github.io/sqlcommenter/>sqlcommenter</a>过程中，遇到一些问题，顺便把<code>gorm</code>整个流程梳理了一遍，整理记录一下。</p><p>gorm使用示例</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span>package main
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>import (
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;gorm.io/driver/mysql&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;gorm.io/gorm&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>type Product struct {
+</span></span><span style=display:flex><span>  gorm<span style=color:#f92672>.</span>Model
+</span></span><span style=display:flex><span>  Code  string
+</span></span><span style=display:flex><span>  Price uint
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> main() {
+</span></span><span style=display:flex><span>  <span style=color:#f92672>//</span> <span style=color:#960050;background-color:#1e0010>参考</span> https:<span style=color:#f92672>//</span>github<span style=color:#f92672>.</span>com<span style=color:#f92672>/</span>go<span style=color:#f92672>-</span>sql<span style=color:#f92672>-</span>driver<span style=color:#f92672>/</span>mysql<span style=color:#75715e>#dsn-data-source-name 获取详情</span>
+</span></span><span style=display:flex><span>  dsn :<span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&amp;parseTime=True&amp;loc=Local&#34;</span>
+</span></span><span style=display:flex><span>  db, err :<span style=color:#f92672>=</span> gorm<span style=color:#f92672>.</span>Open(mysql<span style=color:#f92672>.</span>Open(dsn), <span style=color:#f92672>&amp;</span>gorm<span style=color:#f92672>.</span>Config{})
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>var</span> product Product
+</span></span><span style=display:flex><span>  db<span style=color:#f92672>.</span>First(<span style=color:#f92672>&amp;</span>product, <span style=color:#ae81ff>1</span>) <span style=color:#f92672>//</span> <span style=color:#960050;background-color:#1e0010>根据整型主键查找</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>我们以<code>First</code>查询为例，看一下是怎么转成具体sql的。</p><p>在<a href=https://github.com/go-gorm/gorm/blob/master/finisher_api.go>finisher_api.go</a>文件，声明了<code>First</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>//</span> First finds the first record ordered by primary key, matching given conditions conds
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (db <span style=color:#f92672>*</span>DB) First(dest interface{}, conds <span style=color:#f92672>...</span>interface{}) (tx <span style=color:#f92672>*</span>DB) {
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> <span style=color:#960050;background-color:#1e0010>注册</span>Order类型的Clause
+</span></span><span style=display:flex><span>	tx <span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Limit(<span style=color:#ae81ff>1</span>)<span style=color:#f92672>.</span>Order(clause<span style=color:#f92672>.</span>OrderByColumn{
+</span></span><span style=display:flex><span>		Column: clause<span style=color:#f92672>.</span>Column{Table: clause<span style=color:#f92672>.</span>CurrentTable, Name: clause<span style=color:#f92672>.</span>PrimaryKey},
+</span></span><span style=display:flex><span>	})
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> <span style=color:#960050;background-color:#1e0010>这里如果有指定条件的话，注册一个</span>Where类型的Clause
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> len(conds) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> exprs :<span style=color:#f92672>=</span> tx<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>BuildCondition(conds[<span style=color:#ae81ff>0</span>], conds[<span style=color:#ae81ff>1</span>:]<span style=color:#f92672>...</span>); len(exprs) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>			tx<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>AddClause(clause<span style=color:#f92672>.</span>Where{Exprs: exprs})
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	tx<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>RaiseErrorOnNotFound <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>	tx<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Dest <span style=color:#f92672>=</span> dest
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> tx<span style=color:#f92672>.</span>callbacks<span style=color:#f92672>.</span>Query()<span style=color:#f92672>.</span>Execute(tx)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>在<a href=https://github.com/go-gorm/gorm/blob/master/gorm.go>gorm.go</a>文件，可以找到<code>tx.callbacks</code>定义。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>type Config struct {
+</span></span><span style=display:flex><span>	...
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	callbacks  *callbacks
+</span></span><span style=display:flex><span>	cacheStore *sync.Map
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><a href=https://github.com/go-gorm/gorm/blob/master/callbacks.go>callbacks.go</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>//</span> callbacks gorm callbacks manager
+</span></span><span style=display:flex><span>type callbacks struct {
+</span></span><span style=display:flex><span>	processors map[string]<span style=color:#f92672>*</span>processor
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>type processor struct {
+</span></span><span style=display:flex><span>	db        <span style=color:#f92672>*</span>DB
+</span></span><span style=display:flex><span>	Clauses   []string
+</span></span><span style=display:flex><span>	fns       []<span style=color:#66d9ef>func</span>(<span style=color:#f92672>*</span>DB)
+</span></span><span style=display:flex><span>	callbacks []<span style=color:#f92672>*</span>callback
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>type callback struct {
+</span></span><span style=display:flex><span>	name      string
+</span></span><span style=display:flex><span>	before    string
+</span></span><span style=display:flex><span>	after     string
+</span></span><span style=display:flex><span>	remove    <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>	replace   <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>	match     <span style=color:#66d9ef>func</span>(<span style=color:#f92672>*</span>DB) <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>	handler   <span style=color:#66d9ef>func</span>(<span style=color:#f92672>*</span>DB)
+</span></span><span style=display:flex><span>	processor <span style=color:#f92672>*</span>processor
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>//</span> <span style=color:#960050;background-color:#1e0010>返回</span>query类型的processor
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (cs <span style=color:#f92672>*</span>callbacks) Query() <span style=color:#f92672>*</span>processor {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> cs<span style=color:#f92672>.</span>processors[<span style=color:#e6db74>&#34;query&#34;</span>]
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (p <span style=color:#f92672>*</span>processor) Execute(db <span style=color:#f92672>*</span>DB) <span style=color:#f92672>*</span>DB {
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> call scopes
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>for</span> len(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>scopes) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>		db <span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>executeScopes()
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>var</span> (
+</span></span><span style=display:flex><span>		curTime           <span style=color:#f92672>=</span> time<span style=color:#f92672>.</span>Now()
+</span></span><span style=display:flex><span>		stmt              <span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Statement
+</span></span><span style=display:flex><span>		resetBuildClauses <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>	)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> <span style=color:#960050;background-color:#1e0010>注意这里的</span>stmt<span style=color:#f92672>.</span>BuildClauses<span style=color:#960050;background-color:#1e0010>，后面会用到这个信息</span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> len(stmt<span style=color:#f92672>.</span>BuildClauses) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>		stmt<span style=color:#f92672>.</span>BuildClauses <span style=color:#f92672>=</span> p<span style=color:#f92672>.</span>Clauses
+</span></span><span style=display:flex><span>		resetBuildClauses <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> optimizer, ok :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Dest<span style=color:#f92672>.</span>(StatementModifier); ok {
+</span></span><span style=display:flex><span>		optimizer<span style=color:#f92672>.</span>ModifyStatement(stmt)
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> assign model values
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> stmt<span style=color:#f92672>.</span>Model <span style=color:#f92672>==</span> nil {
+</span></span><span style=display:flex><span>		stmt<span style=color:#f92672>.</span>Model <span style=color:#f92672>=</span> stmt<span style=color:#f92672>.</span>Dest
+</span></span><span style=display:flex><span>	} <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> stmt<span style=color:#f92672>.</span>Dest <span style=color:#f92672>==</span> nil {
+</span></span><span style=display:flex><span>		stmt<span style=color:#f92672>.</span>Dest <span style=color:#f92672>=</span> stmt<span style=color:#f92672>.</span>Model
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> parse model values
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> stmt<span style=color:#f92672>.</span>Model <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> err :<span style=color:#f92672>=</span> stmt<span style=color:#f92672>.</span>Parse(stmt<span style=color:#f92672>.</span>Model); err <span style=color:#f92672>!=</span> nil <span style=color:#f92672>&amp;&amp;</span> (<span style=color:#f92672>!</span>errors<span style=color:#f92672>.</span>Is(err, schema<span style=color:#f92672>.</span>ErrUnsupportedDataType) <span style=color:#f92672>||</span> (stmt<span style=color:#f92672>.</span>Table <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;&#34;</span> <span style=color:#f92672>&amp;&amp;</span> stmt<span style=color:#f92672>.</span>TableExpr <span style=color:#f92672>==</span> nil <span style=color:#f92672>&amp;&amp;</span> stmt<span style=color:#f92672>.</span>SQL<span style=color:#f92672>.</span>Len() <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>)) {
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>if</span> errors<span style=color:#f92672>.</span>Is(err, schema<span style=color:#f92672>.</span>ErrUnsupportedDataType) <span style=color:#f92672>&amp;&amp;</span> stmt<span style=color:#f92672>.</span>Table <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;&#34;</span> <span style=color:#f92672>&amp;&amp;</span> stmt<span style=color:#f92672>.</span>TableExpr <span style=color:#f92672>==</span> nil {
+</span></span><span style=display:flex><span>				db<span style=color:#f92672>.</span>AddError(fmt<span style=color:#f92672>.</span>Errorf(<span style=color:#e6db74>&#34;%w: Table not set, please set it like: db.Model(&amp;user) or db.Table(</span><span style=color:#ae81ff>\&#34;</span><span style=color:#e6db74>users</span><span style=color:#ae81ff>\&#34;</span><span style=color:#e6db74>)&#34;</span>, err))
+</span></span><span style=display:flex><span>			} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>				db<span style=color:#f92672>.</span>AddError(err)
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> assign stmt<span style=color:#f92672>.</span>ReflectValue
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> stmt<span style=color:#f92672>.</span>Dest <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>		stmt<span style=color:#f92672>.</span>ReflectValue <span style=color:#f92672>=</span> reflect<span style=color:#f92672>.</span>ValueOf(stmt<span style=color:#f92672>.</span>Dest)
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>for</span> stmt<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>Kind() <span style=color:#f92672>==</span> reflect<span style=color:#f92672>.</span>Ptr {
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>if</span> stmt<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>IsNil() <span style=color:#f92672>&amp;&amp;</span> stmt<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>CanAddr() {
+</span></span><span style=display:flex><span>				stmt<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>Set(reflect<span style=color:#f92672>.</span>New(stmt<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>Type()<span style=color:#f92672>.</span>Elem()))
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>			stmt<span style=color:#f92672>.</span>ReflectValue <span style=color:#f92672>=</span> stmt<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>Elem()
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> <span style=color:#f92672>!</span>stmt<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>IsValid() {
+</span></span><span style=display:flex><span>			db<span style=color:#f92672>.</span>AddError(ErrInvalidValue)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> <span style=color:#960050;background-color:#1e0010>根据优先级执行不同</span>callback的回调方法
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>for</span> _, f :<span style=color:#f92672>=</span> range p<span style=color:#f92672>.</span>fns {
+</span></span><span style=display:flex><span>		f(db)
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> stmt<span style=color:#f92672>.</span>SQL<span style=color:#f92672>.</span>Len() <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>		db<span style=color:#f92672>.</span>Logger<span style=color:#f92672>.</span>Trace(stmt<span style=color:#f92672>.</span>Context, curTime, <span style=color:#66d9ef>func</span>() (string, int64) {
+</span></span><span style=display:flex><span>			sql, vars :<span style=color:#f92672>=</span> stmt<span style=color:#f92672>.</span>SQL<span style=color:#f92672>.</span>String(), stmt<span style=color:#f92672>.</span>Vars
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>if</span> filter, ok :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Logger<span style=color:#f92672>.</span>(ParamsFilter); ok {
+</span></span><span style=display:flex><span>				sql, vars <span style=color:#f92672>=</span> filter<span style=color:#f92672>.</span>ParamsFilter(stmt<span style=color:#f92672>.</span>Context, stmt<span style=color:#f92672>.</span>SQL<span style=color:#f92672>.</span>String(), stmt<span style=color:#f92672>.</span>Vars<span style=color:#f92672>...</span>)
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>return</span> db<span style=color:#f92672>.</span>Dialector<span style=color:#f92672>.</span>Explain(sql, vars<span style=color:#f92672>...</span>), db<span style=color:#f92672>.</span>RowsAffected
+</span></span><span style=display:flex><span>		}, db<span style=color:#f92672>.</span>Error)
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#f92672>!</span>stmt<span style=color:#f92672>.</span>DB<span style=color:#f92672>.</span>DryRun {
+</span></span><span style=display:flex><span>		stmt<span style=color:#f92672>.</span>SQL<span style=color:#f92672>.</span>Reset()
+</span></span><span style=display:flex><span>		stmt<span style=color:#f92672>.</span>Vars <span style=color:#f92672>=</span> nil
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> resetBuildClauses {
+</span></span><span style=display:flex><span>		stmt<span style=color:#f92672>.</span>BuildClauses <span style=color:#f92672>=</span> nil
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> db
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>接下来，我们来看一下内置的<code>callback</code>是如何注册的。</p><p><a href=https://github.com/go-gorm/mysql/blob/master/mysql.go>mysql.go</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#66d9ef>var</span> (
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> CreateClauses create clauses
+</span></span><span style=display:flex><span>	CreateClauses <span style=color:#f92672>=</span> []string{<span style=color:#e6db74>&#34;INSERT&#34;</span>, <span style=color:#e6db74>&#34;VALUES&#34;</span>, <span style=color:#e6db74>&#34;ON CONFLICT&#34;</span>}
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> QueryClauses query clauses
+</span></span><span style=display:flex><span>	QueryClauses <span style=color:#f92672>=</span> []string{}
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> UpdateClauses update clauses
+</span></span><span style=display:flex><span>	UpdateClauses <span style=color:#f92672>=</span> []string{<span style=color:#e6db74>&#34;UPDATE&#34;</span>, <span style=color:#e6db74>&#34;SET&#34;</span>, <span style=color:#e6db74>&#34;WHERE&#34;</span>, <span style=color:#e6db74>&#34;ORDER BY&#34;</span>, <span style=color:#e6db74>&#34;LIMIT&#34;</span>}
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> DeleteClauses delete clauses
+</span></span><span style=display:flex><span>	DeleteClauses <span style=color:#f92672>=</span> []string{<span style=color:#e6db74>&#34;DELETE&#34;</span>, <span style=color:#e6db74>&#34;FROM&#34;</span>, <span style=color:#e6db74>&#34;WHERE&#34;</span>, <span style=color:#e6db74>&#34;ORDER BY&#34;</span>, <span style=color:#e6db74>&#34;LIMIT&#34;</span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	defaultDatetimePrecision <span style=color:#f92672>=</span> <span style=color:#ae81ff>3</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (dialector Dialector) Initialize(db <span style=color:#f92672>*</span>gorm<span style=color:#f92672>.</span>DB) (err error) {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> dialector<span style=color:#f92672>.</span>DriverName <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;&#34;</span> {
+</span></span><span style=display:flex><span>		dialector<span style=color:#f92672>.</span>DriverName <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;mysql&#34;</span>
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> dialector<span style=color:#f92672>.</span>DefaultDatetimePrecision <span style=color:#f92672>==</span> nil {
+</span></span><span style=display:flex><span>		dialector<span style=color:#f92672>.</span>DefaultDatetimePrecision <span style=color:#f92672>=</span> <span style=color:#f92672>&amp;</span>defaultDatetimePrecision
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> dialector<span style=color:#f92672>.</span>Conn <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>		db<span style=color:#f92672>.</span>ConnPool <span style=color:#f92672>=</span> dialector<span style=color:#f92672>.</span>Conn
+</span></span><span style=display:flex><span>	} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>		db<span style=color:#f92672>.</span>ConnPool, err <span style=color:#f92672>=</span> sql<span style=color:#f92672>.</span>Open(dialector<span style=color:#f92672>.</span>DriverName, dialector<span style=color:#f92672>.</span>DSN)
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> err <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>return</span> err
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	withReturning :<span style=color:#f92672>=</span> false
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#f92672>!</span>dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>SkipInitializeWithVersion {
+</span></span><span style=display:flex><span>		err <span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>ConnPool<span style=color:#f92672>.</span>QueryRowContext(context<span style=color:#f92672>.</span>Background(), <span style=color:#e6db74>&#34;SELECT VERSION()&#34;</span>)<span style=color:#f92672>.</span>Scan(<span style=color:#f92672>&amp;</span>dialector<span style=color:#f92672>.</span>ServerVersion)
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> err <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>return</span> err
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> strings<span style=color:#f92672>.</span>Contains(dialector<span style=color:#f92672>.</span>ServerVersion, <span style=color:#e6db74>&#34;MariaDB&#34;</span>) {
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportRenameIndex <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportRenameColumn <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportForShareClause <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportNullAsDefaultValue <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			withReturning <span style=color:#f92672>=</span> checkVersion(dialector<span style=color:#f92672>.</span>ServerVersion, <span style=color:#e6db74>&#34;10.5&#34;</span>)
+</span></span><span style=display:flex><span>		} <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> strings<span style=color:#f92672>.</span>HasPrefix(dialector<span style=color:#f92672>.</span>ServerVersion, <span style=color:#e6db74>&#34;5.6.&#34;</span>) {
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportRenameIndex <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportRenameColumn <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportForShareClause <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportDropConstraint <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>		} <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> strings<span style=color:#f92672>.</span>HasPrefix(dialector<span style=color:#f92672>.</span>ServerVersion, <span style=color:#e6db74>&#34;5.7.&#34;</span>) {
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportRenameColumn <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportForShareClause <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportDropConstraint <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>		} <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> strings<span style=color:#f92672>.</span>HasPrefix(dialector<span style=color:#f92672>.</span>ServerVersion, <span style=color:#e6db74>&#34;5.&#34;</span>) {
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DisableDatetimePrecision <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportRenameIndex <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportRenameColumn <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportForShareClause <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportDropConstraint <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> strings<span style=color:#f92672>.</span>Contains(dialector<span style=color:#f92672>.</span>ServerVersion, <span style=color:#e6db74>&#34;TiDB&#34;</span>) {
+</span></span><span style=display:flex><span>			dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DontSupportRenameColumnUnique <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> register callbacks
+</span></span><span style=display:flex><span>	callbackConfig :<span style=color:#f92672>=</span> <span style=color:#f92672>&amp;</span>callbacks<span style=color:#f92672>.</span>Config{
+</span></span><span style=display:flex><span>		CreateClauses: CreateClauses,
+</span></span><span style=display:flex><span>		QueryClauses:  QueryClauses,
+</span></span><span style=display:flex><span>		UpdateClauses: UpdateClauses,
+</span></span><span style=display:flex><span>		DeleteClauses: DeleteClauses,
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#f92672>!</span>dialector<span style=color:#f92672>.</span>Config<span style=color:#f92672>.</span>DisableWithReturning <span style=color:#f92672>&amp;&amp;</span> withReturning {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> <span style=color:#f92672>!</span>utils<span style=color:#f92672>.</span>Contains(callbackConfig<span style=color:#f92672>.</span>CreateClauses, <span style=color:#e6db74>&#34;RETURNING&#34;</span>) {
+</span></span><span style=display:flex><span>			callbackConfig<span style=color:#f92672>.</span>CreateClauses <span style=color:#f92672>=</span> append(callbackConfig<span style=color:#f92672>.</span>CreateClauses, <span style=color:#e6db74>&#34;RETURNING&#34;</span>)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> <span style=color:#f92672>!</span>utils<span style=color:#f92672>.</span>Contains(callbackConfig<span style=color:#f92672>.</span>UpdateClauses, <span style=color:#e6db74>&#34;RETURNING&#34;</span>) {
+</span></span><span style=display:flex><span>			callbackConfig<span style=color:#f92672>.</span>UpdateClauses <span style=color:#f92672>=</span> append(callbackConfig<span style=color:#f92672>.</span>UpdateClauses, <span style=color:#e6db74>&#34;RETURNING&#34;</span>)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> <span style=color:#f92672>!</span>utils<span style=color:#f92672>.</span>Contains(callbackConfig<span style=color:#f92672>.</span>DeleteClauses, <span style=color:#e6db74>&#34;RETURNING&#34;</span>) {
+</span></span><span style=display:flex><span>			callbackConfig<span style=color:#f92672>.</span>DeleteClauses <span style=color:#f92672>=</span> append(callbackConfig<span style=color:#f92672>.</span>DeleteClauses, <span style=color:#e6db74>&#34;RETURNING&#34;</span>)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#f92672>//</span> <span style=color:#960050;background-color:#1e0010>注册默认</span>callback
+</span></span><span style=display:flex><span>	callbacks<span style=color:#f92672>.</span>RegisterDefaultCallbacks(db, callbackConfig)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>for</span> k, v :<span style=color:#f92672>=</span> range dialector<span style=color:#f92672>.</span>ClauseBuilders() {
+</span></span><span style=display:flex><span>		db<span style=color:#f92672>.</span>ClauseBuilders[k] <span style=color:#f92672>=</span> v
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><a href=https://github.com/go-gorm/gorm/blob/master/callbacks/callbacks.go>callbacks.go</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#66d9ef>var</span> (
+</span></span><span style=display:flex><span>	createClauses <span style=color:#f92672>=</span> []string{<span style=color:#e6db74>&#34;INSERT&#34;</span>, <span style=color:#e6db74>&#34;VALUES&#34;</span>, <span style=color:#e6db74>&#34;ON CONFLICT&#34;</span>}
+</span></span><span style=display:flex><span>	queryClauses  <span style=color:#f92672>=</span> []string{<span style=color:#e6db74>&#34;SELECT&#34;</span>, <span style=color:#e6db74>&#34;FROM&#34;</span>, <span style=color:#e6db74>&#34;WHERE&#34;</span>, <span style=color:#e6db74>&#34;GROUP BY&#34;</span>, <span style=color:#e6db74>&#34;ORDER BY&#34;</span>, <span style=color:#e6db74>&#34;LIMIT&#34;</span>, <span style=color:#e6db74>&#34;FOR&#34;</span>}
+</span></span><span style=display:flex><span>	updateClauses <span style=color:#f92672>=</span> []string{<span style=color:#e6db74>&#34;UPDATE&#34;</span>, <span style=color:#e6db74>&#34;SET&#34;</span>, <span style=color:#e6db74>&#34;WHERE&#34;</span>}
+</span></span><span style=display:flex><span>	deleteClauses <span style=color:#f92672>=</span> []string{<span style=color:#e6db74>&#34;DELETE&#34;</span>, <span style=color:#e6db74>&#34;FROM&#34;</span>, <span style=color:#e6db74>&#34;WHERE&#34;</span>}
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>type Config struct {
+</span></span><span style=display:flex><span>	LastInsertIDReversed <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>	CreateClauses        []string
+</span></span><span style=display:flex><span>	QueryClauses         []string
+</span></span><span style=display:flex><span>	UpdateClauses        []string
+</span></span><span style=display:flex><span>	DeleteClauses        []string
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> RegisterDefaultCallbacks(db <span style=color:#f92672>*</span>gorm<span style=color:#f92672>.</span>DB, config <span style=color:#f92672>*</span>Config) {
+</span></span><span style=display:flex><span>	enableTransaction :<span style=color:#f92672>=</span> <span style=color:#66d9ef>func</span>(db <span style=color:#f92672>*</span>gorm<span style=color:#f92672>.</span>DB) <span style=color:#a6e22e>bool</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#f92672>!</span>db<span style=color:#f92672>.</span>SkipDefaultTransaction
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> len(config<span style=color:#f92672>.</span>CreateClauses) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>		config<span style=color:#f92672>.</span>CreateClauses <span style=color:#f92672>=</span> createClauses
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> len(config<span style=color:#f92672>.</span>QueryClauses) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>		config<span style=color:#f92672>.</span>QueryClauses <span style=color:#f92672>=</span> queryClauses
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> len(config<span style=color:#f92672>.</span>DeleteClauses) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>		config<span style=color:#f92672>.</span>DeleteClauses <span style=color:#f92672>=</span> deleteClauses
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> len(config<span style=color:#f92672>.</span>UpdateClauses) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>		config<span style=color:#f92672>.</span>UpdateClauses <span style=color:#f92672>=</span> updateClauses
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> <span style=color:#960050;background-color:#1e0010>注册不同类型的</span>callback
+</span></span><span style=display:flex><span>	createCallback :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Callback()<span style=color:#f92672>.</span>Create()
+</span></span><span style=display:flex><span>	createCallback<span style=color:#f92672>.</span>Match(enableTransaction)<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:begin_transaction&#34;</span>, BeginTransaction)
+</span></span><span style=display:flex><span>	createCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:before_create&#34;</span>, BeforeCreate)
+</span></span><span style=display:flex><span>	createCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:save_before_associations&#34;</span>, SaveBeforeAssociations(true))
+</span></span><span style=display:flex><span>	createCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:create&#34;</span>, Create(config))
+</span></span><span style=display:flex><span>	createCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:save_after_associations&#34;</span>, SaveAfterAssociations(true))
+</span></span><span style=display:flex><span>	createCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:after_create&#34;</span>, AfterCreate)
+</span></span><span style=display:flex><span>	createCallback<span style=color:#f92672>.</span>Match(enableTransaction)<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:commit_or_rollback_transaction&#34;</span>, CommitOrRollbackTransaction)
+</span></span><span style=display:flex><span>	createCallback<span style=color:#f92672>.</span>Clauses <span style=color:#f92672>=</span> config<span style=color:#f92672>.</span>CreateClauses
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	queryCallback :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Callback()<span style=color:#f92672>.</span>Query()
+</span></span><span style=display:flex><span>	queryCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:query&#34;</span>, Query)
+</span></span><span style=display:flex><span>	queryCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:preload&#34;</span>, Preload)
+</span></span><span style=display:flex><span>	queryCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:after_query&#34;</span>, AfterQuery)
+</span></span><span style=display:flex><span>	queryCallback<span style=color:#f92672>.</span>Clauses <span style=color:#f92672>=</span> config<span style=color:#f92672>.</span>QueryClauses
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	deleteCallback :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Callback()<span style=color:#f92672>.</span>Delete()
+</span></span><span style=display:flex><span>	deleteCallback<span style=color:#f92672>.</span>Match(enableTransaction)<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:begin_transaction&#34;</span>, BeginTransaction)
+</span></span><span style=display:flex><span>	deleteCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:before_delete&#34;</span>, BeforeDelete)
+</span></span><span style=display:flex><span>	deleteCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:delete_before_associations&#34;</span>, DeleteBeforeAssociations)
+</span></span><span style=display:flex><span>	deleteCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:delete&#34;</span>, Delete(config))
+</span></span><span style=display:flex><span>	deleteCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:after_delete&#34;</span>, AfterDelete)
+</span></span><span style=display:flex><span>	deleteCallback<span style=color:#f92672>.</span>Match(enableTransaction)<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:commit_or_rollback_transaction&#34;</span>, CommitOrRollbackTransaction)
+</span></span><span style=display:flex><span>	deleteCallback<span style=color:#f92672>.</span>Clauses <span style=color:#f92672>=</span> config<span style=color:#f92672>.</span>DeleteClauses
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	updateCallback :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Callback()<span style=color:#f92672>.</span>Update()
+</span></span><span style=display:flex><span>	updateCallback<span style=color:#f92672>.</span>Match(enableTransaction)<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:begin_transaction&#34;</span>, BeginTransaction)
+</span></span><span style=display:flex><span>	updateCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:setup_reflect_value&#34;</span>, SetupUpdateReflectValue)
+</span></span><span style=display:flex><span>	updateCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:before_update&#34;</span>, BeforeUpdate)
+</span></span><span style=display:flex><span>	updateCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:save_before_associations&#34;</span>, SaveBeforeAssociations(false))
+</span></span><span style=display:flex><span>	updateCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:update&#34;</span>, Update(config))
+</span></span><span style=display:flex><span>	updateCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:save_after_associations&#34;</span>, SaveAfterAssociations(false))
+</span></span><span style=display:flex><span>	updateCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:after_update&#34;</span>, AfterUpdate)
+</span></span><span style=display:flex><span>	updateCallback<span style=color:#f92672>.</span>Match(enableTransaction)<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:commit_or_rollback_transaction&#34;</span>, CommitOrRollbackTransaction)
+</span></span><span style=display:flex><span>	updateCallback<span style=color:#f92672>.</span>Clauses <span style=color:#f92672>=</span> config<span style=color:#f92672>.</span>UpdateClauses
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	rowCallback :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Callback()<span style=color:#f92672>.</span>Row()
+</span></span><span style=display:flex><span>	rowCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:row&#34;</span>, RowQuery)
+</span></span><span style=display:flex><span>	rowCallback<span style=color:#f92672>.</span>Clauses <span style=color:#f92672>=</span> config<span style=color:#f92672>.</span>QueryClauses
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	rawCallback :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Callback()<span style=color:#f92672>.</span>Raw()
+</span></span><span style=display:flex><span>	rawCallback<span style=color:#f92672>.</span>Register(<span style=color:#e6db74>&#34;gorm:raw&#34;</span>, RawExec)
+</span></span><span style=display:flex><span>	rawCallback<span style=color:#f92672>.</span>Clauses <span style=color:#f92672>=</span> config<span style=color:#f92672>.</span>QueryClauses
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>到这里，默认callback就注册完成了，但是是如何转成对应sql的呢？</p><p>别急，我们继续往下看。</p><p>在<code>RegisterDefaultCallbacks</code>方法里注册了一个<code>gorm:query</code>类型的callback，对应的回调方法为<code>Query</code>。</p><p><a href=https://github.com/go-gorm/gorm/blob/master/callbacks/query.go>query.go</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#66d9ef>func</span> Query(db <span style=color:#f92672>*</span>gorm<span style=color:#f92672>.</span>DB) {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> db<span style=color:#f92672>.</span>Error <span style=color:#f92672>==</span> nil {
+</span></span><span style=display:flex><span>		<span style=color:#f92672>//</span> <span style=color:#960050;background-color:#1e0010>调用</span>BuildQuerySQL方法
+</span></span><span style=display:flex><span>		BuildQuerySQL(db)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> <span style=color:#f92672>!</span>db<span style=color:#f92672>.</span>DryRun <span style=color:#f92672>&amp;&amp;</span> db<span style=color:#f92672>.</span>Error <span style=color:#f92672>==</span> nil {
+</span></span><span style=display:flex><span>			rows, err :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>ConnPool<span style=color:#f92672>.</span>QueryContext(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Context, db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>SQL<span style=color:#f92672>.</span>String(), db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Vars<span style=color:#f92672>...</span>)
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>if</span> err <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>				db<span style=color:#f92672>.</span>AddError(err)
+</span></span><span style=display:flex><span>				<span style=color:#66d9ef>return</span>
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>			defer <span style=color:#66d9ef>func</span>() {
+</span></span><span style=display:flex><span>				db<span style=color:#f92672>.</span>AddError(rows<span style=color:#f92672>.</span>Close())
+</span></span><span style=display:flex><span>			}()
+</span></span><span style=display:flex><span>			gorm<span style=color:#f92672>.</span>Scan(rows, db, <span style=color:#ae81ff>0</span>)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> BuildQuerySQL(db <span style=color:#f92672>*</span>gorm<span style=color:#f92672>.</span>DB) {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>for</span> _, c :<span style=color:#f92672>=</span> range db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>QueryClauses {
+</span></span><span style=display:flex><span>			db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>AddClause(c)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>SQL<span style=color:#f92672>.</span>Len() <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>		db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>SQL<span style=color:#f92672>.</span>Grow(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>		clauseSelect :<span style=color:#f92672>=</span> clause<span style=color:#f92672>.</span>Select{Distinct: db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Distinct}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>Kind() <span style=color:#f92672>==</span> reflect<span style=color:#f92672>.</span>Struct <span style=color:#f92672>&amp;&amp;</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>Type() <span style=color:#f92672>==</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>ModelType {
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>var</span> conds []clause<span style=color:#f92672>.</span>Expression
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>for</span> _, primaryField :<span style=color:#f92672>=</span> range db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>PrimaryFields {
+</span></span><span style=display:flex><span>				<span style=color:#66d9ef>if</span> v, isZero :<span style=color:#f92672>=</span> primaryField<span style=color:#f92672>.</span>ValueOf(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Context, db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>ReflectValue); <span style=color:#f92672>!</span>isZero {
+</span></span><span style=display:flex><span>					conds <span style=color:#f92672>=</span> append(conds, clause<span style=color:#f92672>.</span>Eq{Column: clause<span style=color:#f92672>.</span>Column{Table: db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Table, Name: primaryField<span style=color:#f92672>.</span>DBName}, Value: v})
+</span></span><span style=display:flex><span>				}
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>if</span> len(conds) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>				db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>AddClause(clause<span style=color:#f92672>.</span>Where{Exprs: conds})
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> len(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Selects) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>			clauseSelect<span style=color:#f92672>.</span>Columns <span style=color:#f92672>=</span> make([]clause<span style=color:#f92672>.</span>Column, len(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Selects))
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>for</span> idx, name :<span style=color:#f92672>=</span> range db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Selects {
+</span></span><span style=display:flex><span>				<span style=color:#66d9ef>if</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema <span style=color:#f92672>==</span> nil {
+</span></span><span style=display:flex><span>					clauseSelect<span style=color:#f92672>.</span>Columns[idx] <span style=color:#f92672>=</span> clause<span style=color:#f92672>.</span>Column{Name: name, Raw: true}
+</span></span><span style=display:flex><span>				} <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> f :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>LookUpField(name); f <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>					clauseSelect<span style=color:#f92672>.</span>Columns[idx] <span style=color:#f92672>=</span> clause<span style=color:#f92672>.</span>Column{Name: f<span style=color:#f92672>.</span>DBName}
+</span></span><span style=display:flex><span>				} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>					clauseSelect<span style=color:#f92672>.</span>Columns[idx] <span style=color:#f92672>=</span> clause<span style=color:#f92672>.</span>Column{Name: name, Raw: true}
+</span></span><span style=display:flex><span>				}
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>		} <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema <span style=color:#f92672>!=</span> nil <span style=color:#f92672>&amp;&amp;</span> len(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Omits) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>			selectColumns, _ :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>SelectAndOmitColumns(false, false)
+</span></span><span style=display:flex><span>			clauseSelect<span style=color:#f92672>.</span>Columns <span style=color:#f92672>=</span> make([]clause<span style=color:#f92672>.</span>Column, <span style=color:#ae81ff>0</span>, len(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>DBNames))
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>for</span> _, dbName :<span style=color:#f92672>=</span> range db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>DBNames {
+</span></span><span style=display:flex><span>				<span style=color:#66d9ef>if</span> v, ok :<span style=color:#f92672>=</span> selectColumns[dbName]; (ok <span style=color:#f92672>&amp;&amp;</span> v) <span style=color:#f92672>||</span> <span style=color:#f92672>!</span>ok {
+</span></span><span style=display:flex><span>					clauseSelect<span style=color:#f92672>.</span>Columns <span style=color:#f92672>=</span> append(clauseSelect<span style=color:#f92672>.</span>Columns, clause<span style=color:#f92672>.</span>Column{Table: db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Table, Name: dbName})
+</span></span><span style=display:flex><span>				}
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>		} <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema <span style=color:#f92672>!=</span> nil <span style=color:#f92672>&amp;&amp;</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>IsValid() {
+</span></span><span style=display:flex><span>			queryFields :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>QueryFields
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>if</span> <span style=color:#f92672>!</span>queryFields {
+</span></span><span style=display:flex><span>				<span style=color:#66d9ef>switch</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>Kind() {
+</span></span><span style=display:flex><span>				<span style=color:#66d9ef>case</span> reflect<span style=color:#f92672>.</span>Struct:
+</span></span><span style=display:flex><span>					queryFields <span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>Type() <span style=color:#f92672>!=</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>ModelType
+</span></span><span style=display:flex><span>				<span style=color:#66d9ef>case</span> reflect<span style=color:#f92672>.</span>Slice:
+</span></span><span style=display:flex><span>					queryFields <span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>ReflectValue<span style=color:#f92672>.</span>Type()<span style=color:#f92672>.</span>Elem() <span style=color:#f92672>!=</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>ModelType
+</span></span><span style=display:flex><span>				}
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>if</span> queryFields {
+</span></span><span style=display:flex><span>				stmt :<span style=color:#f92672>=</span> gorm<span style=color:#f92672>.</span>Statement{DB: db}
+</span></span><span style=display:flex><span>				<span style=color:#f92672>//</span> smaller struct
+</span></span><span style=display:flex><span>				<span style=color:#66d9ef>if</span> err :<span style=color:#f92672>=</span> stmt<span style=color:#f92672>.</span>Parse(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Dest); err <span style=color:#f92672>==</span> nil <span style=color:#f92672>&amp;&amp;</span> (db<span style=color:#f92672>.</span>QueryFields <span style=color:#f92672>||</span> stmt<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>ModelType <span style=color:#f92672>!=</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>ModelType) {
+</span></span><span style=display:flex><span>					clauseSelect<span style=color:#f92672>.</span>Columns <span style=color:#f92672>=</span> make([]clause<span style=color:#f92672>.</span>Column, len(stmt<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>DBNames))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>					<span style=color:#66d9ef>for</span> idx, dbName :<span style=color:#f92672>=</span> range stmt<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>DBNames {
+</span></span><span style=display:flex><span>						clauseSelect<span style=color:#f92672>.</span>Columns[idx] <span style=color:#f92672>=</span> clause<span style=color:#f92672>.</span>Column{Table: db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Table, Name: dbName}
+</span></span><span style=display:flex><span>					}
+</span></span><span style=display:flex><span>				}
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#f92672>//</span> inline joins
+</span></span><span style=display:flex><span>		fromClause :<span style=color:#f92672>=</span> clause<span style=color:#f92672>.</span>From{}
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> v, ok :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Clauses[<span style=color:#e6db74>&#34;FROM&#34;</span>]<span style=color:#f92672>.</span>Expression<span style=color:#f92672>.</span>(clause<span style=color:#f92672>.</span>From); ok {
+</span></span><span style=display:flex><span>			fromClause <span style=color:#f92672>=</span> v
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> len(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Joins) <span style=color:#f92672>!=</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>||</span> len(fromClause<span style=color:#f92672>.</span>Joins) <span style=color:#f92672>!=</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>if</span> len(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Selects) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>&amp;&amp;</span> len(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Omits) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>&amp;&amp;</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>				clauseSelect<span style=color:#f92672>.</span>Columns <span style=color:#f92672>=</span> make([]clause<span style=color:#f92672>.</span>Column, len(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>DBNames))
+</span></span><span style=display:flex><span>				<span style=color:#66d9ef>for</span> idx, dbName :<span style=color:#f92672>=</span> range db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>DBNames {
+</span></span><span style=display:flex><span>					clauseSelect<span style=color:#f92672>.</span>Columns[idx] <span style=color:#f92672>=</span> clause<span style=color:#f92672>.</span>Column{Table: db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Table, Name: dbName}
+</span></span><span style=display:flex><span>				}
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>			specifiedRelationsName :<span style=color:#f92672>=</span> make(map[string]interface{})
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>for</span> _, join :<span style=color:#f92672>=</span> range db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Joins {
+</span></span><span style=display:flex><span>				<span style=color:#66d9ef>if</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>					<span style=color:#66d9ef>var</span> isRelations <span style=color:#a6e22e>bool</span> <span style=color:#f92672>//</span> is relations <span style=color:#f92672>or</span> raw sql
+</span></span><span style=display:flex><span>					<span style=color:#66d9ef>var</span> relations []<span style=color:#f92672>*</span>schema<span style=color:#f92672>.</span>Relationship
+</span></span><span style=display:flex><span>					relation, ok :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>Relationships<span style=color:#f92672>.</span>Relations[join<span style=color:#f92672>.</span>Name]
+</span></span><span style=display:flex><span>					<span style=color:#66d9ef>if</span> ok {
+</span></span><span style=display:flex><span>						isRelations <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>						relations <span style=color:#f92672>=</span> append(relations, relation)
+</span></span><span style=display:flex><span>					} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>						<span style=color:#f92672>//</span> handle nested join like <span style=color:#e6db74>&#34;Manager.Company&#34;</span>
+</span></span><span style=display:flex><span>						nestedJoinNames :<span style=color:#f92672>=</span> strings<span style=color:#f92672>.</span>Split(join<span style=color:#f92672>.</span>Name, <span style=color:#e6db74>&#34;.&#34;</span>)
+</span></span><span style=display:flex><span>						<span style=color:#66d9ef>if</span> len(nestedJoinNames) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>1</span> {
+</span></span><span style=display:flex><span>							isNestedJoin :<span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>							gussNestedRelations :<span style=color:#f92672>=</span> make([]<span style=color:#f92672>*</span>schema<span style=color:#f92672>.</span>Relationship, <span style=color:#ae81ff>0</span>, len(nestedJoinNames))
+</span></span><span style=display:flex><span>							currentRelations :<span style=color:#f92672>=</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Schema<span style=color:#f92672>.</span>Relationships<span style=color:#f92672>.</span>Relations
+</span></span><span style=display:flex><span>							<span style=color:#66d9ef>for</span> _, relname :<span style=color:#f92672>=</span> range nestedJoinNames {
+</span></span><span style=display:flex><span>								<span style=color:#f92672>//</span> incomplete match, only treated as raw sql
+</span></span><span style=display:flex><span>								<span style=color:#66d9ef>if</span> relation, ok <span style=color:#f92672>=</span> currentRelations[relname]; ok {
+</span></span><span style=display:flex><span>									gussNestedRelations <span style=color:#f92672>=</span> append(gussNestedRelations, relation)
+</span></span><span style=display:flex><span>									currentRelations <span style=color:#f92672>=</span> relation<span style=color:#f92672>.</span>FieldSchema<span style=color:#f92672>.</span>Relationships<span style=color:#f92672>.</span>Relations
+</span></span><span style=display:flex><span>								} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>									isNestedJoin <span style=color:#f92672>=</span> false
+</span></span><span style=display:flex><span>									<span style=color:#66d9ef>break</span>
+</span></span><span style=display:flex><span>								}
+</span></span><span style=display:flex><span>							}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>							<span style=color:#66d9ef>if</span> isNestedJoin {
+</span></span><span style=display:flex><span>								isRelations <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>								relations <span style=color:#f92672>=</span> gussNestedRelations
+</span></span><span style=display:flex><span>							}
+</span></span><span style=display:flex><span>						}
+</span></span><span style=display:flex><span>					}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>					<span style=color:#66d9ef>if</span> isRelations {
+</span></span><span style=display:flex><span>						genJoinClause :<span style=color:#f92672>=</span> <span style=color:#66d9ef>func</span>(joinType clause<span style=color:#f92672>.</span>JoinType, parentTableName string, relation <span style=color:#f92672>*</span>schema<span style=color:#f92672>.</span>Relationship) clause<span style=color:#f92672>.</span>Join {
+</span></span><span style=display:flex><span>							tableAliasName :<span style=color:#f92672>=</span> relation<span style=color:#f92672>.</span>Name
+</span></span><span style=display:flex><span>							<span style=color:#66d9ef>if</span> parentTableName <span style=color:#f92672>!=</span> clause<span style=color:#f92672>.</span>CurrentTable {
+</span></span><span style=display:flex><span>								tableAliasName <span style=color:#f92672>=</span> utils<span style=color:#f92672>.</span>NestedRelationName(parentTableName, tableAliasName)
+</span></span><span style=display:flex><span>							}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>							columnStmt :<span style=color:#f92672>=</span> gorm<span style=color:#f92672>.</span>Statement{
+</span></span><span style=display:flex><span>								Table: tableAliasName, DB: db, Schema: relation<span style=color:#f92672>.</span>FieldSchema,
+</span></span><span style=display:flex><span>								Selects: join<span style=color:#f92672>.</span>Selects, Omits: join<span style=color:#f92672>.</span>Omits,
+</span></span><span style=display:flex><span>							}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>							selectColumns, restricted :<span style=color:#f92672>=</span> columnStmt<span style=color:#f92672>.</span>SelectAndOmitColumns(false, false)
+</span></span><span style=display:flex><span>							<span style=color:#66d9ef>for</span> _, s :<span style=color:#f92672>=</span> range relation<span style=color:#f92672>.</span>FieldSchema<span style=color:#f92672>.</span>DBNames {
+</span></span><span style=display:flex><span>								<span style=color:#66d9ef>if</span> v, ok :<span style=color:#f92672>=</span> selectColumns[s]; (ok <span style=color:#f92672>&amp;&amp;</span> v) <span style=color:#f92672>||</span> (<span style=color:#f92672>!</span>ok <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!</span>restricted) {
+</span></span><span style=display:flex><span>									clauseSelect<span style=color:#f92672>.</span>Columns <span style=color:#f92672>=</span> append(clauseSelect<span style=color:#f92672>.</span>Columns, clause<span style=color:#f92672>.</span>Column{
+</span></span><span style=display:flex><span>										Table: tableAliasName,
+</span></span><span style=display:flex><span>										Name:  s,
+</span></span><span style=display:flex><span>										Alias: utils<span style=color:#f92672>.</span>NestedRelationName(tableAliasName, s),
+</span></span><span style=display:flex><span>									})
+</span></span><span style=display:flex><span>								}
+</span></span><span style=display:flex><span>							}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>							exprs :<span style=color:#f92672>=</span> make([]clause<span style=color:#f92672>.</span>Expression, len(relation<span style=color:#f92672>.</span>References))
+</span></span><span style=display:flex><span>							<span style=color:#66d9ef>for</span> idx, ref :<span style=color:#f92672>=</span> range relation<span style=color:#f92672>.</span>References {
+</span></span><span style=display:flex><span>								<span style=color:#66d9ef>if</span> ref<span style=color:#f92672>.</span>OwnPrimaryKey {
+</span></span><span style=display:flex><span>									exprs[idx] <span style=color:#f92672>=</span> clause<span style=color:#f92672>.</span>Eq{
+</span></span><span style=display:flex><span>										Column: clause<span style=color:#f92672>.</span>Column{Table: parentTableName, Name: ref<span style=color:#f92672>.</span>PrimaryKey<span style=color:#f92672>.</span>DBName},
+</span></span><span style=display:flex><span>										Value:  clause<span style=color:#f92672>.</span>Column{Table: tableAliasName, Name: ref<span style=color:#f92672>.</span>ForeignKey<span style=color:#f92672>.</span>DBName},
+</span></span><span style=display:flex><span>									}
+</span></span><span style=display:flex><span>								} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>									<span style=color:#66d9ef>if</span> ref<span style=color:#f92672>.</span>PrimaryValue <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;&#34;</span> {
+</span></span><span style=display:flex><span>										exprs[idx] <span style=color:#f92672>=</span> clause<span style=color:#f92672>.</span>Eq{
+</span></span><span style=display:flex><span>											Column: clause<span style=color:#f92672>.</span>Column{Table: parentTableName, Name: ref<span style=color:#f92672>.</span>ForeignKey<span style=color:#f92672>.</span>DBName},
+</span></span><span style=display:flex><span>											Value:  clause<span style=color:#f92672>.</span>Column{Table: tableAliasName, Name: ref<span style=color:#f92672>.</span>PrimaryKey<span style=color:#f92672>.</span>DBName},
+</span></span><span style=display:flex><span>										}
+</span></span><span style=display:flex><span>									} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>										exprs[idx] <span style=color:#f92672>=</span> clause<span style=color:#f92672>.</span>Eq{
+</span></span><span style=display:flex><span>											Column: clause<span style=color:#f92672>.</span>Column{Table: tableAliasName, Name: ref<span style=color:#f92672>.</span>ForeignKey<span style=color:#f92672>.</span>DBName},
+</span></span><span style=display:flex><span>											Value:  ref<span style=color:#f92672>.</span>PrimaryValue,
+</span></span><span style=display:flex><span>										}
+</span></span><span style=display:flex><span>									}
+</span></span><span style=display:flex><span>								}
+</span></span><span style=display:flex><span>							}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>							{
+</span></span><span style=display:flex><span>								onStmt :<span style=color:#f92672>=</span> gorm<span style=color:#f92672>.</span>Statement{Table: tableAliasName, DB: db, Clauses: map[string]clause<span style=color:#f92672>.</span>Clause{}}
+</span></span><span style=display:flex><span>								<span style=color:#66d9ef>for</span> _, c :<span style=color:#f92672>=</span> range relation<span style=color:#f92672>.</span>FieldSchema<span style=color:#f92672>.</span>QueryClauses {
+</span></span><span style=display:flex><span>									onStmt<span style=color:#f92672>.</span>AddClause(c)
+</span></span><span style=display:flex><span>								}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>								<span style=color:#66d9ef>if</span> join<span style=color:#f92672>.</span>On <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>									onStmt<span style=color:#f92672>.</span>AddClause(join<span style=color:#f92672>.</span>On)
+</span></span><span style=display:flex><span>								}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>								<span style=color:#66d9ef>if</span> cs, ok :<span style=color:#f92672>=</span> onStmt<span style=color:#f92672>.</span>Clauses[<span style=color:#e6db74>&#34;WHERE&#34;</span>]; ok {
+</span></span><span style=display:flex><span>									<span style=color:#66d9ef>if</span> where, ok :<span style=color:#f92672>=</span> cs<span style=color:#f92672>.</span>Expression<span style=color:#f92672>.</span>(clause<span style=color:#f92672>.</span>Where); ok {
+</span></span><span style=display:flex><span>										where<span style=color:#f92672>.</span>Build(<span style=color:#f92672>&amp;</span>onStmt)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>										<span style=color:#66d9ef>if</span> onSQL :<span style=color:#f92672>=</span> onStmt<span style=color:#f92672>.</span>SQL<span style=color:#f92672>.</span>String(); onSQL <span style=color:#f92672>!=</span> <span style=color:#e6db74>&#34;&#34;</span> {
+</span></span><span style=display:flex><span>											vars :<span style=color:#f92672>=</span> onStmt<span style=color:#f92672>.</span>Vars
+</span></span><span style=display:flex><span>											<span style=color:#66d9ef>for</span> idx, v :<span style=color:#f92672>=</span> range vars {
+</span></span><span style=display:flex><span>												bindvar :<span style=color:#f92672>=</span> strings<span style=color:#f92672>.</span>Builder{}
+</span></span><span style=display:flex><span>												onStmt<span style=color:#f92672>.</span>Vars <span style=color:#f92672>=</span> vars[<span style=color:#ae81ff>0</span> : idx<span style=color:#f92672>+</span><span style=color:#ae81ff>1</span>]
+</span></span><span style=display:flex><span>												db<span style=color:#f92672>.</span>Dialector<span style=color:#f92672>.</span>BindVarTo(<span style=color:#f92672>&amp;</span>bindvar, <span style=color:#f92672>&amp;</span>onStmt, v)
+</span></span><span style=display:flex><span>												onSQL <span style=color:#f92672>=</span> strings<span style=color:#f92672>.</span>Replace(onSQL, bindvar<span style=color:#f92672>.</span>String(), <span style=color:#e6db74>&#34;?&#34;</span>, <span style=color:#ae81ff>1</span>)
+</span></span><span style=display:flex><span>											}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>											exprs <span style=color:#f92672>=</span> append(exprs, clause<span style=color:#f92672>.</span>Expr{SQL: onSQL, Vars: vars})
+</span></span><span style=display:flex><span>										}
+</span></span><span style=display:flex><span>									}
+</span></span><span style=display:flex><span>								}
+</span></span><span style=display:flex><span>							}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>							<span style=color:#66d9ef>return</span> clause<span style=color:#f92672>.</span>Join{
+</span></span><span style=display:flex><span>								Type:  joinType,
+</span></span><span style=display:flex><span>								Table: clause<span style=color:#f92672>.</span>Table{Name: relation<span style=color:#f92672>.</span>FieldSchema<span style=color:#f92672>.</span>Table, Alias: tableAliasName},
+</span></span><span style=display:flex><span>								ON:    clause<span style=color:#f92672>.</span>Where{Exprs: exprs},
+</span></span><span style=display:flex><span>							}
+</span></span><span style=display:flex><span>						}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>						parentTableName :<span style=color:#f92672>=</span> clause<span style=color:#f92672>.</span>CurrentTable
+</span></span><span style=display:flex><span>						<span style=color:#66d9ef>for</span> _, rel :<span style=color:#f92672>=</span> range relations {
+</span></span><span style=display:flex><span>							<span style=color:#f92672>//</span> joins table alias like <span style=color:#e6db74>&#34;Manager, Company, Manager__Company&#34;</span>
+</span></span><span style=display:flex><span>							nestedAlias :<span style=color:#f92672>=</span> utils<span style=color:#f92672>.</span>NestedRelationName(parentTableName, rel<span style=color:#f92672>.</span>Name)
+</span></span><span style=display:flex><span>							<span style=color:#66d9ef>if</span> _, ok :<span style=color:#f92672>=</span> specifiedRelationsName[nestedAlias]; <span style=color:#f92672>!</span>ok {
+</span></span><span style=display:flex><span>								fromClause<span style=color:#f92672>.</span>Joins <span style=color:#f92672>=</span> append(fromClause<span style=color:#f92672>.</span>Joins, genJoinClause(join<span style=color:#f92672>.</span>JoinType, parentTableName, rel))
+</span></span><span style=display:flex><span>								specifiedRelationsName[nestedAlias] <span style=color:#f92672>=</span> nil
+</span></span><span style=display:flex><span>							}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>							<span style=color:#66d9ef>if</span> parentTableName <span style=color:#f92672>!=</span> clause<span style=color:#f92672>.</span>CurrentTable {
+</span></span><span style=display:flex><span>								parentTableName <span style=color:#f92672>=</span> utils<span style=color:#f92672>.</span>NestedRelationName(parentTableName, rel<span style=color:#f92672>.</span>Name)
+</span></span><span style=display:flex><span>							} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>								parentTableName <span style=color:#f92672>=</span> rel<span style=color:#f92672>.</span>Name
+</span></span><span style=display:flex><span>							}
+</span></span><span style=display:flex><span>						}
+</span></span><span style=display:flex><span>					} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>						fromClause<span style=color:#f92672>.</span>Joins <span style=color:#f92672>=</span> append(fromClause<span style=color:#f92672>.</span>Joins, clause<span style=color:#f92672>.</span>Join{
+</span></span><span style=display:flex><span>							Expression: clause<span style=color:#f92672>.</span>NamedExpr{SQL: join<span style=color:#f92672>.</span>Name, Vars: join<span style=color:#f92672>.</span>Conds},
+</span></span><span style=display:flex><span>						})
+</span></span><span style=display:flex><span>					}
+</span></span><span style=display:flex><span>				} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>					fromClause<span style=color:#f92672>.</span>Joins <span style=color:#f92672>=</span> append(fromClause<span style=color:#f92672>.</span>Joins, clause<span style=color:#f92672>.</span>Join{
+</span></span><span style=display:flex><span>						Expression: clause<span style=color:#f92672>.</span>NamedExpr{SQL: join<span style=color:#f92672>.</span>Name, Vars: join<span style=color:#f92672>.</span>Conds},
+</span></span><span style=display:flex><span>					})
+</span></span><span style=display:flex><span>				}
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>			db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>AddClause(fromClause)
+</span></span><span style=display:flex><span>		} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>			db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>AddClauseIfNotExists(clause<span style=color:#f92672>.</span>From{})
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>AddClauseIfNotExists(clauseSelect)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#f92672>//</span> db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>BuildClauses眼熟吗<span style=color:#960050;background-color:#1e0010>？还记得前面的</span>stmt<span style=color:#f92672>.</span>BuildClauses吗<span style=color:#960050;background-color:#1e0010>？</span>
+</span></span><span style=display:flex><span>		db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>Build(db<span style=color:#f92672>.</span>Statement<span style=color:#f92672>.</span>BuildClauses<span style=color:#f92672>...</span>)
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>重头戏终于来了，<code>Query</code>方法里调用了<code>BuildQuerySQl</code>，看名字也能猜到这里就是生成sql了，这里最终调用了<code>db.Statement.Build</code>方法。</p><p><a href=https://github.com/go-gorm/gorm/blob/master/statement.go>statement.go</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>//</span> Build build sql with clauses names
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (stmt <span style=color:#f92672>*</span>Statement) Build(clauses <span style=color:#f92672>...</span>string) {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>var</span> firstClauseWritten <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>for</span> _, name :<span style=color:#f92672>=</span> range clauses {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> c, ok :<span style=color:#f92672>=</span> stmt<span style=color:#f92672>.</span>Clauses[name]; ok {
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>if</span> firstClauseWritten {
+</span></span><span style=display:flex><span>				stmt<span style=color:#f92672>.</span>WriteByte(<span style=color:#e6db74>&#39; &#39;</span>)
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>			firstClauseWritten <span style=color:#f92672>=</span> true
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>if</span> b, ok :<span style=color:#f92672>=</span> stmt<span style=color:#f92672>.</span>DB<span style=color:#f92672>.</span>ClauseBuilders[name]; ok {
+</span></span><span style=display:flex><span>				b(c, stmt)
+</span></span><span style=display:flex><span>			} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>				c<span style=color:#f92672>.</span>Build(stmt)
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里会根据<code>statement</code>的<code>BuildCluauses</code>属性，执行<code>Clause</code>的<code>Build</code>方法。</p><p><a href=https://github.com/go-gorm/gorm/blob/master/clause/clause.go>clause.go</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>//</span> ClauseBuilder clause builder, allows to customize how to build clause
+</span></span><span style=display:flex><span>type ClauseBuilder <span style=color:#66d9ef>func</span>(Clause, Builder)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>type Writer interface {
+</span></span><span style=display:flex><span>	WriteByte(byte) error
+</span></span><span style=display:flex><span>	WriteString(string) (<span style=color:#a6e22e>int</span>, error)
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>//</span> Builder builder interface
+</span></span><span style=display:flex><span>type Builder interface {
+</span></span><span style=display:flex><span>	Writer
+</span></span><span style=display:flex><span>	WriteQuoted(field interface{})
+</span></span><span style=display:flex><span>	AddVar(Writer, <span style=color:#f92672>...</span>interface{})
+</span></span><span style=display:flex><span>	AddError(error) error
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>//</span> Clause
+</span></span><span style=display:flex><span>type Clause struct {
+</span></span><span style=display:flex><span>	Name                string <span style=color:#f92672>//</span> WHERE
+</span></span><span style=display:flex><span>	BeforeExpression    Expression
+</span></span><span style=display:flex><span>	AfterNameExpression Expression
+</span></span><span style=display:flex><span>	AfterExpression     Expression
+</span></span><span style=display:flex><span>	Expression          Expression
+</span></span><span style=display:flex><span>	Builder             ClauseBuilder
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>//</span> Build build clause
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (c Clause) Build(builder Builder) {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> c<span style=color:#f92672>.</span>Builder <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>		c<span style=color:#f92672>.</span>Builder(c, builder)
+</span></span><span style=display:flex><span>	} <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> c<span style=color:#f92672>.</span>Expression <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> c<span style=color:#f92672>.</span>BeforeExpression <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>			c<span style=color:#f92672>.</span>BeforeExpression<span style=color:#f92672>.</span>Build(builder)
+</span></span><span style=display:flex><span>			builder<span style=color:#f92672>.</span>WriteByte(<span style=color:#e6db74>&#39; &#39;</span>)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> c<span style=color:#f92672>.</span>Name <span style=color:#f92672>!=</span> <span style=color:#e6db74>&#34;&#34;</span> {
+</span></span><span style=display:flex><span>			builder<span style=color:#f92672>.</span>WriteString(c<span style=color:#f92672>.</span>Name)
+</span></span><span style=display:flex><span>			builder<span style=color:#f92672>.</span>WriteByte(<span style=color:#e6db74>&#39; &#39;</span>)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> c<span style=color:#f92672>.</span>AfterNameExpression <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>			c<span style=color:#f92672>.</span>AfterNameExpression<span style=color:#f92672>.</span>Build(builder)
+</span></span><span style=display:flex><span>			builder<span style=color:#f92672>.</span>WriteByte(<span style=color:#e6db74>&#39; &#39;</span>)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		c<span style=color:#f92672>.</span>Expression<span style=color:#f92672>.</span>Build(builder)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> c<span style=color:#f92672>.</span>AfterExpression <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>			builder<span style=color:#f92672>.</span>WriteByte(<span style=color:#e6db74>&#39; &#39;</span>)
+</span></span><span style=display:flex><span>			c<span style=color:#f92672>.</span>AfterExpression<span style=color:#f92672>.</span>Build(builder)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里会执行对应Clause的Build方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>//</span> Select select attrs when querying, updating, creating
+</span></span><span style=display:flex><span>type Select struct {
+</span></span><span style=display:flex><span>	Distinct   <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>	Columns    []Column
+</span></span><span style=display:flex><span>	Expression Expression
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (s Select) Name() string {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;SELECT&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (s Select) Build(builder Builder) {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> len(s<span style=color:#f92672>.</span>Columns) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> s<span style=color:#f92672>.</span>Distinct {
+</span></span><span style=display:flex><span>			builder<span style=color:#f92672>.</span>WriteString(<span style=color:#e6db74>&#34;DISTINCT &#34;</span>)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>for</span> idx, column :<span style=color:#f92672>=</span> range s<span style=color:#f92672>.</span>Columns {
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>if</span> idx <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>				builder<span style=color:#f92672>.</span>WriteByte(<span style=color:#e6db74>&#39;,&#39;</span>)
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>			builder<span style=color:#f92672>.</span>WriteQuoted(column)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>		builder<span style=color:#f92672>.</span>WriteByte(<span style=color:#e6db74>&#39;*&#39;</span>)
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (s Select) MergeClause(clause <span style=color:#f92672>*</span>Clause) {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> s<span style=color:#f92672>.</span>Expression <span style=color:#f92672>!=</span> nil {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> s<span style=color:#f92672>.</span>Distinct {
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>if</span> expr, ok :<span style=color:#f92672>=</span> s<span style=color:#f92672>.</span>Expression<span style=color:#f92672>.</span>(Expr); ok {
+</span></span><span style=display:flex><span>				expr<span style=color:#f92672>.</span>SQL <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;DISTINCT &#34;</span> <span style=color:#f92672>+</span> expr<span style=color:#f92672>.</span>SQL
+</span></span><span style=display:flex><span>				clause<span style=color:#f92672>.</span>Expression <span style=color:#f92672>=</span> expr
+</span></span><span style=display:flex><span>				<span style=color:#66d9ef>return</span>
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		clause<span style=color:#f92672>.</span>Expression <span style=color:#f92672>=</span> s<span style=color:#f92672>.</span>Expression
+</span></span><span style=display:flex><span>	} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>		clause<span style=color:#f92672>.</span>Expression <span style=color:#f92672>=</span> s
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这是<code>Select</code>类型的<code>Clause</code>定义，是不是一下就清楚了。</p><p><code>gorm</code>通过<code>callback</code>里注册<code>Clause</code>，在<code>Clause</code>里实现了sql拼接操作。</p><p>看了几回源码，这次总算是搞清楚了。</p></div><footer class=post-footer><ul class=post-tags><li><a href=https://liudon.com/tags/gorm/>Gorm</a></li></ul><nav class=paginav><a class=prev href=https://liudon.com/posts/gorm-supports-sqlcommenter/><span class=title>« Prev</span><br><span>GORM增加sqlcommenter特性</span>
+</a><a class=next href=https://liudon.com/posts/%E5%B7%A5%E9%93%B6%E4%BA%9A%E6%B4%B2%E7%BD%91%E9%93%B6%E5%AF%86%E7%A0%81%E9%87%8D%E7%BD%AE/><span class=title>Next »</span><br><span>工银亚洲网银密码重置</span></a></nav></footer><div><div class=post_ads><ins class=adsbygoogle style=display:block data-ad-client=ca-pub-4739645989170648 data-ad-slot=5019102040 data-ad-format=auto data-full-width-responsive=true></ins><script>window.addEventListener("load",function(){(adsbygoogle=window.adsbygoogle||[]).push({})})</script></div><div class=pagination__title><span class=pagination__title-h style=font-size:20px>💬评论</span><hr></div><div id=tcomment></div><script src=https://cdnjs.cloudflare.com/ajax/libs/twikoo/1.6.41/twikoo.all.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script>twikoo.init({envId:"https://comment.liudon.com",el:"#tcomment",lang:"zh-CN",region:"ap-shanghai",path:window.TWIKOO_MAGIC_PATH||window.location.pathname})</script></div></article></main><footer class=footer><span>&copy; 2025 <a href=https://liudon.com/>流动</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg></a><footer class=footer style=margin-top:-20px;padding-top:0><span><a href=https://beian.miit.gov.cn target=_blank>京ICP备13029522号-2</a></span></footer><script src=//tokinx.github.io/ViewImage/view-image.min.js async></script><script>function initViewImage(){window.ViewImage&&ViewImage.init(".post-content img")}document.readyState==="complete"?initViewImage():window.addEventListener("load",initViewImage)</script><script>const host=window.location.host;host!=="blog.liudon.xyz"&&!host.startsWith("liudon.")&&!host.startsWith("localhost")&&!host.startsWith("127.0.0.1")&&(document.body.innerHTML=['<div style="margin: auto;">',"<h1>当前页面并非本人博客，即将在2秒后跳转到本人博客: https://liudon.com。</h1>","<br />","</div>"].join(""),document.body.style=["background-color: white;","color: black;","text-align: center;","font-size: 50px;","width: 100vw;","height: 100vh;","display: flex;"].join(""),setTimeout(()=>{window.location.href="https://liudon.com"},2e3))</script><script>enScroll=!1,enFdl=!1,extCurrent=0[0],filename=0[0],targetText=0[0],splitOrigin=0[0];const lStor=localStorage,sStor=sessionStorage,doc=document,docEl=document.documentElement,docBody=document.body,docLoc=document.location,w=window,s=screen,nav=navigator||{},extensions=["pdf","xls","xlsx","doc","docx","txt","rtf","csv","exe","key","pps","ppt","pptx","7z","pkg","rar","gz","zip","avi","mov","mp4","mpe","mpeg","wmv","mid","midi","mp3","wav","wma"];function a(e,t,n,o){const j="G-G9ZDJQN9E2",r=()=>Math.floor(Math.random()*1e9)+1,c=()=>Math.floor(Date.now()/1e3),F=()=>(sStor._p||(sStor._p=r()),sStor._p),E=()=>r()+"."+c(),_=()=>(lStor.cid_v4||(lStor.cid_v4=E()),lStor.cid_v4),m=lStor.getItem("cid_v4"),v=()=>m?0[0]:enScroll==!0?0[0]:"1",p=()=>(sStor.sid||(sStor.sid=c()),sStor.sid),O=()=>{if(!sStor._ss)return sStor._ss="1",sStor._ss;if(sStor.getItem("_ss")=="1")return 0[0]},a="1",g=()=>{if(sStor.sct)if(enScroll==!0)return sStor.sct;else x=+sStor.getItem("sct")+ +a,sStor.sct=x;else sStor.sct=a;return sStor.sct},i=docLoc.search,b=new URLSearchParams(i),h=["q","s","search","query","keyword"],y=h.some(e=>i.includes("&"+e+"=")||i.includes("?"+e+"=")),u=()=>y==!0?"view_search_results":enScroll==!0?"scroll":enFdl==!0?"file_download":"page_view",f=()=>enScroll==!0?"90":0[0],C=()=>{if(u()=="view_search_results"){for(let e of b)if(h.includes(e[0]))return e[1]}else return 0[0]},d=encodeURIComponent,k=e=>{let t=[];for(let n in e)e.hasOwnProperty(n)&&e[n]!==0[0]&&t.push(d(n)+"="+d(e[n]));return t.join("&")},A=!1,S="https://liudon.com/analytics/post",M=k({tid:j,_p:F(),v:"2",sr:(s.width*w.devicePixelRatio+"x"+s.height*w.devicePixelRatio).toString(),ul:(nav.language||0[0]).toLowerCase(),cid:_(),_fv:v(),_s:"1",dl:docLoc.origin+docLoc.pathname+i,dt:doc.title||0[0],dr:doc.referrer||0[0],sid:p(),sct:g(),seg:"1",en:u(),"epn.percent_scrolled":f(),"ep.search_term":C(),"ep.file_extension":e||0[0],"ep.file_name":t||0[0],"ep.link_text":n||0[0],"ep.link_url":o||0[0],_ss:O(),_dbg:A?1:0[0]}),l=S+"?"+M;if(nav.sendBeacon)nav.sendBeacon(l);else{let e=new XMLHttpRequest;e.open("POST",l,!0)}}a();function sPr(){return(docEl.scrollTop||docBody.scrollTop)/((docEl.scrollHeight||docBody.scrollHeight)-docEl.clientHeight)*100}doc.addEventListener("scroll",sEv,{passive:!0});function sEv(){const e=sPr();if(e<90)return;enScroll=!0,a(),doc.removeEventListener("scroll",sEv,{passive:!0}),enScroll=!1}document.addEventListener("DOMContentLoaded",function(){let e=document.getElementsByTagName("a");for(let t=0;t<e.length;t++)if(e[t].getAttribute("href")!=null){const n=e[t].getAttribute("href"),s=n.substring(n.lastIndexOf("/")+1),o=s.split(".").pop();(e[t].hasAttribute("download")||extensions.includes(o))&&e[t].addEventListener("click",fDl,{passive:!0})}});function fDl(e){enFdl=!0;const t=e.currentTarget.getAttribute("href"),n=t.substring(t.lastIndexOf("/")+1),s=n.split(".").pop(),o=n.replace("."+s,""),i=e.currentTarget.text,r=t.replace(docLoc.origin,"");a(s,o,i,r),enFdl=!1}</script><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

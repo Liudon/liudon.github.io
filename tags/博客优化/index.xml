@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>博客优化 on 流动</title>
+    <link>https://liudon.com/tags/%E5%8D%9A%E5%AE%A2%E4%BC%98%E5%8C%96/</link>
+    <description>Recent content in 博客优化 on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 30 Sep 2024 22:01:45 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/%E5%8D%9A%E5%AE%A2%E4%BC%98%E5%8C%96/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>当Hugo遇上AVIF，优化图片加载</title>
+      <link>https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/</link>
+      <pubDate>Mon, 30 Sep 2024 22:01:45 +0800</pubDate>
+      <guid>https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/</guid>
+      <description>&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/avif-on-hugo.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/avif-on-hugo.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;avif-on-hugo.png&#34; width=&#34;1080&#34; height=&#34;328&#34; alt=&#34;avif-on-hugo&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;这篇文章会介绍基于Github Workflow使用ImageMagick生成AVIF图片，来优化Hugo站点的加载速度。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>加速Cloudflare访问</title>
+      <link>https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/</link>
+      <pubDate>Wed, 21 Feb 2024 20:25:49 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/</guid>
+      <description>&lt;h4 id=&#34;背景&#34;&gt;背景&lt;/h4&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/blog.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/blog.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;blog.png&#34; width=&#34;828&#34; height=&#34;753&#34; alt=&#34;博客架构&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;这是当前的博客架构，文件保存在&lt;code&gt;Github&lt;/code&gt;仓库，通过&lt;code&gt;Cloudflare Page&lt;/code&gt;提供访问。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/slow.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/slow.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;slow.png&#34; width=&#34;1080&#34; height=&#34;311&#34; alt=&#34;国内访问情况&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;众所周知，在国内，&lt;code&gt;Cloudflare&lt;/code&gt;的CDN属于反向加速，平均耗时在1.5s左右。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>使用Hugo实现响应式和优化的图片</title>
+      <link>https://liudon.com/posts/responsive-and-optimized-images-with-hugo/</link>
+      <pubDate>Sun, 10 Dec 2023 08:29:05 +0800</pubDate>
+      <guid>https://liudon.com/posts/responsive-and-optimized-images-with-hugo/</guid>
+      <description>&lt;p&gt;继续我们的&lt;a href=&#34;../../tags/%E5%8D%9A%E5%AE%A2%E4%BC%98%E5%8C%96/&#34;&gt;博客优化之旅&lt;/a&gt;，本篇内容我们将介绍如何使用&lt;code&gt;Hugo&lt;/code&gt;实现响应式和优化的图片。&lt;/p&gt;
+&lt;h4 id=&#34;问题&#34;&gt;问题&lt;/h4&gt;
+&lt;p&gt;在之前文章里，通过腾讯云数据万象实现了图片优化能力，具体的可参考文章&lt;a href=&#34;https://liudon.com/posts/hugo-auto-generate-image-width-and-height/&#34;&gt;累计布局偏移修复方案改进 —— 自动生成图片宽高&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;经过一段运行后，发现这里有一个弊端。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Run hugo --gc --minify --cleanDestinationDir
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Start building sites … 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hugo v0.119.0-b84644c008e0dc2c4b67bd69cccf87a41a03937e linux/amd64 BuildDate=2023-09-24T15:20:17Z VendorInfo=gohugoio
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ERROR Failed to get JSON resource &amp;#34;https://static.***.com/64412246-9050f100-d0c1-11e9-893a-f9b0766533ad.png?imageInfo&amp;amp;t=1698674110&amp;#34;: Get &amp;#34;https://static.***.com/64412246-9050f100-d0c1-11e9-893a-f9b0766533ad.png?imageInfo&amp;amp;t=1698674110&amp;#34;: stream error: stream ID 1; STREAM_CLOSED; received from peer
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ERROR Failed to get JSON resource &amp;#34;https://static.***.com/SkRx5uFwQ8Cliyq.jpg?imageInfo&amp;amp;t=1698674110&amp;#34;: Get &amp;#34;https://static.***.com/SkRx5uFwQ8Cliyq.jpg?imageInfo&amp;amp;t=1698674110&amp;#34;: stream error: stream ID 3; STREAM_CLOSED; received from peer
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;随着图片数量增多，因为需要调接口查询图片信息，这里构建耗时变长，同时也特别容易出现超时导致构建失败。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>加速Google Analytics</title>
+      <link>https://liudon.com/posts/optimize-google-analytics/</link>
+      <pubDate>Sat, 02 Dec 2023 09:25:49 +0800</pubDate>
+      <guid>https://liudon.com/posts/optimize-google-analytics/</guid>
+      <description>&lt;h3 id=&#34;起因&#34;&gt;起因&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Google Analytics&lt;/code&gt;是一款优秀的流量分析服务，集成方便，使用简单。&lt;/p&gt;
+&lt;p&gt;最近在优化页面访问速度，发现&lt;code&gt;Google Analytics&lt;/code&gt;是一个优化点。&lt;/p&gt;
+&lt;h3 id=&#34;优化&#34;&gt;优化&lt;/h3&gt;
+&lt;h4 id=&#34;1-访问加速&#34;&gt;1. 访问加速&lt;/h4&gt;
+&lt;p&gt;国内访问&lt;code&gt;Google Analytics&lt;/code&gt;很慢，同时还面临着各种广告屏蔽插件拦截。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>累计布局偏移修复方案改进 —— 自动生成图片宽高</title>
+      <link>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</link>
+      <pubDate>Wed, 24 Aug 2022 12:37:22 +0800</pubDate>
+      <guid>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</guid>
+      <description>&lt;p&gt;本站已不再采用本方案，新方案见&lt;a href=&#34;../../posts/responsive-and-optimized-images-with-hugo/&#34;&gt;使用Hugo实现响应式和优化的图片&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;遗留的问题&#34;&gt;遗留的问题&lt;/h4&gt;
+&lt;p&gt;上一篇文章讲了我是如何解决博客累计布局偏移的问题，但是这个方案存在一个很大的问题。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;手动输入每张图片的宽高&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;这就要求每次插入图片后，需要手动查看图片宽高，修改插入代码，导致整个流程变得繁琐，无法自动化。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>优化博客的累计布局偏移(CLS)问题</title>
+      <link>https://liudon.com/posts/fix-blog-cls/</link>
+      <pubDate>Sat, 20 Aug 2022 07:27:22 +0800</pubDate>
+      <guid>https://liudon.com/posts/fix-blog-cls/</guid>
+      <description>&lt;p&gt;此文已过期，优化方案参考&lt;a href=&#34;https://liudon.com/posts/hugo-auto-generate-image-width-and-height/&#34;&gt;累计布局偏移修复方案改进 —— 自动生成图片宽高&lt;/a&gt;.&lt;/p&gt;
+&lt;h4 id=&#34;问题表现&#34;&gt;问题表现&lt;/h4&gt;
+&lt;p&gt;7月份将博客部署由&lt;code&gt;Github&lt;/code&gt;迁移到&lt;code&gt;Cloudflare&lt;/code&gt;后，开始关注博客的性能问题。&lt;/p&gt;
+&lt;p&gt;偶然看到苏卡卡大佬的&lt;a href=&#34;https://blog.skk.moe/post/fix-blog-cls/&#34;&gt;CLS优化文章&lt;/a&gt;，拿自己博客也测试了下，发现也存在同样的问题。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

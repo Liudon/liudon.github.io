@@ -1,0 +1,951 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Swoft 框架运行分析（五） —— ConsoleProcessor模块分析 | 流动</title><meta name=keywords content="Swoft"><meta name=description content="
+这里以Swoft启动http server为例。
+php bin/swoft http:start
+执行上述命令，启动http server。
+在前面第一篇文章的时候，提到了如何启动http服务。
+今天我们就来看一下http服务是如何启动的，具体实现就在ConsoleProcess这个模块。"><meta name=author content="Liudon"><link rel=canonical href=https://liudon.com/posts/swoft-console-processor-analysis/><link crossorigin=anonymous href=../../assets/css/stylesheet.c2b4102602461aaea01497bf2f89d3d4096e9005f6ac8a7e60b27e335724b916.css integrity="sha256-wrQQJgJGGq6gFJe/L4nT1AlukAX2rIp+YLJ+M1ckuRY=" rel="preload stylesheet" as=style><link rel=icon href=https://liudon.com/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://liudon.com/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://liudon.com/favicon-32x32.png><link rel=apple-touch-icon href=https://liudon.com/apple-touch-icon.png><link rel=mask-icon href=https://liudon.com/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://liudon.com/posts/swoft-console-processor-analysis/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous></script><meta property="og:url" content="https://liudon.com/posts/swoft-console-processor-analysis/"><meta property="og:site_name" content="流动"><meta property="og:title" content="Swoft 框架运行分析（五） —— ConsoleProcessor模块分析"><meta property="og:description" content=" 这里以Swoft启动http server为例。
+php bin/swoft http:start
+执行上述命令，启动http server。
+在前面第一篇文章的时候，提到了如何启动http服务。
+今天我们就来看一下http服务是如何启动的，具体实现就在ConsoleProcess这个模块。"><meta property="og:locale" content="zh-cn"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2019-09-26T13:14:23+08:00"><meta property="article:modified_time" content="2019-09-26T13:14:23+08:00"><meta property="article:tag" content="Swoft"><meta name=twitter:card content="summary"><meta name=twitter:title content="Swoft 框架运行分析（五） —— ConsoleProcessor模块分析"><meta name=twitter:description content="
+这里以Swoft启动http server为例。
+php bin/swoft http:start
+执行上述命令，启动http server。
+在前面第一篇文章的时候，提到了如何启动http服务。
+今天我们就来看一下http服务是如何启动的，具体实现就在ConsoleProcess这个模块。"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"文章","item":"https://liudon.com/posts/"},{"@type":"ListItem","position":2,"name":"Swoft 框架运行分析（五） —— ConsoleProcessor模块分析","item":"https://liudon.com/posts/swoft-console-processor-analysis/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Swoft 框架运行分析（五） —— ConsoleProcessor模块分析","name":"Swoft 框架运行分析（五） —— ConsoleProcessor模块分析","description":" 这里以Swoft启动http server为例。\nphp bin/swoft http:start\n执行上述命令，启动http server。\n在前面第一篇文章的时候，提到了如何启动http服务。\n今天我们就来看一下http服务是如何启动的，具体实现就在ConsoleProcess这个模块。\n","keywords":["Swoft"],"articleBody":" 这里以Swoft启动http server为例。\nphp bin/swoft http:start\n执行上述命令，启动http server。\n在前面第一篇文章的时候，提到了如何启动http服务。\n今天我们就来看一下http服务是如何启动的，具体实现就在ConsoleProcess这个模块。\n/** * Handle console * @return bool * @throws ReflectionException * @throws ContainerException */ public function handle(): bool { if (!$this-\u003eapplication-\u003ebeforeConsole()) { return false; } /** @var Router $router */ $router = bean('cliRouter'); // Register console routes CommandRegister::register($router); CLog::info( 'Console command route registered (group %d, command %d)', $router-\u003egroupCount(), $router-\u003ecount() ); // Run console application bean('cliApp')-\u003erun(); return $this-\u003eapplication-\u003eafterConsole(); } 这里调用了bean方法获取Bean实例，定义见swoft-component-2.0.5\\src\\bean\\src\\Helper\\Functions.php。\nif (!function_exists('bean')) { /** * Get bean by name * * @param string $name Bean name Or alias Or class name * * @return object|string|mixed */ function bean(string $name) { if (BeanFactory::isSingleton('config')) { return BeanFactory::getBean($name); } return sprintf('${%s}', $name); } } 这里调用了BeanFactory的getBean方法。\n/** * Get object by name * * @param string $name Bean name Or alias Or class name * * @return object|mixed */ public static function getBean(string $name) { return Container::getInstance()-\u003eget($name); } 最终调用的是Swoft\\Bean\\Container下的get方法。\n/** * Finds an entry of the container by its identifier and returns it. * * @param string $id Bean name Or alias Or class name * * When class name will return all of instance for class name * * @return object * @throws InvalidArgumentException */ public function get($id) { // It is singleton if (isset($this-\u003esingletonPool[$id])) { return $this-\u003esingletonPool[$id]; } // Prototype by clone if (isset($this-\u003eprototypePool[$id])) { return clone $this-\u003eprototypePool[$id]; } // Alias name $aliasId = $this-\u003ealiases[$id] ?? ''; if ($aliasId) { return $this-\u003eget($aliasId); } // Class name $classNames = $this-\u003eclassNames[$id] ?? []; if ($classNames) { $id = end($classNames); return $this-\u003eget($id); } // Interface if (interface_exists($id)) { $id = InterfaceRegister::getInterfaceInjectBean($id); return $this-\u003eget($id); } // Not defined if (!isset($this-\u003eobjectDefinitions[$id])) { throw new InvalidArgumentException(sprintf('The bean of %s is not defined', $id)); } /* @var ObjectDefinition $objectDefinition */ $objectDefinition = $this-\u003eobjectDefinitions[$id]; // Prototype return $this-\u003esafeNewBean($objectDefinition-\u003egetName()); } 获取对应的ObjectDefinition实例，然后调用safeNewBean方法。\n/** * Secure creation of beans * * @param string $beanName * @param string $id * * @return object|mixed */ private function safeNewBean(string $beanName, string $id = '') { try { return $this-\u003enewBean($beanName, $id); } catch (Throwable $e) { throw new InvalidArgumentException($e-\u003egetMessage(), 500, $e); } } 这里又调用了newBean方法，在上一篇文章里我们已经讲过这个方法，这里会返回实例化后的Bean类。\n那cliRouter对应的类是说明呢？这个定义在swoft-component-2.0.5\\src\\console\\src\\AutoLoader.php里。\n/** * {@inheritDoc} */ public function beans(): array { return [ 'cliApp' =\u003e [ 'class' =\u003e Application::class, 'version' =\u003e '2.0.0' ], 'cliRouter' =\u003e [ 'class' =\u003e Router::class, ], 'cliDispatcher' =\u003e [ 'class' =\u003e ConsoleDispatcher::class, ], ]; } 所以$router = bean('cliRouter')，返回的是一个Swoft\\Console\\Router\\Router类。\n回到ConsoleProcessor类，接着看代码。\nCommandRegister::register($router); 调用了CommandRegister类的register方法。\n/** * @param Router $router * @throws ReflectionException */ public static function register(Router $router): void { $maxLen = 12; $groups = []; $docOpts = [ 'allow' =\u003e ['example'] ]; $defInfo = [ 'example' =\u003e '', 'description' =\u003e 'No description message', ]; foreach (self::$commands as $class =\u003e $mapping) { $names = []; $group = $mapping['group']; // Set ID aliases $router-\u003esetIdAliases($mapping['idAliases']); // Set group name aliases $router-\u003esetGroupAliases($group, $mapping['aliases']); $refInfo = Swoft::getReflection($class); $mhdInfo = $refInfo['methods'] ?? []; $grpOpts = $mapping['options'] ?? []; foreach ($mapping['commands'] as $method =\u003e $route) { // $method = $route['method']; $cmdDesc = $route['desc']; $command = $route['command']; $idLen = strlen($group . $command); if ($idLen \u003e $maxLen) { $maxLen = $idLen; } $cmdExam = ''; if (!empty($mhdInfo[$method]['comments'])) { $tagInfo = DocBlock::getTags($mhdInfo[$method]['comments'], $docOpts, $defInfo); $cmdDesc = $cmdDesc ?: Str::firstLine($tagInfo['description']); $cmdExam = $tagInfo['example']; } $route['group'] = $group; $route['desc'] = ucfirst($cmdDesc); $route['example'] = $cmdExam; $route['options'] = self::mergeOptions($grpOpts, $route['options']); // Append group option $route['enabled'] = $mapping['enabled']; $route['coroutine'] = $mapping['coroutine']; $router-\u003emap($group, $command, [$class, $method], $route); $names[] = $command; } $groupExam = ''; $groupDesc = $mapping['desc']; if (!empty($refInfo['comments'])) { $tagInfo = DocBlock::getTags($refInfo['comments'], $docOpts, $defInfo); $groupDesc = $groupDesc ?: Str::firstLine($tagInfo['description']); $groupExam = $tagInfo['example']; } $groups[$group] = [ 'names' =\u003e $names, 'desc' =\u003e ucfirst($groupDesc), 'class' =\u003e $class, 'alias' =\u003e $mapping['alias'], 'aliases' =\u003e $mapping['aliases'], 'example' =\u003e $groupExam, ]; } $router-\u003esetGroups($groups); // +1 because router-\u003edelimiter $router-\u003esetKeyWidth($maxLen + 1); // clear data self::$commands = []; } 这里遍历了类属性$commands注册路由。\n那么$commands这个属性是哪里来的呢？\n既然开头我们说的是http服务是怎么启动的，这里我们就以http-server来举例，找到swoft-component-2.0.5\\src\\http-server\\src\\Command\\HttpServerCommand.php文件。\n\u003c?php declare(strict_types=1); namespace Swoft\\Http\\Server\\Command; use ReflectionException; use Swoft; use Swoft\\Bean\\Exception\\ContainerException; use Swoft\\Console\\Annotation\\Mapping\\Command; use Swoft\\Console\\Annotation\\Mapping\\CommandMapping; use Swoft\\Console\\Annotation\\Mapping\\CommandOption; use Swoft\\Console\\Helper\\Show; use Swoft\\Http\\Server\\HttpServer; use Swoft\\Server\\Command\\BaseServerCommand; use Swoft\\Server\\Exception\\ServerException; use function bean; use function input; use function output; /** * Provide some commands to manage the swoft HTTP server * * @since 2.0 * * @Command(\"http\", alias=\"httpsrv\", coroutine=false) * @example * {fullCmd}:start Start the http server * {fullCmd}:stop Stop the http server */ class HttpServerCommand extends BaseServerCommand { /** * Start the http server * * @CommandMapping(usage=\"{fullCommand} [-d|--daemon]\") * @CommandOption(\"daemon\", short=\"d\", desc=\"Run server on the background\", type=\"bool\", default=\"false\") * * @throws ReflectionException * @throws ContainerException * @throws ServerException * @example * {fullCommand} * {fullCommand} -d * */ public function start(): void { $server = $this-\u003ecreateServer(); // Check if it has started if ($server-\u003eisRunning()) { $masterPid = $server-\u003egetPid(); output()-\u003ewriteln(\"The HTTP server have been running!(PID: {$masterPid})\"); return; } // Startup settings $this-\u003econfigStartOption($server); $settings = $server-\u003egetSetting(); // Setting $workerNum = $settings['worker_num']; // Server startup parameters $mainHost = $server-\u003egetHost(); $mainPort = $server-\u003egetPort(); $modeName = $server-\u003egetModeName(); $typeName = $server-\u003egetTypeName(); // Http $panel = [ 'HTTP' =\u003e [ 'listen' =\u003e $mainHost . ':' . $mainPort, 'type' =\u003e $typeName, 'mode' =\u003e $modeName, 'worker' =\u003e $workerNum, ], ]; // Port Listeners $panel = $this-\u003eappendPortsToPanel($server, $panel); Show::panel($panel); output()-\u003ewriteln('HTTP server start success !'); // Start the server $server-\u003estart(); } /** * Reload worker processes * * @CommandMapping(usage=\"{fullCommand} [-t]\") * @CommandOption(\"t\", desc=\"Only to reload task processes, default to reload worker and task\") * * @throws ReflectionException * @throws ContainerException */ public function reload(): void { $server = $this-\u003ecreateServer(); $script = input()-\u003egetScript(); // Check if it has started if (!$server-\u003eisRunning()) { output()-\u003ewriteln('The HTTP server is not running! cannot reload'); return; } output()-\u003ewritef('Server %s is reloading', $script); if ($reloadTask = input()-\u003ehasOpt('t')) { Show::notice('Will only reload task worker'); } if (!$server-\u003ereload($reloadTask)) { Show::error('The swoole server worker process reload fail!'); return; } output()-\u003ewritef('HTTP server %s reload success', $script); } /** * Stop the currently running server * * @CommandMapping() * * @throws ReflectionException * @throws ContainerException */ public function stop(): void { $server = $this-\u003ecreateServer(); // Check if it has started if (!$server-\u003eisRunning()) { output()-\u003ewriteln('The HTTP server is not running! cannot stop.'); return; } // Do stopping. $server-\u003estop(); } /** * Restart the http server * * @CommandMapping(usage=\"{fullCommand} [-d|--daemon]\",) * @CommandOption(\"daemon\", short=\"d\", desc=\"Run server on the background\") * * @throws ReflectionException * @throws ContainerException * @example * {fullCommand} * {fullCommand} -d */ public function restart(): void { $server = $this-\u003ecreateServer(); // Check if it has started if ($server-\u003eisRunning()) { $success = $server-\u003estop(); if (!$success) { output()-\u003eerror('Stop the old server failed!'); return; } } output()-\u003ewritef('Server HTTP restart success !'); $server-\u003estartWithDaemonize(); } /** * @return HttpServer * @throws ReflectionException * @throws ContainerException */ private function createServer(): HttpServer { $script = input()-\u003egetScript(); $command = $this-\u003egetFullCommand(); /** @var HttpServer $server */ $server = bean('httpServer'); $server-\u003esetScriptFile(Swoft::app()-\u003egetPath($script)); $server-\u003esetFullCommand($command); return $server; } } 通过Swoft文档，我们可以看到这里分别使用了类注解和方法注解。\n@Command(\"http\", alias=\"httpsrv\", coroutine=false) @CommandMapping(usage=\"{fullCommand} [-d|--daemon]\") @CommandOption(\"daemon\", short=\"d\", desc=\"Run server on the background\", type=\"bool\", default=\"false\") ... 通过第二篇文章分析，我们知道这里会自动实例化对应的注解类。\n这里以Swoft\\Console\\Annotation\\Mapping\\CommandMapping这个注解为例，对应的注解解析类为Swoft\\Console\\Annotation\\Parser\\CommandMappingParser。\n\u003c?php declare(strict_types=1); namespace Swoft\\Console\\Annotation\\Parser; use Swoft\\Annotation\\Annotation\\Mapping\\AnnotationParser; use Swoft\\Annotation\\Annotation\\Parser\\Parser; use Swoft\\Annotation\\Exception\\AnnotationException; use Swoft\\Console\\Annotation\\Mapping\\CommandMapping; use Swoft\\Console\\CommandRegister; /** * Class CommandMappingParser * * @since 2.0 * @AnnotationParser(CommandMapping::class) */ class CommandMappingParser extends Parser { /** * Parse object * * @param int $type Class or Method or Property * @param CommandMapping $annotation Annotation object * * @return array * Return empty array is nothing to do! * When class type return [$beanName, $className, $scope, $alias, $size] is to inject bean * When property type return [$propertyValue, $isRef] is to reference value */ public function parse(int $type, $annotation): array { if ($type !== self::TYPE_METHOD) { throw new AnnotationException('`@CommandMapping` must be defined on class method!'); } $method = $this-\u003emethodName; // add route info for controller action CommandRegister::addRoute($this-\u003eclassName, $method, [ 'command' =\u003e $annotation-\u003egetName() ?: $method, 'method' =\u003e $method, 'alias' =\u003e $annotation-\u003egetAlias(), 'aliases' =\u003e $annotation-\u003egetAliases(), 'desc' =\u003e $annotation-\u003egetDesc(), 'usage' =\u003e $annotation-\u003egetUsage(), // 'example' =\u003e $annotation-\u003egetExample(), ]); return []; } } 看到这里，你应该可以猜到CommandRegister类的$commands是怎么来的了吧。\n我们看下CommandRegister类的addRoute方法，验证下想法。\n/** * @param string $class * @param string $method * @param array $route * * @throws AnnotationException */ public static function addRoute(string $class, string $method, array $route): void { self::checkClass($class); // init some keys $route['options'] = []; $route['arguments'] = []; // save self::$commands[$class]['commands'][$method] = $route; } bingo，跟我们猜想的一模一样，这下我们也知道CommandMapping这个注解是用来注册终端的路由信息。\n回到ConsoleProcessor类，接着看代码。\nCLog::info( 'Console command route registered (group %d, command %d)', $router-\u003egroupCount(), $router-\u003ecount() ); 打印日志。\n// Run console application bean('cliApp')-\u003erun(); 感觉到了重头戏。\n根据前面的代码，我们知道cliApp这个Bean实例对应的类是Swoft\\Console\\Application。\n/** * @return void * @throws ContainerException */ public function run(): void { try { Swoft::trigger(ConsoleEvent::RUN_BEFORE, $this); // Prepare $this-\u003eprepare(); // Get input command $inputCommand = $this-\u003einput-\u003egetCommand(); if (!$inputCommand) { $this-\u003efilterSpecialOption(); } else { $this-\u003edoRun($inputCommand); } Swoft::trigger(ConsoleEvent::RUN_AFTER, $this, $inputCommand); } catch (Throwable $e) { /** @var ConsoleErrorDispatcher $errDispatcher */ $errDispatcher = BeanFactory::getSingleton(ConsoleErrorDispatcher::class); // Handle request error $errDispatcher-\u003erun($e); } } 通过Swoft::trigger，注册了ConsoleEvent::RUN_BEFORE和ConsoleEvent::RUN_AFTER两个事件。\nprotected function prepare(): void { $this-\u003einput = \\input(); $this-\u003eoutput = \\output(); // load builtin comments vars $this-\u003esetCommentsVars($this-\u003ecommentsVars()); } prepare比较简单，这里声明了输入和输出两个类。注意哈，这个后面会用到。\n$inputCommand = $this-\u003einput-\u003egetCommand(); if (!$inputCommand) { $this-\u003efilterSpecialOption(); } else { $this-\u003edoRun($inputCommand); } 获取终端命令行下的输入，如果有输入执行doRun方法。\n/** * @param string $inputCmd * * @return void * @throws ReflectionException * @throws ContainerException * @throws Throwable */ protected function doRun(string $inputCmd): void { $output = $this-\u003eoutput; /* @var Router $router */ $router = Swoft::getBean('cliRouter'); $result = $router-\u003ematch($inputCmd); // Command not found if ($result[0] === Router::NOT_FOUND) { $names = $router-\u003egetAllNames(); $output-\u003eliteError(\"The entered command '{$inputCmd}' is not exists!\"); // find similar command names by similar_text() if ($similar = Arr::findSimilar($inputCmd, $names)) { $output-\u003ewritef(\"\\nMaybe what you mean is:\\n %s\", implode(', ', $similar)); } else { $this-\u003eshowApplicationHelp(false); } return; } $info = $result[1]; // Only input a group name, display help for the group if ($result[0] === Router::ONLY_GROUP) { $this-\u003eshowGroupHelp($info['group']); return; } // Display help for a command if ($this-\u003einput-\u003egetSameOpt(['h', 'help'])) { $this-\u003eshowCommandHelp($info); return; } // Parse default options and arguments $this-\u003ebindCommandFlags($info); $this-\u003einput-\u003esetCommandId($info['cmdId']); Swoft::triggerByArray(ConsoleEvent::DISPATCH_BEFORE, $this, $info); // Call command handler /** @var ConsoleDispatcher $dispatcher */ $dispatcher = Swoft::getSingleton('cliDispatcher'); $dispatcher-\u003edispatch($info); Swoft::triggerByArray(ConsoleEvent::DISPATCH_AFTER, $this, $info); } $router = Swoft::getBean('cliRouter'); $result = $router-\u003ematch($inputCmd); 获取cliRouter实例，根据输入匹配路由操作类。\n/** * Match route by input command * * @param array $params [$route] * * @return array * * [ * status, info(array) * ] */ public function match(...$params): array { $delimiter = $this-\u003edelimiter; $inputCmd = trim($params[0], \"$delimiter \"); $noSepChar = strpos($inputCmd, $delimiter) === false; // If use command ID alias if ($noSepChar \u0026\u0026 isset($this-\u003eidAliases[$inputCmd])) { $inputCmd = $this-\u003eidAliases[$inputCmd]; // Must re-check $noSepChar = strpos($inputCmd, $delimiter) === false; } if ($noSepChar \u0026\u0026 in_array($inputCmd, $this-\u003edefaultCommands, true)) { $group = $this-\u003edefaultGroup; $command = $this-\u003eresolveCommandAlias($inputCmd); // Only a group name } elseif ($noSepChar) { $group = $this-\u003eresolveGroupAlias($inputCmd); if (isset($this-\u003egroups[$group])) { return [self::ONLY_GROUP, ['group' =\u003e $group]]; } return [self::NOT_FOUND]; } else { $nameList = explode($delimiter, $inputCmd, 2); if (count($nameList) === 2) { [$group, $command] = $nameList; // resolve command alias $command = $this-\u003eresolveCommandAlias($command); } else { $command = ''; // $command = $this-\u003edefaultCommand; $group = $nameList[0]; } } $group = $this-\u003eresolveGroupAlias($group); // build command ID $commandID = $this-\u003ebuildCommandID($group, $command); if (isset($this-\u003eroutes[$commandID])) { $info = $this-\u003eroutes[$commandID]; // append some info $info['cmdId'] = $commandID; return [self::FOUND, $info]; } if ($group \u0026\u0026 isset($this-\u003egroups[$group])) { return [self::ONLY_GROUP, ['group' =\u003e $group]]; } return [self::NOT_FOUND]; } 这里会返回匹配后的路由信息。\n回到doRun方法。\n// Command not found if ($result[0] === Router::NOT_FOUND) { $names = $router-\u003egetAllNames(); $output-\u003eliteError(\"The entered command '{$inputCmd}' is not exists!\"); // find similar command names by similar_text() if ($similar = Arr::findSimilar($inputCmd, $names)) { $output-\u003ewritef(\"\\nMaybe what you mean is:\\n %s\", implode(', ', $similar)); } else { $this-\u003eshowApplicationHelp(false); } return; } $info = $result[1]; // Only input a group name, display help for the group if ($result[0] === Router::ONLY_GROUP) { $this-\u003eshowGroupHelp($info['group']); return; } // Display help for a command if ($this-\u003einput-\u003egetSameOpt(['h', 'help'])) { $this-\u003eshowCommandHelp($info); return; } 根据返回的路由信息进行不同的处理。\n// Parse default options and arguments $this-\u003ebindCommandFlags($info); $this-\u003einput-\u003esetCommandId($info['cmdId']); Swoft::triggerByArray(ConsoleEvent::DISPATCH_BEFORE, $this, $info); 绑定默认参数，注册ConsoleEvent::DISPATCH_BEFORE事件。\n// Call command handler /** @var ConsoleDispatcher $dispatcher */ $dispatcher = Swoft::getSingleton('cliDispatcher'); $dispatcher-\u003edispatch($info); 获取cliDispatcher的Bean实例，对应Swoft\\Console\\ConsoleDispatcher类，调用dispatch方法。\n/** * @param array $params * * @return void * @throws ReflectionException * @throws Throwable */ public function dispatch(...$params): void { $route = $params[0]; // Handler info [$className, $method] = $route['handler']; // Bind method params $params = $this-\u003egetBindParams($className, $method); $object = Swoft::getSingleton($className); // Blocking running if (!$route['coroutine']) { $this-\u003ebefore(get_parent_class($object), $method); PhpHelper::call([$object, $method], ...$params); $this-\u003eafter($method); return; } // Hook php io function Runtime::enableCoroutine(); // If in unit test env, has been in coroutine. if (\\defined('PHPUNIT_COMPOSER_INSTALL')) { $this-\u003eexecuteByCo($object, $method, $params); return; } // Coroutine running srun(function () use ($object, $method, $params) { $this-\u003eexecuteByCo($object, $method, $params); }); } 获取路由对应的类和方法，通过Swoft::getSingleton($className);实例化对象。\n如果未开启协程，则用PhpHelper::call([$object, $method], ...$params);调用对应的方法。\n开启协程的话，使用$this-\u003eexecuteByCo($object, $method, $params);调用对应的方法。\n我们前面启动命令是php bin/swoft http:start，这里对应的类就是Swoft\\Http\\Server\\Command\\HttpServerCommand，方法就是start。\n/** * Start the http server * * @CommandMapping(usage=\"{fullCommand} [-d|--daemon]\") * @CommandOption(\"daemon\", short=\"d\", desc=\"Run server on the background\", type=\"bool\", default=\"false\") * * @throws ReflectionException * @throws ContainerException * @throws ServerException * @example * {fullCommand} * {fullCommand} -d * */ public function start(): void { $server = $this-\u003ecreateServer(); // Check if it has started if ($server-\u003eisRunning()) { $masterPid = $server-\u003egetPid(); output()-\u003ewriteln(\"The HTTP server have been running!(PID: {$masterPid})\"); return; } // Startup settings $this-\u003econfigStartOption($server); $settings = $server-\u003egetSetting(); // Setting $workerNum = $settings['worker_num']; // Server startup parameters $mainHost = $server-\u003egetHost(); $mainPort = $server-\u003egetPort(); $modeName = $server-\u003egetModeName(); $typeName = $server-\u003egetTypeName(); // Http $panel = [ 'HTTP' =\u003e [ 'listen' =\u003e $mainHost . ':' . $mainPort, 'type' =\u003e $typeName, 'mode' =\u003e $modeName, 'worker' =\u003e $workerNum, ], ]; // Port Listeners $panel = $this-\u003eappendPortsToPanel($server, $panel); Show::panel($panel); output()-\u003ewriteln('HTTP server start success !'); // Start the server $server-\u003estart(); } 这里先调用了createServer方法。\n/** * @return HttpServer * @throws ReflectionException * @throws ContainerException */ private function createServer(): HttpServer { $script = input()-\u003egetScript(); $command = $this-\u003egetFullCommand(); /** @var HttpServer $server */ $server = bean('httpServer'); $server-\u003esetScriptFile(Swoft::app()-\u003egetPath($script)); $server-\u003esetFullCommand($command); return $server; } 获取httpServer的Bean实例。\n框架定义在swoft-component-2.0.5\\src\\http-server\\src\\AutoLoader.php，这里声明了onRequest回调事件。\n'httpServer' =\u003e [ 'on' =\u003e [ SwooleEvent::REQUEST =\u003e bean(RequestListener::class) ] ], 业务定义在swoft-2.0.5\\app\\bean.php。\n'httpServer' =\u003e [ 'class' =\u003e HttpServer::class, 'port' =\u003e 18306, 'listener' =\u003e [ 'rpc' =\u003e bean('rpcServer') ], 'process' =\u003e [ // 'monitor' =\u003e bean(MonitorProcess::class) // 'crontab' =\u003e bean(CrontabProcess::class) ], 'on' =\u003e [ // SwooleEvent::TASK =\u003e bean(SyncTaskListener::class), // Enable sync task SwooleEvent::TASK =\u003e bean(TaskListener::class), // Enable task must task and finish event SwooleEvent::FINISH =\u003e bean(FinishListener::class) ], /* @see HttpServer::$setting */ 'setting' =\u003e [ 'task_worker_num' =\u003e 12, 'task_enable_coroutine' =\u003e true ] ], createServer返回的是一个Swoft\\Http\\Server\\HttpServer实例。\n回到HttpServerCommand类的start方法。\n// Start the server $server-\u003estart(); 调用Swoft\\Http\\Server\\HttpServer类的start方法。\n/** * Start server * * @throws ServerException * @throws ContainerException */ public function start(): void { $this-\u003eswooleServer = new \\Swoole\\Http\\Server($this-\u003ehost, $this-\u003eport, $this-\u003emode, $this-\u003etype); $this-\u003estartSwoole(); } 声明Swoole\\Http\\Server对象，调用startSwoole方法。\nSwoft\\Http\\Server\\HttpServer类继承自Swoft\\Server\\Server类，startSwoole方法定义在这个类。\n/** * Bind swoole event and start swoole server * * @throws ServerException * @throws Swoft\\Bean\\Exception\\ContainerException */ protected function startSwoole(): void { if (!$this-\u003eswooleServer) { throw new ServerException('You must to new server before start swoole!'); } // Always enable coroutine hook on server CLog::info('Swoole\\Runtime::enableCoroutine'); Runtime::enableCoroutine(); Swoft::trigger(ServerEvent::BEFORE_SETTING, $this); // Set settings $this-\u003eswooleServer-\u003eset($this-\u003esetting); // Update setting property // $this-\u003esetSetting($this-\u003eswooleServer-\u003esetting); // Before Add event Swoft::trigger(ServerEvent::BEFORE_ADDED_EVENT, $this); // Register events $defaultEvents = $this-\u003edefaultEvents(); $swooleEvents = array_merge($defaultEvents, $this-\u003eon); // Add events $this-\u003eaddEvent($this-\u003eswooleServer, $swooleEvents, $defaultEvents); //After add event Swoft::trigger(ServerEvent::AFTER_ADDED_EVENT, $this); // Before listener Swoft::trigger(ServerEvent::BEFORE_ADDED_LISTENER, $this); // Add port listener $this-\u003eaddListener(); // Before bind process Swoft::trigger(ServerEvent::BEFORE_ADDED_PROCESS, $this); // Add Process Swoft::trigger(ServerEvent::ADDED_PROCESS, $this); // After bind process Swoft::trigger(ServerEvent::AFTER_ADDED_PROCESS, $this); // Trigger event Swoft::trigger(ServerEvent::BEFORE_START, $this, array_keys($swooleEvents)); // Storage server instance self::$server = $this; // Start swoole server $this-\u003eswooleServer-\u003estart(); } $this-\u003eswooleServer-\u003eset($this-\u003esetting); 设置Swoole运行配置。\n// Register events $defaultEvents = $this-\u003edefaultEvents(); $swooleEvents = array_merge($defaultEvents, $this-\u003eon); // Add events $this-\u003eaddEvent($this-\u003eswooleServer, $swooleEvents, $defaultEvents); 添加Swoole回调事件。\n// Add port listener $this-\u003eaddListener(); 监听端口。\n// Start swoole server $this-\u003eswooleServer-\u003estart(); 启动Swoole\\Http\\Server服务。\n现在服务已经启动了，那http请求是怎么被处理的呢？\n这个我们下一篇再继续讲。\n","wordCount":"4524","inLanguage":"en","datePublished":"2019-09-26T13:14:23+08:00","dateModified":"2019-09-26T13:14:23+08:00","author":{"@type":"Person","name":"Liudon"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://liudon.com/posts/swoft-console-processor-analysis/"},"publisher":{"@type":"Organization","name":"流动","logo":{"@type":"ImageObject","url":"https://liudon.com/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://liudon.com/ accesskey=h title="流动 (Alt + H)">流动</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://liudon.com/ title=Home><span>Home</span></a></li><li><a href=https://liudon.com/posts/ title=Posts><span>Posts</span></a></li><li><a href=https://workout.liudon.com title=Workouts><span>Workouts</span>&nbsp;
+<svg fill="none" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" height="12" width="12"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></a></li><li><a href=https://liudon.com/about/ title=About><span>About</span></a></li><li><a href=https://liudon.com/search/ title="🔍 (Alt + /)" accesskey=/><span>🔍</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Swoft 框架运行分析（五） —— ConsoleProcessor模块分析</h1><div class=post-meta><span title='2019-09-26 13:14:23 +0800 +0800'>2019-09-26</span>&nbsp;·&nbsp;10 min&nbsp;·&nbsp;4524 words&nbsp;·&nbsp;Liudon</div></header><div class=post-content><blockquote><p>这里以Swoft启动http server为例。</p><p>php bin/swoft http:start</p><p>执行上述命令，启动http server。</p></blockquote><p>在前面第一篇文章的时候，提到了如何启动http服务。</p><p>今天我们就来看一下http服务是如何启动的，具体实现就在<code>ConsoleProcess</code>这个模块。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> Handle console
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ContainerException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>public function handle(): <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!$</span>this<span style=color:#f92672>-&gt;</span>application<span style=color:#f92672>-&gt;</span>beforeConsole()) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> false;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> Router <span style=color:#f92672>$</span>router <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>router <span style=color:#f92672>=</span> bean(<span style=color:#e6db74>&#39;cliRouter&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Register console routes
+</span></span><span style=display:flex><span>    CommandRegister::register(<span style=color:#f92672>$</span>router);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    CLog::info(
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#39;Console command route registered (group </span><span style=color:#e6db74>%d</span><span style=color:#e6db74>, command </span><span style=color:#e6db74>%d</span><span style=color:#e6db74>)&#39;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>router<span style=color:#f92672>-&gt;</span>groupCount(),
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>router<span style=color:#f92672>-&gt;</span>count()
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Run console application
+</span></span><span style=display:flex><span>    bean(<span style=color:#e6db74>&#39;cliApp&#39;</span>)<span style=color:#f92672>-&gt;</span>run();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>application<span style=color:#f92672>-&gt;</span>afterConsole();
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里调用了<code>bean</code>方法获取<code>Bean</code>实例，定义见<code>swoft-component-2.0.5\src\bean\src\Helper\Functions.php</code>。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>if (!function_exists(&#39;bean&#39;)) {
+</span></span><span style=display:flex><span>    /**
+</span></span><span style=display:flex><span>     * Get bean by name
+</span></span><span style=display:flex><span>     *
+</span></span><span style=display:flex><span>     * @param string $name Bean name Or alias Or class name
+</span></span><span style=display:flex><span>     *
+</span></span><span style=display:flex><span>     * @return object|string|mixed
+</span></span><span style=display:flex><span>     */
+</span></span><span style=display:flex><span>    function bean(string $name)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        if (BeanFactory::isSingleton(&#39;config&#39;)) {
+</span></span><span style=display:flex><span>            return BeanFactory::getBean($name);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        return sprintf(&#39;${%s}&#39;, $name);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里调用了<code>BeanFactory</code>的<code>getBean</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Get object by name
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @param string $name Bean name Or alias Or class name
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return object|mixed
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public static function getBean(string $name)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    return Container::getInstance()-&gt;get($name);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>最终调用的是<code>Swoft\Bean\Container</code>下的<code>get</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> Finds an entry of the container by its identifier <span style=color:#f92672>and</span> returns it<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param string <span style=color:#f92672>$</span>id Bean name Or alias Or <span style=color:#66d9ef>class</span> name
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> When <span style=color:#66d9ef>class</span> name will <span style=color:#66d9ef>return</span> all of instance <span style=color:#66d9ef>for</span> <span style=color:#66d9ef>class</span> name
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> object
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws InvalidArgumentException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>public function get(<span style=color:#f92672>$</span>id)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> It is singleton
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>singletonPool[<span style=color:#f92672>$</span>id])) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>singletonPool[<span style=color:#f92672>$</span>id];
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Prototype by clone
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>prototypePool[<span style=color:#f92672>$</span>id])) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> clone <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>prototypePool[<span style=color:#f92672>$</span>id];
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Alias name
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>aliasId <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>aliases[<span style=color:#f92672>$</span>id] <span style=color:#960050;background-color:#1e0010>??</span> <span style=color:#e6db74>&#39;&#39;</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>aliasId) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>get(<span style=color:#f92672>$</span>aliasId);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Class name
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>classNames <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>classNames[<span style=color:#f92672>$</span>id] <span style=color:#960050;background-color:#1e0010>??</span> [];
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>classNames) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>id <span style=color:#f92672>=</span> end(<span style=color:#f92672>$</span>classNames);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>get(<span style=color:#f92672>$</span>id);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Interface
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (interface_exists(<span style=color:#f92672>$</span>id)) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>id <span style=color:#f92672>=</span> InterfaceRegister::getInterfaceInjectBean(<span style=color:#f92672>$</span>id);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>get(<span style=color:#f92672>$</span>id);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Not defined
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>isset(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>objectDefinitions[<span style=color:#f92672>$</span>id])) {
+</span></span><span style=display:flex><span>        throw new InvalidArgumentException(sprintf(<span style=color:#e6db74>&#39;The bean of </span><span style=color:#e6db74>%s</span><span style=color:#e6db74> is not defined&#39;</span>, <span style=color:#f92672>$</span>id));
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> ObjectDefinition <span style=color:#f92672>$</span>objectDefinition <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>objectDefinition <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>objectDefinitions[<span style=color:#f92672>$</span>id];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Prototype
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>safeNewBean(<span style=color:#f92672>$</span>objectDefinition<span style=color:#f92672>-&gt;</span>getName());
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>获取对应的<code>ObjectDefinition</code>实例，然后调用<code>safeNewBean</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Secure creation of beans
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @param string $beanName
+</span></span><span style=display:flex><span>    * @param string $id
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return object|mixed
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>private function safeNewBean(string $beanName, string $id = &#39;&#39;)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    try {
+</span></span><span style=display:flex><span>        return $this-&gt;newBean($beanName, $id);
+</span></span><span style=display:flex><span>    } catch (Throwable $e) {
+</span></span><span style=display:flex><span>        throw new InvalidArgumentException($e-&gt;getMessage(), 500, $e);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里又调用了<code>newBean</code>方法，在上一篇文章里我们已经讲过这个方法，这里会返回实例化后的<code>Bean</code>类。</p><p>那<code>cliRouter</code>对应的类是说明呢？这个定义在<code>swoft-component-2.0.5\src\console\src\AutoLoader.php</code>里。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * {@inheritDoc}
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public function beans(): array
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    return [
+</span></span><span style=display:flex><span>        &#39;cliApp&#39;    =&gt; [
+</span></span><span style=display:flex><span>            &#39;class&#39;   =&gt; Application::class,
+</span></span><span style=display:flex><span>            &#39;version&#39; =&gt; &#39;2.0.0&#39;
+</span></span><span style=display:flex><span>        ],
+</span></span><span style=display:flex><span>        &#39;cliRouter&#39; =&gt; [
+</span></span><span style=display:flex><span>            &#39;class&#39; =&gt; Router::class,
+</span></span><span style=display:flex><span>        ],
+</span></span><span style=display:flex><span>        &#39;cliDispatcher&#39; =&gt; [
+</span></span><span style=display:flex><span>            &#39;class&#39; =&gt; ConsoleDispatcher::class,
+</span></span><span style=display:flex><span>        ],
+</span></span><span style=display:flex><span>    ];
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>所以<code>$router = bean('cliRouter')</code>，返回的是一个<code>Swoft\Console\Router\Router</code>类。</p><p>回到<code>ConsoleProcessor</code>类，接着看代码。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>CommandRegister::register($router);
+</span></span></code></pre></div><p>调用了<code>CommandRegister</code>类的<code>register</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>
+</span></span><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * @param Router $router
+</span></span><span style=display:flex><span>    * @throws ReflectionException
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public static function register(Router $router): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $maxLen  = 12;
+</span></span><span style=display:flex><span>    $groups  = [];
+</span></span><span style=display:flex><span>    $docOpts = [
+</span></span><span style=display:flex><span>        &#39;allow&#39; =&gt; [&#39;example&#39;]
+</span></span><span style=display:flex><span>    ];
+</span></span><span style=display:flex><span>    $defInfo = [
+</span></span><span style=display:flex><span>        &#39;example&#39;     =&gt; &#39;&#39;,
+</span></span><span style=display:flex><span>        &#39;description&#39; =&gt; &#39;No description message&#39;,
+</span></span><span style=display:flex><span>    ];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    foreach (self::$commands as $class =&gt; $mapping) {
+</span></span><span style=display:flex><span>        $names = [];
+</span></span><span style=display:flex><span>        $group = $mapping[&#39;group&#39;];
+</span></span><span style=display:flex><span>        // Set ID aliases
+</span></span><span style=display:flex><span>        $router-&gt;setIdAliases($mapping[&#39;idAliases&#39;]);
+</span></span><span style=display:flex><span>        // Set group name aliases
+</span></span><span style=display:flex><span>        $router-&gt;setGroupAliases($group, $mapping[&#39;aliases&#39;]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $refInfo = Swoft::getReflection($class);
+</span></span><span style=display:flex><span>        $mhdInfo = $refInfo[&#39;methods&#39;] ?? [];
+</span></span><span style=display:flex><span>        $grpOpts = $mapping[&#39;options&#39;] ?? [];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        foreach ($mapping[&#39;commands&#39;] as $method =&gt; $route) {
+</span></span><span style=display:flex><span>            // $method = $route[&#39;method&#39;];
+</span></span><span style=display:flex><span>            $cmdDesc = $route[&#39;desc&#39;];
+</span></span><span style=display:flex><span>            $command = $route[&#39;command&#39;];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            $idLen = strlen($group . $command);
+</span></span><span style=display:flex><span>            if ($idLen &gt; $maxLen) {
+</span></span><span style=display:flex><span>                $maxLen = $idLen;
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            $cmdExam = &#39;&#39;;
+</span></span><span style=display:flex><span>            if (!empty($mhdInfo[$method][&#39;comments&#39;])) {
+</span></span><span style=display:flex><span>                $tagInfo = DocBlock::getTags($mhdInfo[$method][&#39;comments&#39;], $docOpts, $defInfo);
+</span></span><span style=display:flex><span>                $cmdDesc = $cmdDesc ?: Str::firstLine($tagInfo[&#39;description&#39;]);
+</span></span><span style=display:flex><span>                $cmdExam = $tagInfo[&#39;example&#39;];
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            $route[&#39;group&#39;]   = $group;
+</span></span><span style=display:flex><span>            $route[&#39;desc&#39;]    = ucfirst($cmdDesc);
+</span></span><span style=display:flex><span>            $route[&#39;example&#39;] = $cmdExam;
+</span></span><span style=display:flex><span>            $route[&#39;options&#39;] = self::mergeOptions($grpOpts, $route[&#39;options&#39;]);
+</span></span><span style=display:flex><span>            // Append group option
+</span></span><span style=display:flex><span>            $route[&#39;enabled&#39;]   = $mapping[&#39;enabled&#39;];
+</span></span><span style=display:flex><span>            $route[&#39;coroutine&#39;] = $mapping[&#39;coroutine&#39;];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            $router-&gt;map($group, $command, [$class, $method], $route);
+</span></span><span style=display:flex><span>            $names[] = $command;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $groupExam = &#39;&#39;;
+</span></span><span style=display:flex><span>        $groupDesc = $mapping[&#39;desc&#39;];
+</span></span><span style=display:flex><span>        if (!empty($refInfo[&#39;comments&#39;])) {
+</span></span><span style=display:flex><span>            $tagInfo   = DocBlock::getTags($refInfo[&#39;comments&#39;], $docOpts, $defInfo);
+</span></span><span style=display:flex><span>            $groupDesc = $groupDesc ?: Str::firstLine($tagInfo[&#39;description&#39;]);
+</span></span><span style=display:flex><span>            $groupExam = $tagInfo[&#39;example&#39;];
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $groups[$group] = [
+</span></span><span style=display:flex><span>            &#39;names&#39;   =&gt; $names,
+</span></span><span style=display:flex><span>            &#39;desc&#39;    =&gt; ucfirst($groupDesc),
+</span></span><span style=display:flex><span>            &#39;class&#39;   =&gt; $class,
+</span></span><span style=display:flex><span>            &#39;alias&#39;   =&gt; $mapping[&#39;alias&#39;],
+</span></span><span style=display:flex><span>            &#39;aliases&#39; =&gt; $mapping[&#39;aliases&#39;],
+</span></span><span style=display:flex><span>            &#39;example&#39; =&gt; $groupExam,
+</span></span><span style=display:flex><span>        ];
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $router-&gt;setGroups($groups);
+</span></span><span style=display:flex><span>    // +1 because router-&gt;delimiter
+</span></span><span style=display:flex><span>    $router-&gt;setKeyWidth($maxLen + 1);
+</span></span><span style=display:flex><span>    // clear data
+</span></span><span style=display:flex><span>    self::$commands = [];
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里遍历了类属性<code>$commands</code>注册路由。</p><p>那么<code>$commands</code>这个属性是哪里来的呢？</p><p>既然开头我们说的是http服务是怎么启动的，这里我们就以<code>http-server</code>来举例，找到<code>swoft-component-2.0.5\src\http-server\src\Command\HttpServerCommand.php</code>文件。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>&lt;</span><span style=color:#960050;background-color:#1e0010>?</span>php declare(strict_types<span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>namespace Swoft\Http\Server\Command;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>use ReflectionException;
+</span></span><span style=display:flex><span>use Swoft;
+</span></span><span style=display:flex><span>use Swoft\Bean\Exception\ContainerException;
+</span></span><span style=display:flex><span>use Swoft\Console\Annotation\Mapping\Command;
+</span></span><span style=display:flex><span>use Swoft\Console\Annotation\Mapping\CommandMapping;
+</span></span><span style=display:flex><span>use Swoft\Console\Annotation\Mapping\CommandOption;
+</span></span><span style=display:flex><span>use Swoft\Console\Helper\Show;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\HttpServer;
+</span></span><span style=display:flex><span>use Swoft\Server\Command\BaseServerCommand;
+</span></span><span style=display:flex><span>use Swoft\Server\Exception\ServerException;
+</span></span><span style=display:flex><span>use function bean;
+</span></span><span style=display:flex><span>use function input;
+</span></span><span style=display:flex><span>use function output;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> Provide some commands to manage the swoft HTTP server
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>since <span style=color:#ae81ff>2.0</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>Command(<span style=color:#e6db74>&#34;http&#34;</span>, alias<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;httpsrv&#34;</span>, coroutine<span style=color:#f92672>=</span>false)
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>example
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>  {fullCmd}:start     Start the http server
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>  {fullCmd}:stop      Stop the http server
+</span></span><span style=display:flex><span> <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> HttpServerCommand <span style=color:#66d9ef>extends</span> BaseServerCommand
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Start the http server
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>CommandMapping(usage<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;{fullCommand} [-d|--daemon]&#34;</span>)
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>CommandOption(<span style=color:#e6db74>&#34;daemon&#34;</span>, short<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;d&#34;</span>, desc<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;Run server on the background&#34;</span>, type<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;bool&#34;</span>, default<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;false&#34;</span>)
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ContainerException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ServerException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>example
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>   {fullCommand}
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>   {fullCommand} <span style=color:#f92672>-</span>d
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function start(): void
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>server <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>createServer();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Check <span style=color:#66d9ef>if</span> it has started
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>isRunning()) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>masterPid <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>getPid();
+</span></span><span style=display:flex><span>            output()<span style=color:#f92672>-&gt;</span>writeln(<span style=color:#e6db74>&#34;&lt;error&gt;The HTTP server have been running!(PID: {$masterPid})&lt;/error&gt;&#34;</span>);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Startup settings
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>configStartOption(<span style=color:#f92672>$</span>server);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>settings <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>getSetting();
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Setting
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>workerNum <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>settings[<span style=color:#e6db74>&#39;worker_num&#39;</span>];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Server startup parameters
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>mainHost <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>getHost();
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>mainPort <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>getPort();
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>modeName <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>getModeName();
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>typeName <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>getTypeName();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Http
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>panel <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;HTTP&#39;</span> <span style=color:#f92672>=&gt;</span> [
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;listen&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>mainHost <span style=color:#f92672>.</span> <span style=color:#e6db74>&#39;:&#39;</span> <span style=color:#f92672>.</span> <span style=color:#f92672>$</span>mainPort,
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;type&#39;</span>   <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>typeName,
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;mode&#39;</span>   <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>modeName,
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;worker&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>workerNum,
+</span></span><span style=display:flex><span>            ],
+</span></span><span style=display:flex><span>        ];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Port Listeners
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>panel <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>appendPortsToPanel(<span style=color:#f92672>$</span>server, <span style=color:#f92672>$</span>panel);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        Show::panel(<span style=color:#f92672>$</span>panel);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        output()<span style=color:#f92672>-&gt;</span>writeln(<span style=color:#e6db74>&#39;&lt;success&gt;HTTP server start success !&lt;/success&gt;&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Start the server
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>start();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Reload worker processes
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>CommandMapping(usage<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;{fullCommand} [-t]&#34;</span>)
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>CommandOption(<span style=color:#e6db74>&#34;t&#34;</span>, desc<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;Only to reload task processes, default to reload worker and task&#34;</span>)
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ContainerException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function reload(): void
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>server <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>createServer();
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>script <span style=color:#f92672>=</span> input()<span style=color:#f92672>-&gt;</span>getScript();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Check <span style=color:#66d9ef>if</span> it has started
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!$</span>server<span style=color:#f92672>-&gt;</span>isRunning()) {
+</span></span><span style=display:flex><span>            output()<span style=color:#f92672>-&gt;</span>writeln(<span style=color:#e6db74>&#39;&lt;error&gt;The HTTP server is not running! cannot reload&lt;/error&gt;&#39;</span>);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        output()<span style=color:#f92672>-&gt;</span>writef(<span style=color:#e6db74>&#39;&lt;info&gt;Server </span><span style=color:#e6db74>%s</span><span style=color:#e6db74> is reloading&lt;/info&gt;&#39;</span>, <span style=color:#f92672>$</span>script);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>reloadTask <span style=color:#f92672>=</span> input()<span style=color:#f92672>-&gt;</span>hasOpt(<span style=color:#e6db74>&#39;t&#39;</span>)) {
+</span></span><span style=display:flex><span>            Show::notice(<span style=color:#e6db74>&#39;Will only reload task worker&#39;</span>);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!$</span>server<span style=color:#f92672>-&gt;</span>reload(<span style=color:#f92672>$</span>reloadTask)) {
+</span></span><span style=display:flex><span>            Show::error(<span style=color:#e6db74>&#39;The swoole server worker process reload fail!&#39;</span>);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        output()<span style=color:#f92672>-&gt;</span>writef(<span style=color:#e6db74>&#39;&lt;success&gt;HTTP server </span><span style=color:#e6db74>%s</span><span style=color:#e6db74> reload success&lt;/success&gt;&#39;</span>, <span style=color:#f92672>$</span>script);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Stop the currently running server
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>CommandMapping()
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ContainerException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function stop(): void
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>server <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>createServer();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Check <span style=color:#66d9ef>if</span> it has started
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!$</span>server<span style=color:#f92672>-&gt;</span>isRunning()) {
+</span></span><span style=display:flex><span>            output()<span style=color:#f92672>-&gt;</span>writeln(<span style=color:#e6db74>&#39;&lt;error&gt;The HTTP server is not running! cannot stop.&lt;/error&gt;&#39;</span>);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Do stopping<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>stop();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Restart the http server
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>CommandMapping(usage<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;{fullCommand} [-d|--daemon]&#34;</span>,)
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>CommandOption(<span style=color:#e6db74>&#34;daemon&#34;</span>, short<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;d&#34;</span>, desc<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;Run server on the background&#34;</span>)
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ContainerException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>example
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>  {fullCommand}
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>  {fullCommand} <span style=color:#f92672>-</span>d
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function restart(): void
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>server <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>createServer();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Check <span style=color:#66d9ef>if</span> it has started
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>isRunning()) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>success <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>stop();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!$</span>success) {
+</span></span><span style=display:flex><span>                output()<span style=color:#f92672>-&gt;</span>error(<span style=color:#e6db74>&#39;Stop the old server failed!&#39;</span>);
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        output()<span style=color:#f92672>-&gt;</span>writef(<span style=color:#e6db74>&#39;&lt;success&gt;Server HTTP restart success !&lt;/success&gt;&#39;</span>);
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>startWithDaemonize();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> HttpServer
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ContainerException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    private function createServer(): HttpServer
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>script  <span style=color:#f92672>=</span> input()<span style=color:#f92672>-&gt;</span>getScript();
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>command <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>getFullCommand();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>/**</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> HttpServer <span style=color:#f92672>$</span>server <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>server <span style=color:#f92672>=</span> bean(<span style=color:#e6db74>&#39;httpServer&#39;</span>);
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>setScriptFile(Swoft::app()<span style=color:#f92672>-&gt;</span>getPath(<span style=color:#f92672>$</span>script));
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>setFullCommand(<span style=color:#f92672>$</span>command);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>server;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>通过<a href=https://www.swoft.org/docs/2.x/zh-CN/annotation/usage.html>Swoft文档</a>，我们可以看到这里分别使用了类注解和方法注解。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>@Command(&#34;http&#34;, alias=&#34;httpsrv&#34;, coroutine=false)
+</span></span><span style=display:flex><span>@CommandMapping(usage=&#34;{fullCommand} [-d|--daemon]&#34;)
+</span></span><span style=display:flex><span>@CommandOption(&#34;daemon&#34;, short=&#34;d&#34;, desc=&#34;Run server on the background&#34;, type=&#34;bool&#34;, default=&#34;false&#34;)
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p>通过第二篇文章分析，我们知道这里会自动实例化对应的注解类。</p><p>这里以<code>Swoft\Console\Annotation\Mapping\CommandMapping</code>这个注解为例，对应的注解解析类为<code>Swoft\Console\Annotation\Parser\CommandMappingParser</code>。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>&lt;</span><span style=color:#960050;background-color:#1e0010>?</span>php declare(strict_types<span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>namespace Swoft\Console\Annotation\Parser;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>use Swoft\Annotation\Annotation\Mapping\AnnotationParser;
+</span></span><span style=display:flex><span>use Swoft\Annotation\Annotation\Parser\Parser;
+</span></span><span style=display:flex><span>use Swoft\Annotation\Exception\AnnotationException;
+</span></span><span style=display:flex><span>use Swoft\Console\Annotation\Mapping\CommandMapping;
+</span></span><span style=display:flex><span>use Swoft\Console\CommandRegister;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> Class CommandMappingParser
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>since <span style=color:#ae81ff>2.0</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>AnnotationParser(CommandMapping::<span style=color:#66d9ef>class</span>)
+</span></span><span style=display:flex><span> <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> CommandMappingParser <span style=color:#66d9ef>extends</span> Parser
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Parse object
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param <span style=color:#a6e22e>int</span>            <span style=color:#f92672>$</span>type Class <span style=color:#f92672>or</span> Method <span style=color:#f92672>or</span> Property
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param CommandMapping <span style=color:#f92672>$</span>annotation Annotation object
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> array
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Return empty array is nothing to <span style=color:#66d9ef>do</span><span style=color:#f92672>!</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> When <span style=color:#66d9ef>class</span> type <span style=color:#66d9ef>return</span> [<span style=color:#f92672>$</span>beanName, <span style=color:#f92672>$</span>className, <span style=color:#f92672>$</span>scope, <span style=color:#f92672>$</span>alias, <span style=color:#f92672>$</span>size] is to inject bean
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> When property type <span style=color:#66d9ef>return</span> [<span style=color:#f92672>$</span>propertyValue, <span style=color:#f92672>$</span>isRef] is to reference value
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function parse(<span style=color:#a6e22e>int</span> <span style=color:#f92672>$</span>type, <span style=color:#f92672>$</span>annotation): array
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>type <span style=color:#f92672>!==</span> self::TYPE_METHOD) {
+</span></span><span style=display:flex><span>            throw new AnnotationException(<span style=color:#e6db74>&#39;`@CommandMapping` must be defined on class method!&#39;</span>);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>method <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>methodName;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> add route info <span style=color:#66d9ef>for</span> controller action
+</span></span><span style=display:flex><span>        CommandRegister::addRoute(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>className, <span style=color:#f92672>$</span>method, [
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;command&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>annotation<span style=color:#f92672>-&gt;</span>getName() <span style=color:#960050;background-color:#1e0010>?</span>: <span style=color:#f92672>$</span>method,
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;method&#39;</span>  <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>method,
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;alias&#39;</span>   <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>annotation<span style=color:#f92672>-&gt;</span>getAlias(),
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;aliases&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>annotation<span style=color:#f92672>-&gt;</span>getAliases(),
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;desc&#39;</span>    <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>annotation<span style=color:#f92672>-&gt;</span>getDesc(),
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;usage&#39;</span>   <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>annotation<span style=color:#f92672>-&gt;</span>getUsage(),
+</span></span><span style=display:flex><span>            <span style=color:#f92672>//</span> <span style=color:#e6db74>&#39;example&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>annotation<span style=color:#f92672>-&gt;</span>getExample(),
+</span></span><span style=display:flex><span>        ]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> [];
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>看到这里，你应该可以猜到<code>CommandRegister</code>类的<code>$commands</code>是怎么来的了吧。</p><p>我们看下<code>CommandRegister</code>类的<code>addRoute</code>方法，验证下想法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * @param string $class
+</span></span><span style=display:flex><span>    * @param string $method
+</span></span><span style=display:flex><span>    * @param array  $route
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @throws AnnotationException
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public static function addRoute(string $class, string $method, array $route): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    self::checkClass($class);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // init some keys
+</span></span><span style=display:flex><span>    $route[&#39;options&#39;]   = [];
+</span></span><span style=display:flex><span>    $route[&#39;arguments&#39;] = [];
+</span></span><span style=display:flex><span>    // save
+</span></span><span style=display:flex><span>    self::$commands[$class][&#39;commands&#39;][$method] = $route;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>bingo，跟我们猜想的一模一样，这下我们也知道<code>CommandMapping</code>这个注解是用来注册终端的路由信息。</p><p>回到<code>ConsoleProcessor</code>类，接着看代码。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>CLog::info(
+</span></span><span style=display:flex><span>    &#39;Console command route registered (group %d, command %d)&#39;,
+</span></span><span style=display:flex><span>    $router-&gt;groupCount(),
+</span></span><span style=display:flex><span>    $router-&gt;count()
+</span></span><span style=display:flex><span>);
+</span></span></code></pre></div><p>打印日志。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>// Run console application
+</span></span><span style=display:flex><span>bean(&#39;cliApp&#39;)-&gt;run();
+</span></span></code></pre></div><p>感觉到了重头戏。</p><p>根据前面的代码，我们知道<code>cliApp</code>这个<code>Bean</code>实例对应的类是<code>Swoft\Console\Application</code>。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> void
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ContainerException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>public function run(): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    try {
+</span></span><span style=display:flex><span>        Swoft::trigger(ConsoleEvent::RUN_BEFORE, <span style=color:#f92672>$</span>this);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Prepare
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>prepare();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Get input command
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>inputCommand <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>input<span style=color:#f92672>-&gt;</span>getCommand();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!$</span>inputCommand) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>filterSpecialOption();
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>doRun(<span style=color:#f92672>$</span>inputCommand);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        Swoft::trigger(ConsoleEvent::RUN_AFTER, <span style=color:#f92672>$</span>this, <span style=color:#f92672>$</span>inputCommand);
+</span></span><span style=display:flex><span>    } catch (Throwable <span style=color:#f92672>$</span>e) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>/**</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> ConsoleErrorDispatcher <span style=color:#f92672>$</span>errDispatcher <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>errDispatcher <span style=color:#f92672>=</span> BeanFactory::getSingleton(ConsoleErrorDispatcher::<span style=color:#66d9ef>class</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Handle request error
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>errDispatcher<span style=color:#f92672>-&gt;</span>run(<span style=color:#f92672>$</span>e);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>通过<code>Swoft::trigger</code>，注册了<code>ConsoleEvent::RUN_BEFORE</code>和<code>ConsoleEvent::RUN_AFTER</code>两个事件。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span>protected function prepare(): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>input  <span style=color:#f92672>=</span> \input();
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>output <span style=color:#f92672>=</span> \output();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> load builtin comments vars
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>setCommentsVars(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>commentsVars());
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><code>prepare</code>比较简单，这里声明了输入和输出两个类。注意哈，这个后面会用到。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>$inputCommand = $this-&gt;input-&gt;getCommand();
+</span></span><span style=display:flex><span>if (!$inputCommand) {
+</span></span><span style=display:flex><span>    $this-&gt;filterSpecialOption();
+</span></span><span style=display:flex><span>} else {
+</span></span><span style=display:flex><span>    $this-&gt;doRun($inputCommand);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>获取终端命令行下的输入，如果有输入执行<code>doRun</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param string <span style=color:#f92672>$</span>inputCmd
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> void
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ContainerException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws Throwable
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>protected function doRun(string <span style=color:#f92672>$</span>inputCmd): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>output <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>output;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> Router <span style=color:#f92672>$</span>router <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>router <span style=color:#f92672>=</span> Swoft::getBean(<span style=color:#e6db74>&#39;cliRouter&#39;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>result <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>router<span style=color:#f92672>-&gt;</span>match(<span style=color:#f92672>$</span>inputCmd);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Command <span style=color:#f92672>not</span> found
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>result[<span style=color:#ae81ff>0</span>] <span style=color:#f92672>===</span> Router::NOT_FOUND) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>names <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>router<span style=color:#f92672>-&gt;</span>getAllNames();
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>output<span style=color:#f92672>-&gt;</span>liteError(<span style=color:#e6db74>&#34;The entered command &#39;{$inputCmd}&#39; is not exists!&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> find similar command names by similar_text()
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>similar <span style=color:#f92672>=</span> Arr::findSimilar(<span style=color:#f92672>$</span>inputCmd, <span style=color:#f92672>$</span>names)) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>output<span style=color:#f92672>-&gt;</span>writef(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>Maybe what you mean is:</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>    &lt;info&gt;</span><span style=color:#e6db74>%s</span><span style=color:#e6db74>&lt;/info&gt;&#34;</span>, implode(<span style=color:#e6db74>&#39;, &#39;</span>, <span style=color:#f92672>$</span>similar));
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>showApplicationHelp(false);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>info <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>result[<span style=color:#ae81ff>1</span>];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Only input a group name, display help <span style=color:#66d9ef>for</span> the group
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>result[<span style=color:#ae81ff>0</span>] <span style=color:#f92672>===</span> Router::ONLY_GROUP) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>showGroupHelp(<span style=color:#f92672>$</span>info[<span style=color:#e6db74>&#39;group&#39;</span>]);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Display help <span style=color:#66d9ef>for</span> a command
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>input<span style=color:#f92672>-&gt;</span>getSameOpt([<span style=color:#e6db74>&#39;h&#39;</span>, <span style=color:#e6db74>&#39;help&#39;</span>])) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>showCommandHelp(<span style=color:#f92672>$</span>info);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Parse default options <span style=color:#f92672>and</span> arguments
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>bindCommandFlags(<span style=color:#f92672>$</span>info);
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>input<span style=color:#f92672>-&gt;</span>setCommandId(<span style=color:#f92672>$</span>info[<span style=color:#e6db74>&#39;cmdId&#39;</span>]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    Swoft::triggerByArray(ConsoleEvent::DISPATCH_BEFORE, <span style=color:#f92672>$</span>this, <span style=color:#f92672>$</span>info);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Call command handler
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> ConsoleDispatcher <span style=color:#f92672>$</span>dispatcher <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>dispatcher <span style=color:#f92672>=</span> Swoft::getSingleton(<span style=color:#e6db74>&#39;cliDispatcher&#39;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>dispatcher<span style=color:#f92672>-&gt;</span>dispatch(<span style=color:#f92672>$</span>info);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    Swoft::triggerByArray(ConsoleEvent::DISPATCH_AFTER, <span style=color:#f92672>$</span>this, <span style=color:#f92672>$</span>info);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>$router = Swoft::getBean(&#39;cliRouter&#39;);
+</span></span><span style=display:flex><span>$result = $router-&gt;match($inputCmd);
+</span></span></code></pre></div><p>获取<code>cliRouter</code>实例，根据输入匹配路由操作类。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Match route by input command
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @param array $params [$route]
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return array
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * [
+</span></span><span style=display:flex><span>    *  status, info(array)
+</span></span><span style=display:flex><span>    * ]
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public function match(...$params): array
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $delimiter = $this-&gt;delimiter;
+</span></span><span style=display:flex><span>    $inputCmd  = trim($params[0], &#34;$delimiter &#34;);
+</span></span><span style=display:flex><span>    $noSepChar = strpos($inputCmd, $delimiter) === false;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // If use command ID alias
+</span></span><span style=display:flex><span>    if ($noSepChar &amp;&amp; isset($this-&gt;idAliases[$inputCmd])) {
+</span></span><span style=display:flex><span>        $inputCmd = $this-&gt;idAliases[$inputCmd];
+</span></span><span style=display:flex><span>        // Must re-check
+</span></span><span style=display:flex><span>        $noSepChar = strpos($inputCmd, $delimiter) === false;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    if ($noSepChar &amp;&amp; in_array($inputCmd, $this-&gt;defaultCommands, true)) {
+</span></span><span style=display:flex><span>        $group   = $this-&gt;defaultGroup;
+</span></span><span style=display:flex><span>        $command = $this-&gt;resolveCommandAlias($inputCmd);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        // Only a group name
+</span></span><span style=display:flex><span>    } elseif ($noSepChar) {
+</span></span><span style=display:flex><span>        $group = $this-&gt;resolveGroupAlias($inputCmd);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        if (isset($this-&gt;groups[$group])) {
+</span></span><span style=display:flex><span>            return [self::ONLY_GROUP, [&#39;group&#39; =&gt; $group]];
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        return [self::NOT_FOUND];
+</span></span><span style=display:flex><span>    } else {
+</span></span><span style=display:flex><span>        $nameList = explode($delimiter, $inputCmd, 2);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        if (count($nameList) === 2) {
+</span></span><span style=display:flex><span>            [$group, $command] = $nameList;
+</span></span><span style=display:flex><span>            // resolve command alias
+</span></span><span style=display:flex><span>            $command = $this-&gt;resolveCommandAlias($command);
+</span></span><span style=display:flex><span>        } else {
+</span></span><span style=display:flex><span>            $command = &#39;&#39;;
+</span></span><span style=display:flex><span>            // $command = $this-&gt;defaultCommand;
+</span></span><span style=display:flex><span>            $group = $nameList[0];
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $group = $this-&gt;resolveGroupAlias($group);
+</span></span><span style=display:flex><span>    // build command ID
+</span></span><span style=display:flex><span>    $commandID = $this-&gt;buildCommandID($group, $command);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    if (isset($this-&gt;routes[$commandID])) {
+</span></span><span style=display:flex><span>        $info = $this-&gt;routes[$commandID];
+</span></span><span style=display:flex><span>        // append some info
+</span></span><span style=display:flex><span>        $info[&#39;cmdId&#39;] = $commandID;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        return [self::FOUND, $info];
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    if ($group &amp;&amp; isset($this-&gt;groups[$group])) {
+</span></span><span style=display:flex><span>        return [self::ONLY_GROUP, [&#39;group&#39; =&gt; $group]];
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    return [self::NOT_FOUND];
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里会返回匹配后的路由信息。</p><p>回到<code>doRun</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>// Command not found
+</span></span><span style=display:flex><span>if ($result[0] === Router::NOT_FOUND) {
+</span></span><span style=display:flex><span>    $names = $router-&gt;getAllNames();
+</span></span><span style=display:flex><span>    $output-&gt;liteError(&#34;The entered command &#39;{$inputCmd}&#39; is not exists!&#34;);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // find similar command names by similar_text()
+</span></span><span style=display:flex><span>    if ($similar = Arr::findSimilar($inputCmd, $names)) {
+</span></span><span style=display:flex><span>        $output-&gt;writef(&#34;\nMaybe what you mean is:\n    &lt;info&gt;%s&lt;/info&gt;&#34;, implode(&#39;, &#39;, $similar));
+</span></span><span style=display:flex><span>    } else {
+</span></span><span style=display:flex><span>        $this-&gt;showApplicationHelp(false);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    return;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$info = $result[1];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>// Only input a group name, display help for the group
+</span></span><span style=display:flex><span>if ($result[0] === Router::ONLY_GROUP) {
+</span></span><span style=display:flex><span>    $this-&gt;showGroupHelp($info[&#39;group&#39;]);
+</span></span><span style=display:flex><span>    return;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>// Display help for a command
+</span></span><span style=display:flex><span>if ($this-&gt;input-&gt;getSameOpt([&#39;h&#39;, &#39;help&#39;])) {
+</span></span><span style=display:flex><span>    $this-&gt;showCommandHelp($info);
+</span></span><span style=display:flex><span>    return;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>根据返回的路由信息进行不同的处理。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>// Parse default options and arguments
+</span></span><span style=display:flex><span>$this-&gt;bindCommandFlags($info);
+</span></span><span style=display:flex><span>$this-&gt;input-&gt;setCommandId($info[&#39;cmdId&#39;]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Swoft::triggerByArray(ConsoleEvent::DISPATCH_BEFORE, $this, $info);
+</span></span></code></pre></div><p>绑定默认参数，注册<code>ConsoleEvent::DISPATCH_BEFORE</code>事件。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>//</span> Call command handler
+</span></span><span style=display:flex><span><span style=color:#f92672>/**</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> ConsoleDispatcher <span style=color:#f92672>$</span>dispatcher <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>$</span>dispatcher <span style=color:#f92672>=</span> Swoft::getSingleton(<span style=color:#e6db74>&#39;cliDispatcher&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#f92672>$</span>dispatcher<span style=color:#f92672>-&gt;</span>dispatch(<span style=color:#f92672>$</span>info);
+</span></span></code></pre></div><p>获取<code>cliDispatcher</code>的<code>Bean</code>实例，对应<code>Swoft\Console\ConsoleDispatcher</code>类，调用<code>dispatch</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * @param array $params
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return void
+</span></span><span style=display:flex><span>    * @throws ReflectionException
+</span></span><span style=display:flex><span>    * @throws Throwable
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public function dispatch(...$params): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $route = $params[0];
+</span></span><span style=display:flex><span>    // Handler info
+</span></span><span style=display:flex><span>    [$className, $method] = $route[&#39;handler&#39;];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Bind method params
+</span></span><span style=display:flex><span>    $params = $this-&gt;getBindParams($className, $method);
+</span></span><span style=display:flex><span>    $object = Swoft::getSingleton($className);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Blocking running
+</span></span><span style=display:flex><span>    if (!$route[&#39;coroutine&#39;]) {
+</span></span><span style=display:flex><span>        $this-&gt;before(get_parent_class($object), $method);
+</span></span><span style=display:flex><span>        PhpHelper::call([$object, $method], ...$params);
+</span></span><span style=display:flex><span>        $this-&gt;after($method);
+</span></span><span style=display:flex><span>        return;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Hook php io function
+</span></span><span style=display:flex><span>    Runtime::enableCoroutine();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // If in unit test env, has been in coroutine.
+</span></span><span style=display:flex><span>    if (\defined(&#39;PHPUNIT_COMPOSER_INSTALL&#39;)) {
+</span></span><span style=display:flex><span>        $this-&gt;executeByCo($object, $method, $params);
+</span></span><span style=display:flex><span>        return;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Coroutine running
+</span></span><span style=display:flex><span>    srun(function () use ($object, $method, $params) {
+</span></span><span style=display:flex><span>        $this-&gt;executeByCo($object, $method, $params);
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>获取路由对应的类和方法，通过<code>Swoft::getSingleton($className);</code>实例化对象。</p><p>如果未开启协程，则用<code>PhpHelper::call([$object, $method], ...$params);</code>调用对应的方法。</p><p>开启协程的话，使用<code>$this->executeByCo($object, $method, $params);</code>调用对应的方法。</p><p>我们前面启动命令是<code>php bin/swoft http:start</code>，这里对应的类就是<code>Swoft\Http\Server\Command\HttpServerCommand</code>，方法就是<code>start</code>。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Start the http server
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @CommandMapping(usage=&#34;{fullCommand} [-d|--daemon]&#34;)
+</span></span><span style=display:flex><span>    * @CommandOption(&#34;daemon&#34;, short=&#34;d&#34;, desc=&#34;Run server on the background&#34;, type=&#34;bool&#34;, default=&#34;false&#34;)
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @throws ReflectionException
+</span></span><span style=display:flex><span>    * @throws ContainerException
+</span></span><span style=display:flex><span>    * @throws ServerException
+</span></span><span style=display:flex><span>    * @example
+</span></span><span style=display:flex><span>    *   {fullCommand}
+</span></span><span style=display:flex><span>    *   {fullCommand} -d
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public function start(): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $server = $this-&gt;createServer();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Check if it has started
+</span></span><span style=display:flex><span>    if ($server-&gt;isRunning()) {
+</span></span><span style=display:flex><span>        $masterPid = $server-&gt;getPid();
+</span></span><span style=display:flex><span>        output()-&gt;writeln(&#34;&lt;error&gt;The HTTP server have been running!(PID: {$masterPid})&lt;/error&gt;&#34;);
+</span></span><span style=display:flex><span>        return;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Startup settings
+</span></span><span style=display:flex><span>    $this-&gt;configStartOption($server);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $settings = $server-&gt;getSetting();
+</span></span><span style=display:flex><span>    // Setting
+</span></span><span style=display:flex><span>    $workerNum = $settings[&#39;worker_num&#39;];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Server startup parameters
+</span></span><span style=display:flex><span>    $mainHost = $server-&gt;getHost();
+</span></span><span style=display:flex><span>    $mainPort = $server-&gt;getPort();
+</span></span><span style=display:flex><span>    $modeName = $server-&gt;getModeName();
+</span></span><span style=display:flex><span>    $typeName = $server-&gt;getTypeName();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Http
+</span></span><span style=display:flex><span>    $panel = [
+</span></span><span style=display:flex><span>        &#39;HTTP&#39; =&gt; [
+</span></span><span style=display:flex><span>            &#39;listen&#39; =&gt; $mainHost . &#39;:&#39; . $mainPort,
+</span></span><span style=display:flex><span>            &#39;type&#39;   =&gt; $typeName,
+</span></span><span style=display:flex><span>            &#39;mode&#39;   =&gt; $modeName,
+</span></span><span style=display:flex><span>            &#39;worker&#39; =&gt; $workerNum,
+</span></span><span style=display:flex><span>        ],
+</span></span><span style=display:flex><span>    ];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Port Listeners
+</span></span><span style=display:flex><span>    $panel = $this-&gt;appendPortsToPanel($server, $panel);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    Show::panel($panel);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    output()-&gt;writeln(&#39;&lt;success&gt;HTTP server start success !&lt;/success&gt;&#39;);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Start the server
+</span></span><span style=display:flex><span>    $server-&gt;start();
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里先调用了<code>createServer</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> HttpServer
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ContainerException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>private function createServer(): HttpServer
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>script  <span style=color:#f92672>=</span> input()<span style=color:#f92672>-&gt;</span>getScript();
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>command <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>getFullCommand();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> HttpServer <span style=color:#f92672>$</span>server <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>server <span style=color:#f92672>=</span> bean(<span style=color:#e6db74>&#39;httpServer&#39;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>setScriptFile(Swoft::app()<span style=color:#f92672>-&gt;</span>getPath(<span style=color:#f92672>$</span>script));
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>server<span style=color:#f92672>-&gt;</span>setFullCommand(<span style=color:#f92672>$</span>command);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>server;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>获取<code>httpServer</code>的<code>Bean</code>实例。</p><p>框架定义在<code>swoft-component-2.0.5\src\http-server\src\AutoLoader.php</code>，这里声明了<code>onRequest</code>回调事件。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>&#39;httpServer&#39;      =&gt; [
+</span></span><span style=display:flex><span>    &#39;on&#39; =&gt; [
+</span></span><span style=display:flex><span>        SwooleEvent::REQUEST =&gt; bean(RequestListener::class)
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>],
+</span></span></code></pre></div><p>业务定义在<code>swoft-2.0.5\app\bean.php</code>。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>&#39;httpServer&#39;        =&gt; [
+</span></span><span style=display:flex><span>    &#39;class&#39;    =&gt; HttpServer::class,
+</span></span><span style=display:flex><span>    &#39;port&#39;     =&gt; 18306,
+</span></span><span style=display:flex><span>    &#39;listener&#39; =&gt; [
+</span></span><span style=display:flex><span>        &#39;rpc&#39; =&gt; bean(&#39;rpcServer&#39;)
+</span></span><span style=display:flex><span>    ],
+</span></span><span style=display:flex><span>    &#39;process&#39;  =&gt; [
+</span></span><span style=display:flex><span>//            &#39;monitor&#39; =&gt; bean(MonitorProcess::class)
+</span></span><span style=display:flex><span>//            &#39;crontab&#39; =&gt; bean(CrontabProcess::class)
+</span></span><span style=display:flex><span>    ],
+</span></span><span style=display:flex><span>    &#39;on&#39;       =&gt; [
+</span></span><span style=display:flex><span>//            SwooleEvent::TASK   =&gt; bean(SyncTaskListener::class),  // Enable sync task
+</span></span><span style=display:flex><span>        SwooleEvent::TASK   =&gt; bean(TaskListener::class),  // Enable task must task and finish event
+</span></span><span style=display:flex><span>        SwooleEvent::FINISH =&gt; bean(FinishListener::class)
+</span></span><span style=display:flex><span>    ],
+</span></span><span style=display:flex><span>    /* @see HttpServer::$setting */
+</span></span><span style=display:flex><span>    &#39;setting&#39;  =&gt; [
+</span></span><span style=display:flex><span>        &#39;task_worker_num&#39;       =&gt; 12,
+</span></span><span style=display:flex><span>        &#39;task_enable_coroutine&#39; =&gt; true
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>],
+</span></span></code></pre></div><p><code>createServer</code>返回的是一个<code>Swoft\Http\Server\HttpServer</code>实例。</p><p>回到<code>HttpServerCommand</code>类的<code>start</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>// Start the server
+</span></span><span style=display:flex><span>$server-&gt;start();
+</span></span></code></pre></div><p>调用<code>Swoft\Http\Server\HttpServer</code>类的<code>start</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Start server
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @throws ServerException
+</span></span><span style=display:flex><span>    * @throws ContainerException
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public function start(): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $this-&gt;swooleServer = new \Swoole\Http\Server($this-&gt;host, $this-&gt;port, $this-&gt;mode, $this-&gt;type);
+</span></span><span style=display:flex><span>    $this-&gt;startSwoole();
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>声明<code>Swoole\Http\Server</code>对象，调用<code>startSwoole</code>方法。</p><p><code>Swoft\Http\Server\HttpServer</code>类继承自<code>Swoft\Server\Server</code>类，<code>startSwoole</code>方法定义在这个类。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Bind swoole event and start swoole server
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @throws ServerException
+</span></span><span style=display:flex><span>    * @throws Swoft\Bean\Exception\ContainerException
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>protected function startSwoole(): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    if (!$this-&gt;swooleServer) {
+</span></span><span style=display:flex><span>        throw new ServerException(&#39;You must to new server before start swoole!&#39;);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Always enable coroutine hook on server
+</span></span><span style=display:flex><span>    CLog::info(&#39;Swoole\Runtime::enableCoroutine&#39;);
+</span></span><span style=display:flex><span>    Runtime::enableCoroutine();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    Swoft::trigger(ServerEvent::BEFORE_SETTING, $this);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Set settings
+</span></span><span style=display:flex><span>    $this-&gt;swooleServer-&gt;set($this-&gt;setting);
+</span></span><span style=display:flex><span>    // Update setting property
+</span></span><span style=display:flex><span>    // $this-&gt;setSetting($this-&gt;swooleServer-&gt;setting);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Before Add event
+</span></span><span style=display:flex><span>    Swoft::trigger(ServerEvent::BEFORE_ADDED_EVENT, $this);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Register events
+</span></span><span style=display:flex><span>    $defaultEvents = $this-&gt;defaultEvents();
+</span></span><span style=display:flex><span>    $swooleEvents  = array_merge($defaultEvents, $this-&gt;on);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Add events
+</span></span><span style=display:flex><span>    $this-&gt;addEvent($this-&gt;swooleServer, $swooleEvents, $defaultEvents);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    //After add event
+</span></span><span style=display:flex><span>    Swoft::trigger(ServerEvent::AFTER_ADDED_EVENT, $this);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Before listener
+</span></span><span style=display:flex><span>    Swoft::trigger(ServerEvent::BEFORE_ADDED_LISTENER, $this);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Add port listener
+</span></span><span style=display:flex><span>    $this-&gt;addListener();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Before bind process
+</span></span><span style=display:flex><span>    Swoft::trigger(ServerEvent::BEFORE_ADDED_PROCESS, $this);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Add Process
+</span></span><span style=display:flex><span>    Swoft::trigger(ServerEvent::ADDED_PROCESS, $this);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // After bind process
+</span></span><span style=display:flex><span>    Swoft::trigger(ServerEvent::AFTER_ADDED_PROCESS, $this);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Trigger event
+</span></span><span style=display:flex><span>    Swoft::trigger(ServerEvent::BEFORE_START, $this, array_keys($swooleEvents));
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Storage server instance
+</span></span><span style=display:flex><span>    self::$server = $this;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Start swoole server
+</span></span><span style=display:flex><span>    $this-&gt;swooleServer-&gt;start();
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>$this-&gt;swooleServer-&gt;set($this-&gt;setting);
+</span></span></code></pre></div><p>设置<code>Swoole</code>运行配置。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>// Register events
+</span></span><span style=display:flex><span>$defaultEvents = $this-&gt;defaultEvents();
+</span></span><span style=display:flex><span>$swooleEvents  = array_merge($defaultEvents, $this-&gt;on);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>// Add events
+</span></span><span style=display:flex><span>$this-&gt;addEvent($this-&gt;swooleServer, $swooleEvents, $defaultEvents);
+</span></span></code></pre></div><p>添加<code>Swoole</code>回调事件。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>// Add port listener
+</span></span><span style=display:flex><span>$this-&gt;addListener();
+</span></span></code></pre></div><p>监听端口。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>// Start swoole server
+</span></span><span style=display:flex><span>$this-&gt;swooleServer-&gt;start();
+</span></span></code></pre></div><p>启动<code>Swoole\Http\Server</code>服务。</p><p>现在服务已经启动了，那<code>http请求</code>是怎么被处理的呢？</p><p>这个我们下一篇再继续讲。</p></div><footer class=post-footer><ul class=post-tags><li><a href=https://liudon.com/tags/swoft/>Swoft</a></li></ul><nav class=paginav><a class=prev href=https://liudon.com/posts/chinese-national-day/><span class=title>« Prev</span><br><span>十一假期经历</span>
+</a><a class=next href=https://liudon.com/posts/swoft-event-processor-analysis/><span class=title>Next »</span><br><span>Swoft 框架运行分析（四） —— EventProcessor模块分析</span></a></nav></footer><div><div class=post_ads><ins class=adsbygoogle style=display:block data-ad-client=ca-pub-4739645989170648 data-ad-slot=5019102040 data-ad-format=auto data-full-width-responsive=true></ins><script>window.addEventListener("load",function(){(adsbygoogle=window.adsbygoogle||[]).push({})})</script></div><div class=pagination__title><span class=pagination__title-h style=font-size:20px>💬评论</span><hr></div><div id=tcomment></div><script src=https://cdnjs.cloudflare.com/ajax/libs/twikoo/1.6.41/twikoo.all.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script>twikoo.init({envId:"https://comment.liudon.com",el:"#tcomment",lang:"zh-CN",region:"ap-shanghai",path:window.TWIKOO_MAGIC_PATH||window.location.pathname})</script></div></article></main><footer class=footer><span>&copy; 2025 <a href=https://liudon.com/>流动</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg></a><footer class=footer style=margin-top:-20px;padding-top:0><span><a href=https://beian.miit.gov.cn target=_blank>京ICP备13029522号-2</a></span></footer><script src=//tokinx.github.io/ViewImage/view-image.min.js async></script><script>function initViewImage(){window.ViewImage&&ViewImage.init(".post-content img")}document.readyState==="complete"?initViewImage():window.addEventListener("load",initViewImage)</script><script>const host=window.location.host;host!=="blog.liudon.xyz"&&!host.startsWith("liudon.")&&!host.startsWith("localhost")&&!host.startsWith("127.0.0.1")&&(document.body.innerHTML=['<div style="margin: auto;">',"<h1>当前页面并非本人博客，即将在2秒后跳转到本人博客: https://liudon.com。</h1>","<br />","</div>"].join(""),document.body.style=["background-color: white;","color: black;","text-align: center;","font-size: 50px;","width: 100vw;","height: 100vh;","display: flex;"].join(""),setTimeout(()=>{window.location.href="https://liudon.com"},2e3))</script><script>enScroll=!1,enFdl=!1,extCurrent=0[0],filename=0[0],targetText=0[0],splitOrigin=0[0];const lStor=localStorage,sStor=sessionStorage,doc=document,docEl=document.documentElement,docBody=document.body,docLoc=document.location,w=window,s=screen,nav=navigator||{},extensions=["pdf","xls","xlsx","doc","docx","txt","rtf","csv","exe","key","pps","ppt","pptx","7z","pkg","rar","gz","zip","avi","mov","mp4","mpe","mpeg","wmv","mid","midi","mp3","wav","wma"];function a(e,t,n,o){const j="G-G9ZDJQN9E2",r=()=>Math.floor(Math.random()*1e9)+1,c=()=>Math.floor(Date.now()/1e3),F=()=>(sStor._p||(sStor._p=r()),sStor._p),E=()=>r()+"."+c(),_=()=>(lStor.cid_v4||(lStor.cid_v4=E()),lStor.cid_v4),m=lStor.getItem("cid_v4"),v=()=>m?0[0]:enScroll==!0?0[0]:"1",p=()=>(sStor.sid||(sStor.sid=c()),sStor.sid),O=()=>{if(!sStor._ss)return sStor._ss="1",sStor._ss;if(sStor.getItem("_ss")=="1")return 0[0]},a="1",g=()=>{if(sStor.sct)if(enScroll==!0)return sStor.sct;else x=+sStor.getItem("sct")+ +a,sStor.sct=x;else sStor.sct=a;return sStor.sct},i=docLoc.search,b=new URLSearchParams(i),h=["q","s","search","query","keyword"],y=h.some(e=>i.includes("&"+e+"=")||i.includes("?"+e+"=")),u=()=>y==!0?"view_search_results":enScroll==!0?"scroll":enFdl==!0?"file_download":"page_view",f=()=>enScroll==!0?"90":0[0],C=()=>{if(u()=="view_search_results"){for(let e of b)if(h.includes(e[0]))return e[1]}else return 0[0]},d=encodeURIComponent,k=e=>{let t=[];for(let n in e)e.hasOwnProperty(n)&&e[n]!==0[0]&&t.push(d(n)+"="+d(e[n]));return t.join("&")},A=!1,S="https://liudon.com/analytics/post",M=k({tid:j,_p:F(),v:"2",sr:(s.width*w.devicePixelRatio+"x"+s.height*w.devicePixelRatio).toString(),ul:(nav.language||0[0]).toLowerCase(),cid:_(),_fv:v(),_s:"1",dl:docLoc.origin+docLoc.pathname+i,dt:doc.title||0[0],dr:doc.referrer||0[0],sid:p(),sct:g(),seg:"1",en:u(),"epn.percent_scrolled":f(),"ep.search_term":C(),"ep.file_extension":e||0[0],"ep.file_name":t||0[0],"ep.link_text":n||0[0],"ep.link_url":o||0[0],_ss:O(),_dbg:A?1:0[0]}),l=S+"?"+M;if(nav.sendBeacon)nav.sendBeacon(l);else{let e=new XMLHttpRequest;e.open("POST",l,!0)}}a();function sPr(){return(docEl.scrollTop||docBody.scrollTop)/((docEl.scrollHeight||docBody.scrollHeight)-docEl.clientHeight)*100}doc.addEventListener("scroll",sEv,{passive:!0});function sEv(){const e=sPr();if(e<90)return;enScroll=!0,a(),doc.removeEventListener("scroll",sEv,{passive:!0}),enScroll=!1}document.addEventListener("DOMContentLoaded",function(){let e=document.getElementsByTagName("a");for(let t=0;t<e.length;t++)if(e[t].getAttribute("href")!=null){const n=e[t].getAttribute("href"),s=n.substring(n.lastIndexOf("/")+1),o=s.split(".").pop();(e[t].hasAttribute("download")||extensions.includes(o))&&e[t].addEventListener("click",fDl,{passive:!0})}});function fDl(e){enFdl=!0;const t=e.currentTarget.getAttribute("href"),n=t.substring(t.lastIndexOf("/")+1),s=n.split(".").pop(),o=n.replace("."+s,""),i=e.currentTarget.text,r=t.replace(docLoc.origin,"");a(s,o,i,r),enFdl=!1}</script><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

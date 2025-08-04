@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>SSD on 流动</title>
+    <link>https://liudon.com/tags/ssd/</link>
+    <description>Recent content in SSD on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 22 Apr 2022 08:04:18 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/ssd/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>自己动手，更换thinkpad x1硬盘</title>
+      <link>https://liudon.com/posts/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%9B%B4%E6%8D%A2thinkpad-x1%E7%A1%AC%E7%9B%98/</link>
+      <pubDate>Fri, 22 Apr 2022 08:04:18 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%9B%B4%E6%8D%A2thinkpad-x1%E7%A1%AC%E7%9B%98/</guid>
+      <description>&lt;p&gt;电脑突然没法用了，提示&amp;quot;A disk read error occurred&amp;quot;的错误。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%9B%B4%E6%8D%A2thinkpad-x1%E7%A1%AC%E7%9B%98/491650584526_.pic.jpg_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%9B%B4%E6%8D%A2thinkpad-x1%E7%A1%AC%E7%9B%98/491650584526_.pic.jpg_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;491650584526_.pic.jpg&#34; width=&#34;1080&#34; height=&#34;810&#34; alt=&#34;491650584526_.pic&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;多次重启也不行，感觉是硬盘挂了。&lt;/p&gt;
+&lt;p&gt;机器去年过保了，之前有过在售后维护的经历，费用不低，这次决定自己动手。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

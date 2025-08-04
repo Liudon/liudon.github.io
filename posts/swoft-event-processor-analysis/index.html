@@ -1,0 +1,369 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Swoft 框架运行分析（四） —— EventProcessor模块分析 | 流动</title><meta name=keywords content="Swoft"><meta name=description content="今天我们来看一下EventProcessor的实现。
+/**
+    * Handle event register
+    * @return bool
+    */
+public function handle(): bool
+{
+    if (!$this->application->beforeEvent()) {
+        CLog::warning('Stop event processor by beforeEvent return false');
+        return false;
+    }
+
+    /** @var EventManager $eventManager */
+    $eventManager = bean('eventManager');
+    [$count1, $count2] = ListenerRegister::register($eventManager);
+
+    CLog::info('Event manager initialized(%d listener, %d subscriber)', $count1, $count2);
+
+    // Trigger a app init event
+    Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);
+
+    return $this->application->afterEvent();
+}
+获取eventManager的Bean实例，对应为Swoft\Event\Manager\EventManager类。"><meta name=author content="Liudon"><link rel=canonical href=https://liudon.com/posts/swoft-event-processor-analysis/><link crossorigin=anonymous href=../../assets/css/stylesheet.c2b4102602461aaea01497bf2f89d3d4096e9005f6ac8a7e60b27e335724b916.css integrity="sha256-wrQQJgJGGq6gFJe/L4nT1AlukAX2rIp+YLJ+M1ckuRY=" rel="preload stylesheet" as=style><link rel=icon href=https://liudon.com/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://liudon.com/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://liudon.com/favicon-32x32.png><link rel=apple-touch-icon href=https://liudon.com/apple-touch-icon.png><link rel=mask-icon href=https://liudon.com/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://liudon.com/posts/swoft-event-processor-analysis/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous></script><meta property="og:url" content="https://liudon.com/posts/swoft-event-processor-analysis/"><meta property="og:site_name" content="流动"><meta property="og:title" content="Swoft 框架运行分析（四） —— EventProcessor模块分析"><meta property="og:description" content="今天我们来看一下EventProcessor的实现。
+/** * Handle event register * @return bool */ public function handle(): bool { if (!$this->application->beforeEvent()) { CLog::warning('Stop event processor by beforeEvent return false'); return false; } /** @var EventManager $eventManager */ $eventManager = bean('eventManager'); [$count1, $count2] = ListenerRegister::register($eventManager); CLog::info('Event manager initialized(%d listener, %d subscriber)', $count1, $count2); // Trigger a app init event Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE); return $this->application->afterEvent(); } 获取eventManager的Bean实例，对应为Swoft\Event\Manager\EventManager类。"><meta property="og:locale" content="zh-cn"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2019-09-26T13:02:18+08:00"><meta property="article:modified_time" content="2019-09-26T13:02:18+08:00"><meta property="article:tag" content="Swoft"><meta name=twitter:card content="summary"><meta name=twitter:title content="Swoft 框架运行分析（四） —— EventProcessor模块分析"><meta name=twitter:description content="今天我们来看一下EventProcessor的实现。
+/**
+    * Handle event register
+    * @return bool
+    */
+public function handle(): bool
+{
+    if (!$this->application->beforeEvent()) {
+        CLog::warning('Stop event processor by beforeEvent return false');
+        return false;
+    }
+
+    /** @var EventManager $eventManager */
+    $eventManager = bean('eventManager');
+    [$count1, $count2] = ListenerRegister::register($eventManager);
+
+    CLog::info('Event manager initialized(%d listener, %d subscriber)', $count1, $count2);
+
+    // Trigger a app init event
+    Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);
+
+    return $this->application->afterEvent();
+}
+获取eventManager的Bean实例，对应为Swoft\Event\Manager\EventManager类。"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"文章","item":"https://liudon.com/posts/"},{"@type":"ListItem","position":2,"name":"Swoft 框架运行分析（四） —— EventProcessor模块分析","item":"https://liudon.com/posts/swoft-event-processor-analysis/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Swoft 框架运行分析（四） —— EventProcessor模块分析","name":"Swoft 框架运行分析（四） —— EventProcessor模块分析","description":"今天我们来看一下EventProcessor的实现。\n/** * Handle event register * @return bool */ public function handle(): bool { if (!$this-\u0026gt;application-\u0026gt;beforeEvent()) { CLog::warning(\u0026#39;Stop event processor by beforeEvent return false\u0026#39;); return false; } /** @var EventManager $eventManager */ $eventManager = bean(\u0026#39;eventManager\u0026#39;); [$count1, $count2] = ListenerRegister::register($eventManager); CLog::info(\u0026#39;Event manager initialized(%d listener, %d subscriber)\u0026#39;, $count1, $count2); // Trigger a app init event Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE); return $this-\u0026gt;application-\u0026gt;afterEvent(); } 获取eventManager的Bean实例，对应为Swoft\\Event\\Manager\\EventManager类。\n","keywords":["Swoft"],"articleBody":"今天我们来看一下EventProcessor的实现。\n/** * Handle event register * @return bool */ public function handle(): bool { if (!$this-\u003eapplication-\u003ebeforeEvent()) { CLog::warning('Stop event processor by beforeEvent return false'); return false; } /** @var EventManager $eventManager */ $eventManager = bean('eventManager'); [$count1, $count2] = ListenerRegister::register($eventManager); CLog::info('Event manager initialized(%d listener, %d subscriber)', $count1, $count2); // Trigger a app init event Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE); return $this-\u003eapplication-\u003eafterEvent(); } 获取eventManager的Bean实例，对应为Swoft\\Event\\Manager\\EventManager类。\n[$count1, $count2] = ListenerRegister::register($eventManager); 调用ListenerRegister类的register方法。\n/** * @param EventManager $em * * @return array */ public static function register(EventManager $em): array { foreach (self::$listeners as $className =\u003e $eventInfo) { $listener = Swoft::getSingleton($className); if (!$listener instanceof EventHandlerInterface) { throw new RuntimeException(\"The event listener class '{$className}' must be instanceof EventHandlerInterface\"); } $em-\u003eaddListener($listener, $eventInfo); } foreach (self::$subscribers as $className) { $subscriber = Swoft::getSingleton($className); if (!$subscriber instanceof EventSubscriberInterface) { throw new RuntimeException(\"The event subscriber class '{$className}' must be instanceof EventSubscriberInterface\"); } $em-\u003eaddSubscriber($subscriber); } $count1 = count(self::$listeners); $count2 = count(self::$subscribers); // Clear data self::$listeners = self::$subscribers = []; return [$count1, $count2]; } 遍历ListenerRegister类下的$listeners和$subscribers属性，绑定事件到eventManager的Bean实例上。\n这里的$listeners和$subscribers是从哪里来的呢？\n这里以http-server为例。\n在swoft-component-2.0.5\\src\\http-server\\src\\Listener目录下，存在下面三个文件。\nAfterRequestListener.php AppInitCompleteListener.php BeforeRequestListener.php 这里我们以AppInitCompleteListener.php为例。\n\u003c?php namespace Swoft\\Http\\Server\\Listener; use function bean; use ReflectionException; use Swoft\\Bean\\Exception\\ContainerException; use Swoft\\Event\\Annotation\\Mapping\\Listener; use Swoft\\Event\\EventHandlerInterface; use Swoft\\Event\\EventInterface; use Swoft\\Http\\Server\\Exception\\HttpServerException; use Swoft\\Http\\Server\\Middleware\\MiddlewareRegister; use Swoft\\Http\\Server\\Router\\Router; use Swoft\\Http\\Server\\Router\\RouteRegister; use Swoft\\SwoftEvent; /** * Class AppInitCompleteListener * @since 2.0 * * @Listener(SwoftEvent::APP_INIT_COMPLETE) */ class AppInitCompleteListener implements EventHandlerInterface { /** * @param EventInterface $event * * @throws ContainerException * @throws ReflectionException * @throws HttpServerException */ public function handle(EventInterface $event): void { /** @var Router $router Register HTTP routes */ $router = bean('httpRouter'); RouteRegister::registerRoutes($router); // Register middleware MiddlewareRegister::register(); } } 可以看到这里通过@Listener(SwoftEvent::APP_INIT_COMPLETE)，使用了Swoft\\Event\\Annotation\\Mapping\\Listener类注解，对应的注解解析类为Swoft\\Event\\Annotation\\Parser\\ListenerParser。\n\u003c?php declare(strict_types=1); namespace Swoft\\Event\\Annotation\\Parser; use Doctrine\\Common\\Annotations\\AnnotationException; use Swoft\\Annotation\\Annotation\\Mapping\\AnnotationParser; use Swoft\\Annotation\\Annotation\\Parser\\Parser; use Swoft\\Bean\\Annotation\\Mapping\\Bean; use Swoft\\Event\\Annotation\\Mapping\\Listener; use Swoft\\Event\\ListenerRegister; /** * Class ListenerParser * * @since 2.0 * * @AnnotationParser(Listener::class) */ class ListenerParser extends Parser { /** * @param int $type * @param Listener $annotation * * @return array * @throws AnnotationException */ public function parse(int $type, $annotation): array { if ($type !== self::TYPE_CLASS) { throw new AnnotationException('`@Listener` must be defined on class!'); } // collect listeners ListenerRegister::addListener($this-\u003eclassName, [ // event name =\u003e listener priority $annotation-\u003egetEvent() =\u003e $annotation-\u003egetPriority() ]); return [$this-\u003eclassName, $this-\u003eclassName, Bean::SINGLETON, '']; } } /** * @param string $className * @param array $definition [event name =\u003e listener priority] */ public static function addListener(string $className, array $definition = []): void { // Collect listeners self::$listeners[$className] = $definition; } 可以看到这里通过ListenerRegister::addListener方法，往ListenerRegister上注册了$listeners属性。\n属性$listeners和$subscribers的值，都是通过注解解析得来。\n这里我们回到EventProcessor类的handle方法。\n// Trigger a app init event Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE); trigger的方法定义如下。\n/** * Trigger an swoft application event * * @param string|EventInterface $event eg: 'app.start' 'app.stop' * @param null|mixed $target * @param array $params * * @return EventInterface */ public static function trigger($event, $target = null, ...$params): EventInterface { /** @see EventManager::trigger() */ return BeanFactory::getSingleton('eventManager')-\u003etrigger($event, $target, $params); } 这里调用了eventManager这个Bean实例的trigger方法。\n/** * Trigger an event. Can accept an EventInterface or will create one if not passed * * @param string|EventInterface $event 'app.start' 'app.stop' * @param mixed|string $target It is object or string. * @param array|mixed $args * * @return EventInterface * @throws InvalidArgumentException */ public function trigger($event, $target = null, array $args = []): EventInterface { if ($isString = is_string($event)) { $name = trim($event); } elseif ($event instanceof EventInterface) { $name = trim($event-\u003egetName()); } else { throw new InvalidArgumentException('Invalid event params for trigger event handler'); } $shouldCall = []; // Have matched listener if (isset($this-\u003elistenedEvents[$name])) { $shouldCall[$name] = ''; } // Like 'app.db.query' =\u003e prefix: 'app.db' if ($pos = strrpos($name, '.')) { $prefix = substr($name, 0, $pos); // Have a wildcards listener. eg 'app.db.*' $wildcardEvent = $prefix . '.*'; if (isset($this-\u003elistenedEvents[$wildcardEvent])) { $shouldCall[$wildcardEvent] = substr($name, $pos + 1); } } // Not found listeners if (!$shouldCall) { return $isString ? $this-\u003ebasicEvent : $event; } /** @var EventInterface $event */ if ($isString) { $event = $this-\u003eevents[$name] ?? $this-\u003ebasicEvent; } // Initial value $event-\u003esetName($name); $event-\u003esetParams($args); $event-\u003esetTarget($target); $event-\u003estopPropagation(false); // Notify event listeners foreach ($shouldCall as $name =\u003e $method) { $this-\u003etriggerListeners($this-\u003elisteners[$name], $event, $method); if ($event-\u003eisPropagationStopped()) { return $event; } } // Have global wildcards '*' listener. if (isset($this-\u003elistenedEvents['*'])) { $this-\u003etriggerListeners($this-\u003elisteners['*'], $event); } return $event; } 如果存在对应的事件，调用triggerListeners方法。\n/** * @param array|ListenerQueue $listeners * @param EventInterface $event * @param string $method */ protected function triggerListeners($listeners, EventInterface $event, string $method = ''): void { // $handled = false; $name = $event-\u003egetName(); $callable = false === strpos($name, '.'); // 循环调用监听器，处理事件 foreach ($listeners as $listener) { if ($event-\u003eisPropagationStopped()) { break; } if (is_object($listener)) { if ($listener instanceof EventHandlerInterface) { $listener-\u003ehandle($event); } elseif ($method \u0026\u0026 method_exists($listener, $method)) { $listener-\u003e$method($event); } elseif ($callable \u0026\u0026 method_exists($listener, $name)) { $listener-\u003e$name($event); } elseif (method_exists($listener, '__invoke')) { $listener($event); } } elseif (is_callable($listener)) { $listener($event); } } } 遍历事件回调，执行对应方法。\n回到EventProcessor类的handle方法。\n// Trigger a app init event Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE); 这里的事件为SwoftEvent::APP_INIT_COMPLETE，所以这里会执行这个事件下的所有回调。\n这里以Swoft\\Http\\Server\\Listener\\AppInitCompleteListener为例。\n\u003c?php namespace Swoft\\Http\\Server\\Listener; use function bean; use ReflectionException; use Swoft\\Bean\\Exception\\ContainerException; use Swoft\\Event\\Annotation\\Mapping\\Listener; use Swoft\\Event\\EventHandlerInterface; use Swoft\\Event\\EventInterface; use Swoft\\Http\\Server\\Exception\\HttpServerException; use Swoft\\Http\\Server\\Middleware\\MiddlewareRegister; use Swoft\\Http\\Server\\Router\\Router; use Swoft\\Http\\Server\\Router\\RouteRegister; use Swoft\\SwoftEvent; /** * Class AppInitCompleteListener * @since 2.0 * * @Listener(SwoftEvent::APP_INIT_COMPLETE) */ class AppInitCompleteListener implements EventHandlerInterface { /** * @param EventInterface $event * * @throws ContainerException * @throws ReflectionException * @throws HttpServerException */ public function handle(EventInterface $event): void { /** @var Router $router Register HTTP routes */ $router = bean('httpRouter'); RouteRegister::registerRoutes($router); // Register middleware MiddlewareRegister::register(); } } 这里使用了Swoft\\Event\\Annotation\\Mapping\\Listener注解，对应的事件为SwoftEvent::APP_INIT_COMPLETE。\n按照上面的分析，这里会调用到AppInitCompleteListener的handle方法，获取httpRouter的Bean实例，注册http服务的路由信息和中间件。\n到这里，我们大概清楚了EventProcessor这个模块的作用，注册了所有事件的回调。\n","wordCount":"1896","inLanguage":"en","datePublished":"2019-09-26T13:02:18+08:00","dateModified":"2019-09-26T13:02:18+08:00","author":{"@type":"Person","name":"Liudon"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://liudon.com/posts/swoft-event-processor-analysis/"},"publisher":{"@type":"Organization","name":"流动","logo":{"@type":"ImageObject","url":"https://liudon.com/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://liudon.com/ accesskey=h title="流动 (Alt + H)">流动</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://liudon.com/ title=Home><span>Home</span></a></li><li><a href=https://liudon.com/posts/ title=Posts><span>Posts</span></a></li><li><a href=https://workout.liudon.com title=Workouts><span>Workouts</span>&nbsp;
+<svg fill="none" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" height="12" width="12"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></a></li><li><a href=https://liudon.com/about/ title=About><span>About</span></a></li><li><a href=https://liudon.com/search/ title="🔍 (Alt + /)" accesskey=/><span>🔍</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Swoft 框架运行分析（四） —— EventProcessor模块分析</h1><div class=post-meta><span title='2019-09-26 13:02:18 +0800 +0800'>2019-09-26</span>&nbsp;·&nbsp;4 min&nbsp;·&nbsp;1896 words&nbsp;·&nbsp;Liudon</div></header><div class=post-content><p>今天我们来看一下<code>EventProcessor</code>的实现。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> Handle event register
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>public function handle(): <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!$</span>this<span style=color:#f92672>-&gt;</span>application<span style=color:#f92672>-&gt;</span>beforeEvent()) {
+</span></span><span style=display:flex><span>        CLog::warning(<span style=color:#e6db74>&#39;Stop event processor by beforeEvent return false&#39;</span>);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> false;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> EventManager <span style=color:#f92672>$</span>eventManager <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>eventManager <span style=color:#f92672>=</span> bean(<span style=color:#e6db74>&#39;eventManager&#39;</span>);
+</span></span><span style=display:flex><span>    [<span style=color:#f92672>$</span>count1, <span style=color:#f92672>$</span>count2] <span style=color:#f92672>=</span> ListenerRegister::register(<span style=color:#f92672>$</span>eventManager);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    CLog::info(<span style=color:#e6db74>&#39;Event manager initialized(</span><span style=color:#e6db74>%d</span><span style=color:#e6db74> listener, </span><span style=color:#e6db74>%d</span><span style=color:#e6db74> subscriber)&#39;</span>, <span style=color:#f92672>$</span>count1, <span style=color:#f92672>$</span>count2);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Trigger a app init event
+</span></span><span style=display:flex><span>    Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>application<span style=color:#f92672>-&gt;</span>afterEvent();
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>获取<code>eventManager</code>的<code>Bean</code>实例，对应为<code>Swoft\Event\Manager\EventManager</code>类。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>[$count1, $count2] = ListenerRegister::register($eventManager);
+</span></span></code></pre></div><p>调用<code>ListenerRegister</code>类的<code>register</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * @param EventManager $em
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return array
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public static function register(EventManager $em): array
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    foreach (self::$listeners as $className =&gt; $eventInfo) {
+</span></span><span style=display:flex><span>        $listener = Swoft::getSingleton($className);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        if (!$listener instanceof EventHandlerInterface) {
+</span></span><span style=display:flex><span>            throw new RuntimeException(&#34;The event listener class &#39;{$className}&#39; must be instanceof EventHandlerInterface&#34;);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $em-&gt;addListener($listener, $eventInfo);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    foreach (self::$subscribers as $className) {
+</span></span><span style=display:flex><span>        $subscriber = Swoft::getSingleton($className);
+</span></span><span style=display:flex><span>        if (!$subscriber instanceof EventSubscriberInterface) {
+</span></span><span style=display:flex><span>            throw new RuntimeException(&#34;The event subscriber class &#39;{$className}&#39; must be instanceof EventSubscriberInterface&#34;);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $em-&gt;addSubscriber($subscriber);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $count1 = count(self::$listeners);
+</span></span><span style=display:flex><span>    $count2 = count(self::$subscribers);
+</span></span><span style=display:flex><span>    // Clear data
+</span></span><span style=display:flex><span>    self::$listeners = self::$subscribers = [];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    return [$count1, $count2];
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>遍历<code>ListenerRegister</code>类下的<code>$listeners</code>和<code>$subscribers</code>属性，绑定事件到<code>eventManager</code>的<code>Bean</code>实例上。</p><p>这里的<code>$listeners</code>和<code>$subscribers</code>是从哪里来的呢？</p><p>这里以<code>http-server</code>为例。</p><p>在<code>swoft-component-2.0.5\src\http-server\src\Listener</code>目录下，存在下面三个文件。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>AfterRequestListener.php
+</span></span><span style=display:flex><span>AppInitCompleteListener.php
+</span></span><span style=display:flex><span>BeforeRequestListener.php
+</span></span></code></pre></div><p>这里我们以<code>AppInitCompleteListener.php</code>为例。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>&lt;</span><span style=color:#960050;background-color:#1e0010>?</span>php
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>namespace Swoft\Http\Server\Listener;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>use function bean;
+</span></span><span style=display:flex><span>use ReflectionException;
+</span></span><span style=display:flex><span>use Swoft\Bean\Exception\ContainerException;
+</span></span><span style=display:flex><span>use Swoft\Event\Annotation\Mapping\Listener;
+</span></span><span style=display:flex><span>use Swoft\Event\EventHandlerInterface;
+</span></span><span style=display:flex><span>use Swoft\Event\EventInterface;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Exception\HttpServerException;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Middleware\MiddlewareRegister;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Router\Router;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Router\RouteRegister;
+</span></span><span style=display:flex><span>use Swoft\SwoftEvent;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> Class AppInitCompleteListener
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>since <span style=color:#ae81ff>2.0</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>Listener(SwoftEvent::APP_INIT_COMPLETE)
+</span></span><span style=display:flex><span> <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> AppInitCompleteListener implements EventHandlerInterface
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param EventInterface <span style=color:#f92672>$</span>event
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ContainerException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws HttpServerException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function handle(EventInterface <span style=color:#f92672>$</span>event): void
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>/**</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> Router <span style=color:#f92672>$</span>router Register HTTP routes <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>router <span style=color:#f92672>=</span> bean(<span style=color:#e6db74>&#39;httpRouter&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        RouteRegister::registerRoutes(<span style=color:#f92672>$</span>router);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Register middleware
+</span></span><span style=display:flex><span>        MiddlewareRegister::register();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>可以看到这里通过<code>@Listener(SwoftEvent::APP_INIT_COMPLETE)</code>，使用了<code>Swoft\Event\Annotation\Mapping\Listener</code>类注解，对应的注解解析类为<code>Swoft\Event\Annotation\Parser\ListenerParser</code>。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>&lt;</span><span style=color:#960050;background-color:#1e0010>?</span>php declare(strict_types<span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>namespace Swoft\Event\Annotation\Parser;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>use Doctrine\Common\Annotations\AnnotationException;
+</span></span><span style=display:flex><span>use Swoft\Annotation\Annotation\Mapping\AnnotationParser;
+</span></span><span style=display:flex><span>use Swoft\Annotation\Annotation\Parser\Parser;
+</span></span><span style=display:flex><span>use Swoft\Bean\Annotation\Mapping\Bean;
+</span></span><span style=display:flex><span>use Swoft\Event\Annotation\Mapping\Listener;
+</span></span><span style=display:flex><span>use Swoft\Event\ListenerRegister;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> Class ListenerParser
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>since <span style=color:#ae81ff>2.0</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>AnnotationParser(Listener::<span style=color:#66d9ef>class</span>)
+</span></span><span style=display:flex><span> <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> ListenerParser <span style=color:#66d9ef>extends</span> Parser
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param <span style=color:#a6e22e>int</span>      <span style=color:#f92672>$</span>type
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param Listener <span style=color:#f92672>$</span>annotation
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> array
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws AnnotationException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function parse(<span style=color:#a6e22e>int</span> <span style=color:#f92672>$</span>type, <span style=color:#f92672>$</span>annotation): array
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>type <span style=color:#f92672>!==</span> self::TYPE_CLASS) {
+</span></span><span style=display:flex><span>            throw new AnnotationException(<span style=color:#e6db74>&#39;`@Listener` must be defined on class!&#39;</span>);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> collect listeners
+</span></span><span style=display:flex><span>        ListenerRegister::addListener(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>className, [
+</span></span><span style=display:flex><span>            <span style=color:#f92672>//</span> event name <span style=color:#f92672>=&gt;</span> listener priority
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>annotation<span style=color:#f92672>-&gt;</span>getEvent() <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>annotation<span style=color:#f92672>-&gt;</span>getPriority()
+</span></span><span style=display:flex><span>        ]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> [<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>className, <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>className, Bean::SINGLETON, <span style=color:#e6db74>&#39;&#39;</span>];
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zed data-lang=zed><span style=display:flex><span><span style=color:#75715e>/**
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * @param string $className
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * @param array  $definition [event name =&gt; listener priority]
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    */</span>
+</span></span><span style=display:flex><span>public static function addListener(string <span style=color:#960050;background-color:#1e0010>$</span>className, array <span style=color:#960050;background-color:#1e0010>$</span><span style=color:#66d9ef>definition</span> <span style=color:#f92672>=</span> [])<span style=color:#f92672>:</span> void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Collect listeners
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    self<span style=color:#f92672>::</span><span style=color:#960050;background-color:#1e0010>$</span>listeners[<span style=color:#960050;background-color:#1e0010>$</span>className] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span><span style=color:#66d9ef>definition</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>可以看到这里通过<code>ListenerRegister::addListener</code>方法，往<code>ListenerRegister</code>上注册了<code>$listeners</code>属性。</p><p>属性<code>$listeners</code>和<code>$subscribers</code>的值，都是通过注解解析得来。</p><p>这里我们回到<code>EventProcessor</code>类的<code>handle</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>// Trigger a app init event
+</span></span><span style=display:flex><span>Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);
+</span></span></code></pre></div><p>trigger的方法定义如下。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Trigger an swoft application event
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @param string|EventInterface $event eg: &#39;app.start&#39; &#39;app.stop&#39;
+</span></span><span style=display:flex><span>    * @param null|mixed            $target
+</span></span><span style=display:flex><span>    * @param array                 $params
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return EventInterface
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public static function trigger($event, $target = null, ...$params): EventInterface
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    /** @see EventManager::trigger() */
+</span></span><span style=display:flex><span>    return BeanFactory::getSingleton(&#39;eventManager&#39;)-&gt;trigger($event, $target, $params);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里调用了<code>eventManager</code>这个<code>Bean</code>实例的<code>trigger</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> Trigger an event<span style=color:#f92672>.</span> Can accept an EventInterface <span style=color:#f92672>or</span> will create one <span style=color:#66d9ef>if</span> <span style=color:#f92672>not</span> passed
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param string<span style=color:#f92672>|</span>EventInterface <span style=color:#f92672>$</span>event  <span style=color:#e6db74>&#39;app.start&#39;</span> <span style=color:#e6db74>&#39;app.stop&#39;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param mixed<span style=color:#f92672>|</span>string          <span style=color:#f92672>$</span>target It is object <span style=color:#f92672>or</span> string<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param array<span style=color:#f92672>|</span>mixed           <span style=color:#f92672>$</span>args
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> EventInterface
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws InvalidArgumentException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>public function trigger(<span style=color:#f92672>$</span>event, <span style=color:#f92672>$</span>target <span style=color:#f92672>=</span> null, array <span style=color:#f92672>$</span>args <span style=color:#f92672>=</span> []): EventInterface
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>isString <span style=color:#f92672>=</span> is_string(<span style=color:#f92672>$</span>event)) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>name <span style=color:#f92672>=</span> trim(<span style=color:#f92672>$</span>event);
+</span></span><span style=display:flex><span>    } elseif (<span style=color:#f92672>$</span>event instanceof EventInterface) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>name <span style=color:#f92672>=</span> trim(<span style=color:#f92672>$</span>event<span style=color:#f92672>-&gt;</span>getName());
+</span></span><span style=display:flex><span>    } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>        throw new InvalidArgumentException(<span style=color:#e6db74>&#39;Invalid event params for trigger event handler&#39;</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>shouldCall <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Have matched listener
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>listenedEvents[<span style=color:#f92672>$</span>name])) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>shouldCall[<span style=color:#f92672>$</span>name] <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;&#39;</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Like <span style=color:#e6db74>&#39;app.db.query&#39;</span> <span style=color:#f92672>=&gt;</span> prefix: <span style=color:#e6db74>&#39;app.db&#39;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>pos <span style=color:#f92672>=</span> strrpos(<span style=color:#f92672>$</span>name, <span style=color:#e6db74>&#39;.&#39;</span>)) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>prefix <span style=color:#f92672>=</span> substr(<span style=color:#f92672>$</span>name, <span style=color:#ae81ff>0</span>, <span style=color:#f92672>$</span>pos);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Have a wildcards listener<span style=color:#f92672>.</span> eg <span style=color:#e6db74>&#39;app.db.*&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>wildcardEvent <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>prefix <span style=color:#f92672>.</span> <span style=color:#e6db74>&#39;.*&#39;</span>;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>listenedEvents[<span style=color:#f92672>$</span>wildcardEvent])) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>shouldCall[<span style=color:#f92672>$</span>wildcardEvent] <span style=color:#f92672>=</span> substr(<span style=color:#f92672>$</span>name, <span style=color:#f92672>$</span>pos <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Not found listeners
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!$</span>shouldCall) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>isString <span style=color:#960050;background-color:#1e0010>?</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>basicEvent : <span style=color:#f92672>$</span>event;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> EventInterface <span style=color:#f92672>$</span>event <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>isString) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>event <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>events[<span style=color:#f92672>$</span>name] <span style=color:#960050;background-color:#1e0010>??</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>basicEvent;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Initial value
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>event<span style=color:#f92672>-&gt;</span>setName(<span style=color:#f92672>$</span>name);
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>event<span style=color:#f92672>-&gt;</span>setParams(<span style=color:#f92672>$</span>args);
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>event<span style=color:#f92672>-&gt;</span>setTarget(<span style=color:#f92672>$</span>target);
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>event<span style=color:#f92672>-&gt;</span>stopPropagation(false);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Notify event listeners
+</span></span><span style=display:flex><span>    foreach (<span style=color:#f92672>$</span>shouldCall as <span style=color:#f92672>$</span>name <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>method) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>triggerListeners(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>listeners[<span style=color:#f92672>$</span>name], <span style=color:#f92672>$</span>event, <span style=color:#f92672>$</span>method);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>event<span style=color:#f92672>-&gt;</span>isPropagationStopped()) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>event;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Have global wildcards <span style=color:#e6db74>&#39;*&#39;</span> listener<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>listenedEvents[<span style=color:#e6db74>&#39;*&#39;</span>])) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>triggerListeners(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>listeners[<span style=color:#e6db74>&#39;*&#39;</span>], <span style=color:#f92672>$</span>event);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>event;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>如果存在对应的事件，调用<code>triggerListeners</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * @param array|ListenerQueue $listeners
+</span></span><span style=display:flex><span>    * @param EventInterface      $event
+</span></span><span style=display:flex><span>    * @param string              $method
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>protected function triggerListeners($listeners, EventInterface $event, string $method = &#39;&#39;): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    // $handled = false;
+</span></span><span style=display:flex><span>    $name     = $event-&gt;getName();
+</span></span><span style=display:flex><span>    $callable = false === strpos($name, &#39;.&#39;);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // 循环调用监听器，处理事件
+</span></span><span style=display:flex><span>    foreach ($listeners as $listener) {
+</span></span><span style=display:flex><span>        if ($event-&gt;isPropagationStopped()) {
+</span></span><span style=display:flex><span>            break;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        if (is_object($listener)) {
+</span></span><span style=display:flex><span>            if ($listener instanceof EventHandlerInterface) {
+</span></span><span style=display:flex><span>                $listener-&gt;handle($event);
+</span></span><span style=display:flex><span>            } elseif ($method &amp;&amp; method_exists($listener, $method)) {
+</span></span><span style=display:flex><span>                $listener-&gt;$method($event);
+</span></span><span style=display:flex><span>            } elseif ($callable &amp;&amp; method_exists($listener, $name)) {
+</span></span><span style=display:flex><span>                $listener-&gt;$name($event);
+</span></span><span style=display:flex><span>            } elseif (method_exists($listener, &#39;__invoke&#39;)) {
+</span></span><span style=display:flex><span>                $listener($event);
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        } elseif (is_callable($listener)) {
+</span></span><span style=display:flex><span>            $listener($event);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>遍历事件回调，执行对应方法。</p><p>回到<code>EventProcessor</code>类的<code>handle</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>// Trigger a app init event
+</span></span><span style=display:flex><span>Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);
+</span></span></code></pre></div><p>这里的事件为<code>SwoftEvent::APP_INIT_COMPLETE</code>，所以这里会执行这个事件下的所有回调。</p><p>这里以<code>Swoft\Http\Server\Listener\AppInitCompleteListener</code>为例。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>&lt;</span><span style=color:#960050;background-color:#1e0010>?</span>php
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>namespace Swoft\Http\Server\Listener;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>use function bean;
+</span></span><span style=display:flex><span>use ReflectionException;
+</span></span><span style=display:flex><span>use Swoft\Bean\Exception\ContainerException;
+</span></span><span style=display:flex><span>use Swoft\Event\Annotation\Mapping\Listener;
+</span></span><span style=display:flex><span>use Swoft\Event\EventHandlerInterface;
+</span></span><span style=display:flex><span>use Swoft\Event\EventInterface;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Exception\HttpServerException;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Middleware\MiddlewareRegister;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Router\Router;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Router\RouteRegister;
+</span></span><span style=display:flex><span>use Swoft\SwoftEvent;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> Class AppInitCompleteListener
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>since <span style=color:#ae81ff>2.0</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>Listener(SwoftEvent::APP_INIT_COMPLETE)
+</span></span><span style=display:flex><span> <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> AppInitCompleteListener implements EventHandlerInterface
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param EventInterface <span style=color:#f92672>$</span>event
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ContainerException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws HttpServerException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function handle(EventInterface <span style=color:#f92672>$</span>event): void
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>/**</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> Router <span style=color:#f92672>$</span>router Register HTTP routes <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>router <span style=color:#f92672>=</span> bean(<span style=color:#e6db74>&#39;httpRouter&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        RouteRegister::registerRoutes(<span style=color:#f92672>$</span>router);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Register middleware
+</span></span><span style=display:flex><span>        MiddlewareRegister::register();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里使用了<code>Swoft\Event\Annotation\Mapping\Listener</code>注解，对应的事件为<code>SwoftEvent::APP_INIT_COMPLETE</code>。</p><p>按照上面的分析，这里会调用到<code>AppInitCompleteListener</code>的<code>handle</code>方法，获取<code>httpRouter</code>的<code>Bean</code>实例，注册<code>http服务</code>的路由信息和中间件。</p><p>到这里，我们大概清楚了<code>EventProcessor</code>这个模块的作用，注册了所有事件的回调。</p></div><footer class=post-footer><ul class=post-tags><li><a href=https://liudon.com/tags/swoft/>Swoft</a></li></ul><nav class=paginav><a class=prev href=https://liudon.com/posts/swoft-console-processor-analysis/><span class=title>« Prev</span><br><span>Swoft 框架运行分析（五） —— ConsoleProcessor模块分析</span>
+</a><a class=next href=https://liudon.com/posts/a-issues-of-git-submodule-update/><span class=title>Next »</span><br><span>一个git submodule update引发的问题</span></a></nav></footer><div><div class=post_ads><ins class=adsbygoogle style=display:block data-ad-client=ca-pub-4739645989170648 data-ad-slot=5019102040 data-ad-format=auto data-full-width-responsive=true></ins><script>window.addEventListener("load",function(){(adsbygoogle=window.adsbygoogle||[]).push({})})</script></div><div class=pagination__title><span class=pagination__title-h style=font-size:20px>💬评论</span><hr></div><div id=tcomment></div><script src=https://cdnjs.cloudflare.com/ajax/libs/twikoo/1.6.41/twikoo.all.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script>twikoo.init({envId:"https://comment.liudon.com",el:"#tcomment",lang:"zh-CN",region:"ap-shanghai",path:window.TWIKOO_MAGIC_PATH||window.location.pathname})</script></div></article></main><footer class=footer><span>&copy; 2025 <a href=https://liudon.com/>流动</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg></a><footer class=footer style=margin-top:-20px;padding-top:0><span><a href=https://beian.miit.gov.cn target=_blank>京ICP备13029522号-2</a></span></footer><script src=//tokinx.github.io/ViewImage/view-image.min.js async></script><script>function initViewImage(){window.ViewImage&&ViewImage.init(".post-content img")}document.readyState==="complete"?initViewImage():window.addEventListener("load",initViewImage)</script><script>const host=window.location.host;host!=="blog.liudon.xyz"&&!host.startsWith("liudon.")&&!host.startsWith("localhost")&&!host.startsWith("127.0.0.1")&&(document.body.innerHTML=['<div style="margin: auto;">',"<h1>当前页面并非本人博客，即将在2秒后跳转到本人博客: https://liudon.com。</h1>","<br />","</div>"].join(""),document.body.style=["background-color: white;","color: black;","text-align: center;","font-size: 50px;","width: 100vw;","height: 100vh;","display: flex;"].join(""),setTimeout(()=>{window.location.href="https://liudon.com"},2e3))</script><script>enScroll=!1,enFdl=!1,extCurrent=0[0],filename=0[0],targetText=0[0],splitOrigin=0[0];const lStor=localStorage,sStor=sessionStorage,doc=document,docEl=document.documentElement,docBody=document.body,docLoc=document.location,w=window,s=screen,nav=navigator||{},extensions=["pdf","xls","xlsx","doc","docx","txt","rtf","csv","exe","key","pps","ppt","pptx","7z","pkg","rar","gz","zip","avi","mov","mp4","mpe","mpeg","wmv","mid","midi","mp3","wav","wma"];function a(e,t,n,o){const j="G-G9ZDJQN9E2",r=()=>Math.floor(Math.random()*1e9)+1,c=()=>Math.floor(Date.now()/1e3),F=()=>(sStor._p||(sStor._p=r()),sStor._p),E=()=>r()+"."+c(),_=()=>(lStor.cid_v4||(lStor.cid_v4=E()),lStor.cid_v4),m=lStor.getItem("cid_v4"),v=()=>m?0[0]:enScroll==!0?0[0]:"1",p=()=>(sStor.sid||(sStor.sid=c()),sStor.sid),O=()=>{if(!sStor._ss)return sStor._ss="1",sStor._ss;if(sStor.getItem("_ss")=="1")return 0[0]},a="1",g=()=>{if(sStor.sct)if(enScroll==!0)return sStor.sct;else x=+sStor.getItem("sct")+ +a,sStor.sct=x;else sStor.sct=a;return sStor.sct},i=docLoc.search,b=new URLSearchParams(i),h=["q","s","search","query","keyword"],y=h.some(e=>i.includes("&"+e+"=")||i.includes("?"+e+"=")),u=()=>y==!0?"view_search_results":enScroll==!0?"scroll":enFdl==!0?"file_download":"page_view",f=()=>enScroll==!0?"90":0[0],C=()=>{if(u()=="view_search_results"){for(let e of b)if(h.includes(e[0]))return e[1]}else return 0[0]},d=encodeURIComponent,k=e=>{let t=[];for(let n in e)e.hasOwnProperty(n)&&e[n]!==0[0]&&t.push(d(n)+"="+d(e[n]));return t.join("&")},A=!1,S="https://liudon.com/analytics/post",M=k({tid:j,_p:F(),v:"2",sr:(s.width*w.devicePixelRatio+"x"+s.height*w.devicePixelRatio).toString(),ul:(nav.language||0[0]).toLowerCase(),cid:_(),_fv:v(),_s:"1",dl:docLoc.origin+docLoc.pathname+i,dt:doc.title||0[0],dr:doc.referrer||0[0],sid:p(),sct:g(),seg:"1",en:u(),"epn.percent_scrolled":f(),"ep.search_term":C(),"ep.file_extension":e||0[0],"ep.file_name":t||0[0],"ep.link_text":n||0[0],"ep.link_url":o||0[0],_ss:O(),_dbg:A?1:0[0]}),l=S+"?"+M;if(nav.sendBeacon)nav.sendBeacon(l);else{let e=new XMLHttpRequest;e.open("POST",l,!0)}}a();function sPr(){return(docEl.scrollTop||docBody.scrollTop)/((docEl.scrollHeight||docBody.scrollHeight)-docEl.clientHeight)*100}doc.addEventListener("scroll",sEv,{passive:!0});function sEv(){const e=sPr();if(e<90)return;enScroll=!0,a(),doc.removeEventListener("scroll",sEv,{passive:!0}),enScroll=!1}document.addEventListener("DOMContentLoaded",function(){let e=document.getElementsByTagName("a");for(let t=0;t<e.length;t++)if(e[t].getAttribute("href")!=null){const n=e[t].getAttribute("href"),s=n.substring(n.lastIndexOf("/")+1),o=s.split(".").pop();(e[t].hasAttribute("download")||extensions.includes(o))&&e[t].addEventListener("click",fDl,{passive:!0})}});function fDl(e){enFdl=!0;const t=e.currentTarget.getAttribute("href"),n=t.substring(t.lastIndexOf("/")+1),s=n.split(".").pop(),o=n.replace("."+s,""),i=e.currentTarget.text,r=t.replace(docLoc.origin,"");a(s,o,i,r),enFdl=!1}</script><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

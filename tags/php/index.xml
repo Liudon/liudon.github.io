@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Php on 流动</title>
+    <link>https://liudon.com/tags/php/</link>
+    <description>Recent content in Php on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Tue, 26 Nov 2019 19:56:18 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/php/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PHP7.2编译安装后没有php.ini文件的问题</title>
+      <link>https://liudon.com/posts/php7.2%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85%E5%90%8E%E6%B2%A1%E6%9C%89php.ini%E6%96%87%E4%BB%B6/</link>
+      <pubDate>Tue, 26 Nov 2019 19:56:18 +0800</pubDate>
+      <guid>https://liudon.com/posts/php7.2%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85%E5%90%8E%E6%B2%A1%E6%9C%89php.ini%E6%96%87%E4%BB%B6/</guid>
+      <description>&lt;p&gt;下载PHP7.2源码，编译安装。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;[root@VM_73_135_centos ~/swoole-src-4.4.12]# php -v
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;PHP 7.2.25 (cli) (built: Nov 26 2019 19:33:23) ( NTS )
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Copyright (c) 1997-2018 The PHP Group
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Zend Engine v3.2.0, Copyright (c) 1998-2018 Zend Technologies
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;[root@VM_73_135_centos ~/swoole-src-4.4.12]# 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安装Swoole。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;phpize &amp;amp;&amp;amp; \
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;./configure &amp;amp;&amp;amp; \
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;make &amp;amp;&amp;amp; make install
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安装完，准备修改&lt;code&gt;php.ini&lt;/code&gt;文件，结果没找到。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>一个Curl的耗时长的问题</title>
+      <link>https://liudon.com/posts/curl-cost-time-long/</link>
+      <pubDate>Wed, 04 Sep 2019 11:07:46 +0800</pubDate>
+      <guid>https://liudon.com/posts/curl-cost-time-long/</guid>
+      <description>&lt;p&gt;发现某个接口请求很慢，但是后端确认接口是很快的。&lt;/p&gt;
+&lt;p&gt;在机器上通过shell执行curl命令，确实很快，但是PHP代码里请求又确实很慢。&lt;/p&gt;
+&lt;p&gt;业务里用到了&lt;code&gt;Requests&lt;/code&gt;这个库，一开始以为是这个库导致的问题。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

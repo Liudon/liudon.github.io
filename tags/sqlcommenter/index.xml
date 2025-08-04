@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Sqlcommenter on 流动</title>
+    <link>https://liudon.com/tags/sqlcommenter/</link>
+    <description>Recent content in Sqlcommenter on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 18 Apr 2024 21:25:24 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/sqlcommenter/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GORM增加sqlcommenter特性</title>
+      <link>https://liudon.com/posts/gorm-supports-sqlcommenter/</link>
+      <pubDate>Thu, 18 Apr 2024 21:25:24 +0800</pubDate>
+      <guid>https://liudon.com/posts/gorm-supports-sqlcommenter/</guid>
+      <description>&lt;p&gt;什么是sqlcommenter？&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;sqlcommenter is a suite of middlewares/plugins that enable your ORMs to augment SQL statements before execution, with comments containing information about the code that caused its execution. This helps in easily correlating slow performance with source code and giving insights into backend database performance. In short it provides some observability into the state of your client-side applications and their impact on the database’s server-side.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

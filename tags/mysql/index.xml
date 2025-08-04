@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Mysql on 流动</title>
+    <link>https://liudon.com/tags/mysql/</link>
+    <description>Recent content in Mysql on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 14 Dec 2020 18:47:29 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/mysql/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>mysql中字符串和整型自动转换的问题</title>
+      <link>https://liudon.com/posts/strings-and-numbers-in-mysql/</link>
+      <pubDate>Mon, 14 Dec 2020 18:47:29 +0800</pubDate>
+      <guid>https://liudon.com/posts/strings-and-numbers-in-mysql/</guid>
+      <description>&lt;p&gt;表结构如下&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;desc info;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;+-------+-----------------+------+-----+---------+----------------+&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; Field &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; Type            &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; Null &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; Key &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; Default &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; Extra          &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;+-------+-----------------+------+-----+---------+----------------+&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; id    &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;int&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;8&lt;/span&gt;) unsigned &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; NO   &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; PRI &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; NULL    &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; auto_increment &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; name  &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; varchar(&lt;span style=&#34;color:#ae81ff&#34;&gt;20&lt;/span&gt;)     &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; YES  &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;     &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; NULL    &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;                &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;+-------+-----------------+------+-----+---------+----------------+&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt; rows &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; set (&lt;span style=&#34;color:#ae81ff&#34;&gt;0.00&lt;/span&gt; sec)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;执行sql.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;insert into info values (&amp;#39;&amp;#39;, &amp;#39;xxx&amp;#39;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;insert into info values (&amp;#39;&amp;#39;, &amp;#39;yyy&amp;#39;);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;查询记录.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;select * from info;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----+------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| id | name |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----+------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|  1 | xxx  |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|  2 | yyy  |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----+------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2 rows in set (0.00 sec)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;执行下面sql.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>一次惊心动魄的Mysql更新操作</title>
+      <link>https://liudon.com/posts/%E4%B8%80%E6%AC%A1%E6%83%8A%E5%BF%83%E5%8A%A8%E9%AD%84%E7%9A%84mysql%E6%9B%B4%E6%96%B0%E6%93%8D%E4%BD%9C/</link>
+      <pubDate>Tue, 19 May 2020 17:16:53 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E4%B8%80%E6%AC%A1%E6%83%8A%E5%BF%83%E5%8A%A8%E9%AD%84%E7%9A%84mysql%E6%9B%B4%E6%96%B0%E6%93%8D%E4%BD%9C/</guid>
+      <description>&lt;h4 id=&#34;问题描述&#34;&gt;问题描述&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;# 表结构
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;MySQL &amp;gt; desc user_packages;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----------------+---------------------+------+-----+---------------------+----------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| Field          | Type                | Null | Key | Default             | Extra          |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----------------+---------------------+------+-----+---------------------+----------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| up_id          | bigint(20) unsigned | NO   | PRI | NULL                | auto_increment |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| start_date     | date                | NO   |     | NULL                |                |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| end_date       | date                | NO   |     | NULL                |                |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| up_created     | datetime            | NO   | MUL | 0000-00-00 00:00:00 |                |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| up_updated     | datetime            | NO   |     | 0000-00-00 00:00:00 |                |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----------------+---------------------+------+-----+---------------------+----------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;5 rows in set (0.00 sec)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;MySQL &amp;gt; select * from user_packages limit 5;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+-------+------------+------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| up_id | start_date | end_date   |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+-------+------------+------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|   185 | 2018-04-01 | 2018-06-30 |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|   186 | 2018-04-01 | 2018-06-30 |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|   187 | 2018-04-01 | 2018-06-30 |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|   188 | 2018-04-01 | 2018-06-30 |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|   189 | 2018-04-01 | 2018-06-30 |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+-------+------------+------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;5 rows in set (0.00 sec)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;操作过程&#34;&gt;操作过程&lt;/h4&gt;
+&lt;p&gt;需要更新某条记录的&lt;code&gt;end_date&lt;/code&gt;字段，执行sql如下：&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

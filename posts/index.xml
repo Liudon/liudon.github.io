@@ -1,0 +1,1259 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>文章 on 流动</title>
+    <link>https://liudon.com/posts/</link>
+    <description>Recent content in 文章 on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 03 Aug 2025 20:55:36 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>大连之行</title>
+      <link>https://liudon.com/posts/dalian-trip/</link>
+      <pubDate>Sun, 03 Aug 2025 20:55:36 +0800</pubDate>
+      <guid>https://liudon.com/posts/dalian-trip/</guid>
+      <description>&lt;p&gt;6月底，趁着娃刚考完试，学校也没课了，请假带娃去大连玩了一趟。&lt;/p&gt;
+&lt;p&gt;这次是跟娃好朋友一起出行，人两口子以前做旅行社的，直接搞了一个行程表，我们就跟报了个旅行团一样。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>回家收麦</title>
+      <link>https://liudon.com/posts/%E5%9B%9E%E5%AE%B6%E6%94%B6%E9%BA%A6/</link>
+      <pubDate>Sun, 03 Aug 2025 20:39:18 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E5%9B%9E%E5%AE%B6%E6%94%B6%E9%BA%A6/</guid>
+      <description>&lt;p&gt;家里有两块地，一块离的远租出去了，另一块近的老爸老妈还在自己种。&lt;/p&gt;
+&lt;p&gt;自从上高中后，就很少下地了，现在让我下地，我都找不到自家地。&lt;/p&gt;
+&lt;p&gt;老爸生日回家，刚好赶上收麦，记录一下。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>六一儿童节爬长城</title>
+      <link>https://liudon.com/posts/hiking-great-wall-childrens-day/</link>
+      <pubDate>Sun, 03 Aug 2025 20:00:23 +0800</pubDate>
+      <guid>https://liudon.com/posts/hiking-great-wall-childrens-day/</guid>
+      <description>&lt;p&gt;六一儿童节，娃和好朋友约好一起爬长城。&lt;/p&gt;
+&lt;p&gt;去年我们&lt;a href=&#34;https://liudon.com/posts/climbing-mutianyu-great-wall-on-october-1st/&#34;&gt;去过慕田峪长城&lt;/a&gt;，人不多、好爬不累，两家商量后决定还是去慕田峪。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/hiking-great-wall-childrens-day/WechatIMG189.jpg_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/hiking-great-wall-childrens-day/WechatIMG189.jpg_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;WechatIMG189.jpg&#34; width=&#34;1080&#34; height=&#34;1440&#34; alt=&#34;&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+
+
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/hiking-great-wall-childrens-day/WechatIMG190.jpg_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/hiking-great-wall-childrens-day/WechatIMG190.jpg_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;WechatIMG190.jpg&#34; width=&#34;1080&#34; height=&#34;1920&#34; alt=&#34;&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;早上打车到清河站，还是粉色的小火车。&lt;/p&gt;
+&lt;p&gt;这次人多没占到位置，俩小朋友只能席地而坐了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Golang database/sql 数据库断线自动重连机制解析</title>
+      <link>https://liudon.com/posts/golang-database-sql-auto-reconnect-mechanism/</link>
+      <pubDate>Wed, 30 Apr 2025 17:37:23 +0800</pubDate>
+      <guid>https://liudon.com/posts/golang-database-sql-auto-reconnect-mechanism/</guid>
+      <description>&lt;p&gt;最近有个交接服务的数据库要升级版本，升级最后切换瞬间会有一个闪断。&lt;/p&gt;
+&lt;p&gt;这里业务侧需要确保有自动重连机制，否则会影响服务。&lt;/p&gt;
+&lt;p&gt;因为是交接的服务，得通过代码再确认一下。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Golang默认Http Client导致的cannot assign requested address错误</title>
+      <link>https://liudon.com/posts/cannot-assign-requested-address-in-golang-http-client/</link>
+      <pubDate>Tue, 29 Apr 2025 20:20:29 +0800</pubDate>
+      <guid>https://liudon.com/posts/cannot-assign-requested-address-in-golang-http-client/</guid>
+      <description>&lt;h3 id=&#34;问题表现&#34;&gt;问题表现&lt;/h3&gt;
+&lt;p&gt;重现代码：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;package&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; (
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;fmt&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;io&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;net/http&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;time&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;() {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#a6e22e&#34;&gt;client&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;http&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Client&lt;/span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		&lt;span style=&#34;color:#a6e22e&#34;&gt;Timeout&lt;/span&gt;: &lt;span style=&#34;color:#a6e22e&#34;&gt;time&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Duration&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;time&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Second&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;i&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;; &lt;span style=&#34;color:#a6e22e&#34;&gt;i&lt;/span&gt; &amp;lt; &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;; &lt;span style=&#34;color:#a6e22e&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;++&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		&lt;span style=&#34;color:#66d9ef&#34;&gt;go&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt;() {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;			&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;				&lt;span style=&#34;color:#a6e22e&#34;&gt;req&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;_&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;http&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;NewRequest&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;http&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;MethodGet&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://baidu.com&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#66d9ef&#34;&gt;nil&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;				&lt;span style=&#34;color:#a6e22e&#34;&gt;rsp&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;client&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Do&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;req&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;				&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;nil&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;					&lt;span style=&#34;color:#a6e22e&#34;&gt;fmt&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Println&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;request failed&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;					&lt;span style=&#34;color:#66d9ef&#34;&gt;continue&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;				}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;				&lt;span style=&#34;color:#a6e22e&#34;&gt;rsp&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Body&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Close&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;				&lt;span style=&#34;color:#a6e22e&#34;&gt;body&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;io&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;ReadAll&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;rsp&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Body&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;				&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;nil&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;					&lt;span style=&#34;color:#a6e22e&#34;&gt;fmt&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Println&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;read body failed&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;err&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;					&lt;span style=&#34;color:#66d9ef&#34;&gt;continue&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;				}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;				&lt;span style=&#34;color:#a6e22e&#34;&gt;fmt&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Println&lt;/span&gt;(string(&lt;span style=&#34;color:#a6e22e&#34;&gt;body&lt;/span&gt;))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;			}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		}()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#66d9ef&#34;&gt;select&lt;/span&gt; {}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;启动后，随着请求越来越多，很快就出现了&amp;quot;cannot assign requested address&amp;quot;错误，服务器出现大量TIME_WAIT连接。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>清明踏春，爬山看海</title>
+      <link>https://liudon.com/posts/qingming-festival-holiday-2025/</link>
+      <pubDate>Sun, 06 Apr 2025 22:47:37 +0800</pubDate>
+      <guid>https://liudon.com/posts/qingming-festival-holiday-2025/</guid>
+      <description>&lt;p&gt;自从买了登山杖，娃一直说想去爬山。&lt;/p&gt;
+&lt;p&gt;前段时间天气一直不好，山上也还是光秃秃的，就一直没去。&lt;/p&gt;
+&lt;p&gt;趁着清明假期，带娃爬山去。&lt;/p&gt;
+&lt;p&gt;去年假期去过一次香山，路上超堵，这次还是选择了离家不远的百望山：好爬不累。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>购入小牛G400T电动车</title>
+      <link>https://liudon.com/posts/xiaoniu-g400t-electric-bike-experience/</link>
+      <pubDate>Wed, 26 Mar 2025 22:07:21 +0800</pubDate>
+      <guid>https://liudon.com/posts/xiaoniu-g400t-electric-bike-experience/</guid>
+      <description>&lt;p&gt;去年10月底，考虑到老的绿源电动车已经骑了5年，电池越来越不行，马上要冬天了，考虑换个新电动车。&lt;/p&gt;
+&lt;p&gt;到各个品牌店里转了一圈，发现都没有车子，说是新规的缘故，要到11月份才能有新车。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>北京的三月飞雪</title>
+      <link>https://liudon.com/posts/heavy-snow-in-beijing/</link>
+      <pubDate>Sun, 16 Mar 2025 18:33:57 +0800</pubDate>
+      <guid>https://liudon.com/posts/heavy-snow-in-beijing/</guid>
+      <description>&lt;p&gt;盼了一冬天的雪没下，开春了，来了场大雪。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/heavy-snow-in-beijing/WechatIMG152.jpg_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/heavy-snow-in-beijing/WechatIMG152.jpg_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;WechatIMG152.jpg&#34; width=&#34;1080&#34; height=&#34;1441&#34; alt=&#34;&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+
+
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/heavy-snow-in-beijing/WechatIMG153.jpg_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/heavy-snow-in-beijing/WechatIMG153.jpg_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;WechatIMG153.jpg&#34; width=&#34;1080&#34; height=&#34;1441&#34; alt=&#34;&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/heavy-snow-in-beijing/WechatIMG154.jpg_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/heavy-snow-in-beijing/WechatIMG154.jpg_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;WechatIMG154.jpg&#34; width=&#34;1080&#34; height=&#34;1441&#34; alt=&#34;&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+
+
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/heavy-snow-in-beijing/WechatIMG155.jpg_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/heavy-snow-in-beijing/WechatIMG155.jpg_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;WechatIMG155.jpg&#34; width=&#34;1080&#34; height=&#34;1441&#34; alt=&#34;&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;figure&gt;
+    &lt;video src=2025-03-15.mp4 controls&gt;
+    你的浏览器不支持 &lt;code&gt;video&lt;/code&gt; 标签。
+    &lt;/video&gt;
+&lt;/figure&gt;</description>
+    </item>
+    <item>
+      <title>wrenAI本地LLM模型部署</title>
+      <link>https://liudon.com/posts/wrenai-local-llm-usage-guide/</link>
+      <pubDate>Sun, 16 Mar 2025 17:28:10 +0800</pubDate>
+      <guid>https://liudon.com/posts/wrenai-local-llm-usage-guide/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;Open-source GenBI AI Agent that empowers data-driven teams to chat with their data to generate Text-to-SQL, charts, spreadsheets, reports, and BI.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;WrenAI 是一个开源的Text-SQL 的工具，通过导入数据库结构，通过提问的方式生成SQL。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/wrenai-local-llm-usage-guide/wren_workflow.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/wrenai-local-llm-usage-guide/wren_workflow.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;wren_workflow.png&#34; width=&#34;1080&#34; height=&#34;437&#34; alt=&#34;&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>天津一日游</title>
+      <link>https://liudon.com/posts/the-trip-of-tianjin/</link>
+      <pubDate>Sun, 16 Mar 2025 16:35:23 +0800</pubDate>
+      <guid>https://liudon.com/posts/the-trip-of-tianjin/</guid>
+      <description>&lt;p&gt;娃看完中华寻宝记，一直想去天津转转。&lt;/p&gt;
+&lt;p&gt;大年初九，返京第二天，带娃错峰去一趟天津。&lt;/p&gt;
+&lt;p&gt;7点出门，直奔北京南站，一路不敢耽搁，在发车前10分钟赶上了车。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/the-trip-of-tianjin/IMG_0328.PNG_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/the-trip-of-tianjin/IMG_0328.PNG_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;IMG_0328.PNG&#34; width=&#34;1080&#34; height=&#34;2341&#34; alt=&#34;&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2024年终总结</title>
+      <link>https://liudon.com/posts/review-2024/</link>
+      <pubDate>Fri, 07 Mar 2025 22:23:14 +0800</pubDate>
+      <guid>https://liudon.com/posts/review-2024/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;2024年已经过去3个月了，这篇年终总结从元旦拖到了现在。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;2024年是我的本命年，这一年发生了很多事，这一年过的并不太如意。&lt;/p&gt;
+&lt;p&gt;早就想要总结这一年，但不知道从哪下笔。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>停止使用staticfile.org服务</title>
+      <link>https://liudon.com/posts/remove-staticfile.org-from-your-website/</link>
+      <pubDate>Thu, 17 Oct 2024 22:34:29 +0800</pubDate>
+      <guid>https://liudon.com/posts/remove-staticfile.org-from-your-website/</guid>
+      <description>&lt;p&gt;昨天像往常一样打开博客，发现评论没有加载出来。&lt;/p&gt;
+&lt;p&gt;一开始以为是手机网络问题，用电脑复现了一下，发现twikoo的js访问报错了。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/remove-staticfile.org-from-your-website/20241016-175127.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/remove-staticfile.org-from-your-website/20241016-175127.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;20241016-175127.png&#34; width=&#34;1080&#34; height=&#34;207&#34; alt=&#34;&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>使用 ImageMagick 自动添加水印，保护图片版权</title>
+      <link>https://liudon.com/posts/auto-add-watermark-imagemagick-protect-copyright/</link>
+      <pubDate>Sat, 12 Oct 2024 23:32:31 +0800</pubDate>
+      <guid>https://liudon.com/posts/auto-add-watermark-imagemagick-protect-copyright/</guid>
+      <description>&lt;h2 id=&#34;背景&#34;&gt;背景&lt;/h2&gt;
+&lt;p&gt;细心的朋友可能会发现，我的博客图片都带上了水印。&lt;/p&gt;
+&lt;p&gt;经过&lt;a href=&#34;https://liudon.com/posts/blog-malicious-mirroring/&#34;&gt;博客被恶意镜像&lt;/a&gt;这个事情后，我一直在思考如何防止内容被恶意盗用，尤其是博客里的一些图片。&lt;/p&gt;
+&lt;p&gt;在&lt;a href=&#34;https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/&#34;&gt;当Hugo遇上AVIF，优化图片加载&lt;/a&gt;这篇文章里，使用了ImageMagick工具做了图片压缩。&lt;/p&gt;
+&lt;p&gt;当时文章最后说留了个坑，其实就是今天的这篇内容，利用ImageMagick自动给图片添加水印。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>如何注册一个.sol域名</title>
+      <link>https://liudon.com/posts/how-to-register-a-.sol-domain-name/</link>
+      <pubDate>Thu, 10 Oct 2024 21:37:48 +0800</pubDate>
+      <guid>https://liudon.com/posts/how-to-register-a-.sol-domain-name/</guid>
+      <description>&lt;p&gt;Livid大佬新搞了个&lt;a href=&#34;https://www.v2ex.com/t/1078126&#34;&gt;支持Solana的IPFS/IPNS网关&lt;/a&gt;，了解到还有一个&lt;code&gt;.sol&lt;/code&gt;的web3域名。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Solana域名服务（SNS）的目标是提供一种去中心化且可负担的方式，将域名（.sol）和链上数据连接起来。这些链上数据可以是SOL地址、 IPFS CID、图片、文本、或者任何其它的东西。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>奥森公园半日游</title>
+      <link>https://liudon.com/posts/half-day-tour-of-olympic-forest-park/</link>
+      <pubDate>Mon, 07 Oct 2024 22:24:55 +0800</pubDate>
+      <guid>https://liudon.com/posts/half-day-tour-of-olympic-forest-park/</guid>
+      <description>&lt;p&gt;假期第三天，腰间盘犯了，在家躺了三天。&lt;/p&gt;
+&lt;p&gt;假期最后一天，感觉轻了许多，今天北京天气非常好，带娃出来走走。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/half-day-tour-of-olympic-forest-park/WechatIMG101.jpg_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/half-day-tour-of-olympic-forest-park/WechatIMG101.jpg_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;WechatIMG101.jpg&#34; width=&#34;1080&#34; height=&#34;1440&#34; alt=&#34;&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+
+
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/half-day-tour-of-olympic-forest-park/WechatIMG111.jpg_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/half-day-tour-of-olympic-forest-park/WechatIMG111.jpg_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;WechatIMG111.jpg&#34; width=&#34;1080&#34; height=&#34;1440&#34; alt=&#34;&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>昌平42公里骑行绿道打卡</title>
+      <link>https://liudon.com/posts/changping-42km-greenway-cycling/</link>
+      <pubDate>Sat, 05 Oct 2024 17:21:21 +0800</pubDate>
+      <guid>https://liudon.com/posts/changping-42km-greenway-cycling/</guid>
+      <description>&lt;p&gt;五一的时候带娃骑过南边这段，网上查了说北边这段不好骑，难得2号下午有空，决定先自己走一遍看看。&lt;/p&gt;
+&lt;p&gt;从家附近的奥北森林公园开始，骑行到沙河水库，整个行程近30公里，耗时3个小时左右。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>十月一日爬慕田峪长城</title>
+      <link>https://liudon.com/posts/climbing-mutianyu-great-wall-on-october-1st/</link>
+      <pubDate>Fri, 04 Oct 2024 22:43:24 +0800</pubDate>
+      <guid>https://liudon.com/posts/climbing-mutianyu-great-wall-on-october-1st/</guid>
+      <description>&lt;p&gt;早上5点半起床洗漱，6点出门打车直奔清河站，6点50的火车S515清河-雁栖湖。&lt;/p&gt;
+&lt;p&gt;虽然坐地铁经常路过清河站，但还是第一次来清河站坐车。&lt;/p&gt;
+&lt;p&gt;我们提前20分钟到的车站，已经开始排队了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>当Hugo遇上AVIF，优化图片加载</title>
+      <link>https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/</link>
+      <pubDate>Mon, 30 Sep 2024 22:01:45 +0800</pubDate>
+      <guid>https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/</guid>
+      <description>&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/avif-on-hugo.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/use-avif-to-optimize-images-on-hugo/avif-on-hugo.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;avif-on-hugo.png&#34; width=&#34;1080&#34; height=&#34;328&#34; alt=&#34;avif-on-hugo&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;这篇文章会介绍基于Github Workflow使用ImageMagick生成AVIF图片，来优化Hugo站点的加载速度。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>博客被恶意镜像</title>
+      <link>https://liudon.com/posts/blog-malicious-mirroring/</link>
+      <pubDate>Thu, 26 Sep 2024 22:18:23 +0800</pubDate>
+      <guid>https://liudon.com/posts/blog-malicious-mirroring/</guid>
+      <description>&lt;h2 id=&#34;起因&#34;&gt;起因&lt;/h2&gt;
+&lt;p&gt;9月初的时候，在&lt;code&gt;Google Search Console&lt;/code&gt;里发现了一个外链，域名是&lt;code&gt;**.top&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;随手点过去看了下，发现居然跟我的博客内容一模一样，就是内容变成了繁体。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Github Pages 部署流程解析</title>
+      <link>https://liudon.com/posts/github-pages-deployment-tutorial/</link>
+      <pubDate>Tue, 24 Sep 2024 21:30:21 +0800</pubDate>
+      <guid>https://liudon.com/posts/github-pages-deployment-tutorial/</guid>
+      <description>&lt;p&gt;上周末在&lt;a href=&#34;https://liudon.com/posts/building-a-workout-page/&#34;&gt;搭建个人锻炼页面&lt;/a&gt;时，遇到个&lt;code&gt;Github Pages&lt;/code&gt;部署的困惑。&lt;/p&gt;
+&lt;p&gt;看了&lt;code&gt;running_page&lt;/code&gt;项目文档，是支持部署到&lt;code&gt;Github Pages&lt;/code&gt;页面的，对应的操作流程定义在&lt;a href=&#34;https://github.com/yihong0618/running_page/blob/master/.github/workflows/gh-pages.yml&#34;&gt;github/workflows/gh-pages.yml&lt;/a&gt;文件。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt; name: Install dependencies
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    run: pnpm install
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt; name: Build
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    run: PATH_PREFIX&lt;span style=&#34;color:#f92672&#34;&gt;=/$&lt;/span&gt;{{ github&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;event&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;repository&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;name }} pnpm build
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt; name: Upload artifact
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    uses: actions&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;upload&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;pages&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;artifact&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;v3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    with:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#75715e&#34;&gt;# Upload dist repository&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        path: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;./dist&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt; name: Deploy to GitHub Pages
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    id: deployment
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    uses: actions&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;deploy&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;pages&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;v4
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;核心逻辑就是上面这段。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>搭建个人锻炼页面</title>
+      <link>https://liudon.com/posts/building-a-workout-page/</link>
+      <pubDate>Sun, 22 Sep 2024 16:57:38 +0800</pubDate>
+      <guid>https://liudon.com/posts/building-a-workout-page/</guid>
+      <description>&lt;p&gt;工作的缘故，平时基本一坐一天，缺少运动。&lt;/p&gt;
+&lt;p&gt;时间久了，各种毛病也就出来了。&lt;/p&gt;
+&lt;p&gt;搬到新大楼后，每天中午吃完饭楼下遛个弯，走一走，身体精神也好了很多。&lt;/p&gt;
+&lt;p&gt;坚持了一段时间，也不了了之了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>你好 Follow</title>
+      <link>https://liudon.com/posts/hi-follow/</link>
+      <pubDate>Tue, 17 Sep 2024 00:53:38 +0800</pubDate>
+      <guid>https://liudon.com/posts/hi-follow/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;Follow:  Next generation information browser.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;最近博客圈开始流行&lt;code&gt;Follow邀请码&lt;/code&gt;，大家各种求码，一码难求。&lt;/p&gt;
+&lt;p&gt;蹲在&lt;code&gt;Discord&lt;/code&gt;群里一周，虽然时有发码，但最终还是狼多肉少，抢不到码呀。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>中秋爬山</title>
+      <link>https://liudon.com/posts/mid-autumn-festival-climb/</link>
+      <pubDate>Mon, 16 Sep 2024 23:56:16 +0800</pubDate>
+      <guid>https://liudon.com/posts/mid-autumn-festival-climb/</guid>
+      <description>&lt;p&gt;中秋第一天，娃约了同学在公园玩，骑车、滑轮滑，晚上娃带我去了她说非常好吃的一家店吃饭。&lt;/p&gt;
+&lt;p&gt;晚上回来，想着第二天在家呆一天也是看电视，打算带她爬长城，查了一下，往返的票早已售罄，只好放弃这个方案。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Google Adsense的审核之旅</title>
+      <link>https://liudon.com/posts/my-google-adsense-approval-journey/</link>
+      <pubDate>Mon, 16 Sep 2024 23:18:50 +0800</pubDate>
+      <guid>https://liudon.com/posts/my-google-adsense-approval-journey/</guid>
+      <description>&lt;p&gt;中午的时候，突然收到一条消息，打开一看，提示我的&lt;code&gt;Google Adsense&lt;/code&gt;审核通过了。&lt;/p&gt;
+&lt;p&gt;偶然发现&lt;code&gt;Google Adsense&lt;/code&gt;里居然有40美金，想起来是之前&lt;a href=&#34;https://liudon.org&#34;&gt;老博客&lt;/a&gt;加的广告。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>让你的IPFS站点持久在线：接入Filebase的Names(IPNS)服务</title>
+      <link>https://liudon.com/posts/keep-your-ipfs-site-online-with-filebase-ipns/</link>
+      <pubDate>Wed, 04 Sep 2024 22:39:37 +0800</pubDate>
+      <guid>https://liudon.com/posts/keep-your-ipfs-site-online-with-filebase-ipns/</guid>
+      <description>&lt;p&gt;本文会介绍如何接入&lt;code&gt;filebase&lt;/code&gt;的Names(IPNS)服务，使你的&lt;code&gt;IPFS&lt;/code&gt;站点持久在线。&lt;/p&gt;
+&lt;h4 id=&#34;背景&#34;&gt;背景&lt;/h4&gt;
+&lt;p&gt;周末更新博客时，发现workflow的上传IPFS任务执行失败了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>一次简短的青岛之行</title>
+      <link>https://liudon.com/posts/the-trip-of-qingdao/</link>
+      <pubDate>Sat, 31 Aug 2024 21:24:53 +0800</pubDate>
+      <guid>https://liudon.com/posts/the-trip-of-qingdao/</guid>
+      <description>&lt;p&gt;刚放暑假的时候，就答应了娃带她去一趟青岛。&lt;/p&gt;
+&lt;p&gt;8月份要回老家，所以定在了7月中下旬出发。&lt;/p&gt;
+&lt;p&gt;车票/酒店都订好了，结果来了个台风格美。&lt;/p&gt;
+&lt;p&gt;出发前一周一直在查天气，就怕去了一直下雨。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>解决 &#34;undeclared name: any (requires version go1.18 or later)&#34; 编译错误</title>
+      <link>https://liudon.com/posts/solving-undeclared-name-any-requires-version-go1.18-or-later-compilation-error/</link>
+      <pubDate>Fri, 14 Jun 2024 20:41:20 +0800</pubDate>
+      <guid>https://liudon.com/posts/solving-undeclared-name-any-requires-version-go1.18-or-later-compilation-error/</guid>
+      <description>&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ protoc-gen-go --version
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;protoc-gen-go v1.34.2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ sh make.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;user.pb.go:123:45: undeclared name: any (requires version go1.18 or later)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;流水线编译报错，其中&lt;code&gt;make.sh&lt;/code&gt;文件代码：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;protoc -I=./ --proto_path=./ --go_out=./ --go_opt=paths=source_relative user.proto 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;go build
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;同样的代码在本机编译就没问题，但是放到流水线里编译就报上面的错误。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>搭建自托管IPFS Gateway服务，替代Cloudflare的IPFS Gateway</title>
+      <link>https://liudon.com/posts/replacing-cloudflare-ipfs-gateway-with-self-hosted-gateway/</link>
+      <pubDate>Wed, 22 May 2024 21:20:20 +0800</pubDate>
+      <guid>https://liudon.com/posts/replacing-cloudflare-ipfs-gateway-with-self-hosted-gateway/</guid>
+      <description>&lt;h4 id=&#34;背景&#34;&gt;背景&lt;/h4&gt;
+&lt;p&gt;4月底的时候，Livid大佬提醒，&lt;code&gt;Cloudflare&lt;/code&gt;应该是调整了&lt;code&gt;IPFS Gateway&lt;/code&gt;网关策略，我的&lt;a href=&#34;https://liudon.xyz&#34;&gt;IPFS镜像博客&lt;/a&gt;无法访问了。&lt;/p&gt;
+&lt;p&gt;没查到&lt;code&gt;Cloudflare&lt;/code&gt;的调整说明，不过还好&lt;code&gt;IPFS&lt;/code&gt;官方也提供了公共网关&lt;code&gt;gateway.ipfs.io&lt;/code&gt;，将域名解析改到官网网关。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>302跳转的跨域问题(CORS)</title>
+      <link>https://liudon.com/posts/the-cors-issue-with-302-redirect/</link>
+      <pubDate>Fri, 17 May 2024 20:13:57 +0800</pubDate>
+      <guid>https://liudon.com/posts/the-cors-issue-with-302-redirect/</guid>
+      <description>&lt;p&gt;302跳转的跨域问题&lt;/p&gt;
+&lt;h4 id=&#34;场景一302不返回跨域头&#34;&gt;场景一：302不返回跨域头&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;请求&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;GET /302 HTTP/1.1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Host: liudon.xyz
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Origin: https://www.baidu.com
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;返回&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;HTTP/1.1 200 OK
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Cache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Cf-Ray: 88535773eaf5107e-HKG
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Content-Length: 143
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Content-Type: text/html
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Date: Fri, 17 May 2024 11:42:00 GMT
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Expires: Thu, 01 Jan 1970 00:00:01 GMT
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Location: https://liudon.org
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Server: cloudflare
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Vary: Accept-Encoding
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;浏览器报错&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>GORM增加sqlcommenter特性</title>
+      <link>https://liudon.com/posts/gorm-supports-sqlcommenter/</link>
+      <pubDate>Thu, 18 Apr 2024 21:25:24 +0800</pubDate>
+      <guid>https://liudon.com/posts/gorm-supports-sqlcommenter/</guid>
+      <description>&lt;p&gt;什么是sqlcommenter？&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;sqlcommenter is a suite of middlewares/plugins that enable your ORMs to augment SQL statements before execution, with comments containing information about the code that caused its execution. This helps in easily correlating slow performance with source code and giving insights into backend database performance. In short it provides some observability into the state of your client-side applications and their impact on the database’s server-side.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>源码分析：GORM是如何生成sql的</title>
+      <link>https://liudon.com/posts/how-gorm-generates-sql/</link>
+      <pubDate>Thu, 18 Apr 2024 21:14:24 +0800</pubDate>
+      <guid>https://liudon.com/posts/how-gorm-generates-sql/</guid>
+      <description>&lt;p&gt;在&lt;code&gt;gorm&lt;/code&gt;下实现&lt;a href=&#34;https://google.github.io/sqlcommenter/&#34;&gt;sqlcommenter&lt;/a&gt;过程中，遇到一些问题，顺便把&lt;code&gt;gorm&lt;/code&gt;整个流程梳理了一遍，整理记录一下。&lt;/p&gt;
+&lt;p&gt;gorm使用示例&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;package main
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;import (
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;gorm.io/driver/mysql&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;gorm.io/gorm&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;type Product struct {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  gorm&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Model
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  Code  string
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  Price uint
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; main() {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;//&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;参考&lt;/span&gt; https:&lt;span style=&#34;color:#f92672&#34;&gt;//&lt;/span&gt;github&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;com&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;go&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;sql&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;driver&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;mysql&lt;span style=&#34;color:#75715e&#34;&gt;#dsn-data-source-name 获取详情&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  dsn :&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&amp;amp;parseTime=True&amp;amp;loc=Local&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  db, err :&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; gorm&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Open(mysql&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Open(dsn), &lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt;gorm&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Config{})
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; product Product
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  db&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;First(&lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt;product, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;//&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;根据整型主键查找&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;我们以&lt;code&gt;First&lt;/code&gt;查询为例，看一下是怎么转成具体sql的。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>工银亚洲网银密码重置</title>
+      <link>https://liudon.com/posts/%E5%B7%A5%E9%93%B6%E4%BA%9A%E6%B4%B2%E7%BD%91%E9%93%B6%E5%AF%86%E7%A0%81%E9%87%8D%E7%BD%AE/</link>
+      <pubDate>Sat, 16 Mar 2024 10:09:59 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E5%B7%A5%E9%93%B6%E4%BA%9A%E6%B4%B2%E7%BD%91%E9%93%B6%E5%AF%86%E7%A0%81%E9%87%8D%E7%BD%AE/</guid>
+      <description>&lt;p&gt;18年的时候办了张工银亚洲的银行卡，好几年没有用过了。&lt;/p&gt;
+&lt;p&gt;今年想起来了，发现网银登不上了，密码忘了。&lt;/p&gt;
+&lt;p&gt;最悲剧的是，试了超过10次，账户冻结了。&lt;/p&gt;
+&lt;p&gt;打95588咨询了一下，说是可以内地见证方式修改密码，只需要带上港澳通行证和身份证即可。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>加速Cloudflare访问</title>
+      <link>https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/</link>
+      <pubDate>Wed, 21 Feb 2024 20:25:49 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/</guid>
+      <description>&lt;h4 id=&#34;背景&#34;&gt;背景&lt;/h4&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/blog.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/blog.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;blog.png&#34; width=&#34;828&#34; height=&#34;753&#34; alt=&#34;博客架构&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;这是当前的博客架构，文件保存在&lt;code&gt;Github&lt;/code&gt;仓库，通过&lt;code&gt;Cloudflare Page&lt;/code&gt;提供访问。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/slow.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/%E5%8A%A0%E9%80%9Fcloudflare%E8%AE%BF%E9%97%AE/slow.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;slow.png&#34; width=&#34;1080&#34; height=&#34;311&#34; alt=&#34;国内访问情况&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;众所周知，在国内，&lt;code&gt;Cloudflare&lt;/code&gt;的CDN属于反向加速，平均耗时在1.5s左右。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2023年终总结</title>
+      <link>https://liudon.com/posts/review-2023/</link>
+      <pubDate>Thu, 04 Jan 2024 18:41:20 +0800</pubDate>
+      <guid>https://liudon.com/posts/review-2023/</guid>
+      <description>&lt;p&gt;2023年过完了，是时候来个总结了。&lt;/p&gt;
+&lt;h4 id=&#34;博客&#34;&gt;博客&lt;/h4&gt;
+&lt;p&gt;2023年一共更新了15篇内容，共计12000字。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/review-2023/20240104184720.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/review-2023/20240104184720.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;20240104184720.png&#34; width=&#34;733&#34; height=&#34;436&#34; alt=&#34;Google Analytics全年统计&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;访问Top3的文章：&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2023年12月北京暴雪记录</title>
+      <link>https://liudon.com/posts/2023%E5%B9%B412%E6%9C%88%E5%8C%97%E4%BA%AC%E6%9A%B4%E9%9B%AA%E8%AE%B0%E5%BD%95/</link>
+      <pubDate>Sat, 16 Dec 2023 10:15:33 +0800</pubDate>
+      <guid>https://liudon.com/posts/2023%E5%B9%B412%E6%9C%88%E5%8C%97%E4%BA%AC%E6%9A%B4%E9%9B%AA%E8%AE%B0%E5%BD%95/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;记录暴雪下普通打工人的生活。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h4 id=&#34;12月14日-周四&#34;&gt;12月14日 周四&lt;/h4&gt;
+&lt;p&gt;北京的雪已经连着下了两天了。&lt;/p&gt;
+&lt;p&gt;12月11日，也是因为下雪，晚上打车打到10点半才叫到车。&lt;/p&gt;
+&lt;p&gt;所以这次下雪后，晚上就早走了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>使用Hugo实现响应式和优化的图片</title>
+      <link>https://liudon.com/posts/responsive-and-optimized-images-with-hugo/</link>
+      <pubDate>Sun, 10 Dec 2023 08:29:05 +0800</pubDate>
+      <guid>https://liudon.com/posts/responsive-and-optimized-images-with-hugo/</guid>
+      <description>&lt;p&gt;继续我们的&lt;a href=&#34;../tags/%E5%8D%9A%E5%AE%A2%E4%BC%98%E5%8C%96/&#34;&gt;博客优化之旅&lt;/a&gt;，本篇内容我们将介绍如何使用&lt;code&gt;Hugo&lt;/code&gt;实现响应式和优化的图片。&lt;/p&gt;
+&lt;h4 id=&#34;问题&#34;&gt;问题&lt;/h4&gt;
+&lt;p&gt;在之前文章里，通过腾讯云数据万象实现了图片优化能力，具体的可参考文章&lt;a href=&#34;https://liudon.com/posts/hugo-auto-generate-image-width-and-height/&#34;&gt;累计布局偏移修复方案改进 —— 自动生成图片宽高&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;经过一段运行后，发现这里有一个弊端。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Run hugo --gc --minify --cleanDestinationDir
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Start building sites … 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hugo v0.119.0-b84644c008e0dc2c4b67bd69cccf87a41a03937e linux/amd64 BuildDate=2023-09-24T15:20:17Z VendorInfo=gohugoio
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ERROR Failed to get JSON resource &amp;#34;https://static.***.com/64412246-9050f100-d0c1-11e9-893a-f9b0766533ad.png?imageInfo&amp;amp;t=1698674110&amp;#34;: Get &amp;#34;https://static.***.com/64412246-9050f100-d0c1-11e9-893a-f9b0766533ad.png?imageInfo&amp;amp;t=1698674110&amp;#34;: stream error: stream ID 1; STREAM_CLOSED; received from peer
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ERROR Failed to get JSON resource &amp;#34;https://static.***.com/SkRx5uFwQ8Cliyq.jpg?imageInfo&amp;amp;t=1698674110&amp;#34;: Get &amp;#34;https://static.***.com/SkRx5uFwQ8Cliyq.jpg?imageInfo&amp;amp;t=1698674110&amp;#34;: stream error: stream ID 3; STREAM_CLOSED; received from peer
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;随着图片数量增多，因为需要调接口查询图片信息，这里构建耗时变长，同时也特别容易出现超时导致构建失败。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>加速Google Analytics</title>
+      <link>https://liudon.com/posts/optimize-google-analytics/</link>
+      <pubDate>Sat, 02 Dec 2023 09:25:49 +0800</pubDate>
+      <guid>https://liudon.com/posts/optimize-google-analytics/</guid>
+      <description>&lt;h3 id=&#34;起因&#34;&gt;起因&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Google Analytics&lt;/code&gt;是一款优秀的流量分析服务，集成方便，使用简单。&lt;/p&gt;
+&lt;p&gt;最近在优化页面访问速度，发现&lt;code&gt;Google Analytics&lt;/code&gt;是一个优化点。&lt;/p&gt;
+&lt;h3 id=&#34;优化&#34;&gt;优化&lt;/h3&gt;
+&lt;h4 id=&#34;1-访问加速&#34;&gt;1. 访问加速&lt;/h4&gt;
+&lt;p&gt;国内访问&lt;code&gt;Google Analytics&lt;/code&gt;很慢，同时还面临着各种广告屏蔽插件拦截。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>使用Google Indexing API加速博客收录</title>
+      <link>https://liudon.com/posts/how-to-use-google-indexing-api-to-speed-up-blog-indexing/</link>
+      <pubDate>Fri, 27 Oct 2023 19:32:24 +0800</pubDate>
+      <guid>https://liudon.com/posts/how-to-use-google-indexing-api-to-speed-up-blog-indexing/</guid>
+      <description>&lt;p&gt;对于一个新站点来说，总是想着能让搜索引擎快点收录网站内容。&lt;/p&gt;
+&lt;p&gt;今天，我们就来介绍一种利用&lt;code&gt;Google Indexing API&lt;/code&gt;接口，通过&lt;code&gt;Github Actions&lt;/code&gt;实现部署时通知&lt;code&gt;Google&lt;/code&gt;抓取页面内容。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>在Netlify上部署Twikoo评论系统</title>
+      <link>https://liudon.com/posts/deploy-twikoo-on-netlify/</link>
+      <pubDate>Thu, 19 Oct 2023 19:46:32 +0800</pubDate>
+      <guid>https://liudon.com/posts/deploy-twikoo-on-netlify/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;在本篇文章里，我会介绍如何在Netlify上部署Twikoo评论系统，如何接入到静态博客Hugo，以及如何实现Twikoo系统版本自动更新。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;&lt;em&gt;2024年7月30日更新：因为&lt;a href=&#34;https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting&#34;&gt;Github接口策略调整&lt;/a&gt;，原有的匿名通过接口获取版本号方法失效，已更改为带token方式请求接口获取版本号，详见workflow里Get twikoo version步骤配置。&lt;/em&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>利用Github Actions定时抓取微博</title>
+      <link>https://liudon.com/posts/using-github-actions-to-schedule-weibo-scraping/</link>
+      <pubDate>Sat, 07 Oct 2023 13:17:57 +0800</pubDate>
+      <guid>https://liudon.com/posts/using-github-actions-to-schedule-weibo-scraping/</guid>
+      <description>&lt;h4 id=&#34;背景&#34;&gt;背景&lt;/h4&gt;
+&lt;p&gt;在微博上关注了一些用户，比如&lt;a href=&#34;https://weibo.com/u/1401527553&#34;&gt;tk教主&lt;/a&gt;，&lt;a href=&#34;https://weibo.com/u/1670659923&#34;&gt;月风&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;但是有些内容过段时间不可见了，所以希望可以定时抓取微博归档备份下来。&lt;/p&gt;
+&lt;h4 id=&#34;实现方案&#34;&gt;实现方案&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;整体思路：利用&lt;code&gt;Github Actions&lt;/code&gt;的&lt;code&gt;Scheduled&lt;/code&gt;任务，定时执行抓取shell脚本，将内容保存到文件，提交到Github仓库。&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>北大口腔牙周刮治记录</title>
+      <link>https://liudon.com/posts/%E5%8C%97%E5%A4%A7%E5%8F%A3%E8%85%94%E7%89%99%E5%91%A8%E5%88%AE%E6%B2%BB%E8%AE%B0%E5%BD%95/</link>
+      <pubDate>Sun, 17 Sep 2023 15:46:32 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E5%8C%97%E5%A4%A7%E5%8F%A3%E8%85%94%E7%89%99%E5%91%A8%E5%88%AE%E6%B2%BB%E8%AE%B0%E5%BD%95/</guid>
+      <description>&lt;h4 id=&#34;病情&#34;&gt;病情&lt;/h4&gt;
+&lt;p&gt;上次洗完牙后，还是不时有出血的情况。&lt;/p&gt;
+&lt;p&gt;前段时间更是出现牙龈劈开一块肉，特别容易塞东西的情况。&lt;/p&gt;
+&lt;p&gt;于是，又跑到医院来看牙了。&lt;/p&gt;
+&lt;p&gt;医生检查后，说是牙周病，需要牙周刮治，要约到8月份了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>故乡回忆之旅</title>
+      <link>https://liudon.com/posts/%E6%95%85%E4%B9%A1%E5%9B%9E%E5%BF%86%E4%B9%8B%E6%97%85/</link>
+      <pubDate>Sat, 09 Sep 2023 23:19:03 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E6%95%85%E4%B9%A1%E5%9B%9E%E5%BF%86%E4%B9%8B%E6%97%85/</guid>
+      <description>&lt;p&gt;赶在8月底，趁着娃暑假的尾声，回了趟老家。&lt;/p&gt;
+&lt;p&gt;老家有条俗语，“永福庄的街，三里长”。&lt;/p&gt;
+&lt;p&gt;这天吃完午饭，临时起意，带媳妇溜溜大街，见识下我们的大街。&lt;/p&gt;
+&lt;p&gt;小时候，整天在这条街上跑来跑去。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>解决Golang使用go get安装包后找不到可执行文件的问题</title>
+      <link>https://liudon.com/posts/golang-go-get-binary-not-found-solution/</link>
+      <pubDate>Thu, 17 Aug 2023 09:20:50 +0800</pubDate>
+      <guid>https://liudon.com/posts/golang-go-get-binary-not-found-solution/</guid>
+      <description>&lt;h4 id=&#34;背景&#34;&gt;背景&lt;/h4&gt;
+&lt;p&gt;编译流水线代码&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;go get google.golang.org/protobuf/cmd/protoc-gen-go@latest
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;protoc -I=./zzz --proto_path=./xx --go_out=./abc --go_opt=paths=xx.proto
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;go build -o xxx
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;在go升级到1.20.1版本后，执行报错。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;protoc-gen-go: program not found or is not executable
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;解决&#34;&gt;解决&lt;/h4&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Starting in Go 1.17, installing executables with go get is deprecated. go install may be used instead.&lt;/p&gt;
+&lt;p&gt;In a future Go release, go get will no longer build packages; it will only be used to add, update, or remove dependencies in go.mod. Specifically, go get will act as if the -d flag were enabled.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>修正Hugo的JSON Feed格式</title>
+      <link>https://liudon.com/posts/fix-hugo-json-feed/</link>
+      <pubDate>Sat, 25 Mar 2023 14:11:18 +0800</pubDate>
+      <guid>https://liudon.com/posts/fix-hugo-json-feed/</guid>
+      <description>&lt;h4 id=&#34;问题背景&#34;&gt;问题背景&lt;/h4&gt;
+&lt;p&gt;前几天在&lt;a href=&#34;https://planetics.xyz/&#34;&gt;Planet&lt;/a&gt;里follow自己的&lt;a href=&#34;https://liudon.eth&#34;&gt;web3博客&lt;/a&gt;，遇到下面的错误。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/fix-hugo-json-feed/202303251415675.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/fix-hugo-json-feed/202303251415675.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;202303251415675.png&#34; width=&#34;716&#34; height=&#34;544&#34; alt=&#34;PlanetFeedError&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;经过Livid大佬提醒，说是网站的JSON Feed不是标准格式导致的。&lt;/p&gt;
+&lt;p&gt;因为我的已经修正没法截图，这里以&lt;a href=&#34;https://dvel.me/index.json&#34;&gt;dvel的博客&lt;/a&gt;举例，格式类似如下。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;[
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &amp;#34;content&amp;#34;: &amp;#34;用 ChatGPT 写一些小脚本真是太方便了。\nGPT-4 发布后试了试，还是蛮不错的，代码是 ChatGPT 生成的。\n几个来回就可以编写一个能正常使用的油猴脚本：\n（略，HTML 代码） 在 https://chdbits.co/bakatest.php 有如上内容。 我要为这个网页编写一个油猴脚本。 通过自动获取 ChatGPT 的 API 来解析此问题的答案，供用户参考。 将内容输出到 `#outer &amp;amp;gt; h1` 的下面，同时输出你提取到的问题内容和答案，以便我看看你是否提取正确。 获取错啦。 问题的获取路径是 `#outer &amp;amp;gt; form &amp;amp;gt; table &amp;amp;gt; tbody &amp;amp;gt; tr:nth-child(1) &amp;amp;gt; td` 选项的获取路径是 `#outer &amp;amp;gt; form &amp;amp;gt; table &amp;amp;gt; tbody &amp;amp;gt; tr:nth-child(2) &amp;amp;gt; td` 使用这个 API： ``` curl https://api.openai.com/v1/chat/completions \\ -H &amp;amp;#39;Content-Type: application/json&amp;amp;#39; \\ -H &amp;amp;#39;Authorization: Bearer YOUR_API_KEY&amp;amp;#39; \\ -d &amp;amp;#39;{ &amp;amp;#34;model&amp;amp;#34;: &amp;amp;#34;gpt-3.5-turbo&amp;amp;#34;, &amp;amp;#34;messages&amp;amp;#34;: [{&amp;amp;#34;role&amp;amp;#34;: &amp;amp;#34;user&amp;amp;#34;, &amp;amp;#34;content&amp;amp;#34;: &amp;amp;#34;Say this is a test!&amp;amp;#34;}], &amp;amp;#34;temperature&amp;amp;#34;: 0.7 }&amp;amp;#39; ``` 响应格式为： ``` { &amp;amp;#34;id&amp;amp;#34;:&amp;amp;#34;chatcmpl-abc123&amp;amp;#34;, &amp;amp;#34;object&amp;amp;#34;:&amp;amp;#34;chat.completion&amp;amp;#34;, &amp;amp;#34;created&amp;amp;#34;:1677858242, &amp;amp;#34;model&amp;amp;#34;:&amp;amp;#34;gpt-3.5-turbo-0301&amp;amp;#34;, &amp;amp;#34;usage&amp;amp;#34;:{ &amp;amp;#34;prompt_tokens&amp;amp;#34;:13, &amp;amp;#34;completion_tokens&amp;amp;#34;:7, &amp;amp;#34;total_tokens&amp;amp;#34;:20 }, &amp;amp;#34;choices&amp;amp;#34;:[ { &amp;amp;#34;message&amp;amp;#34;:{ &amp;amp;#34;role&amp;amp;#34;:&amp;amp;#34;assistant&amp;amp;#34;, &amp;amp;#34;content&amp;amp;#34;:&amp;amp;#34;\\n\\nThis is a test!&amp;amp;#34; }, &amp;amp;#34;finish_reason&amp;amp;#34;:&amp;amp;#34;stop&amp;amp;#34;, &amp;amp;#34;index&amp;amp;#34;:0 } ] } ``` 它没有最近的互联网数据，所以还是需要把 API 的使用方式发给它。\n然后它就帮我写好了，我不用复习 JavaScript，不用看油猴脚本的教程和文档，也不用查 @grant 等等标记是干嘛的。\n可以再继续要求它改进一些，比如换个输出位置，优化 prompt，自动选中正确回答，支持单选题和多选题等等。\n效果展示：\n安装： https://greasyfork.org/zh-CN/scripts/461944-chd-quiz-answer\n&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &amp;#34;permalink&amp;#34;: &amp;#34;https://dvel.me/posts/chd-quiz-answer/&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &amp;#34;summary&amp;#34;: &amp;#34;用 ChatGPT 写一些小脚本真是太方便了。\nGPT-4 发布后试了试，还是蛮不错的，代码是 ChatGPT 生成的。\n几个来回就可以编写一个能正常使用的油猴脚本：\n（略，HTML 代码） 在 https://chdbits.co/bakatest.php 有如上内容。 我要为这个网页编写一个油猴脚本。 通过自动获取 ChatGPT 的 API 来解析此问题的答案，供用户参考。 将内容输出到 `#outer &amp;amp;gt; h1` 的下面，同时输出你提取到的问题内容和答案，以便我看看你是否提取正确。 获取错啦。 问题的获取路径是 `#outer &amp;amp;gt; form &amp;amp;gt; table &amp;amp;gt; tbody &amp;amp;gt; tr:nth-child(1) &amp;amp;gt; td` 选项的获取路径是 `#outer &amp;amp;gt; form &amp;amp;gt; table &amp;amp;gt; tbody &amp;amp;gt; tr:nth-child(2) &amp;amp;gt; td` 使用这个 API： ``` curl https://api.openai.com/v1/chat/completions \\ -H &amp;amp;#39;Content-Type: application/json&amp;amp;#39; \\ -H &amp;amp;#39;Authorization: Bearer YOUR_API_KEY&amp;amp;#39; \\ -d &amp;amp;#39;{ &amp;amp;#34;model&amp;amp;#34;: &amp;amp;#34;gpt-3.5-turbo&amp;amp;#34;, &amp;amp;#34;messages&amp;amp;#34;: [{&amp;amp;#34;role&amp;amp;#34;: &amp;amp;#34;user&amp;amp;#34;, &amp;amp;#34;content&amp;amp;#34;: &amp;amp;#34;Say this is a test!&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &amp;#34;title&amp;#34;: &amp;#34;CHD 油猴脚本：每日签到自动答题&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  },
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;下面是一个&lt;code&gt;JSON Feed&lt;/code&gt;的示例，详细规范见&lt;a href=&#34;https://www.jsonfeed.org/&#34;&gt;jsonfeed.org&lt;/a&gt;。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>我的学车之路</title>
+      <link>https://liudon.com/posts/my-journey-of-learning-to-drive/</link>
+      <pubDate>Fri, 24 Mar 2023 20:48:24 +0800</pubDate>
+      <guid>https://liudon.com/posts/my-journey-of-learning-to-drive/</guid>
+      <description>&lt;p&gt;之前在&lt;a href=&#34;https://liudon.com/posts/review-2022/&#34;&gt;2022年终总结&lt;/a&gt;提到过，我在练车考驾照。&lt;/p&gt;
+&lt;p&gt;就在昨天，终于拿证了。👏👏👏&lt;/p&gt;
+&lt;p&gt;咱也是可以上路开车的人了，虽然比别人晚了快10年才拿证。🐶&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2022年6月11日，在海淀驾校报名，周末连续班，报名费5380元。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2022年10月12日，科目一考试通过。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2022年10月22日，科目二模拟驾驶。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2022年11月13日，科目二第一次上车练习。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2022年11月24日，疫情严重，驾校发通知，自11月25日暂停培训。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2023年2月4日，年后驾校恢复培训，继续科目二练车。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2023年2月13日，科目二考试通过。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2023年3月11日，科目三上路练习。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2023年3月23日，上午科目三考试通过，下午科目四考试通过。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;考试的时候，早上遇到临时交通管制，一直到9点40才开考。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;考完回来，班车上的人说又管制不能考了。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;班车拉回驾校，剩下的人中午加班考试。
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;终于不用再5点半起床赶班车了。🥱&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>将博客部署到星际文件系统(IPFS)</title>
+      <link>https://liudon.com/posts/deploy-blog-to-ipfs/</link>
+      <pubDate>Tue, 21 Feb 2023 19:46:58 +0800</pubDate>
+      <guid>https://liudon.com/posts/deploy-blog-to-ipfs/</guid>
+      <description>&lt;p&gt;在这篇文章，我将会介绍如何利用&lt;code&gt;Github Actions&lt;/code&gt;将&lt;code&gt;hugo&lt;/code&gt;博客自动部署到&lt;code&gt;IPFS&lt;/code&gt;上，并通过自定义域名访问&lt;code&gt;IPFS&lt;/code&gt;上的文件。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;IPFS（InterPlanetary File System）中文称为星际文件系统，是一个旨在实现文件的分布式存储、共享和持久化的网络传输协议。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>新冠疫情后的第一个春节</title>
+      <link>https://liudon.com/posts/the-first-chinese-new-year-after-the-covid-19/</link>
+      <pubDate>Thu, 16 Feb 2023 20:56:38 +0800</pubDate>
+      <guid>https://liudon.com/posts/the-first-chinese-new-year-after-the-covid-19/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;下面的内容是由chatGPT润色生成的。&lt;/p&gt;
+&lt;p&gt;AI太强大了 😂&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;当我还是个孩子的时候，在看春节晚会时，总会有节目介绍那些不能回家过年的人。&lt;/p&gt;
+&lt;p&gt;但我从未想过，等我长大后，我也会成为其中的一员。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>第一次清理键盘</title>
+      <link>https://liudon.com/posts/cleaning-the-keyboard-for-the-first-time/</link>
+      <pubDate>Mon, 16 Jan 2023 14:43:38 +0800</pubDate>
+      <guid>https://liudon.com/posts/cleaning-the-keyboard-for-the-first-time/</guid>
+      <description>&lt;p&gt;19年生日的时候，媳妇送了一款flico的机械键盘。&lt;/p&gt;
+&lt;p&gt;这次搬家后，想着年前清理下键盘，实在是太脏了。&lt;/p&gt;
+&lt;p&gt;周五下班，带上键盘回家。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/cleaning-the-keyboard-for-the-first-time/202301161450523.jpeg_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/cleaning-the-keyboard-for-the-first-time/202301161450523.jpeg_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;202301161450523.jpeg&#34; width=&#34;1080&#34; height=&#34;810&#34; alt=&#34;&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2022年终总结</title>
+      <link>https://liudon.com/posts/review-2022/</link>
+      <pubDate>Thu, 12 Jan 2023 07:21:20 +0800</pubDate>
+      <guid>https://liudon.com/posts/review-2022/</guid>
+      <description>&lt;p&gt;2022年已经过去1周多了，记录一下我的2022年。&lt;/p&gt;
+&lt;h4 id=&#34;疫情&#34;&gt;疫情&lt;/h4&gt;
+&lt;p&gt;2022年，是新冠疫情的第三年，也是切身感受到的一年。&lt;/p&gt;
+&lt;p&gt;3月22日晚，8点半和同事刚上13号线地铁。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>去掉Cloudflare烦人的email-decode.min.js请求</title>
+      <link>https://liudon.com/posts/remove-cloudflares-email-decode.min.js/</link>
+      <pubDate>Fri, 26 Aug 2022 23:25:57 +0800</pubDate>
+      <guid>https://liudon.com/posts/remove-cloudflares-email-decode.min.js/</guid>
+      <description>&lt;p&gt;通过WebPageTest页面测试，发现一个&lt;code&gt;/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js&lt;/code&gt;的文件请求，影响到了页面渲染。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>累计布局偏移修复方案改进 —— 自动生成图片宽高</title>
+      <link>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</link>
+      <pubDate>Wed, 24 Aug 2022 12:37:22 +0800</pubDate>
+      <guid>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</guid>
+      <description>&lt;p&gt;本站已不再采用本方案，新方案见&lt;a href=&#34;../posts/responsive-and-optimized-images-with-hugo/&#34;&gt;使用Hugo实现响应式和优化的图片&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;遗留的问题&#34;&gt;遗留的问题&lt;/h4&gt;
+&lt;p&gt;上一篇文章讲了我是如何解决博客累计布局偏移的问题，但是这个方案存在一个很大的问题。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;手动输入每张图片的宽高&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;这就要求每次插入图片后，需要手动查看图片宽高，修改插入代码，导致整个流程变得繁琐，无法自动化。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>优化博客的累计布局偏移(CLS)问题</title>
+      <link>https://liudon.com/posts/fix-blog-cls/</link>
+      <pubDate>Sat, 20 Aug 2022 07:27:22 +0800</pubDate>
+      <guid>https://liudon.com/posts/fix-blog-cls/</guid>
+      <description>&lt;p&gt;此文已过期，优化方案参考&lt;a href=&#34;https://liudon.com/posts/hugo-auto-generate-image-width-and-height/&#34;&gt;累计布局偏移修复方案改进 —— 自动生成图片宽高&lt;/a&gt;.&lt;/p&gt;
+&lt;h4 id=&#34;问题表现&#34;&gt;问题表现&lt;/h4&gt;
+&lt;p&gt;7月份将博客部署由&lt;code&gt;Github&lt;/code&gt;迁移到&lt;code&gt;Cloudflare&lt;/code&gt;后，开始关注博客的性能问题。&lt;/p&gt;
+&lt;p&gt;偶然看到苏卡卡大佬的&lt;a href=&#34;https://blog.skk.moe/post/fix-blog-cls/&#34;&gt;CLS优化文章&lt;/a&gt;，拿自己博客也测试了下，发现也存在同样的问题。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>将博客部署到Cloudflare Pages</title>
+      <link>https://liudon.com/posts/deploy-blog-to-cloudflare-pages/</link>
+      <pubDate>Fri, 29 Jul 2022 23:16:01 +0800</pubDate>
+      <guid>https://liudon.com/posts/deploy-blog-to-cloudflare-pages/</guid>
+      <description>&lt;p&gt;目前博客是部署到了&lt;code&gt;Github Pages&lt;/code&gt;上，具体实现见&lt;a href=&#34;https://liudon.com/posts/%E5%8D%9A%E5%AE%A2%E6%9E%B6%E6%9E%84%E8%AF%B4%E6%98%8E/&#34;&gt;博客架构说明&lt;/a&gt;。&lt;/p&gt;
+&lt;h4 id=&#34;缘由&#34;&gt;缘由&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;Github Pages&lt;/code&gt;部署有一个问题，就是不支持&lt;code&gt;HSTS&lt;/code&gt;。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;HTTP Strict Transport Security（通常简称为HSTS）是一个安全功能，它告诉浏览器只能通过 HTTPS 访问当前资源，而不是HTTP。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>奥林匹克公园向日葵之旅</title>
+      <link>https://liudon.com/posts/olympic-park-sunflower-tour/</link>
+      <pubDate>Thu, 21 Jul 2022 20:40:20 +0800</pubDate>
+      <guid>https://liudon.com/posts/olympic-park-sunflower-tour/</guid>
+      <description>&lt;p&gt;媳妇有事回老家了，这两天自己带娃。&lt;/p&gt;
+&lt;p&gt;小区群里有人说奥林匹克公园的向日葵开了，适合拍照。&lt;/p&gt;
+&lt;p&gt;正好周六多云，没有太阳，出门遛娃。&lt;/p&gt;
+&lt;p&gt;带上我好久不用的相机，省得发霉了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>记第二次洗牙</title>
+      <link>https://liudon.com/posts/%E8%AE%B0%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%B4%97%E7%89%99/</link>
+      <pubDate>Tue, 21 Jun 2022 21:58:49 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E8%AE%B0%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%B4%97%E7%89%99/</guid>
+      <description>&lt;p&gt;最近刷牙的时候，牙龈总是出血。&lt;/p&gt;
+&lt;p&gt;距离上一次洗牙，已经有好几年了，感觉又该去洗一下牙了。&lt;/p&gt;
+&lt;p&gt;上次跟媳妇两个人，在小区外面的私人诊所洗的，俩人花了1000多块钱。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>记录2022年海淀幼升小</title>
+      <link>https://liudon.com/posts/%E8%AE%B0%E5%BD%952022%E5%B9%B4%E6%B5%B7%E6%B7%80%E5%B9%BC%E5%8D%87%E5%B0%8F/</link>
+      <pubDate>Wed, 25 May 2022 20:10:01 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E8%AE%B0%E5%BD%952022%E5%B9%B4%E6%B5%B7%E6%B7%80%E5%B9%BC%E5%8D%87%E5%B0%8F/</guid>
+      <description>&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/%E8%AE%B0%E5%BD%952022%E5%B9%B4%E6%B5%B7%E6%B7%80%E5%B9%BC%E5%8D%87%E5%B0%8F/20220525202612.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/%E8%AE%B0%E5%BD%952022%E5%B9%B4%E6%B5%B7%E6%B7%80%E5%B9%BC%E5%8D%87%E5%B0%8F/20220525202612.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;20220525202612.png&#34; width=&#34;1080&#34; height=&#34;1262&#34; alt=&#34;20220525202612&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;18年的热点新闻，纳税千万孩子无法在北京上学。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;一直听说外地人在北京上学难，今年娃到了上小学的年纪，也算真实的体验了一把上学的难。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Golang解析json的一个问题</title>
+      <link>https://liudon.com/posts/golang%E8%A7%A3%E6%9E%90json%E7%9A%84%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Fri, 20 May 2022 21:18:23 +0800</pubDate>
+      <guid>https://liudon.com/posts/golang%E8%A7%A3%E6%9E%90json%E7%9A%84%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98/</guid>
+      <description>&lt;p&gt;业务模块从&lt;code&gt;php&lt;/code&gt;迁移到&lt;code&gt;golang&lt;/code&gt;下了，最近遇到一个golang下json解析的问题：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;请求接口，按返回包字段判断请求成功与否。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;伪代码如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;package&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; (
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;encoding/json&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;fmt&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;type&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Response&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;struct&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#a6e22e&#34;&gt;Code&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt;    &lt;span style=&#34;color:#e6db74&#34;&gt;`json:&amp;#34;code&amp;#34;`&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#a6e22e&#34;&gt;Msg&lt;/span&gt;  &lt;span style=&#34;color:#66d9ef&#34;&gt;string&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;`json:&amp;#34;msg&amp;#34;`&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;() {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#75715e&#34;&gt;// 场景1，返回包符合接口要求&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#a6e22e&#34;&gt;str&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;`{&amp;#34;code&amp;#34;:100,&amp;#34;msg&amp;#34;:&amp;#34;failed&amp;#34;}`&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;res&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Response&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#a6e22e&#34;&gt;json&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Unmarshal&lt;/span&gt;([]byte(&lt;span style=&#34;color:#a6e22e&#34;&gt;str&lt;/span&gt;), &lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;res&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#a6e22e&#34;&gt;fmt&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Printf&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;res=%+v\n&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;res&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;// 解析正确，符合预期&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#75715e&#34;&gt;// res={Code:100 Msg:failed}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#75715e&#34;&gt;// 场景2，返回包不符合接口要求，缺少相关字段&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#a6e22e&#34;&gt;str&lt;/span&gt; = &lt;span style=&#34;color:#e6db74&#34;&gt;`{&amp;#34;retCode&amp;#34;:100,&amp;#34;retMsg&amp;#34;:&amp;#34;failed&amp;#34;}`&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;res1&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Response&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#a6e22e&#34;&gt;json&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Unmarshal&lt;/span&gt;([]byte(&lt;span style=&#34;color:#a6e22e&#34;&gt;str&lt;/span&gt;), &lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;res1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#a6e22e&#34;&gt;fmt&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Printf&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;res=%+v\n&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;res1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;// 解析错误，不符合预期&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#75715e&#34;&gt;// res={Code:0 Msg:}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这里由于接口地址配置错误，导致请求到其他接口，返回包不符合协议要求。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>疫情下的生活</title>
+      <link>https://liudon.com/posts/%E7%96%AB%E6%83%85%E4%B8%8B%E7%9A%84%E7%94%9F%E6%B4%BB/</link>
+      <pubDate>Fri, 20 May 2022 19:17:57 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E7%96%AB%E6%83%85%E4%B8%8B%E7%9A%84%E7%94%9F%E6%B4%BB/</guid>
+      <description>&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/%E7%96%AB%E6%83%85%E4%B8%8B%E7%9A%84%E7%94%9F%E6%B4%BB/20220520-192500@2x.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/%E7%96%AB%E6%83%85%E4%B8%8B%E7%9A%84%E7%94%9F%E6%B4%BB/20220520-192500@2x.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;20220520-192500@2x.png&#34; width=&#34;1080&#34; height=&#34;692&#34; alt=&#34;20220520-192500@2x&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;不知不觉，北京这一波疫情已经一个月了，目前还是每天50例左右新增。&lt;/p&gt;
+&lt;p&gt;昨天看新闻，基本没有社会面新增了，感觉要解封了。&lt;/p&gt;
+&lt;p&gt;没想到今天直接被打脸，封控升级了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>整理下博客的一些调整</title>
+      <link>https://liudon.com/posts/%E6%95%B4%E7%90%86%E4%B8%8B%E5%8D%9A%E5%AE%A2%E7%9A%84%E4%B8%80%E4%BA%9B%E8%B0%83%E6%95%B4/</link>
+      <pubDate>Fri, 13 May 2022 18:20:52 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E6%95%B4%E7%90%86%E4%B8%8B%E5%8D%9A%E5%AE%A2%E7%9A%84%E4%B8%80%E4%BA%9B%E8%B0%83%E6%95%B4/</guid>
+      <description>&lt;p&gt;新域名上线一段时间了，通过&lt;code&gt;Google Search Console&lt;/code&gt;发现了一些问题，整理下最近进行的一些调整。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;更新主题版本，展示文章tag标签
+通过对比主题作者的网站，发现使用的不是最新代码。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>疫情下的五一假期</title>
+      <link>https://liudon.com/posts/%E7%96%AB%E6%83%85%E4%B8%8B%E7%9A%84%E4%BA%94%E4%B8%80%E5%81%87%E6%9C%9F/</link>
+      <pubDate>Thu, 05 May 2022 20:22:23 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E7%96%AB%E6%83%85%E4%B8%8B%E7%9A%84%E4%BA%94%E4%B8%80%E5%81%87%E6%9C%9F/</guid>
+      <description>&lt;p&gt;五一假期前一周，北京疫情又起，说是已经隐蔽传播一周了。&lt;/p&gt;
+&lt;p&gt;当天晚上大家就开始屯货了，晚上看着APP里可买的东西一点点没了。&lt;/p&gt;
+&lt;p&gt;说实话，出现几粒确诊没有慌，这么抢购搞的有点心慌了，也下单买了点东西。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>自己动手，更换thinkpad x1硬盘</title>
+      <link>https://liudon.com/posts/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%9B%B4%E6%8D%A2thinkpad-x1%E7%A1%AC%E7%9B%98/</link>
+      <pubDate>Fri, 22 Apr 2022 08:04:18 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%9B%B4%E6%8D%A2thinkpad-x1%E7%A1%AC%E7%9B%98/</guid>
+      <description>&lt;p&gt;电脑突然没法用了，提示&amp;quot;A disk read error occurred&amp;quot;的错误。&lt;/p&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%9B%B4%E6%8D%A2thinkpad-x1%E7%A1%AC%E7%9B%98/491650584526_.pic.jpg_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%9B%B4%E6%8D%A2thinkpad-x1%E7%A1%AC%E7%9B%98/491650584526_.pic.jpg_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;491650584526_.pic.jpg&#34; width=&#34;1080&#34; height=&#34;810&#34; alt=&#34;491650584526_.pic&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;多次重启也不行，感觉是硬盘挂了。&lt;/p&gt;
+&lt;p&gt;机器去年过保了，之前有过在售后维护的经历，费用不低，这次决定自己动手。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>二刷百望山</title>
+      <link>https://liudon.com/posts/%E4%BA%8C%E5%88%B7%E7%99%BE%E6%9C%9B%E5%B1%B1/</link>
+      <pubDate>Sun, 17 Apr 2022 22:57:41 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E4%BA%8C%E5%88%B7%E7%99%BE%E6%9C%9B%E5%B1%B1/</guid>
+      <description>&lt;p&gt;又是周末，娃约了小伙伴一起爬山。&lt;/p&gt;
+&lt;p&gt;百望山，二刷走起。&lt;/p&gt;
+&lt;p&gt;约好了9点半门口见面，早上睁眼8点了，赶紧起床洗漱吃饭。&lt;/p&gt;
+&lt;p&gt;出门晚了，还打不到车，快10点才到。&lt;/p&gt;
+&lt;p&gt;小伙伴和人爸爸已经先爬上去了，带着娃一路小跑，20分钟从大门爬到山上。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>带娃游颐和园</title>
+      <link>https://liudon.com/posts/%E5%B8%A6%E5%A8%83%E6%B8%B8%E9%A2%90%E5%92%8C%E5%9B%AD/</link>
+      <pubDate>Mon, 11 Apr 2022 00:37:55 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E5%B8%A6%E5%A8%83%E6%B8%B8%E9%A2%90%E5%92%8C%E5%9B%AD/</guid>
+      <description>&lt;p&gt;上周的北海之行，本来是想划船的，可惜人太多没有划成，答应娃这周末带她去划船。&lt;/p&gt;
+&lt;p&gt;周六7点准时起床，得早点去省得人多排队。&lt;/p&gt;
+&lt;p&gt;8点半吃完饭洗漱完出发，特意带娃坐了一趟双层公交车 —— 二楼第一排观光区。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>博客架构说明</title>
+      <link>https://liudon.com/posts/%E5%8D%9A%E5%AE%A2%E6%9E%B6%E6%9E%84%E8%AF%B4%E6%98%8E/</link>
+      <pubDate>Sun, 10 Apr 2022 20:41:57 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E5%8D%9A%E5%AE%A2%E6%9E%B6%E6%9E%84%E8%AF%B4%E6%98%8E/</guid>
+      <description>&lt;p&gt;在拿到&lt;code&gt;liudon.com&lt;/code&gt;域名前，手中已有两个域名：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;liudon.org&lt;/li&gt;
+&lt;li&gt;liudon.xyz&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+
+&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://liudon.com/posts/%E5%8D%9A%E5%AE%A2%E6%9E%B6%E6%9E%84%E8%AF%B4%E6%98%8E/%E5%8D%9A%E5%AE%A2%E6%9E%B6%E6%9E%84.png_1080x.avif 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://liudon.com/posts/%E5%8D%9A%E5%AE%A2%E6%9E%B6%E6%9E%84%E8%AF%B4%E6%98%8E/%E5%8D%9A%E5%AE%A2%E6%9E%B6%E6%9E%84.png_1080x.webp 1080w&#34; sizes=&#34;(min-width: 768px) 1080px, 100vw&#34; /&gt;&lt;img src=&#34;%e5%8d%9a%e5%ae%a2%e6%9e%b6%e6%9e%84.png&#34; width=&#34;653&#34; height=&#34;206&#34; alt=&#34;两套域名说明&#34; title=&#34;&#34; loading=&#34;lazy&#34; /&gt;
+		&lt;/picture&gt;
+
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;liudon.org&lt;/code&gt;已经不再更新，仅作归档使用。
+&lt;code&gt;liudon.xyz&lt;/code&gt;当时是静态博客流行，尝鲜使用。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>难得的清明假期</title>
+      <link>https://liudon.com/posts/%E9%9A%BE%E5%BE%97%E7%9A%84%E6%B8%85%E6%98%8E%E5%81%87%E6%9C%9F/</link>
+      <pubDate>Wed, 06 Apr 2022 08:06:19 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E9%9A%BE%E5%BE%97%E7%9A%84%E6%B8%85%E6%98%8E%E5%81%87%E6%9C%9F/</guid>
+      <description>&lt;p&gt;前面有写到，被隔离了一周，好在赶在假期开始前解除了隔离。&lt;/p&gt;
+&lt;p&gt;趁着这次难得的假期，外出放松一下。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;爬百望山。&lt;/p&gt;
+&lt;p&gt;娃是第一次爬山，百望山不高，适合带娃体验爬山，我也从13、14年之后没再爬过山了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>十一年的等待，终于拿到了liudon.com域名</title>
+      <link>https://liudon.com/posts/%E5%8D%81%E4%B8%80%E5%B9%B4%E7%9A%84%E7%AD%89%E5%BE%85%E7%BB%88%E4%BA%8E%E6%8B%BF%E5%88%B0%E4%BA%86liudon.com%E5%9F%9F%E5%90%8D/</link>
+      <pubDate>Fri, 01 Apr 2022 01:24:05 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E5%8D%81%E4%B8%80%E5%B9%B4%E7%9A%84%E7%AD%89%E5%BE%85%E7%BB%88%E4%BA%8E%E6%8B%BF%E5%88%B0%E4%BA%86liudon.com%E5%9F%9F%E5%90%8D/</guid>
+      <description>&lt;p&gt;在&lt;a href=&#34;https://liudon.com/about&#34;&gt;关于&lt;/a&gt;部分，有写域名的来历。&lt;/p&gt;
+&lt;p&gt;当时&lt;code&gt;liudon.com&lt;/code&gt;已经被注册，所以只好注册了&lt;code&gt;liudon.org&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;2011年注册的&lt;code&gt;liudon.org&lt;/code&gt;，最早用&lt;code&gt;wordpress&lt;/code&gt;搭建了博客。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>被隔离的一周</title>
+      <link>https://liudon.com/posts/%E8%A2%AB%E9%9A%94%E7%A6%BB%E7%9A%84%E4%B8%80%E5%91%A8/</link>
+      <pubDate>Fri, 01 Apr 2022 01:20:39 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E8%A2%AB%E9%9A%94%E7%A6%BB%E7%9A%84%E4%B8%80%E5%91%A8/</guid>
+      <description>&lt;p&gt;从没有想过疫情会离自己这么近，记录一下。&lt;/p&gt;
+&lt;p&gt;周一的时候说是有确诊同学来过公司，下午组织全员核酸，做完核酸立马回家。&lt;/p&gt;
+&lt;p&gt;周二早上全员核酸阴性，继续到公司上班。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>mysql中字符串和整型自动转换的问题</title>
+      <link>https://liudon.com/posts/strings-and-numbers-in-mysql/</link>
+      <pubDate>Mon, 14 Dec 2020 18:47:29 +0800</pubDate>
+      <guid>https://liudon.com/posts/strings-and-numbers-in-mysql/</guid>
+      <description>&lt;p&gt;表结构如下&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;desc info;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;+-------+-----------------+------+-----+---------+----------------+&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; Field &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; Type            &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; Null &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; Key &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; Default &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; Extra          &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;+-------+-----------------+------+-----+---------+----------------+&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; id    &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;int&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;8&lt;/span&gt;) unsigned &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; NO   &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; PRI &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; NULL    &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; auto_increment &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; name  &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; varchar(&lt;span style=&#34;color:#ae81ff&#34;&gt;20&lt;/span&gt;)     &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; YES  &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;     &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; NULL    &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;                &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;+-------+-----------------+------+-----+---------+----------------+&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt; rows &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; set (&lt;span style=&#34;color:#ae81ff&#34;&gt;0.00&lt;/span&gt; sec)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;执行sql.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;insert into info values (&amp;#39;&amp;#39;, &amp;#39;xxx&amp;#39;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;insert into info values (&amp;#39;&amp;#39;, &amp;#39;yyy&amp;#39;);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;查询记录.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;select * from info;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----+------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| id | name |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----+------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|  1 | xxx  |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|  2 | yyy  |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----+------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2 rows in set (0.00 sec)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;执行下面sql.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>一次惊心动魄的Mysql更新操作</title>
+      <link>https://liudon.com/posts/%E4%B8%80%E6%AC%A1%E6%83%8A%E5%BF%83%E5%8A%A8%E9%AD%84%E7%9A%84mysql%E6%9B%B4%E6%96%B0%E6%93%8D%E4%BD%9C/</link>
+      <pubDate>Tue, 19 May 2020 17:16:53 +0800</pubDate>
+      <guid>https://liudon.com/posts/%E4%B8%80%E6%AC%A1%E6%83%8A%E5%BF%83%E5%8A%A8%E9%AD%84%E7%9A%84mysql%E6%9B%B4%E6%96%B0%E6%93%8D%E4%BD%9C/</guid>
+      <description>&lt;h4 id=&#34;问题描述&#34;&gt;问题描述&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;# 表结构
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;MySQL &amp;gt; desc user_packages;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----------------+---------------------+------+-----+---------------------+----------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| Field          | Type                | Null | Key | Default             | Extra          |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----------------+---------------------+------+-----+---------------------+----------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| up_id          | bigint(20) unsigned | NO   | PRI | NULL                | auto_increment |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| start_date     | date                | NO   |     | NULL                |                |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| end_date       | date                | NO   |     | NULL                |                |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| up_created     | datetime            | NO   | MUL | 0000-00-00 00:00:00 |                |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| up_updated     | datetime            | NO   |     | 0000-00-00 00:00:00 |                |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----------------+---------------------+------+-----+---------------------+----------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;5 rows in set (0.00 sec)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;MySQL &amp;gt; select * from user_packages limit 5;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+-------+------------+------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| up_id | start_date | end_date   |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+-------+------------+------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|   185 | 2018-04-01 | 2018-06-30 |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|   186 | 2018-04-01 | 2018-06-30 |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|   187 | 2018-04-01 | 2018-06-30 |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|   188 | 2018-04-01 | 2018-06-30 |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|   189 | 2018-04-01 | 2018-06-30 |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+-------+------------+------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;5 rows in set (0.00 sec)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;操作过程&#34;&gt;操作过程&lt;/h4&gt;
+&lt;p&gt;需要更新某条记录的&lt;code&gt;end_date&lt;/code&gt;字段，执行sql如下：&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>如何在北京公积金网站上修改婚姻状况</title>
+      <link>https://liudon.com/posts/how-to-modify-marital-status/</link>
+      <pubDate>Fri, 17 Jan 2020 17:14:32 +0800</pubDate>
+      <guid>https://liudon.com/posts/how-to-modify-marital-status/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;关于取消住房公积金提取业务纸质申请表及部分业务网上办结的公告&lt;/p&gt;
+&lt;p&gt;时间：2020年01月08日&lt;/p&gt;
+&lt;p&gt;来源：http://gjj.beijing.gov.cn/web/zwgk/_300583/zxzysx/675803/index.html&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>PHP7.2编译安装后没有php.ini文件的问题</title>
+      <link>https://liudon.com/posts/php7.2%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85%E5%90%8E%E6%B2%A1%E6%9C%89php.ini%E6%96%87%E4%BB%B6/</link>
+      <pubDate>Tue, 26 Nov 2019 19:56:18 +0800</pubDate>
+      <guid>https://liudon.com/posts/php7.2%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85%E5%90%8E%E6%B2%A1%E6%9C%89php.ini%E6%96%87%E4%BB%B6/</guid>
+      <description>&lt;p&gt;下载PHP7.2源码，编译安装。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;[root@VM_73_135_centos ~/swoole-src-4.4.12]# php -v
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;PHP 7.2.25 (cli) (built: Nov 26 2019 19:33:23) ( NTS )
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Copyright (c) 1997-2018 The PHP Group
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Zend Engine v3.2.0, Copyright (c) 1998-2018 Zend Technologies
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;[root@VM_73_135_centos ~/swoole-src-4.4.12]# 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安装Swoole。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;phpize &amp;amp;&amp;amp; \
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;./configure &amp;amp;&amp;amp; \
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;make &amp;amp;&amp;amp; make install
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安装完，准备修改&lt;code&gt;php.ini&lt;/code&gt;文件，结果没找到。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>检测网站支持的SSL/TLS协议版本</title>
+      <link>https://liudon.com/posts/how-to-check-what-ssl-tls-versions-are-available-for-a-website/</link>
+      <pubDate>Thu, 14 Nov 2019 14:48:08 +0800</pubDate>
+      <guid>https://liudon.com/posts/how-to-check-what-ssl-tls-versions-are-available-for-a-website/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;Chrome 72及以上版本不支持TLS 1.0和TLS 1.1，访问TLS 1.0或1.1证书的站点会告警，但不阻止用户访问站点。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;为了解决Chrome的这个问题，今天升级了下Nginx的TLS协议版本，这里记录一下如何检测支持的协议版本。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>记一次难忘的手术经历</title>
+      <link>https://liudon.com/posts/an-unforgettable-surgical-experience/</link>
+      <pubDate>Mon, 28 Oct 2019 19:03:31 +0800</pubDate>
+      <guid>https://liudon.com/posts/an-unforgettable-surgical-experience/</guid>
+      <description>有痔青年的手术经历</description>
+    </item>
+    <item>
+      <title>十一假期经历</title>
+      <link>https://liudon.com/posts/chinese-national-day/</link>
+      <pubDate>Tue, 08 Oct 2019 13:13:36 +0800</pubDate>
+      <guid>https://liudon.com/posts/chinese-national-day/</guid>
+      <description>&lt;p&gt;今年的十一火车票非常难抢，12306的候补订单，一直等到时间截止也没订上票。&lt;/p&gt;
+&lt;p&gt;只好请了2天假，提前回家了，给自己也放个假休息一下。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;回家的几个经历：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;家里的老洗衣机光荣退休了，年龄比我都要大，爸妈舍不得换一直用着。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Swoft 框架运行分析（五） —— ConsoleProcessor模块分析</title>
+      <link>https://liudon.com/posts/swoft-console-processor-analysis/</link>
+      <pubDate>Thu, 26 Sep 2019 13:14:23 +0800</pubDate>
+      <guid>https://liudon.com/posts/swoft-console-processor-analysis/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;这里以Swoft启动http server为例。&lt;/p&gt;
+&lt;p&gt;php bin/swoft http:start&lt;/p&gt;
+&lt;p&gt;执行上述命令，启动http server。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;在前面第一篇文章的时候，提到了如何启动http服务。&lt;/p&gt;
+&lt;p&gt;今天我们就来看一下http服务是如何启动的，具体实现就在&lt;code&gt;ConsoleProcess&lt;/code&gt;这个模块。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Swoft 框架运行分析（四） —— EventProcessor模块分析</title>
+      <link>https://liudon.com/posts/swoft-event-processor-analysis/</link>
+      <pubDate>Thu, 26 Sep 2019 13:02:18 +0800</pubDate>
+      <guid>https://liudon.com/posts/swoft-event-processor-analysis/</guid>
+      <description>&lt;p&gt;今天我们来看一下&lt;code&gt;EventProcessor&lt;/code&gt;的实现。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;/**&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; Handle event register
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;bool&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*/&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;public function handle(): &lt;span style=&#34;color:#a6e22e&#34;&gt;bool&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#f92672&#34;&gt;!$&lt;/span&gt;this&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;application&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;beforeEvent()) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        CLog::warning(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Stop event processor by beforeEvent return false&amp;#39;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; false;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;/**&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; EventManager &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;eventManager &lt;span style=&#34;color:#f92672&#34;&gt;*/&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;eventManager &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; bean(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;eventManager&amp;#39;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    [&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;count1, &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;count2] &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; ListenerRegister::register(&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;eventManager);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    CLog::info(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Event manager initialized(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%d&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; listener, &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%d&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; subscriber)&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;count1, &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;count2);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;//&lt;/span&gt; Trigger a app init event
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    Swoft::trigger(SwoftEvent::APP_INIT_COMPLETE);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;this&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;application&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;afterEvent();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;获取&lt;code&gt;eventManager&lt;/code&gt;的&lt;code&gt;Bean&lt;/code&gt;实例，对应为&lt;code&gt;Swoft\Event\Manager\EventManager&lt;/code&gt;类。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>一个git submodule update引发的问题</title>
+      <link>https://liudon.com/posts/a-issues-of-git-submodule-update/</link>
+      <pubDate>Fri, 06 Sep 2019 15:13:51 +0800</pubDate>
+      <guid>https://liudon.com/posts/a-issues-of-git-submodule-update/</guid>
+      <description>&lt;h4 id=&#34;背景&#34;&gt;背景&lt;/h4&gt;
+&lt;p&gt;1月份的时候，用&lt;code&gt;hugo&lt;/code&gt;搭了这套博客系统。&lt;/p&gt;
+&lt;p&gt;本机写md文件，更新到&lt;code&gt;github&lt;/code&gt;，然后通过&lt;code&gt;travis-ci&lt;/code&gt;自动发布。&lt;/p&gt;
+&lt;p&gt;jane主题是通过&lt;code&gt;git submodule&lt;/code&gt;引入的，&lt;code&gt;.gitmodules&lt;/code&gt;文件内容。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>一个Curl的耗时长的问题</title>
+      <link>https://liudon.com/posts/curl-cost-time-long/</link>
+      <pubDate>Wed, 04 Sep 2019 11:07:46 +0800</pubDate>
+      <guid>https://liudon.com/posts/curl-cost-time-long/</guid>
+      <description>&lt;p&gt;发现某个接口请求很慢，但是后端确认接口是很快的。&lt;/p&gt;
+&lt;p&gt;在机器上通过shell执行curl命令，确实很快，但是PHP代码里请求又确实很慢。&lt;/p&gt;
+&lt;p&gt;业务里用到了&lt;code&gt;Requests&lt;/code&gt;这个库，一开始以为是这个库导致的问题。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Swoft 框架运行分析（三） —— BeanProcessor模块分析</title>
+      <link>https://liudon.com/posts/swoft-bean-processor-analysis/</link>
+      <pubDate>Mon, 02 Sep 2019 18:29:06 +0800</pubDate>
+      <guid>https://liudon.com/posts/swoft-bean-processor-analysis/</guid>
+      <description>&lt;p&gt;今天讲一下&lt;code&gt;BeanProcessor&lt;/code&gt;模块，先看一下&lt;code&gt;handle&lt;/code&gt;方法实现。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;/**&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; Handle bean
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;bool&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;throws ReflectionException
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;throws AnnotationException
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;*/&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;public function handle(): &lt;span style=&#34;color:#a6e22e&#34;&gt;bool&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#f92672&#34;&gt;!$&lt;/span&gt;this&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;application&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;beforeBean()) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; false;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;handler     &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; new BeanHandler();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;definitions &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;this&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;getDefinitions();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;parsers     &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; AnnotationRegister::getParsers();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;annotations &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; AnnotationRegister::getAnnotations();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    BeanFactory::addDefinitions(&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;definitions);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    BeanFactory::addAnnotations(&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;annotations);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    BeanFactory::addParsers(&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;parsers);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    BeanFactory::setHandler(&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;handler);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    BeanFactory::init();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;/*&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;@&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; Config &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;config&lt;span style=&#34;color:#f92672&#34;&gt;*/&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;config &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; BeanFactory::getBean(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;config&amp;#39;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    CLog::info(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;config path=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%s&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;config&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;getPath());
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    CLog::info(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;config env=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%s&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;config&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;getEnv());
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;stats &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; BeanFactory::getStats();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    CLog::info(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Bean is initialized(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%s&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;)&amp;#39;&lt;/span&gt;, SwoftHelper::formatStats(&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;stats));
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;this&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;application&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;afterBean();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;先通过&lt;code&gt;getDefinitions&lt;/code&gt;方法获取所有的Bean定义。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Swoft 框架运行分析（二） —— AnnotationProcessor模块分析</title>
+      <link>https://liudon.com/posts/swoft-anaotion-processor-analysis/</link>
+      <pubDate>Thu, 29 Aug 2019 19:11:04 +0800</pubDate>
+      <guid>https://liudon.com/posts/swoft-anaotion-processor-analysis/</guid>
+      <description>&lt;p&gt;上一篇介绍了，&lt;code&gt;SwoftApplication&lt;/code&gt;里定义了6个Processor对象。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;protected function processors(): array
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        return [
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            new EnvProcessor($this),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            new ConfigProcessor($this),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            new AnnotationProcessor($this),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            new BeanProcessor($this),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            new EventProcessor($this),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            new ConsoleProcessor($this),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        ];
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;所有的Processor实现都在&lt;code&gt;framework\src\Processor&lt;/code&gt;目录下。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Swoft 框架运行分析（一）</title>
+      <link>https://liudon.com/posts/swoft-execution-analysis/</link>
+      <pubDate>Thu, 29 Aug 2019 17:22:28 +0800</pubDate>
+      <guid>https://liudon.com/posts/swoft-execution-analysis/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;Swoft 是一款基于 Swoole 扩展实现的 PHP 微服务协程框架。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;以前一直都是用的原生swoole框架，最近有时间研究了下衍生的Swoft框架。&lt;/p&gt;
+&lt;p&gt;刚开始看的时候，感觉自己像个原始人，完全看不懂。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>BCMath 与 科学计数</title>
+      <link>https://liudon.com/posts/bcmath-and-exponential-notation/</link>
+      <pubDate>Fri, 16 Aug 2019 19:34:34 +0800</pubDate>
+      <guid>https://liudon.com/posts/bcmath-and-exponential-notation/</guid>
+      <description>&lt;p&gt;代码如下&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;?php
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo 9.99997600 + 2.4E-5;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &amp;#34;\n===\n&amp;#34;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo bcadd(9.99997600, 2.4E-5, 8);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;结果为&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;10
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;===
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;9.99997600
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;问了朋友，查了各种资料，终于在PHP手册里发现了这段话。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Caution
+Passing values of type float to a BCMath function which expects a string as operand may not have the desired effect due to the way PHP converts float values to string, namely that the string may be in exponential notation (which is not supported by BCMath), and that the decimal separator is locale dependent (while BCMath always expects a decimal point).&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Flink Could Not Resolve Resourcemanager Address</title>
+      <link>https://liudon.com/posts/flink-could-not-resolve-resourcemanager-address/</link>
+      <pubDate>Thu, 28 Mar 2019 13:00:50 +0800</pubDate>
+      <guid>https://liudon.com/posts/flink-could-not-resolve-resourcemanager-address/</guid>
+      <description>&lt;p&gt;什么是Flink。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Apache Flink® - Stateful Computations over Data Streams&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;Flink安装参考(官方文档)[https://ci.apache.org/projects/flink/flink-docs-release-1.7/tutorials/local_setup.html]。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>解决Sublime Text安装包时&#34;There Are No Packages Available for Installation&#34;的报错</title>
+      <link>https://liudon.com/posts/there-are-no-packages-available-for-installation/</link>
+      <pubDate>Fri, 11 Jan 2019 17:13:14 +0800</pubDate>
+      <guid>https://liudon.com/posts/there-are-no-packages-available-for-installation/</guid>
+      <description>&lt;p&gt;今天安装hugofy的包时，一直遇到&amp;quot;There Are No Packages Available for Installation&amp;quot;的错误。
+按网上的教程，配置host，配置代理都不起作用。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2019，新开始</title>
+      <link>https://liudon.com/posts/the-first-post/</link>
+      <pubDate>Wed, 09 Jan 2019 15:17:04 +0800</pubDate>
+      <guid>https://liudon.com/posts/the-first-post/</guid>
+      <description>&lt;p&gt;从2011年开始写博客，博客程序从WordPress换成Typecho。
+早就有想法换成静态博客，一直没时间搞。&lt;/p&gt;
+&lt;p&gt;2019年了，新年新气象，用hugo + github pages搞了个新博客。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

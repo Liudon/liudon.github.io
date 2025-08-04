@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Follow on 流动</title>
+    <link>https://liudon.com/tags/follow/</link>
+    <description>Recent content in Follow on 流动</description>
+    <generator>Hugo -- 0.148.2</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Tue, 17 Sep 2024 00:53:38 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/follow/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>你好 Follow</title>
+      <link>https://liudon.com/posts/hi-follow/</link>
+      <pubDate>Tue, 17 Sep 2024 00:53:38 +0800</pubDate>
+      <guid>https://liudon.com/posts/hi-follow/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;Follow:  Next generation information browser.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;最近博客圈开始流行&lt;code&gt;Follow邀请码&lt;/code&gt;，大家各种求码，一码难求。&lt;/p&gt;
+&lt;p&gt;蹲在&lt;code&gt;Discord&lt;/code&gt;群里一周，虽然时有发码，但最终还是狼多肉少，抢不到码呀。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,1063 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Swoft 框架运行分析（三） —— BeanProcessor模块分析 | 流动</title><meta name=keywords content="Swoft"><meta name=description content="今天讲一下BeanProcessor模块，先看一下handle方法实现。
+/**
+    * Handle bean
+    *
+    * @return bool
+    * @throws ReflectionException
+    * @throws AnnotationException
+    */
+public function handle(): bool
+{
+    if (!$this->application->beforeBean()) {
+        return false;
+    }
+
+    $handler     = new BeanHandler();
+    $definitions = $this->getDefinitions();
+    $parsers     = AnnotationRegister::getParsers();
+    $annotations = AnnotationRegister::getAnnotations();
+
+    BeanFactory::addDefinitions($definitions);
+    BeanFactory::addAnnotations($annotations);
+    BeanFactory::addParsers($parsers);
+    BeanFactory::setHandler($handler);
+    BeanFactory::init();
+
+    /* @var Config $config*/
+    $config = BeanFactory::getBean('config');
+
+    CLog::info('config path=%s', $config->getPath());
+    CLog::info('config env=%s', $config->getEnv());
+
+    $stats = BeanFactory::getStats();
+
+    CLog::info('Bean is initialized(%s)', SwoftHelper::formatStats($stats));
+
+    return $this->application->afterBean();
+}
+先通过getDefinitions方法获取所有的Bean定义。"><meta name=author content="Liudon"><link rel=canonical href=https://liudon.com/posts/swoft-bean-processor-analysis/><link crossorigin=anonymous href=../../assets/css/stylesheet.c2b4102602461aaea01497bf2f89d3d4096e9005f6ac8a7e60b27e335724b916.css integrity="sha256-wrQQJgJGGq6gFJe/L4nT1AlukAX2rIp+YLJ+M1ckuRY=" rel="preload stylesheet" as=style><link rel=icon href=https://liudon.com/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://liudon.com/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://liudon.com/favicon-32x32.png><link rel=apple-touch-icon href=https://liudon.com/apple-touch-icon.png><link rel=mask-icon href=https://liudon.com/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://liudon.com/posts/swoft-bean-processor-analysis/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous></script><meta property="og:url" content="https://liudon.com/posts/swoft-bean-processor-analysis/"><meta property="og:site_name" content="流动"><meta property="og:title" content="Swoft 框架运行分析（三） —— BeanProcessor模块分析"><meta property="og:description" content="今天讲一下BeanProcessor模块，先看一下handle方法实现。
+/** * Handle bean * * @return bool * @throws ReflectionException * @throws AnnotationException */ public function handle(): bool { if (!$this->application->beforeBean()) { return false; } $handler = new BeanHandler(); $definitions = $this->getDefinitions(); $parsers = AnnotationRegister::getParsers(); $annotations = AnnotationRegister::getAnnotations(); BeanFactory::addDefinitions($definitions); BeanFactory::addAnnotations($annotations); BeanFactory::addParsers($parsers); BeanFactory::setHandler($handler); BeanFactory::init(); /* @var Config $config*/ $config = BeanFactory::getBean('config'); CLog::info('config path=%s', $config->getPath()); CLog::info('config env=%s', $config->getEnv()); $stats = BeanFactory::getStats(); CLog::info('Bean is initialized(%s)', SwoftHelper::formatStats($stats)); return $this->application->afterBean(); } 先通过getDefinitions方法获取所有的Bean定义。"><meta property="og:locale" content="zh-cn"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2019-09-02T18:29:06+08:00"><meta property="article:modified_time" content="2019-09-02T18:29:06+08:00"><meta property="article:tag" content="Swoft"><meta name=twitter:card content="summary"><meta name=twitter:title content="Swoft 框架运行分析（三） —— BeanProcessor模块分析"><meta name=twitter:description content="今天讲一下BeanProcessor模块，先看一下handle方法实现。
+/**
+    * Handle bean
+    *
+    * @return bool
+    * @throws ReflectionException
+    * @throws AnnotationException
+    */
+public function handle(): bool
+{
+    if (!$this->application->beforeBean()) {
+        return false;
+    }
+
+    $handler     = new BeanHandler();
+    $definitions = $this->getDefinitions();
+    $parsers     = AnnotationRegister::getParsers();
+    $annotations = AnnotationRegister::getAnnotations();
+
+    BeanFactory::addDefinitions($definitions);
+    BeanFactory::addAnnotations($annotations);
+    BeanFactory::addParsers($parsers);
+    BeanFactory::setHandler($handler);
+    BeanFactory::init();
+
+    /* @var Config $config*/
+    $config = BeanFactory::getBean('config');
+
+    CLog::info('config path=%s', $config->getPath());
+    CLog::info('config env=%s', $config->getEnv());
+
+    $stats = BeanFactory::getStats();
+
+    CLog::info('Bean is initialized(%s)', SwoftHelper::formatStats($stats));
+
+    return $this->application->afterBean();
+}
+先通过getDefinitions方法获取所有的Bean定义。"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"文章","item":"https://liudon.com/posts/"},{"@type":"ListItem","position":2,"name":"Swoft 框架运行分析（三） —— BeanProcessor模块分析","item":"https://liudon.com/posts/swoft-bean-processor-analysis/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Swoft 框架运行分析（三） —— BeanProcessor模块分析","name":"Swoft 框架运行分析（三） —— BeanProcessor模块分析","description":"今天讲一下BeanProcessor模块，先看一下handle方法实现。\n/** * Handle bean * * @return bool * @throws ReflectionException * @throws AnnotationException */ public function handle(): bool { if (!$this-\u0026gt;application-\u0026gt;beforeBean()) { return false; } $handler = new BeanHandler(); $definitions = $this-\u0026gt;getDefinitions(); $parsers = AnnotationRegister::getParsers(); $annotations = AnnotationRegister::getAnnotations(); BeanFactory::addDefinitions($definitions); BeanFactory::addAnnotations($annotations); BeanFactory::addParsers($parsers); BeanFactory::setHandler($handler); BeanFactory::init(); /* @var Config $config*/ $config = BeanFactory::getBean(\u0026#39;config\u0026#39;); CLog::info(\u0026#39;config path=%s\u0026#39;, $config-\u0026gt;getPath()); CLog::info(\u0026#39;config env=%s\u0026#39;, $config-\u0026gt;getEnv()); $stats = BeanFactory::getStats(); CLog::info(\u0026#39;Bean is initialized(%s)\u0026#39;, SwoftHelper::formatStats($stats)); return $this-\u0026gt;application-\u0026gt;afterBean(); } 先通过getDefinitions方法获取所有的Bean定义。\n","keywords":["Swoft"],"articleBody":"今天讲一下BeanProcessor模块，先看一下handle方法实现。\n/** * Handle bean * * @return bool * @throws ReflectionException * @throws AnnotationException */ public function handle(): bool { if (!$this-\u003eapplication-\u003ebeforeBean()) { return false; } $handler = new BeanHandler(); $definitions = $this-\u003egetDefinitions(); $parsers = AnnotationRegister::getParsers(); $annotations = AnnotationRegister::getAnnotations(); BeanFactory::addDefinitions($definitions); BeanFactory::addAnnotations($annotations); BeanFactory::addParsers($parsers); BeanFactory::setHandler($handler); BeanFactory::init(); /* @var Config $config*/ $config = BeanFactory::getBean('config'); CLog::info('config path=%s', $config-\u003egetPath()); CLog::info('config env=%s', $config-\u003egetEnv()); $stats = BeanFactory::getStats(); CLog::info('Bean is initialized(%s)', SwoftHelper::formatStats($stats)); return $this-\u003eapplication-\u003eafterBean(); } 先通过getDefinitions方法获取所有的Bean定义。\n/** * Get bean definitions * * @return array */ private function getDefinitions(): array { // Core beans $definitions = []; $autoLoaders = AnnotationRegister::getAutoLoaders(); // get disabled loaders by application $disabledLoaders = $this-\u003eapplication-\u003egetDisabledAutoLoaders(); foreach ($autoLoaders as $autoLoader) { if (!$autoLoader instanceof DefinitionInterface) { continue; } $loaderClass = get_class($autoLoader); // If the component is disabled by user. if (isset($disabledLoaders[$loaderClass])) { CLog::info('Auto loader(%s) is disabled, skip handle it', $loaderClass); continue; } // If the component is not enabled. if ($autoLoader instanceof ComponentInterface \u0026\u0026 !$autoLoader-\u003eisEnable()) { continue; } $definitions = ArrayHelper::merge($definitions, $autoLoader-\u003ebeans()); } // Bean definitions $beanFile = $this-\u003eapplication-\u003egetBeanFile(); $beanFile = alias($beanFile); if (!file_exists($beanFile)) { throw new InvalidArgumentException( sprintf('The bean config file of %s is not exist!', $beanFile) ); } $beanDefinitions = require $beanFile; $definitions = ArrayHelper::merge($definitions, $beanDefinitions); return $definitions; } 通过AnnotationRegister::getAutoLoaders()拿到所有的autoloader对象，排除掉非DefinitionInterface对象，通过bean()方法获取定义的Bean信息。\n这里以http-server\\src\\AutoLoader.php为例。\n\u003c?php declare(strict_types=1); namespace Swoft\\Http\\Server; use function bean; use function dirname; use ReflectionException; use Swoft\\Bean\\Exception\\ContainerException; use Swoft\\Helper\\ComposerJSON; use Swoft\\Http\\Message\\ContentType; use Swoft\\Http\\Message\\Response; use Swoft\\Http\\Server\\Formatter\\HtmlResponseFormatter; use Swoft\\Http\\Server\\Formatter\\JsonResponseFormatter; use Swoft\\Http\\Server\\Formatter\\XmlResponseFormatter; use Swoft\\Http\\Server\\Parser\\JsonRequestParser; use Swoft\\Http\\Server\\Parser\\XmlRequestParser; use Swoft\\Http\\Server\\Swoole\\RequestListener; use Swoft\\Server\\SwooleEvent; use Swoft\\SwoftComponent; /** * Class AutoLoader * * @since 2.0 */ class AutoLoader extends SwoftComponent { /** * Metadata information for the component. * * @return array * @see ComponentInterface::getMetadata() */ public function metadata(): array { $jsonFile = dirname(__DIR__) . '/composer.json'; return ComposerJSON::open($jsonFile)-\u003egetMetadata(); } /** * Get namespace and dirs * * @return array */ public function getPrefixDirs(): array { return [ __NAMESPACE__ =\u003e __DIR__, ]; } /** * @return array * @throws ReflectionException * @throws ContainerException */ public function beans(): array { return [ 'httpRequest' =\u003e [ 'parsers' =\u003e [ ContentType::XML =\u003e bean(XmlRequestParser::class), ContentType::JSON =\u003e bean(JsonRequestParser::class), ] ], 'httpResponse' =\u003e [ 'format' =\u003e Response::FORMAT_JSON, 'formatters' =\u003e [ Response::FORMAT_HTML =\u003e bean(HtmlResponseFormatter::class), Response::FORMAT_JSON =\u003e bean(JsonResponseFormatter::class), Response::FORMAT_XML =\u003e bean(XmlResponseFormatter::class), ] ], 'acceptFormatter' =\u003e [ 'formats' =\u003e [ ContentType::JSON =\u003e Response::FORMAT_JSON, ContentType::HTML =\u003e Response::FORMAT_HTML, ContentType::XML =\u003e Response::FORMAT_XML, ] ], 'httpServer' =\u003e [ 'on' =\u003e [ SwooleEvent::REQUEST =\u003e bean(RequestListener::class) ] ], 'httpRouter' =\u003e [ 'name' =\u003e 'swoft-http-router', // config 'ignoreLastSlash' =\u003e true, 'tmpCacheNumber' =\u003e 500, ], ]; } } 可以看到，这里通过beans()定义了httpRequest、httpResponse、acceptFormatter、httpServer和httpRouter四个Bean对象。\n回到上面getDefinitions方法。\n$definitions = ArrayHelper::merge($definitions, $autoLoader-\u003ebeans());\n然后将Bean信息添加到definitions对象上。\n之后通过$beanFile = $this-\u003eapplication-\u003egetBeanFile();获取bean配置文件。\n$beanDefinitions = require $beanFile; $definitions = ArrayHelper::merge($definitions, $beanDefinitions); 加载配置文件，然后将Bean信息添加到definitions对象上。\n可以看到Bean有两种定义方式：通过AutoLoader和配置文件，与swoft官方文档里的说明一致。\n回到handle方法。\n$parsers = AnnotationRegister::getParsers(); $annotations = AnnotationRegister::getAnnotations(); 还记得上一篇文章最后提到的AnnotationRegister类的annotations和parsers两个属性吗？这里通过getParsers和getAnnotations获取这两个属性。\nBeanFactory::addDefinitions($definitions); BeanFactory::addAnnotations($annotations); BeanFactory::addParsers($parsers); BeanFactory::setHandler($handler); BeanFactory::init(); 向BeanFatory注册信息。\n/** * Init * * @return void * @throws AnnotationException * @throws ReflectionException */ public static function init(): void { Container::getInstance()-\u003einit(); } ... /** * Add definitions * * @param array $definitions * * @return void */ public static function addDefinitions(array $definitions): void { Container::getInstance()-\u003eaddDefinitions($definitions); } /** * Add annotations * * @param array $annotations * * @return void */ public static function addAnnotations(array $annotations): void { Container::getInstance()-\u003eaddAnnotations($annotations); } /** * Add annotation parsers * * @param array $annotationParsers * * @return void */ public static function addParsers(array $annotationParsers): void { Container::getInstance()-\u003eaddParsers($annotationParsers); } /** * Set bean handler * * @param HandlerInterface $handler */ public static function setHandler(HandlerInterface $handler): void { Container::getInstance()-\u003esetHandler($handler); } 这里可以看到所有的方法，最终都调用的是Swoft\\Bean\\Container类。\n/** * Add definitions * * @param array $definitions * * @return void */ public function addDefinitions(array $definitions): void { $this-\u003edefinitions = ArrayHelper::merge($this-\u003edefinitions, $definitions); } /** * Add annotations * * @param array $annotations * * @return void */ public function addAnnotations(array $annotations): void { $this-\u003eannotations = ArrayHelper::merge($this-\u003eannotations, $annotations); } /** * Add annotation parsers * * @param array $annotationParsers * * @return void */ public function addParsers(array $annotationParsers): void { $this-\u003eparsers = ArrayHelper::merge($this-\u003eparsers, $annotationParsers); } /** * @param HandlerInterface $handler */ public function setHandler(HandlerInterface $handler): void { $this-\u003ehandler = $handler; } 这四个方法就是注册属性，接下来是重头戏init方法。\n/** * Init * * @throws AnnotationException * @throws ReflectionException */ public function init(): void { // Parse annotations $this-\u003eparseAnnotations(); // Parse definitions $this-\u003eparseDefinitions(); // Init beans $this-\u003einitializeBeans(); } 先看parseAnnotations方法，从代码注释上也可以看出大概，解析注解，接下来我们看下具体是如何实现的。\n/** * Parse annotations * * @throws AnnotationException */ private function parseAnnotations(): void { $annotationParser = new AnnotationObjParser( $this-\u003edefinitions, $this-\u003eobjectDefinitions, $this-\u003eclassNames, $this-\u003ealiases ); $annotationData = $annotationParser-\u003eparseAnnotations($this-\u003eannotations, $this-\u003eparsers); [$this-\u003edefinitions, $this-\u003eobjectDefinitions, $this-\u003eclassNames, $this-\u003ealiases] = $annotationData; } 声明了一个AnnotationObjParser对象，调用了parseAnnotations方法。\n/** * Parse annotations * * @param array $annotations * @param array $parsers * * @return array * @throws AnnotationException */ public function parseAnnotations(array $annotations, array $parsers): array { $this-\u003eparsers = $parsers; $this-\u003eannotations = $annotations; foreach ($this-\u003eannotations as $loadNameSpace =\u003e $classes) { foreach ($classes as $className =\u003e $classOneAnnotations) { $this-\u003eparseOneClassAnnotations($className, $classOneAnnotations); } } return [$this-\u003edefinitions, $this-\u003eobjectDefinitions, $this-\u003eclassNames, $this-\u003ealiases]; } 这里遍历所有的annotation类，循环调用parseOneClassAnnotations进行解析。\n/** * Parse class all annotations * * @param string $className * @param array $classOneAnnotations * * @throws AnnotationException */ private function parseOneClassAnnotations(string $className, array $classOneAnnotations): void { // Check class annotation tag if (!isset($classOneAnnotations['annotation'])) { throw new AnnotationException( sprintf('Property or method(%s) with `@xxx` must be define class annotation', $className) ); } // Parse class annotations $classAnnotations = $classOneAnnotations['annotation']; $reflectionClass = $classOneAnnotations['reflection']; $classAry = [ $className, $reflectionClass, $classAnnotations ]; $objectDefinition = $this-\u003eparseClassAnnotations($classAry); // Parse property annotations $propertyInjects = []; $propertyAllAnnotations = $classOneAnnotations['properties'] ?? []; foreach ($propertyAllAnnotations as $propertyName =\u003e $propertyOneAnnotations) { $proAnnotations = $propertyOneAnnotations['annotation'] ?? []; $propertyInject = $this-\u003eparsePropertyAnnotations($classAry, $propertyName, $proAnnotations); if ($propertyInject) { $propertyInjects[$propertyName] = $propertyInject; } } // Parse method annotations $methodInjects = []; $methodAllAnnotations = $classOneAnnotations['methods'] ?? []; foreach ($methodAllAnnotations as $methodName =\u003e $methodOneAnnotations) { $methodAnnotations = $methodOneAnnotations['annotation'] ?? []; $methodInject = $this-\u003eparseMethodAnnotations($classAry, $methodName, $methodAnnotations); if ($methodInject) { $methodInjects[$methodName] = $methodInject; } } if (!$objectDefinition) { return; } if (!empty($propertyInjects)) { $objectDefinition-\u003esetPropertyInjections($propertyInjects); } if (!empty($methodInjects)) { $objectDefinition-\u003esetMethodInjections($methodInjects); } // Object definition and class name $name = $objectDefinition-\u003egetName(); $aliase = $objectDefinition-\u003egetAlias(); $classNames = $this-\u003eclassNames[$className] ?? []; $classNames[] = $name; $this-\u003eclassNames[$className] = array_unique($classNames); $this-\u003eobjectDefinitions[$name] = $objectDefinition; if (!empty($aliase)) { $this-\u003ealiases[$aliase] = $name; } } 这里可以看到分别有类注解、属性注解和方法注解三类。\n对应官方文档的注解说明。\n/** * @param array $classAry * * @return ObjectDefinition|null */ private function parseClassAnnotations(array $classAry): ?ObjectDefinition { [, , $classAnnotations] = $classAry; $objectDefinition = null; foreach ($classAnnotations as $annotation) { $annotationClass = get_class($annotation); if (!isset($this-\u003eparsers[$annotationClass])) { continue; } $parserClassName = $this-\u003eparsers[$annotationClass]; $annotationParser = $this-\u003egetAnnotationParser($classAry, $parserClassName); $data = $annotationParser-\u003eparse(Parser::TYPE_CLASS, $annotation); if (empty($data)) { continue; } if (count($data) !== 4) { throw new InvalidArgumentException(sprintf('%s annotation parse must be 4 size', $annotationClass)); } [$name, $className, $scope, $alias] = $data; $name = empty($name) ? $className : $name; if (empty($className)) { throw new InvalidArgumentException(sprintf('%s with class name can not be empty', $annotationClass)); } // Multiple coverage $objectDefinition = new ObjectDefinition($name, $className, $scope, $alias); } return $objectDefinition; } 类注解，这里会调用对应解析类的parse方法。\n这里以websocket-server\\src\\Annotation\\Mapping\\WsModule.php和websocket-server\\src\\Annotation\\Parser\\WsModuleParser.php为例。\n\u003c?php declare(strict_types=1); namespace Swoft\\WebSocket\\Server\\Annotation\\Mapping; use Doctrine\\Common\\Annotations\\Annotation\\Attribute; use Doctrine\\Common\\Annotations\\Annotation\\Attributes; use Doctrine\\Common\\Annotations\\Annotation\\Required; use Doctrine\\Common\\Annotations\\Annotation\\Target; use Swoft\\WebSocket\\Server\\MessageParser\\RawTextParser; /** * Class WebSocket - mark an websocket module handler class * * @since 2.0 * * @Annotation * @Target(\"CLASS\") * @Attributes( * @Attribute(\"name\", type=\"string\"), * @Attribute(\"path\", type=\"string\"), * @Attribute(\"controllers\", type=\"array\"), * @Attribute(\"messageParser\", type=\"string\"), * ) */ final class WsModule { /** * Websocket route path.(it must unique in a application) * * @var string * @Required() */ private $path = '/'; /** * Module name. * * @var string */ private $name = ''; /** * Routing path params binding. eg. {\"id\"=\"\\d+\"} * * @var array */ private $params = []; /** * Message controllers of the module * * @var string[] */ private $controllers = []; /** * Message parser class for the module * * @var string */ private $messageParser = RawTextParser::class; /** * Default message command. Format 'controller.action' * * @var string */ private $defaultCommand = 'home.index'; /** * Default message opcode for response. please see WEBSOCKET_OPCODE_* * * @var int */ private $defaultOpcode = 0; /** * Class constructor. * * @param array $values */ public function __construct(array $values) { if (isset($values['value'])) { $this-\u003epath = (string)$values['value']; } elseif (isset($values['path'])) { $this-\u003epath = (string)$values['path']; } if (isset($values['name'])) { $this-\u003ename = (string)$values['name']; } if (isset($values['params'])) { $this-\u003eparams = (array)$values['params']; } if (isset($values['controllers'])) { $this-\u003econtrollers = (array)$values['controllers']; } if (isset($values['messageParser'])) { $this-\u003emessageParser = $values['messageParser']; } if (isset($values['defaultOpcode'])) { $this-\u003edefaultOpcode = (int)$values['defaultOpcode']; } if (isset($values['defaultCommand'])) { $this-\u003edefaultCommand = $values['defaultCommand']; } } /** * @return string */ public function getPath(): string { return $this-\u003epath; } /** * @return string */ public function getMessageParser(): string { return $this-\u003emessageParser; } /** * @return string */ public function getDefaultCommand(): string { return $this-\u003edefaultCommand; } /** * @return string */ public function getName(): string { return $this-\u003ename; } /** * @return string[] */ public function getControllers(): array { return $this-\u003econtrollers; } /** * @return array */ public function getParams(): array { return $this-\u003eparams; } /** * @return int */ public function getDefaultOpcode(): int { return $this-\u003edefaultOpcode; } } WsModule声明了一个类注解。\n\u003c?php declare(strict_types=1); namespace Swoft\\WebSocket\\Server\\Annotation\\Parser; use Swoft\\Annotation\\Annotation\\Mapping\\AnnotationParser; use Swoft\\Annotation\\Annotation\\Parser\\Parser; use Swoft\\Annotation\\Exception\\AnnotationException; use Swoft\\Bean\\Annotation\\Mapping\\Bean; use Swoft\\Stdlib\\Helper\\Str; use Swoft\\WebSocket\\Server\\Annotation\\Mapping\\WsModule; use Swoft\\WebSocket\\Server\\MessageParser\\RawTextParser; use Swoft\\WebSocket\\Server\\Router\\RouteRegister; /** * Class WebSocketParser * * @since 2.0 * * @AnnotationParser(WsModule::class) */ class WsModuleParser extends Parser { /** * Parse object * * @param int $type Class or Method or Property * @param WsModule $ann Annotation object * * @return array * Return empty array is nothing to do! * When class type return [$beanName, $className, $scope, $alias, $size] is to inject bean * When property type return [$propertyValue, $isRef] is to reference value * @throws AnnotationException */ public function parse(int $type, $ann): array { if ($type !== self::TYPE_CLASS) { throw new AnnotationException('`@WsModule` must be defined on class!'); } $class = $this-\u003eclassName; RouteRegister::bindModule($class, [ 'path' =\u003e $ann-\u003egetPath() ?: Str::getClassName($class, 'Module'), 'name' =\u003e $ann-\u003egetName(), 'params' =\u003e $ann-\u003egetParams(), 'class' =\u003e $class, 'eventMethods' =\u003e [], 'controllers' =\u003e $ann-\u003egetControllers(), 'messageParser' =\u003e $ann-\u003egetMessageParser() ?: RawTextParser::class, 'defaultOpcode' =\u003e $ann-\u003egetDefaultOpcode(), 'defaultCommand' =\u003e $ann-\u003egetDefaultCommand(), ]); return [$class, $class, Bean::SINGLETON, '']; } } 按上一篇文章说明，这里WsModuleParser会被标记为注解类WsModule的注解解析类。\n解析注解的时候，会调用WsModuleParser的parse方法，这里通过RouteRegister::bindModule做了一些路由操作，这里后续再讲，这里不做深入介绍。\n属性和方法注解，也是类似的，parseAnnotations方法就讲完了。\n回到Container类的init方法，接下来调用了parseDefinitions方法。\n/** * Parse definitions */ private function parseDefinitions(): void { $annotationParser = new DefinitionObjParser( $this-\u003edefinitions, $this-\u003eobjectDefinitions, $this-\u003eclassNames, $this-\u003ealiases ); // Collect info $definitionData = $annotationParser-\u003eparseDefinitions(); [$this-\u003edefinitions, $this-\u003eobjectDefinitions, $this-\u003eclassNames, $this-\u003ealiases] = $definitionData; } 声明了一个DefinitionObjParser对象，调用了parseDefinitions方法。\n/** * Parse definitions * * @return array */ public function parseDefinitions(): array { foreach ($this-\u003edefinitions as $beanName =\u003e $definition) { if (isset($this-\u003eobjectDefinitions[$beanName])) { $objectDefinition = $this-\u003eobjectDefinitions[$beanName]; $this-\u003eresetObjectDefinition($beanName, $objectDefinition, $definition); continue; } $this-\u003ecreateObjectDefinition($beanName, $definition); } return [$this-\u003edefinitions, $this-\u003eobjectDefinitions, $this-\u003eclassNames, $this-\u003ealiases]; } 遍历所有的Bean对象，调用createObjectDefinition方法。\n/** * Create object definition for definition * * @param string $beanName * @param array $definition */ private function createObjectDefinition(string $beanName, array $definition): void { $className = $definition['class'] ?? ''; if (empty($className)) { throw new InvalidArgumentException(sprintf('%s key for definition must be defined class', $beanName)); } $objDefinition = new ObjectDefinition($beanName, $className); $objDefinition = $this-\u003eupdateObjectDefinitionByDefinition($objDefinition, $definition); $classNames = $this-\u003eclassNames[$className] ?? []; $classNames[] = $beanName; $this-\u003eclassNames[$className] = array_unique($classNames); $this-\u003eobjectDefinitions[$beanName] = $objDefinition; } 声明了ObjectDefinition对象，调用了updateObjectDefinitionByDefinition方法。\n/** * Update definition * * @param ObjectDefinition $objDfn * @param array $definition * * @return ObjectDefinition */ private function updateObjectDefinitionByDefinition(ObjectDefinition $objDfn, array $definition): ObjectDefinition { [$constructInject, $propertyInjects, $option] = $this-\u003eparseDefinition($definition); // Set construct inject if (!empty($constructInject)) { $objDfn-\u003esetConstructorInjection($constructInject); } // Set property inject foreach ($propertyInjects as $propertyName =\u003e $propertyInject) { $objDfn-\u003esetPropertyInjection($propertyName, $propertyInject); } $scopes = [ Bean::SINGLETON, Bean::PROTOTYPE, Bean::REQUEST, ]; $scope = $option['scope'] ?? ''; $alias = $option['alias'] ?? ''; if (!empty($scope) \u0026\u0026 !in_array($scope, $scopes, true)) { throw new InvalidArgumentException('Scope for definition is not undefined'); } // Update scope if (!empty($scope)) { $objDfn-\u003esetScope($scope); } // Update alias if (!empty($alias)) { $objDfn-\u003esetAlias($alias); $objAlias = $objDfn-\u003egetAlias(); unset($this-\u003ealiases[$objAlias]); $this-\u003ealiases[$alias] = $objDfn-\u003egetName(); } return $objDfn; } 这里调用了parseDefinition方法进行解析。\n/** * Parse definition * * @param array $definition * * @return array */ private function parseDefinition(array $definition): array { // Remove class key unset($definition['class']); // Parse construct $constructArgs = $definition[0] ?? []; if (!is_array($constructArgs)) { throw new InvalidArgumentException('Construct args for definition must be array'); } // Parse construct args $argInjects = []; foreach ($constructArgs as $arg) { [$argValue, $argIsRef] = $this-\u003egetValueByRef($arg); $argInjects[] = new ArgsInjection($argValue, $argIsRef); } // Set construct inject $constructInject = null; if (!empty($argInjects)) { $constructInject = new MethodInjection('__construct', $argInjects); } // Remove construct definition unset($definition[0]); // Parse definition option $option = $definition['__option'] ?? []; if (!is_array($option)) { throw new InvalidArgumentException('__option for definition must be array'); } // Remove `__option` unset($definition['__option']); // Parse definition properties $propertyInjects = []; foreach ($definition as $propertyName =\u003e $propertyValue) { if (!is_string($propertyName)) { throw new InvalidArgumentException('Property key from definition must be string'); } [$proValue, $proIsRef] = $this-\u003egetValueByRef($propertyValue); // Parse property for array if (is_array($proValue)) { $proValue = $this-\u003eparseArrayProperty($proValue); } $propertyInject = new PropertyInjection($propertyName, $proValue, $proIsRef); $propertyInjects[$propertyName] = $propertyInject; } return [$constructInject, $propertyInjects, $option]; } 解析__construct方法和传参，解析属性信息。\n回到updateObjectDefinitionByDefinition方法，将__construct和类属性信息注册到ObjectDefinition对象上，到这里parseDefinitions方法执行完毕。\n回到Container类的init方法，接下来调用了initializeBeans方法。\n/** * Initialize beans * * @throws InvalidArgumentException * @throws ReflectionException */ private function initializeBeans(): void { /* @var ObjectDefinition $objectDefinition */ foreach ($this-\u003eobjectDefinitions as $beanName =\u003e $objectDefinition) { $scope = $objectDefinition-\u003egetScope(); // Exclude request if ($scope === Bean::REQUEST) { $this-\u003erequestDefinitions[$beanName] = $objectDefinition; unset($this-\u003eobjectDefinitions[$beanName]); continue; } // Exclude session if ($scope === Bean::SESSION) { $this-\u003esessionDefinitions[$beanName] = $objectDefinition; unset($this-\u003eobjectDefinitions[$beanName]); continue; } // New bean $this-\u003enewBean($beanName); } } 对于scope不为Bean::REQUEST和Bean::SESSION的，调用newBean方法。\n/** * Initialize beans * * @param string $beanName * @param string $id * * @return object * @throws ReflectionException */ private function newBean(string $beanName, string $id = '') { // First, check bean whether has been create. if (isset($this-\u003esingletonPool[$beanName]) || isset($this-\u003eprototypePool[$beanName])) { return $this-\u003eget($beanName); } // Get object definition $objectDefinition = $this-\u003egetNewObjectDefinition($beanName); $scope = $objectDefinition-\u003egetScope(); $alias = $objectDefinition-\u003egetAlias(); $className = $objectDefinition-\u003egetClassName(); // Cache reflection class info Reflections::cache($className); // Before initialize bean $this-\u003ebeforeInit($beanName, $className, $objectDefinition); $constructArgs = []; $constructInject = $objectDefinition-\u003egetConstructorInjection(); if ($constructInject !== null) { $constructArgs = $this-\u003egetConstructParams($constructInject, $id); } $propertyInjects = $objectDefinition-\u003egetPropertyInjections(); // Proxy class if ($this-\u003ehandler) { $className = $this-\u003ehandler-\u003eclassProxy($className); } $reflectionClass = new ReflectionClass($className); $reflectObject = $this-\u003enewInstance($reflectionClass, $constructArgs); // Inject properties values $this-\u003enewProperty($reflectObject, $reflectionClass, $propertyInjects, $id); // Alias if (!empty($alias)) { $this-\u003ealiases[$alias] = $beanName; } // Call init method if exist if ($reflectionClass-\u003ehasMethod(self::INIT_METHOD)) { $reflectObject-\u003e{self::INIT_METHOD}(); } return $this-\u003esetNewBean($beanName, $scope, $reflectObject, $id); } 通过反射实例化Bean对应的类，注册对应的属性。\n如果类存在self::INIT_METHOD方法，执行此方法。\n/** * @param string $beanName * @param string $scope * @param object $object * @param string $id * * @return object */ private function setNewBean(string $beanName, string $scope, $object, string $id = '') { switch ($scope) { case Bean::SINGLETON: // Singleton $this-\u003esingletonPool[$beanName] = $object; break; case Bean::PROTOTYPE: $this-\u003eprototypePool[$beanName] = $object; // Clone it $object = clone $object; break; case Bean::REQUEST: $this-\u003erequestPool[$id][$beanName] = $object; break; case Bean::SESSION: $this-\u003esessionPool[$id][$beanName] = $object; break; } return $object; } setNewBean方法，根据对应的scope信息，将实例化后的反射类注册到对应的类属性上。\n到这里BeanProcessor类就执行完了。\n","wordCount":"4044","inLanguage":"en","datePublished":"2019-09-02T18:29:06+08:00","dateModified":"2019-09-02T18:29:06+08:00","author":{"@type":"Person","name":"Liudon"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://liudon.com/posts/swoft-bean-processor-analysis/"},"publisher":{"@type":"Organization","name":"流动","logo":{"@type":"ImageObject","url":"https://liudon.com/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://liudon.com/ accesskey=h title="流动 (Alt + H)">流动</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://liudon.com/ title=Home><span>Home</span></a></li><li><a href=https://liudon.com/posts/ title=Posts><span>Posts</span></a></li><li><a href=https://workout.liudon.com title=Workouts><span>Workouts</span>&nbsp;
+<svg fill="none" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" height="12" width="12"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></a></li><li><a href=https://liudon.com/about/ title=About><span>About</span></a></li><li><a href=https://liudon.com/search/ title="🔍 (Alt + /)" accesskey=/><span>🔍</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Swoft 框架运行分析（三） —— BeanProcessor模块分析</h1><div class=post-meta><span title='2019-09-02 18:29:06 +0800 +0800'>2019-09-02</span>&nbsp;·&nbsp;9 min&nbsp;·&nbsp;4044 words&nbsp;·&nbsp;Liudon</div></header><div class=post-content><p>今天讲一下<code>BeanProcessor</code>模块，先看一下<code>handle</code>方法实现。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> Handle bean
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws AnnotationException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>public function handle(): <span style=color:#a6e22e>bool</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!$</span>this<span style=color:#f92672>-&gt;</span>application<span style=color:#f92672>-&gt;</span>beforeBean()) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> false;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>handler     <span style=color:#f92672>=</span> new BeanHandler();
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>definitions <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>getDefinitions();
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>parsers     <span style=color:#f92672>=</span> AnnotationRegister::getParsers();
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>annotations <span style=color:#f92672>=</span> AnnotationRegister::getAnnotations();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    BeanFactory::addDefinitions(<span style=color:#f92672>$</span>definitions);
+</span></span><span style=display:flex><span>    BeanFactory::addAnnotations(<span style=color:#f92672>$</span>annotations);
+</span></span><span style=display:flex><span>    BeanFactory::addParsers(<span style=color:#f92672>$</span>parsers);
+</span></span><span style=display:flex><span>    BeanFactory::setHandler(<span style=color:#f92672>$</span>handler);
+</span></span><span style=display:flex><span>    BeanFactory::init();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> Config <span style=color:#f92672>$</span>config<span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>config <span style=color:#f92672>=</span> BeanFactory::getBean(<span style=color:#e6db74>&#39;config&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    CLog::info(<span style=color:#e6db74>&#39;config path=</span><span style=color:#e6db74>%s</span><span style=color:#e6db74>&#39;</span>, <span style=color:#f92672>$</span>config<span style=color:#f92672>-&gt;</span>getPath());
+</span></span><span style=display:flex><span>    CLog::info(<span style=color:#e6db74>&#39;config env=</span><span style=color:#e6db74>%s</span><span style=color:#e6db74>&#39;</span>, <span style=color:#f92672>$</span>config<span style=color:#f92672>-&gt;</span>getEnv());
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>stats <span style=color:#f92672>=</span> BeanFactory::getStats();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    CLog::info(<span style=color:#e6db74>&#39;Bean is initialized(</span><span style=color:#e6db74>%s</span><span style=color:#e6db74>)&#39;</span>, SwoftHelper::formatStats(<span style=color:#f92672>$</span>stats));
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>application<span style=color:#f92672>-&gt;</span>afterBean();
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>先通过<code>getDefinitions</code>方法获取所有的Bean定义。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> Get bean definitions
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> array
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>private function getDefinitions(): array
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Core beans
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>definitions <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>autoLoaders <span style=color:#f92672>=</span> AnnotationRegister::getAutoLoaders();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> get disabled loaders by application
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>disabledLoaders <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>application<span style=color:#f92672>-&gt;</span>getDisabledAutoLoaders();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    foreach (<span style=color:#f92672>$</span>autoLoaders as <span style=color:#f92672>$</span>autoLoader) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!$</span>autoLoader instanceof DefinitionInterface) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>continue</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>loaderClass <span style=color:#f92672>=</span> get_class(<span style=color:#f92672>$</span>autoLoader);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> If the component is disabled by user<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>disabledLoaders[<span style=color:#f92672>$</span>loaderClass])) {
+</span></span><span style=display:flex><span>            CLog::info(<span style=color:#e6db74>&#39;Auto loader(</span><span style=color:#e6db74>%s</span><span style=color:#e6db74>) is &lt;cyan&gt;disabled&lt;/cyan&gt;, skip handle it&#39;</span>, <span style=color:#f92672>$</span>loaderClass);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>continue</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> If the component is <span style=color:#f92672>not</span> enabled<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>autoLoader instanceof ComponentInterface <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!$</span>autoLoader<span style=color:#f92672>-&gt;</span>isEnable()) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>continue</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>definitions <span style=color:#f92672>=</span> ArrayHelper::merge(<span style=color:#f92672>$</span>definitions, <span style=color:#f92672>$</span>autoLoader<span style=color:#f92672>-&gt;</span>beans());
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Bean definitions
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>beanFile <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>application<span style=color:#f92672>-&gt;</span>getBeanFile();
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>beanFile <span style=color:#f92672>=</span> alias(<span style=color:#f92672>$</span>beanFile);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>file_exists(<span style=color:#f92672>$</span>beanFile)) {
+</span></span><span style=display:flex><span>        throw new InvalidArgumentException(
+</span></span><span style=display:flex><span>            sprintf(<span style=color:#e6db74>&#39;The bean config file of </span><span style=color:#e6db74>%s</span><span style=color:#e6db74> is not exist!&#39;</span>, <span style=color:#f92672>$</span>beanFile)
+</span></span><span style=display:flex><span>        );
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>beanDefinitions <span style=color:#f92672>=</span> require <span style=color:#f92672>$</span>beanFile;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>definitions     <span style=color:#f92672>=</span> ArrayHelper::merge(<span style=color:#f92672>$</span>definitions, <span style=color:#f92672>$</span>beanDefinitions);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>definitions;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>通过<code>AnnotationRegister::getAutoLoaders()</code>拿到所有的autoloader对象，排除掉非<code>DefinitionInterface</code>对象，通过<code>bean()</code>方法获取定义的Bean信息。</p><p>这里以<code>http-server\src\AutoLoader.php</code>为例。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>&lt;</span><span style=color:#960050;background-color:#1e0010>?</span>php declare(strict_types<span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>namespace Swoft\Http\Server;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>use function bean;
+</span></span><span style=display:flex><span>use function dirname;
+</span></span><span style=display:flex><span>use ReflectionException;
+</span></span><span style=display:flex><span>use Swoft\Bean\Exception\ContainerException;
+</span></span><span style=display:flex><span>use Swoft\Helper\ComposerJSON;
+</span></span><span style=display:flex><span>use Swoft\Http\Message\ContentType;
+</span></span><span style=display:flex><span>use Swoft\Http\Message\Response;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Formatter\HtmlResponseFormatter;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Formatter\JsonResponseFormatter;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Formatter\XmlResponseFormatter;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Parser\JsonRequestParser;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Parser\XmlRequestParser;
+</span></span><span style=display:flex><span>use Swoft\Http\Server\Swoole\RequestListener;
+</span></span><span style=display:flex><span>use Swoft\Server\SwooleEvent;
+</span></span><span style=display:flex><span>use Swoft\SwoftComponent;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> Class AutoLoader
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>since <span style=color:#ae81ff>2.0</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> AutoLoader <span style=color:#66d9ef>extends</span> SwoftComponent
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Metadata information <span style=color:#66d9ef>for</span> the component<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> array
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>see ComponentInterface::getMetadata()
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function metadata(): array
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>jsonFile <span style=color:#f92672>=</span> dirname(__DIR__) <span style=color:#f92672>.</span> <span style=color:#e6db74>&#39;/composer.json&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> ComposerJSON::open(<span style=color:#f92672>$</span>jsonFile)<span style=color:#f92672>-&gt;</span>getMetadata();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Get namespace <span style=color:#f92672>and</span> dirs
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> array
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function getPrefixDirs(): array
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> [
+</span></span><span style=display:flex><span>            __NAMESPACE__ <span style=color:#f92672>=&gt;</span> __DIR__,
+</span></span><span style=display:flex><span>        ];
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> array
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ContainerException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function beans(): array
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> [
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;httpRequest&#39;</span>     <span style=color:#f92672>=&gt;</span> [
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;parsers&#39;</span> <span style=color:#f92672>=&gt;</span> [
+</span></span><span style=display:flex><span>                    ContentType::XML  <span style=color:#f92672>=&gt;</span> bean(XmlRequestParser::<span style=color:#66d9ef>class</span>),
+</span></span><span style=display:flex><span>                    ContentType::JSON <span style=color:#f92672>=&gt;</span> bean(JsonRequestParser::<span style=color:#66d9ef>class</span>),
+</span></span><span style=display:flex><span>                ]
+</span></span><span style=display:flex><span>            ],
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;httpResponse&#39;</span>    <span style=color:#f92672>=&gt;</span> [
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;format&#39;</span>     <span style=color:#f92672>=&gt;</span> Response::FORMAT_JSON,
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;formatters&#39;</span> <span style=color:#f92672>=&gt;</span> [
+</span></span><span style=display:flex><span>                    Response::FORMAT_HTML <span style=color:#f92672>=&gt;</span> bean(HtmlResponseFormatter::<span style=color:#66d9ef>class</span>),
+</span></span><span style=display:flex><span>                    Response::FORMAT_JSON <span style=color:#f92672>=&gt;</span> bean(JsonResponseFormatter::<span style=color:#66d9ef>class</span>),
+</span></span><span style=display:flex><span>                    Response::FORMAT_XML  <span style=color:#f92672>=&gt;</span> bean(XmlResponseFormatter::<span style=color:#66d9ef>class</span>),
+</span></span><span style=display:flex><span>                ]
+</span></span><span style=display:flex><span>            ],
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;acceptFormatter&#39;</span> <span style=color:#f92672>=&gt;</span> [
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;formats&#39;</span> <span style=color:#f92672>=&gt;</span> [
+</span></span><span style=display:flex><span>                    ContentType::JSON <span style=color:#f92672>=&gt;</span> Response::FORMAT_JSON,
+</span></span><span style=display:flex><span>                    ContentType::HTML <span style=color:#f92672>=&gt;</span> Response::FORMAT_HTML,
+</span></span><span style=display:flex><span>                    ContentType::XML  <span style=color:#f92672>=&gt;</span> Response::FORMAT_XML,
+</span></span><span style=display:flex><span>                ]
+</span></span><span style=display:flex><span>            ],
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;httpServer&#39;</span>      <span style=color:#f92672>=&gt;</span> [
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;on&#39;</span> <span style=color:#f92672>=&gt;</span> [
+</span></span><span style=display:flex><span>                    SwooleEvent::REQUEST <span style=color:#f92672>=&gt;</span> bean(RequestListener::<span style=color:#66d9ef>class</span>)
+</span></span><span style=display:flex><span>                ]
+</span></span><span style=display:flex><span>            ],
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;httpRouter&#39;</span>      <span style=color:#f92672>=&gt;</span> [
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;name&#39;</span>            <span style=color:#f92672>=&gt;</span> <span style=color:#e6db74>&#39;swoft-http-router&#39;</span>,
+</span></span><span style=display:flex><span>                <span style=color:#f92672>//</span> config
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;ignoreLastSlash&#39;</span> <span style=color:#f92672>=&gt;</span> true,
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;tmpCacheNumber&#39;</span>  <span style=color:#f92672>=&gt;</span> <span style=color:#ae81ff>500</span>,
+</span></span><span style=display:flex><span>            ],
+</span></span><span style=display:flex><span>        ];
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>可以看到，这里通过<code>beans()</code>定义了<code>httpRequest</code>、<code>httpResponse</code>、<code>acceptFormatter</code>、<code>httpServer</code>和<code>httpRouter</code>四个Bean对象。</p><p>回到上面<code>getDefinitions</code>方法。</p><p><code>$definitions = ArrayHelper::merge($definitions, $autoLoader->beans());</code></p><p>然后将Bean信息添加到<code>definitions</code>对象上。</p><p>之后通过<code>$beanFile = $this->application->getBeanFile();</code>获取bean配置文件。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>$beanDefinitions = require $beanFile;
+</span></span><span style=display:flex><span>$definitions     = ArrayHelper::merge($definitions, $beanDefinitions);
+</span></span></code></pre></div><p>加载配置文件，然后将Bean信息添加到<code>definitions</code>对象上。</p><p>可以看到Bean有两种定义方式：通过AutoLoader和配置文件，与<a href=https://en.swoft.org/docs/2.x/zh-CN/bean/bean.html>swoft官方文档</a>里的说明一致。</p><p>回到<code>handle</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>$parsers     = AnnotationRegister::getParsers();
+</span></span><span style=display:flex><span>$annotations = AnnotationRegister::getAnnotations();
+</span></span></code></pre></div><p>还记得上一篇文章最后提到的<code>AnnotationRegister</code>类的<code>annotations</code>和<code>parsers</code>两个属性吗？这里通过<code>getParsers</code>和<code>getAnnotations</code>获取这两个属性。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>BeanFactory::addDefinitions($definitions);
+</span></span><span style=display:flex><span>BeanFactory::addAnnotations($annotations);
+</span></span><span style=display:flex><span>BeanFactory::addParsers($parsers);
+</span></span><span style=display:flex><span>BeanFactory::setHandler($handler);
+</span></span><span style=display:flex><span>BeanFactory::init();
+</span></span></code></pre></div><p>向BeanFatory注册信息。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Init
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return void
+</span></span><span style=display:flex><span>    * @throws AnnotationException
+</span></span><span style=display:flex><span>    * @throws ReflectionException
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public static function init(): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    Container::getInstance()-&gt;init();
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>...
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Add definitions
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @param array $definitions
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return void
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public static function addDefinitions(array $definitions): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    Container::getInstance()-&gt;addDefinitions($definitions);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Add annotations
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @param array $annotations
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return void
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public static function addAnnotations(array $annotations): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    Container::getInstance()-&gt;addAnnotations($annotations);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Add annotation parsers
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @param array $annotationParsers
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return void
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public static function addParsers(array $annotationParsers): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    Container::getInstance()-&gt;addParsers($annotationParsers);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Set bean handler
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @param HandlerInterface $handler
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public static function setHandler(HandlerInterface $handler): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    Container::getInstance()-&gt;setHandler($handler);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里可以看到所有的方法，最终都调用的是<code>Swoft\Bean\Container</code>类。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Add definitions
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @param array $definitions
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return void
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public function addDefinitions(array $definitions): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $this-&gt;definitions = ArrayHelper::merge($this-&gt;definitions, $definitions);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Add annotations
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @param array $annotations
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return void
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public function addAnnotations(array $annotations): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $this-&gt;annotations = ArrayHelper::merge($this-&gt;annotations, $annotations);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Add annotation parsers
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @param array $annotationParsers
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return void
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public function addParsers(array $annotationParsers): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $this-&gt;parsers = ArrayHelper::merge($this-&gt;parsers, $annotationParsers);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * @param HandlerInterface $handler
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public function setHandler(HandlerInterface $handler): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $this-&gt;handler = $handler;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这四个方法就是注册属性，接下来是重头戏<code>init</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Init
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @throws AnnotationException
+</span></span><span style=display:flex><span>    * @throws ReflectionException
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public function init(): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    // Parse annotations
+</span></span><span style=display:flex><span>    $this-&gt;parseAnnotations();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Parse definitions
+</span></span><span style=display:flex><span>    $this-&gt;parseDefinitions();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Init beans
+</span></span><span style=display:flex><span>    $this-&gt;initializeBeans();
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>先看<code>parseAnnotations</code>方法，从代码注释上也可以看出大概，解析注解，接下来我们看下具体是如何实现的。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Parse annotations
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @throws AnnotationException
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>private function parseAnnotations(): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $annotationParser = new AnnotationObjParser(
+</span></span><span style=display:flex><span>        $this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>    $annotationData   = $annotationParser-&gt;parseAnnotations($this-&gt;annotations, $this-&gt;parsers);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases] = $annotationData;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>声明了一个<code>AnnotationObjParser</code>对象，调用了<code>parseAnnotations</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> Parse annotations
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param array <span style=color:#f92672>$</span>annotations
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param array <span style=color:#f92672>$</span>parsers
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> array
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws AnnotationException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>public function parseAnnotations(array <span style=color:#f92672>$</span>annotations, array <span style=color:#f92672>$</span>parsers): array
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>parsers     <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>parsers;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>annotations <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>annotations;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    foreach (<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>annotations as <span style=color:#f92672>$</span>loadNameSpace <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>classes) {
+</span></span><span style=display:flex><span>        foreach (<span style=color:#f92672>$</span>classes as <span style=color:#f92672>$</span>className <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>classOneAnnotations) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>parseOneClassAnnotations(<span style=color:#f92672>$</span>className, <span style=color:#f92672>$</span>classOneAnnotations);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> [<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>definitions, <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>objectDefinitions, <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>classNames, <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>aliases];
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里遍历所有的<code>annotation</code>类，循环调用<code>parseOneClassAnnotations</code>进行解析。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zed data-lang=zed><span style=display:flex><span><span style=color:#75715e>/**
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * Parse class all annotations
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * @param string $className
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * @param array  $classOneAnnotations
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * @throws AnnotationException
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    */</span>
+</span></span><span style=display:flex><span>private function parseOneClassAnnotations(string <span style=color:#960050;background-color:#1e0010>$</span>className, array <span style=color:#960050;background-color:#1e0010>$</span>classOneAnnotations)<span style=color:#f92672>:</span> void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Check class annotation tag
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    if (<span style=color:#f92672>!</span>isset(<span style=color:#960050;background-color:#1e0010>$</span>classOneAnnotations[<span style=color:#960050;background-color:#1e0010>&#39;</span>annotation<span style=color:#960050;background-color:#1e0010>&#39;</span>])) {
+</span></span><span style=display:flex><span>        throw new AnnotationException(
+</span></span><span style=display:flex><span>            sprintf(<span style=color:#960050;background-color:#1e0010>&#39;</span>Property or method(<span style=color:#f92672>%</span>s) with <span style=color:#960050;background-color:#1e0010>`@</span>xxx<span style=color:#960050;background-color:#1e0010>`</span> must be define class annotation<span style=color:#960050;background-color:#1e0010>&#39;</span>, <span style=color:#960050;background-color:#1e0010>$</span>className)
+</span></span><span style=display:flex><span>        );
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Parse class annotations
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#960050;background-color:#1e0010>$</span>classAnnotations <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>classOneAnnotations[<span style=color:#960050;background-color:#1e0010>&#39;</span>annotation<span style=color:#960050;background-color:#1e0010>&#39;</span>];
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>reflectionClass  <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>classOneAnnotations[<span style=color:#960050;background-color:#1e0010>&#39;</span>reflection<span style=color:#960050;background-color:#1e0010>&#39;</span>];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>classAry <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>className,
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>reflectionClass,
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>classAnnotations
+</span></span><span style=display:flex><span>    ];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>objectDefinition <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>parseClassAnnotations(<span style=color:#960050;background-color:#1e0010>$</span>classAry);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Parse property annotations
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#960050;background-color:#1e0010>$</span>propertyInjects        <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>propertyAllAnnotations <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>classOneAnnotations[<span style=color:#960050;background-color:#1e0010>&#39;</span>properties<span style=color:#960050;background-color:#1e0010>&#39;</span>] <span style=color:#f92672>??</span> [];
+</span></span><span style=display:flex><span>    foreach (<span style=color:#960050;background-color:#1e0010>$</span>propertyAllAnnotations as <span style=color:#960050;background-color:#1e0010>$</span>propertyName <span style=color:#f92672>=&gt;</span> <span style=color:#960050;background-color:#1e0010>$</span>propertyOneAnnotations) {
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>proAnnotations <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>propertyOneAnnotations[<span style=color:#960050;background-color:#1e0010>&#39;</span>annotation<span style=color:#960050;background-color:#1e0010>&#39;</span>] <span style=color:#f92672>??</span> [];
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>propertyInject <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>parsePropertyAnnotations(<span style=color:#960050;background-color:#1e0010>$</span>classAry, <span style=color:#960050;background-color:#1e0010>$</span>propertyName, <span style=color:#960050;background-color:#1e0010>$</span>proAnnotations);
+</span></span><span style=display:flex><span>        if (<span style=color:#960050;background-color:#1e0010>$</span>propertyInject) {
+</span></span><span style=display:flex><span>            <span style=color:#960050;background-color:#1e0010>$</span>propertyInjects[<span style=color:#960050;background-color:#1e0010>$</span>propertyName] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>propertyInject;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Parse method annotations
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#960050;background-color:#1e0010>$</span>methodInjects        <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>methodAllAnnotations <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>classOneAnnotations[<span style=color:#960050;background-color:#1e0010>&#39;</span>methods<span style=color:#960050;background-color:#1e0010>&#39;</span>] <span style=color:#f92672>??</span> [];
+</span></span><span style=display:flex><span>    foreach (<span style=color:#960050;background-color:#1e0010>$</span>methodAllAnnotations as <span style=color:#960050;background-color:#1e0010>$</span>methodName <span style=color:#f92672>=&gt;</span> <span style=color:#960050;background-color:#1e0010>$</span>methodOneAnnotations) {
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>methodAnnotations <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>methodOneAnnotations[<span style=color:#960050;background-color:#1e0010>&#39;</span>annotation<span style=color:#960050;background-color:#1e0010>&#39;</span>] <span style=color:#f92672>??</span> [];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>methodInject <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>parseMethodAnnotations(<span style=color:#960050;background-color:#1e0010>$</span>classAry, <span style=color:#960050;background-color:#1e0010>$</span>methodName, <span style=color:#960050;background-color:#1e0010>$</span>methodAnnotations);
+</span></span><span style=display:flex><span>        if (<span style=color:#960050;background-color:#1e0010>$</span>methodInject) {
+</span></span><span style=display:flex><span>            <span style=color:#960050;background-color:#1e0010>$</span>methodInjects[<span style=color:#960050;background-color:#1e0010>$</span>methodName] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>methodInject;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    if (<span style=color:#f92672>!</span><span style=color:#960050;background-color:#1e0010>$</span>objectDefinition) {
+</span></span><span style=display:flex><span>        return;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    if (<span style=color:#f92672>!</span>empty(<span style=color:#960050;background-color:#1e0010>$</span>propertyInjects)) {
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>objectDefinition<span style=color:#f92672>-&gt;</span>setPropertyInjections(<span style=color:#960050;background-color:#1e0010>$</span>propertyInjects);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    if (<span style=color:#f92672>!</span>empty(<span style=color:#960050;background-color:#1e0010>$</span>methodInjects)) {
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>objectDefinition<span style=color:#f92672>-&gt;</span>setMethodInjections(<span style=color:#960050;background-color:#1e0010>$</span>methodInjects);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Object definition and class name
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#960050;background-color:#1e0010>$</span>name         <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>objectDefinition<span style=color:#f92672>-&gt;</span>getName();
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>aliase       <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>objectDefinition<span style=color:#f92672>-&gt;</span>getAlias();
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>classNames   <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>classNames[<span style=color:#960050;background-color:#1e0010>$</span>className] <span style=color:#f92672>??</span> [];
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>classNames[] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>name;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>classNames[<span style=color:#960050;background-color:#1e0010>$</span>className]   <span style=color:#f92672>=</span> array_unique(<span style=color:#960050;background-color:#1e0010>$</span>classNames);
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>objectDefinitions[<span style=color:#960050;background-color:#1e0010>$</span>name] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>objectDefinition;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    if (<span style=color:#f92672>!</span>empty(<span style=color:#960050;background-color:#1e0010>$</span>aliase)) {
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>aliases[<span style=color:#960050;background-color:#1e0010>$</span>aliase] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>name;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里可以看到分别有类注解、属性注解和方法注解三类。</p><p>对应官方文档的<a href=https://en.swoft.org/docs/2.x/zh-CN/annotation/index.html#%E8%A7%84%E8%8C%83>注解说明</a>。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * @param array $classAry
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return ObjectDefinition|null
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>private function parseClassAnnotations(array $classAry): ?ObjectDefinition
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    [, , $classAnnotations] = $classAry;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $objectDefinition = null;
+</span></span><span style=display:flex><span>    foreach ($classAnnotations as $annotation) {
+</span></span><span style=display:flex><span>        $annotationClass = get_class($annotation);
+</span></span><span style=display:flex><span>        if (!isset($this-&gt;parsers[$annotationClass])) {
+</span></span><span style=display:flex><span>            continue;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $parserClassName  = $this-&gt;parsers[$annotationClass];
+</span></span><span style=display:flex><span>        $annotationParser = $this-&gt;getAnnotationParser($classAry, $parserClassName);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $data = $annotationParser-&gt;parse(Parser::TYPE_CLASS, $annotation);
+</span></span><span style=display:flex><span>        if (empty($data)) {
+</span></span><span style=display:flex><span>            continue;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        if (count($data) !== 4) {
+</span></span><span style=display:flex><span>            throw new InvalidArgumentException(sprintf(&#39;%s annotation parse must be 4 size&#39;, $annotationClass));
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        [$name, $className, $scope, $alias] = $data;
+</span></span><span style=display:flex><span>        $name = empty($name) ? $className : $name;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        if (empty($className)) {
+</span></span><span style=display:flex><span>            throw new InvalidArgumentException(sprintf(&#39;%s with class name can not be empty&#39;, $annotationClass));
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        // Multiple coverage
+</span></span><span style=display:flex><span>        $objectDefinition = new ObjectDefinition($name, $className, $scope, $alias);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    return $objectDefinition;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>类注解，这里会调用对应解析类的<code>parse</code>方法。</p><p>这里以<code>websocket-server\src\Annotation\Mapping\WsModule.php</code>和<code>websocket-server\src\Annotation\Parser\WsModuleParser.php</code>为例。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>&lt;</span><span style=color:#960050;background-color:#1e0010>?</span>php declare(strict_types<span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>namespace Swoft\WebSocket\Server\Annotation\Mapping;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>use Doctrine\Common\Annotations\Annotation\Attribute;
+</span></span><span style=display:flex><span>use Doctrine\Common\Annotations\Annotation\Attributes;
+</span></span><span style=display:flex><span>use Doctrine\Common\Annotations\Annotation\Required;
+</span></span><span style=display:flex><span>use Doctrine\Common\Annotations\Annotation\Target;
+</span></span><span style=display:flex><span>use Swoft\WebSocket\Server\MessageParser\RawTextParser;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> Class WebSocket <span style=color:#f92672>-</span> mark an websocket module handler <span style=color:#66d9ef>class</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>since <span style=color:#ae81ff>2.0</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>Annotation
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>Target(<span style=color:#e6db74>&#34;CLASS&#34;</span>)
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>Attributes(
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>     <span style=color:#960050;background-color:#1e0010>@</span>Attribute(<span style=color:#e6db74>&#34;name&#34;</span>, type<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;string&#34;</span>),
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>     <span style=color:#960050;background-color:#1e0010>@</span>Attribute(<span style=color:#e6db74>&#34;path&#34;</span>, type<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;string&#34;</span>),
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>     <span style=color:#960050;background-color:#1e0010>@</span>Attribute(<span style=color:#e6db74>&#34;controllers&#34;</span>, type<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;array&#34;</span>),
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>     <span style=color:#960050;background-color:#1e0010>@</span>Attribute(<span style=color:#e6db74>&#34;messageParser&#34;</span>, type<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;string&#34;</span>),
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> )
+</span></span><span style=display:flex><span> <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>final <span style=color:#66d9ef>class</span> WsModule
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Websocket route path<span style=color:#f92672>.</span>(it must unique <span style=color:#f92672>in</span> a application)
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> string
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>Required()
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    private <span style=color:#f92672>$</span>path <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;/&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Module name<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> string
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    private <span style=color:#f92672>$</span>name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Routing path params binding<span style=color:#f92672>.</span> eg<span style=color:#f92672>.</span> {<span style=color:#e6db74>&#34;id&#34;</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;\d+&#34;</span>}
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> array
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    private <span style=color:#f92672>$</span>params <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Message controllers of the module
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> string[]
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    private <span style=color:#f92672>$</span>controllers <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Message parser <span style=color:#66d9ef>class</span> <span style=color:#66d9ef>for</span> the module
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> string
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    private <span style=color:#f92672>$</span>messageParser <span style=color:#f92672>=</span> RawTextParser::<span style=color:#66d9ef>class</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Default message command<span style=color:#f92672>.</span> Format <span style=color:#e6db74>&#39;controller.action&#39;</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> string
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    private <span style=color:#f92672>$</span>defaultCommand <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;home.index&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Default message opcode <span style=color:#66d9ef>for</span> response<span style=color:#f92672>.</span> please see WEBSOCKET_OPCODE_<span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> <span style=color:#a6e22e>int</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    private <span style=color:#f92672>$</span>defaultOpcode <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Class constructor<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param array <span style=color:#f92672>$</span>values
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function __construct(array <span style=color:#f92672>$</span>values)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;value&#39;</span>])) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>path <span style=color:#f92672>=</span> (string)<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;value&#39;</span>];
+</span></span><span style=display:flex><span>        } elseif (isset(<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;path&#39;</span>])) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>path <span style=color:#f92672>=</span> (string)<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;path&#39;</span>];
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;name&#39;</span>])) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>name <span style=color:#f92672>=</span> (string)<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;name&#39;</span>];
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;params&#39;</span>])) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>params <span style=color:#f92672>=</span> (array)<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;params&#39;</span>];
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;controllers&#39;</span>])) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>controllers <span style=color:#f92672>=</span> (array)<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;controllers&#39;</span>];
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;messageParser&#39;</span>])) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>messageParser <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;messageParser&#39;</span>];
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;defaultOpcode&#39;</span>])) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>defaultOpcode <span style=color:#f92672>=</span> (<span style=color:#a6e22e>int</span>)<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;defaultOpcode&#39;</span>];
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;defaultCommand&#39;</span>])) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>defaultCommand <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>values[<span style=color:#e6db74>&#39;defaultCommand&#39;</span>];
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> string
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function getPath(): string
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>path;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> string
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function getMessageParser(): string
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>messageParser;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> string
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function getDefaultCommand(): string
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>defaultCommand;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> string
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function getName(): string
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>name;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> string[]
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function getControllers(): array
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>controllers;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> array
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function getParams(): array
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>params;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> <span style=color:#a6e22e>int</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function getDefaultOpcode(): <span style=color:#a6e22e>int</span>
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>defaultOpcode;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><code>WsModule</code>声明了一个类注解。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>&lt;</span><span style=color:#960050;background-color:#1e0010>?</span>php declare(strict_types<span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>namespace Swoft\WebSocket\Server\Annotation\Parser;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>use Swoft\Annotation\Annotation\Mapping\AnnotationParser;
+</span></span><span style=display:flex><span>use Swoft\Annotation\Annotation\Parser\Parser;
+</span></span><span style=display:flex><span>use Swoft\Annotation\Exception\AnnotationException;
+</span></span><span style=display:flex><span>use Swoft\Bean\Annotation\Mapping\Bean;
+</span></span><span style=display:flex><span>use Swoft\Stdlib\Helper\Str;
+</span></span><span style=display:flex><span>use Swoft\WebSocket\Server\Annotation\Mapping\WsModule;
+</span></span><span style=display:flex><span>use Swoft\WebSocket\Server\MessageParser\RawTextParser;
+</span></span><span style=display:flex><span>use Swoft\WebSocket\Server\Router\RouteRegister;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> Class WebSocketParser
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>since <span style=color:#ae81ff>2.0</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span> <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>AnnotationParser(WsModule::<span style=color:#66d9ef>class</span>)
+</span></span><span style=display:flex><span> <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> WsModuleParser <span style=color:#66d9ef>extends</span> Parser
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Parse object
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param <span style=color:#a6e22e>int</span>      <span style=color:#f92672>$</span>type Class <span style=color:#f92672>or</span> Method <span style=color:#f92672>or</span> Property
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param WsModule <span style=color:#f92672>$</span>ann  Annotation object
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> array
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> Return empty array is nothing to <span style=color:#66d9ef>do</span><span style=color:#f92672>!</span>
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> When <span style=color:#66d9ef>class</span> type <span style=color:#66d9ef>return</span> [<span style=color:#f92672>$</span>beanName, <span style=color:#f92672>$</span>className, <span style=color:#f92672>$</span>scope, <span style=color:#f92672>$</span>alias, <span style=color:#f92672>$</span>size] is to inject bean
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> When property type <span style=color:#66d9ef>return</span> [<span style=color:#f92672>$</span>propertyValue, <span style=color:#f92672>$</span>isRef] is to reference value
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws AnnotationException
+</span></span><span style=display:flex><span>     <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    public function parse(<span style=color:#a6e22e>int</span> <span style=color:#f92672>$</span>type, <span style=color:#f92672>$</span>ann): array
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>type <span style=color:#f92672>!==</span> self::TYPE_CLASS) {
+</span></span><span style=display:flex><span>            throw new AnnotationException(<span style=color:#e6db74>&#39;`@WsModule` must be defined on class!&#39;</span>);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span><span style=color:#66d9ef>class</span> <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>className;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        RouteRegister::bindModule(<span style=color:#f92672>$</span><span style=color:#66d9ef>class</span>, [
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;path&#39;</span>           <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>ann<span style=color:#f92672>-&gt;</span>getPath() <span style=color:#960050;background-color:#1e0010>?</span>: Str::getClassName(<span style=color:#f92672>$</span><span style=color:#66d9ef>class</span>, <span style=color:#e6db74>&#39;Module&#39;</span>),
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;name&#39;</span>           <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>ann<span style=color:#f92672>-&gt;</span>getName(),
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;params&#39;</span>         <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>ann<span style=color:#f92672>-&gt;</span>getParams(),
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;class&#39;</span>          <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span><span style=color:#66d9ef>class</span>,
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;eventMethods&#39;</span>   <span style=color:#f92672>=&gt;</span> [],
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;controllers&#39;</span>    <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>ann<span style=color:#f92672>-&gt;</span>getControllers(),
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;messageParser&#39;</span>  <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>ann<span style=color:#f92672>-&gt;</span>getMessageParser() <span style=color:#960050;background-color:#1e0010>?</span>: RawTextParser::<span style=color:#66d9ef>class</span>,
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;defaultOpcode&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>ann<span style=color:#f92672>-&gt;</span>getDefaultOpcode(),
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;defaultCommand&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>ann<span style=color:#f92672>-&gt;</span>getDefaultCommand(),
+</span></span><span style=display:flex><span>        ]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> [<span style=color:#f92672>$</span><span style=color:#66d9ef>class</span>, <span style=color:#f92672>$</span><span style=color:#66d9ef>class</span>, Bean::SINGLETON, <span style=color:#e6db74>&#39;&#39;</span>];
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>按上一篇文章说明，这里<code>WsModuleParser</code>会被标记为注解类<code>WsModule</code>的注解解析类。</p><p>解析注解的时候，会调用<code>WsModuleParser</code>的<code>parse</code>方法，这里通过<code>RouteRegister::bindModule</code>做了一些路由操作，这里后续再讲，这里不做深入介绍。</p><p>属性和方法注解，也是类似的，<code>parseAnnotations</code>方法就讲完了。</p><p>回到<code>Container</code>类的<code>init</code>方法，接下来调用了<code>parseDefinitions</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Parse definitions
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>private function parseDefinitions(): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $annotationParser = new DefinitionObjParser(
+</span></span><span style=display:flex><span>        $this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    // Collect info
+</span></span><span style=display:flex><span>    $definitionData = $annotationParser-&gt;parseDefinitions();
+</span></span><span style=display:flex><span>    [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases] = $definitionData;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>声明了一个<code>DefinitionObjParser</code>对象，调用了<code>parseDefinitions</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * Parse definitions
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return array
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>public function parseDefinitions(): array
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    foreach ($this-&gt;definitions as $beanName =&gt; $definition) {
+</span></span><span style=display:flex><span>        if (isset($this-&gt;objectDefinitions[$beanName])) {
+</span></span><span style=display:flex><span>            $objectDefinition = $this-&gt;objectDefinitions[$beanName];
+</span></span><span style=display:flex><span>            $this-&gt;resetObjectDefinition($beanName, $objectDefinition, $definition);
+</span></span><span style=display:flex><span>            continue;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $this-&gt;createObjectDefinition($beanName, $definition);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    return [$this-&gt;definitions, $this-&gt;objectDefinitions, $this-&gt;classNames, $this-&gt;aliases];
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>遍历所有的<code>Bean</code>对象，调用<code>createObjectDefinition</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zed data-lang=zed><span style=display:flex><span><span style=color:#75715e>/**
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * Create object definition for definition
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * @param string $beanName
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * @param array  $definition
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    */</span>
+</span></span><span style=display:flex><span>private function createObjectDefinition(string <span style=color:#960050;background-color:#1e0010>$</span>beanName, array <span style=color:#960050;background-color:#1e0010>$</span><span style=color:#66d9ef>definition</span>)<span style=color:#f92672>:</span> void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>className <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span><span style=color:#66d9ef>definition</span>[<span style=color:#960050;background-color:#1e0010>&#39;</span>class<span style=color:#960050;background-color:#1e0010>&#39;</span>] <span style=color:#f92672>??</span> <span style=color:#960050;background-color:#1e0010>&#39;&#39;</span>;
+</span></span><span style=display:flex><span>    if (empty(<span style=color:#960050;background-color:#1e0010>$</span>className)) {
+</span></span><span style=display:flex><span>        throw new InvalidArgumentException(sprintf(<span style=color:#960050;background-color:#1e0010>&#39;</span><span style=color:#f92672>%</span>s key for <span style=color:#66d9ef>definition</span> must be defined class<span style=color:#960050;background-color:#1e0010>&#39;</span>, <span style=color:#960050;background-color:#1e0010>$</span>beanName));
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>objDefinition <span style=color:#f92672>=</span> new ObjectDefinition(<span style=color:#960050;background-color:#1e0010>$</span>beanName, <span style=color:#960050;background-color:#1e0010>$</span>className);
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>objDefinition <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>updateObjectDefinitionByDefinition(<span style=color:#960050;background-color:#1e0010>$</span>objDefinition, <span style=color:#960050;background-color:#1e0010>$</span><span style=color:#66d9ef>definition</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>classNames   <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>classNames[<span style=color:#960050;background-color:#1e0010>$</span>className] <span style=color:#f92672>??</span> [];
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>classNames[] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>beanName;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>classNames[<span style=color:#960050;background-color:#1e0010>$</span>className]       <span style=color:#f92672>=</span> array_unique(<span style=color:#960050;background-color:#1e0010>$</span>classNames);
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>objectDefinitions[<span style=color:#960050;background-color:#1e0010>$</span>beanName] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>objDefinition;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>声明了<code>ObjectDefinition</code>对象，调用了<code>updateObjectDefinitionByDefinition</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zed data-lang=zed><span style=display:flex><span><span style=color:#75715e>/**
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * Update definition
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * @param ObjectDefinition $objDfn
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * @param array            $definition
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * @return ObjectDefinition
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    */</span>
+</span></span><span style=display:flex><span>private function updateObjectDefinitionByDefinition(ObjectDefinition <span style=color:#960050;background-color:#1e0010>$</span>objDfn, array <span style=color:#960050;background-color:#1e0010>$</span><span style=color:#66d9ef>definition</span>)<span style=color:#f92672>:</span> ObjectDefinition
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    [<span style=color:#960050;background-color:#1e0010>$</span>constructInject, <span style=color:#960050;background-color:#1e0010>$</span>propertyInjects, <span style=color:#960050;background-color:#1e0010>$</span>option] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>parseDefinition(<span style=color:#960050;background-color:#1e0010>$</span><span style=color:#66d9ef>definition</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Set construct inject
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    if (<span style=color:#f92672>!</span>empty(<span style=color:#960050;background-color:#1e0010>$</span>constructInject)) {
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>objDfn<span style=color:#f92672>-&gt;</span>setConstructorInjection(<span style=color:#960050;background-color:#1e0010>$</span>constructInject);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Set property inject
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    foreach (<span style=color:#960050;background-color:#1e0010>$</span>propertyInjects as <span style=color:#960050;background-color:#1e0010>$</span>propertyName <span style=color:#f92672>=&gt;</span> <span style=color:#960050;background-color:#1e0010>$</span>propertyInject) {
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>objDfn<span style=color:#f92672>-&gt;</span>setPropertyInjection(<span style=color:#960050;background-color:#1e0010>$</span>propertyName, <span style=color:#960050;background-color:#1e0010>$</span>propertyInject);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>scopes <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>        Bean<span style=color:#f92672>::</span>SINGLETON,
+</span></span><span style=display:flex><span>        Bean<span style=color:#f92672>::</span>PROTOTYPE,
+</span></span><span style=display:flex><span>        Bean<span style=color:#f92672>::</span>REQUEST,
+</span></span><span style=display:flex><span>    ];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>scope <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>option[<span style=color:#960050;background-color:#1e0010>&#39;</span>scope<span style=color:#960050;background-color:#1e0010>&#39;</span>] <span style=color:#f92672>??</span> <span style=color:#960050;background-color:#1e0010>&#39;&#39;</span>;
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>alias <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>option[<span style=color:#960050;background-color:#1e0010>&#39;</span>alias<span style=color:#960050;background-color:#1e0010>&#39;</span>] <span style=color:#f92672>??</span> <span style=color:#960050;background-color:#1e0010>&#39;&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    if (<span style=color:#f92672>!</span>empty(<span style=color:#960050;background-color:#1e0010>$</span>scope) <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!</span>in_array(<span style=color:#960050;background-color:#1e0010>$</span>scope, <span style=color:#960050;background-color:#1e0010>$</span>scopes, true)) {
+</span></span><span style=display:flex><span>        throw new InvalidArgumentException(<span style=color:#960050;background-color:#1e0010>&#39;</span>Scope for <span style=color:#66d9ef>definition</span> is not undefined<span style=color:#960050;background-color:#1e0010>&#39;</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Update scope
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    if (<span style=color:#f92672>!</span>empty(<span style=color:#960050;background-color:#1e0010>$</span>scope)) {
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>objDfn<span style=color:#f92672>-&gt;</span>setScope(<span style=color:#960050;background-color:#1e0010>$</span>scope);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Update alias
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    if (<span style=color:#f92672>!</span>empty(<span style=color:#960050;background-color:#1e0010>$</span>alias)) {
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>objDfn<span style=color:#f92672>-&gt;</span>setAlias(<span style=color:#960050;background-color:#1e0010>$</span>alias);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>objAlias <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>objDfn<span style=color:#f92672>-&gt;</span>getAlias();
+</span></span><span style=display:flex><span>        unset(<span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>aliases[<span style=color:#960050;background-color:#1e0010>$</span>objAlias]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span>aliases[<span style=color:#960050;background-color:#1e0010>$</span>alias] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>objDfn<span style=color:#f92672>-&gt;</span>getName();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    return <span style=color:#960050;background-color:#1e0010>$</span>objDfn;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>这里调用了<code>parseDefinition</code>方法进行解析。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-mysql data-lang=mysql><span style=display:flex><span><span style=color:#75715e>/**
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * Parse definition
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * @param array $definition
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * @return array
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    */</span>
+</span></span><span style=display:flex><span>private function <span style=color:#a6e22e>parseDefinition</span>(array <span style=color:#960050;background-color:#1e0010>$</span>definition): array
+</span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Remove class <span style=color:#66d9ef>key</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>unset</span>(<span style=color:#960050;background-color:#1e0010>$</span>definition[<span style=color:#e6db74>&#39;class&#39;</span>]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Parse construct
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>constructArgs <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>definition[<span style=color:#ae81ff>0</span>] <span style=color:#f92672>??</span> [];
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>is_array</span>(<span style=color:#960050;background-color:#1e0010>$</span>constructArgs)) <span style=color:#960050;background-color:#1e0010>{</span>
+</span></span><span style=display:flex><span>        throw new <span style=color:#a6e22e>InvalidArgumentException</span>(<span style=color:#e6db74>&#39;Construct args for definition must be array&#39;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Parse construct args
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>argInjects <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>foreach</span> (<span style=color:#960050;background-color:#1e0010>$</span>constructArgs <span style=color:#66d9ef>as</span> <span style=color:#960050;background-color:#1e0010>$</span>arg) <span style=color:#960050;background-color:#1e0010>{</span>
+</span></span><span style=display:flex><span>        [<span style=color:#960050;background-color:#1e0010>$</span>argValue, <span style=color:#960050;background-color:#1e0010>$</span>argIsRef] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>getValueByRef</span>(<span style=color:#960050;background-color:#1e0010>$</span>arg);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>argInjects[] <span style=color:#f92672>=</span> new <span style=color:#a6e22e>ArgsInjection</span>(<span style=color:#960050;background-color:#1e0010>$</span>argValue, <span style=color:#960050;background-color:#1e0010>$</span>argIsRef);
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> <span style=color:#66d9ef>Set</span> construct inject
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>constructInject <span style=color:#f92672>=</span> <span style=color:#66d9ef>null</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>empty</span>(<span style=color:#960050;background-color:#1e0010>$</span>argInjects)) <span style=color:#960050;background-color:#1e0010>{</span>
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>constructInject <span style=color:#f92672>=</span> new <span style=color:#a6e22e>MethodInjection</span>(<span style=color:#e6db74>&#39;__construct&#39;</span>, <span style=color:#960050;background-color:#1e0010>$</span>argInjects);
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Remove construct definition
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>unset</span>(<span style=color:#960050;background-color:#1e0010>$</span>definition[<span style=color:#ae81ff>0</span>]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Parse definition <span style=color:#66d9ef>option</span>
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span><span style=color:#66d9ef>option</span> <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>definition[<span style=color:#e6db74>&#39;__option&#39;</span>] <span style=color:#f92672>??</span> [];
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>is_array</span>(<span style=color:#960050;background-color:#1e0010>$</span><span style=color:#66d9ef>option</span>)) <span style=color:#960050;background-color:#1e0010>{</span>
+</span></span><span style=display:flex><span>        throw new <span style=color:#a6e22e>InvalidArgumentException</span>(<span style=color:#e6db74>&#39;__option for definition must be array&#39;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Remove <span style=color:#f92672>`</span>__option<span style=color:#f92672>`</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>unset</span>(<span style=color:#960050;background-color:#1e0010>$</span>definition[<span style=color:#e6db74>&#39;__option&#39;</span>]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Parse definition properties
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>$</span>propertyInjects <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>foreach</span> (<span style=color:#960050;background-color:#1e0010>$</span>definition <span style=color:#66d9ef>as</span> <span style=color:#960050;background-color:#1e0010>$</span>propertyName <span style=color:#f92672>=&gt;</span> <span style=color:#960050;background-color:#1e0010>$</span>propertyValue) <span style=color:#960050;background-color:#1e0010>{</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>is_string</span>(<span style=color:#960050;background-color:#1e0010>$</span>propertyName)) <span style=color:#960050;background-color:#1e0010>{</span>
+</span></span><span style=display:flex><span>            throw new <span style=color:#a6e22e>InvalidArgumentException</span>(<span style=color:#e6db74>&#39;Property key from definition must be string&#39;</span>);
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        [<span style=color:#960050;background-color:#1e0010>$</span>proValue, <span style=color:#960050;background-color:#1e0010>$</span>proIsRef] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>getValueByRef</span>(<span style=color:#960050;background-color:#1e0010>$</span>propertyValue);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Parse property <span style=color:#66d9ef>for</span> array
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>is_array</span>(<span style=color:#960050;background-color:#1e0010>$</span>proValue)) <span style=color:#960050;background-color:#1e0010>{</span>
+</span></span><span style=display:flex><span>            <span style=color:#960050;background-color:#1e0010>$</span>proValue <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>parseArrayProperty</span>(<span style=color:#960050;background-color:#1e0010>$</span>proValue);
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>propertyInject <span style=color:#f92672>=</span> new <span style=color:#a6e22e>PropertyInjection</span>(<span style=color:#960050;background-color:#1e0010>$</span>propertyName, <span style=color:#960050;background-color:#1e0010>$</span>proValue, <span style=color:#960050;background-color:#1e0010>$</span>proIsRef);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#960050;background-color:#1e0010>$</span>propertyInjects[<span style=color:#960050;background-color:#1e0010>$</span>propertyName] <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>$</span>propertyInject;
+</span></span><span style=display:flex><span>    <span style=color:#960050;background-color:#1e0010>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> [<span style=color:#960050;background-color:#1e0010>$</span>constructInject, <span style=color:#960050;background-color:#1e0010>$</span>propertyInjects, <span style=color:#960050;background-color:#1e0010>$</span><span style=color:#66d9ef>option</span>];
+</span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>}</span>
+</span></span></code></pre></div><p>解析<code>__construct</code>方法和传参，解析属性信息。</p><p>回到<code>updateObjectDefinitionByDefinition</code>方法，将<code>__construct</code>和类属性信息注册到<code>ObjectDefinition</code>对象上，到这里<code>parseDefinitions</code>方法执行完毕。</p><p>回到<code>Container</code>类的<code>init</code>方法，接下来调用了<code>initializeBeans</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> Initialize beans
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws InvalidArgumentException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>private function initializeBeans(): void
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>/*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>var</span> ObjectDefinition <span style=color:#f92672>$</span>objectDefinition <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>    foreach (<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>objectDefinitions as <span style=color:#f92672>$</span>beanName <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>$</span>objectDefinition) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>scope <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>objectDefinition<span style=color:#f92672>-&gt;</span>getScope();
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Exclude request
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>scope <span style=color:#f92672>===</span> Bean::REQUEST) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>requestDefinitions[<span style=color:#f92672>$</span>beanName] <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>objectDefinition;
+</span></span><span style=display:flex><span>            unset(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>objectDefinitions[<span style=color:#f92672>$</span>beanName]);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>continue</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> Exclude session
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>scope <span style=color:#f92672>===</span> Bean::SESSION) {
+</span></span><span style=display:flex><span>            <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>sessionDefinitions[<span style=color:#f92672>$</span>beanName] <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>objectDefinition;
+</span></span><span style=display:flex><span>            unset(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>objectDefinitions[<span style=color:#f92672>$</span>beanName]);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>continue</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>//</span> New bean
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>newBean(<span style=color:#f92672>$</span>beanName);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>对于<code>scope</code>不为<code>Bean::REQUEST</code>和<code>Bean::SESSION</code>的，调用<code>newBean</code>方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-gdscript3 data-lang=gdscript3><span style=display:flex><span><span style=color:#f92672>/**</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> Initialize beans
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param string <span style=color:#f92672>$</span>beanName
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>param string <span style=color:#f92672>$</span>id
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span><span style=color:#66d9ef>return</span> object
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*</span> <span style=color:#960050;background-color:#1e0010>@</span>throws ReflectionException
+</span></span><span style=display:flex><span>    <span style=color:#f92672>*/</span>
+</span></span><span style=display:flex><span>private function newBean(string <span style=color:#f92672>$</span>beanName, string <span style=color:#f92672>$</span>id <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;&#39;</span>)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> First, check bean whether has been create<span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (isset(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>singletonPool[<span style=color:#f92672>$</span>beanName]) <span style=color:#f92672>||</span> isset(<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>prototypePool[<span style=color:#f92672>$</span>beanName])) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>get(<span style=color:#f92672>$</span>beanName);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Get object definition
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>objectDefinition <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>getNewObjectDefinition(<span style=color:#f92672>$</span>beanName);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>scope     <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>objectDefinition<span style=color:#f92672>-&gt;</span>getScope();
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>alias     <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>objectDefinition<span style=color:#f92672>-&gt;</span>getAlias();
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>className <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>objectDefinition<span style=color:#f92672>-&gt;</span>getClassName();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Cache reflection <span style=color:#66d9ef>class</span> info
+</span></span><span style=display:flex><span>    Reflections::cache(<span style=color:#f92672>$</span>className);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Before initialize bean
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>beforeInit(<span style=color:#f92672>$</span>beanName, <span style=color:#f92672>$</span>className, <span style=color:#f92672>$</span>objectDefinition);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>constructArgs   <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>constructInject <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>objectDefinition<span style=color:#f92672>-&gt;</span>getConstructorInjection();
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>constructInject <span style=color:#f92672>!==</span> null) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>constructArgs <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>getConstructParams(<span style=color:#f92672>$</span>constructInject, <span style=color:#f92672>$</span>id);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>propertyInjects <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>objectDefinition<span style=color:#f92672>-&gt;</span>getPropertyInjections();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Proxy <span style=color:#66d9ef>class</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>handler) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>className <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>handler<span style=color:#f92672>-&gt;</span>classProxy(<span style=color:#f92672>$</span>className);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>reflectionClass <span style=color:#f92672>=</span> new ReflectionClass(<span style=color:#f92672>$</span>className);
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>reflectObject   <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>newInstance(<span style=color:#f92672>$</span>reflectionClass, <span style=color:#f92672>$</span>constructArgs);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Inject properties values
+</span></span><span style=display:flex><span>    <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>newProperty(<span style=color:#f92672>$</span>reflectObject, <span style=color:#f92672>$</span>reflectionClass, <span style=color:#f92672>$</span>propertyInjects, <span style=color:#f92672>$</span>id);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Alias
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>empty(<span style=color:#f92672>$</span>alias)) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>aliases[<span style=color:#f92672>$</span>alias] <span style=color:#f92672>=</span> <span style=color:#f92672>$</span>beanName;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>//</span> Call init method <span style=color:#66d9ef>if</span> exist
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>$</span>reflectionClass<span style=color:#f92672>-&gt;</span>hasMethod(self::INIT_METHOD)) {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>$</span>reflectObject<span style=color:#f92672>-&gt;</span>{self::INIT_METHOD}();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>$</span>this<span style=color:#f92672>-&gt;</span>setNewBean(<span style=color:#f92672>$</span>beanName, <span style=color:#f92672>$</span>scope, <span style=color:#f92672>$</span>reflectObject, <span style=color:#f92672>$</span>id);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>通过反射实例化<code>Bean</code>对应的类，注册对应的属性。</p><p>如果类存在<code>self::INIT_METHOD</code>方法，执行此方法。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-fallback data-lang=fallback><span style=display:flex><span>/**
+</span></span><span style=display:flex><span>    * @param string $beanName
+</span></span><span style=display:flex><span>    * @param string $scope
+</span></span><span style=display:flex><span>    * @param object $object
+</span></span><span style=display:flex><span>    * @param string $id
+</span></span><span style=display:flex><span>    *
+</span></span><span style=display:flex><span>    * @return object
+</span></span><span style=display:flex><span>    */
+</span></span><span style=display:flex><span>private function setNewBean(string $beanName, string $scope, $object, string $id = &#39;&#39;)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    switch ($scope) {
+</span></span><span style=display:flex><span>        case Bean::SINGLETON: // Singleton
+</span></span><span style=display:flex><span>            $this-&gt;singletonPool[$beanName] = $object;
+</span></span><span style=display:flex><span>            break;
+</span></span><span style=display:flex><span>        case Bean::PROTOTYPE:
+</span></span><span style=display:flex><span>            $this-&gt;prototypePool[$beanName] = $object;
+</span></span><span style=display:flex><span>            // Clone it
+</span></span><span style=display:flex><span>            $object = clone $object;
+</span></span><span style=display:flex><span>            break;
+</span></span><span style=display:flex><span>        case Bean::REQUEST:
+</span></span><span style=display:flex><span>            $this-&gt;requestPool[$id][$beanName] = $object;
+</span></span><span style=display:flex><span>            break;
+</span></span><span style=display:flex><span>        case Bean::SESSION:
+</span></span><span style=display:flex><span>            $this-&gt;sessionPool[$id][$beanName] = $object;
+</span></span><span style=display:flex><span>            break;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    return $object;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><code>setNewBean</code>方法，根据对应的scope信息，将实例化后的反射类注册到对应的类属性上。</p><p>到这里<code>BeanProcessor</code>类就执行完了。</p></div><footer class=post-footer><ul class=post-tags><li><a href=https://liudon.com/tags/swoft/>Swoft</a></li></ul><nav class=paginav><a class=prev href=https://liudon.com/posts/curl-cost-time-long/><span class=title>« Prev</span><br><span>一个Curl的耗时长的问题</span>
+</a><a class=next href=https://liudon.com/posts/swoft-anaotion-processor-analysis/><span class=title>Next »</span><br><span>Swoft 框架运行分析（二） —— AnnotationProcessor模块分析</span></a></nav></footer><div><div class=post_ads><ins class=adsbygoogle style=display:block data-ad-client=ca-pub-4739645989170648 data-ad-slot=5019102040 data-ad-format=auto data-full-width-responsive=true></ins><script>window.addEventListener("load",function(){(adsbygoogle=window.adsbygoogle||[]).push({})})</script></div><div class=pagination__title><span class=pagination__title-h style=font-size:20px>💬评论</span><hr></div><div id=tcomment></div><script src=https://cdnjs.cloudflare.com/ajax/libs/twikoo/1.6.41/twikoo.all.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script>twikoo.init({envId:"https://comment.liudon.com",el:"#tcomment",lang:"zh-CN",region:"ap-shanghai",path:window.TWIKOO_MAGIC_PATH||window.location.pathname})</script></div></article></main><footer class=footer><span>&copy; 2025 <a href=https://liudon.com/>流动</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg></a><footer class=footer style=margin-top:-20px;padding-top:0><span><a href=https://beian.miit.gov.cn target=_blank>京ICP备13029522号-2</a></span></footer><script src=//tokinx.github.io/ViewImage/view-image.min.js async></script><script>function initViewImage(){window.ViewImage&&ViewImage.init(".post-content img")}document.readyState==="complete"?initViewImage():window.addEventListener("load",initViewImage)</script><script>const host=window.location.host;host!=="blog.liudon.xyz"&&!host.startsWith("liudon.")&&!host.startsWith("localhost")&&!host.startsWith("127.0.0.1")&&(document.body.innerHTML=['<div style="margin: auto;">',"<h1>当前页面并非本人博客，即将在2秒后跳转到本人博客: https://liudon.com。</h1>","<br />","</div>"].join(""),document.body.style=["background-color: white;","color: black;","text-align: center;","font-size: 50px;","width: 100vw;","height: 100vh;","display: flex;"].join(""),setTimeout(()=>{window.location.href="https://liudon.com"},2e3))</script><script>enScroll=!1,enFdl=!1,extCurrent=0[0],filename=0[0],targetText=0[0],splitOrigin=0[0];const lStor=localStorage,sStor=sessionStorage,doc=document,docEl=document.documentElement,docBody=document.body,docLoc=document.location,w=window,s=screen,nav=navigator||{},extensions=["pdf","xls","xlsx","doc","docx","txt","rtf","csv","exe","key","pps","ppt","pptx","7z","pkg","rar","gz","zip","avi","mov","mp4","mpe","mpeg","wmv","mid","midi","mp3","wav","wma"];function a(e,t,n,o){const j="G-G9ZDJQN9E2",r=()=>Math.floor(Math.random()*1e9)+1,c=()=>Math.floor(Date.now()/1e3),F=()=>(sStor._p||(sStor._p=r()),sStor._p),E=()=>r()+"."+c(),_=()=>(lStor.cid_v4||(lStor.cid_v4=E()),lStor.cid_v4),m=lStor.getItem("cid_v4"),v=()=>m?0[0]:enScroll==!0?0[0]:"1",p=()=>(sStor.sid||(sStor.sid=c()),sStor.sid),O=()=>{if(!sStor._ss)return sStor._ss="1",sStor._ss;if(sStor.getItem("_ss")=="1")return 0[0]},a="1",g=()=>{if(sStor.sct)if(enScroll==!0)return sStor.sct;else x=+sStor.getItem("sct")+ +a,sStor.sct=x;else sStor.sct=a;return sStor.sct},i=docLoc.search,b=new URLSearchParams(i),h=["q","s","search","query","keyword"],y=h.some(e=>i.includes("&"+e+"=")||i.includes("?"+e+"=")),u=()=>y==!0?"view_search_results":enScroll==!0?"scroll":enFdl==!0?"file_download":"page_view",f=()=>enScroll==!0?"90":0[0],C=()=>{if(u()=="view_search_results"){for(let e of b)if(h.includes(e[0]))return e[1]}else return 0[0]},d=encodeURIComponent,k=e=>{let t=[];for(let n in e)e.hasOwnProperty(n)&&e[n]!==0[0]&&t.push(d(n)+"="+d(e[n]));return t.join("&")},A=!1,S="https://liudon.com/analytics/post",M=k({tid:j,_p:F(),v:"2",sr:(s.width*w.devicePixelRatio+"x"+s.height*w.devicePixelRatio).toString(),ul:(nav.language||0[0]).toLowerCase(),cid:_(),_fv:v(),_s:"1",dl:docLoc.origin+docLoc.pathname+i,dt:doc.title||0[0],dr:doc.referrer||0[0],sid:p(),sct:g(),seg:"1",en:u(),"epn.percent_scrolled":f(),"ep.search_term":C(),"ep.file_extension":e||0[0],"ep.file_name":t||0[0],"ep.link_text":n||0[0],"ep.link_url":o||0[0],_ss:O(),_dbg:A?1:0[0]}),l=S+"?"+M;if(nav.sendBeacon)nav.sendBeacon(l);else{let e=new XMLHttpRequest;e.open("POST",l,!0)}}a();function sPr(){return(docEl.scrollTop||docBody.scrollTop)/((docEl.scrollHeight||docBody.scrollHeight)-docEl.clientHeight)*100}doc.addEventListener("scroll",sEv,{passive:!0});function sEv(){const e=sPr();if(e<90)return;enScroll=!0,a(),doc.removeEventListener("scroll",sEv,{passive:!0}),enScroll=!1}document.addEventListener("DOMContentLoaded",function(){let e=document.getElementsByTagName("a");for(let t=0;t<e.length;t++)if(e[t].getAttribute("href")!=null){const n=e[t].getAttribute("href"),s=n.substring(n.lastIndexOf("/")+1),o=s.split(".").pop();(e[t].hasAttribute("download")||extensions.includes(o))&&e[t].addEventListener("click",fDl,{passive:!0})}});function fDl(e){enFdl=!0;const t=e.currentTarget.getAttribute("href"),n=t.substring(t.lastIndexOf("/")+1),s=n.split(".").pop(),o=n.replace("."+s,""),i=e.currentTarget.text,r=t.replace(docLoc.origin,"");a(s,o,i,r),enFdl=!1}</script><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>
