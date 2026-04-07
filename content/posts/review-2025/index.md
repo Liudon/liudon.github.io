@@ -41,7 +41,7 @@ tags: ["年终总结"]
 
 今年产出较少，全年更新了11篇内容，共计3687字。
 
-![全年访问趋势](2025-blog-analysis)
+![全年访问趋势](2025-blog-analysis.png)
 
 访问最高的文章为[wrenAI本地LLM模型部署](https://liudon.com/posts/wrenai-local-llm-usage-guide/)。
 
