@@ -75,8 +75,8 @@ jobs:
           # cd ../
 
           curl -L https://imagemagick.org/archive/binaries/magick -o magick
-          mv magick "$HOME/bin/"
-          chmod +x "$HOME/bin/magick"
+          mv magick /usr/local/bin/
+          chmod +x /usr/local/bin/magick
 
           find ./content/posts/ -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" \) -exec magick {} -pointsize 48 -fill "#909090" -font ./static/ArchitectsDaughter-Regular.ttf -gravity south -annotate +0+20 "@liudon\nhttps://liudon.com" -resize 1080x\> {} \;
           find ./content/posts/ -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" \) -exec magick {} -quality 75 -define webp:image-hint=photo {}_1080x.webp \;
