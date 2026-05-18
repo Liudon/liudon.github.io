@@ -42,19 +42,18 @@ outputFormats:
     rel: alternate
     isPlainText: true
 
-
 outputs:
-    home:
-      - html
-      - RSS
-      - jsonfeed
-      - json
+  home:
+    - html
+    - RSS
+    - jsonfeed
+    - json
 
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
   title: 流动
   description: "生活就是一个流动的过程"
-  keywords: [流动,博客,liudon,生活,技术]
+  keywords: [流动, 博客, liudon, 生活, 技术]
   author: Liudon
   DateFormat: "2006-01-02"
   defaultTheme: auto # dark, light
@@ -73,14 +72,14 @@ params:
 
   robotsNoIndex: false
 
-  social: true
+  # social: true
 
   ShowToc: true # 显示目录
   TocOpen: true # 自动展开目录
 
   assets:
     disableHLJS: true # to disable highlight.js
-    
+
   twikoo:
     version: 1.5.11
 
@@ -105,7 +104,7 @@ params:
   #    SiteVerificationTag: "G-G9ZDJQN9E2"
 
   responsiveImages: true
-  
+
   cover:
     hidden: false # hide everywhere but not in structured data
     hiddenInList: false # hide on list pages and home

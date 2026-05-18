@@ -1,0 +1,9 @@
+<figure{{ if or (.Get "class") (eq (.Get "align") "center") }} class="
+           {{- if eq (.Get "align") "center" }}align-center {{ end }}
+           {{- with .Get "class" }}{{ . }}{{- end }}"
+{{- end -}}>
+    <audio controls>
+      <source src={{ .Get "src" }} type="audio/wav">
+      Your browser does not support the audio element.
+    </audio>
+</figure>
