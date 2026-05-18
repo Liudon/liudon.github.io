@@ -671,7 +671,7 @@ pip install -e .[cu128]
 
 ## 方案总结
 
-从音色相似度上来看，Fish Speech ≈ CosyVoice > IndexTTS >>> GPT-SoVITS。
+从音色相似度上来看，Fish Speech ≈ CosyVoice > IndexTTS >>> GPT-SoVITS。GPT-SoVITS的音色完全不像，看资料需要推理训练。
 
 从合成耗时上来看，Index-TTS > Fish Speech >> CosyVoice ≈ GPT-SoVITS。
 
