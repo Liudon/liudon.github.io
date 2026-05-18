@@ -58,6 +58,8 @@ CPU 16 vCPU Intel(R) Xeon(R) Platinum 8352V CPU @ 2.10GHz
 
 ### IndexTTS-2
 
+项目地址：[https://github.com/index-tts/index-tts](https://github.com/index-tts/index-tts)
+
 > Index-TTS2是一款突破性的自回归零样本文本转语音模型，专为精确时长控制而设计，这对于视频配音等应用至关重要。它实现了情感表达和说话者身份之间的解耦，从而能够独立控制音色和情感。该模型融合了GPT潜在表示，并具有基于文本描述的软指令机制，以增强情感控制。
 
 #### 部署测试
@@ -261,6 +263,8 @@ hf download Plachta/JDCnet bst.t7
 
 ### CosyVoice
 
+项目地址：[https://github.com/FunAudioLLM/CosyVoice](https://github.com/FunAudioLLM/CosyVoice)
+
 > CosyVoice 2是一款基于大型语言模型的流式语音合成模型，采用统一的流式/非流式框架设计。它在流式模式下实现了150毫秒的超低延迟，同时保持了卓越的质量。与1.0版本相比，它将发音错误减少了30-50%，并将MOS分数从5.4提高到5.53，并能对情感和方言进行精细控制。
 
 本次测试选用CosyVoice2-0.5B这个模型。
@@ -334,6 +338,8 @@ pip install --build-constraint build-constraints.txt -r requirements.txt
 ```
 
 ### GPT-SoVITS
+
+项目地址：[https://github.com/RVC-Boss/GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS)
 
 > 强大的少样本语音转换与语音合成Web用户界面.
 
@@ -547,6 +553,8 @@ Exiting with exit code 0
 ```
 
 ### Fish Speech
+
+项目地址：[https://github.com/fishaudio/fish-speech](https://github.com/fishaudio/fish-speech)
 
 > Fish Audio S2 Pro 是 Fish Audio 开发的最先进的多模态模型。S2 Pro 训练自超过 1000 万小时 的海量音频数据，覆盖全球 80 多种语言。通过创新的 双自回归 (Dual-AR) 架构与强化学习 (RL) 对齐技术，S2 Pro 能生成极具自然感、真实感且情感饱满的语音，在开源与闭源竞争中均处于领先地位。
 
