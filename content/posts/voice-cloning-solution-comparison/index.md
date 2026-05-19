@@ -108,15 +108,11 @@ modelscope download --model IndexTeam/IndexTTS-2 --local_dir checkpoints
 uv run tools/gpu_check.py
 Scanning for PyTorch hardware acceleration devices...
 
-PyTorch: No devices found for NVIDIA CUDA / AMD ROCm backend.
-PyTorch: No devices found for Intel XPU backend.
-PyTorch: Apple MPS is available!
-  * Number of MPS devices found: 1
-
+...
 Hardware acceleration detected. Your system is ready!
 ```
 
-看到`Your system is ready!`表示环境已经部署好了，可以开始合成测试了。
+看到这个表示环境已经部署好了，可以开始合成测试了。
 
 5. 合成测试
 
@@ -124,7 +120,7 @@ Hardware acceleration detected. Your system is ready!
 
 - 将834行`prompt_wav = "examples/voice_01.wav"`中的文件路径改为实际测试音频文件路径。
   
-- 将835行`text = '欢迎大家来体验indextts2，并给予我们意见与反馈，谢谢大家。'`中的内容改为你自定义的文本，Welcome to Beijing, President Trump.北京欢迎你，特朗普总统。
+- 将835行`text = '欢迎大家来体验indextts2，并给予我们意见与反馈，谢谢大家。'`中的内容改为你自定义的文本。
   
 - 将842行`tts.infer(spk_audio_prompt=prompt_wav, text=text, output_path="gen.wav", verbose=True)`下面的代码全部删掉。
 
@@ -137,6 +133,8 @@ PYTHONPATH="$PYTHONPATH:." uv run indextts/infer_v2.py
 合成耗时在**2min+**，合成后的音频效果：
 
 {{< audio src="indextts.wav" >}}
+
+我把这段合成音频发给我老婆后，她在第一时间并没有察觉这是 AI 生成的。对于零样本合成来说，这个效果是非常好了。
 
 #### 问题整理
 
@@ -265,9 +263,9 @@ hf download Plachta/JDCnet bst.t7
 
 项目地址：[https://github.com/FunAudioLLM/CosyVoice](https://github.com/FunAudioLLM/CosyVoice)
 
-> CosyVoice 2是一款基于大型语言模型的流式语音合成模型，采用统一的流式/非流式框架设计。它在流式模式下实现了150毫秒的超低延迟，同时保持了卓越的质量。与1.0版本相比，它将发音错误减少了30-50%，并将MOS分数从5.4提高到5.53，并能对情感和方言进行精细控制。
+> CosyVoice 3.0 是一款基于大型语言模型 (LLM) 的高级文本转语音 (TTS) 系统，在内容一致性、说话人相似度和韵律自然度方面均超越了其前代产品 (CosyVoice 2.0)。它专为实际环境中的零样本多语言语音合成而设计。
 
-本次测试选用CosyVoice2-0.5B这个模型。
+本次测试选用CosyVoice3-0.5B这个模型。
 
 #### 部署测试
 
@@ -300,19 +298,30 @@ snapshot_download('iic/CosyVoice-ttsfrd', local_dir='pretrained_models/CosyVoice
 
 4. 合成测试
 
-测试python代码如下：
+新建测试文件demo_example.py，内容如下：
 
 ```
-cosyvoice = AutoModel(model_dir='pretrained_models/Fun-CosyVoice3-0.5B')
+import sys
+sys.path.append('third_party/Matcha-TTS')
+from cosyvoice.cli.cosyvoice import AutoModel
+import torchaudio
+
+def main():
+    """ CosyVoice3 Usage, check https://funaudiollm.github.io/cosyvoice3/ for more details
+    """
+    cosyvoice = AutoModel(model_dir='pretrained_models/Fun-CosyVoice3-0.5B')
     text = 'You are a helpful assistant.<|endofprompt|>Welcome to Beijing, President Trump. 北京欢迎你，特朗普总统。'
     for i, j in enumerate(cosyvoice.inference_cross_lingual(text, './child.wav', stream=False, speed=1.2)):
         torchaudio.save(f'cross_lingual_{i}.wav', j['tts_speech'], cosyvoice.sample_rate)
+
+if __name__ == '__main__':
+    main()
 ```
 
 执行测试脚本。
 
 ```
-python example.py
+python demo_example.py
 ```
 
 合成耗时在**24秒**，合成后的音频效果：
@@ -342,8 +351,6 @@ pip install --build-constraint build-constraints.txt -r requirements.txt
 项目地址：[https://github.com/RVC-Boss/GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS)
 
 > 强大的少样本语音转换与语音合成Web用户界面.
-
-这个是ChatGPT推荐的一款模型。
 
 #### 部署测试
 
@@ -645,7 +652,7 @@ python tools/api_client.py \
 
 合成的音频文件默认为generated_audio.wav文件。
 
-合成耗时在**1min+**，合成后的音频效果：
+命令行合成耗时在**1min+**，API合成耗时在**30s+**，合成后的音频效果：
 
 {{< audio src="fish-speech.wav" >}}
 
@@ -669,14 +676,40 @@ pip install -e .[cu128]
 
 增加--no-play参数即可。
 
+## 效果对比
+
+### 参考音频
+
+{{< audio src="child.wav" >}}
+
+### IndexTTS-2
+
+{{< audio src="indextts.wav" >}}
+
+### CosyVoice
+
+{{< audio src="cosyvoice.wav" >}}
+
+### GPT-SoVITS
+
+{{< audio src="GPT-SoVITS.wav" >}}
+
+### Fish Speech
+
+{{< audio src="fish-speech.wav" >}}
+
+从试听结果来看，IndexTTS-2、CosyVoice 和 Fish Speech 在零样本场景下的整体完成度更高，但IndexTTS-2的合成耗时明显更长。
+
+GPT-SoVITS 在当前零样本测试中的音色相似度不占优势，但其 few-shot 训练路线更完整，仍然更适合作为长期投入方案。
+
 ## 方案总结
 
-从音色相似度上来看，Fish Speech ≈ CosyVoice > IndexTTS >>> GPT-SoVITS。GPT-SoVITS的音色完全不像，看资料需要推理训练。
+结合这次在同一测试环境、同一参考音频和同一目标文本下的部署与试听结果，可以得到一个比较清晰的结论：
 
-从合成耗时上来看，Index-TTS > Fish Speech >> CosyVoice ≈ GPT-SoVITS。
+从零样本音色相似度来看，**Fish Speech** 和 **CosyVoice** 的整体表现更突出，**IndexTTS-2** 次之，**GPT-SoVITS** 在当前零样本测试中的效果相对一般。如果目标是尽快验证“零样本音色克隆是否可用”，CosyVoice 会是更稳妥的选择。
 
-从部署难度上来看，Index-TTS > GPT-SoVITS > Fish Speech ≈ CosyVoice。
+从推理耗时来看，**GPT-SoVITS** 最快，单次合成大约在 10 秒左右；**CosyVoice** 次之，约 24 秒；**Fish Speech** 大约 1 分钟；**IndexTTS-2** 最慢，约 2 分 38 秒。对于需要更高响应速度的场景，GPT-SoVITS 和 CosyVoice 更有优势。
 
-Fish Speech和CosyVoice都提供了Docker部署方式；Fish Speech要求内存为24GB，CosyVoice对硬件要求要低一些。
+从部署复杂度来看，**CosyVoice** 整体最平衡，安装和调试成本相对最低；**Fish Speech** 和 **GPT-SoVITS** 都需要处理更多依赖和环境细节；**IndexTTS-2** 的网络依赖和外部模型链路较多，部署过程中的不确定性也更高。
 
-对于零样本合成场景，从上述对比来看，我更推荐CosyVoice方案。
+对于零样本合成场景，快速上手的话，我更推荐**CosyVoice**方案。
