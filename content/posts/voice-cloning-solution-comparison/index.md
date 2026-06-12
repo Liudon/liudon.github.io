@@ -1,7 +1,7 @@
 ---
-title: "2026 音色克隆方案对比：IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech 部署与实测"
+title: "2026 音色克隆方案对比：IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech、VoxCPM 部署与实测"
 slug: "voice-cloning-solution-comparison"
-description: "系统对比 IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech 四大音色克隆方案，详解部署步骤、测试方法、硬件要求、CPU 支持、优缺点与选型建议。"
+description: "系统对比 IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech、VoxCPM 五大音色克隆方案，详解部署步骤、测试方法、硬件要求、CPU 支持、优缺点与选型建议。"
 summary: "一篇讲清楚四套主流音色克隆方案部署、测试、硬件门槛和选型建议的实战文章。"
 date: 2026-05-18T15:19:23+08:00
 draft: false
@@ -14,6 +14,7 @@ tags:
   - CosyVoice
   - GPT-SoVITS
   - Fish Speech
+  - VoxCPM
 keywords:
   - 音色克隆
   - voice cloning
@@ -21,6 +22,7 @@ keywords:
   - CosyVoice
   - GPT-SoVITS
   - Fish Speech
+  - VoxCPM
   - 零样本 TTS
   - few-shot TTS
   - TTS 方案对比
@@ -32,7 +34,11 @@ keywords:
 
 但真正进入部署和测试阶段后，问题往往并不只是“能不能出声音”，而是：哪套方案更容易部署，哪套方案语言混合更稳定，哪套方案的音色相似度更高。
 
-本文将围绕 **IndexTTS-2**、**CosyVoice**、**GPT-SoVITS**、**Fish Speech** 四套主流开源音色克隆方案，结合实际部署与测试过程，分析它们在部署复杂度、零样本效果、中英混合能力、服务化支持和后续训练价值上的差异，帮助你更快找到适合自己业务场景的方案。
+本文将围绕 **IndexTTS-2**、**CosyVoice**、**GPT-SoVITS**、**Fish Speech**、**VoxCPM** 五套主流开源音色克隆方案，结合实际部署与测试过程，分析它们在部署复杂度、零样本效果、中英混合能力、服务化支持和后续训练价值上的差异，帮助你更快找到适合自己业务场景的方案。
+
+```
+2026年6月12日更新，添加VoxCPM方案。
+```
 
 ## 部署验证
 
@@ -676,6 +682,33 @@ pip install -e .[cu128]
 
 增加--no-play参数即可。
 
+### VoxCPM
+
+项目地址：[https://github.com/OpenBMB/VoxCPM](https://github.com/OpenBMB/VoxCPM)
+
+#### 部署测试
+
+1. 安装服务
+
+```
+pip install voxcpm
+```
+
+2. 合成测试
+
+```
+voxcpm clone \
+    --text "This is a cloned voice sample." \
+    --reference-audio path/to/voice.wav \
+    --output out.wav
+```
+
+使用命令行方式，`--text`为克隆后的音频内容，`--reference-audio`为参考音频，`--output`为生成后的音频文件。
+
+第一次执行需要下载模型，会慢一些，合成耗时在**7s**左右，合成后的音频效果：
+
+{{< audio src="voxcpm.wav" >}}
+
 ## 效果对比
 
 ### 参考音频
@@ -698,18 +731,22 @@ pip install -e .[cu128]
 
 {{< audio src="fish-speech.wav" >}}
 
-从试听结果来看，IndexTTS-2、CosyVoice 和 Fish Speech 在零样本场景下的整体完成度更高，但IndexTTS-2的合成耗时明显更长。
+### VoxCPM
 
-GPT-SoVITS 在当前零样本测试中的音色相似度不占优势，但其 few-shot 训练路线更完整，仍然更适合作为长期投入方案。
+{{< audio src="voxcpm.wav" >}}
+
+从试听结果来看，IndexTTS-2、CosyVoice、Fish Speech 和 VoxCPM 的整体完成度更高，但IndexTTS-2的合成耗时明显更长。
 
 ## 方案总结
 
 结合这次在同一测试环境、同一参考音频和同一目标文本下的部署与试听结果，可以得到一个比较清晰的结论：
 
-从零样本音色相似度来看，**Fish Speech** 和 **CosyVoice** 的整体表现更突出，**IndexTTS-2** 次之，**GPT-SoVITS** 在当前零样本测试中的效果相对一般。如果目标是尽快验证“零样本音色克隆是否可用”，CosyVoice 会是更稳妥的选择。
+~~从样本音色相似度来看，**Fish Speech** 和 **CosyVoice** 的整体表现更突出，**IndexTTS-2** 次之，**GPT-SoVITS** 在当前测试中的效果相对一般。如果目标是尽快验证“零样本音色克隆是否可用”，CosyVoice 会是更稳妥的选择。~~
 
-从推理耗时来看，**GPT-SoVITS** 最快，单次合成大约在 10 秒左右；**CosyVoice** 次之，约 24 秒；**Fish Speech** 大约 1 分钟；**IndexTTS-2** 最慢，约 2 分 38 秒。对于需要更高响应速度的场景，GPT-SoVITS 和 CosyVoice 更有优势。
+~~从推理耗时来看，**GPT-SoVITS** 最快，单次合成大约在 10 秒左右；**CosyVoice** 次之，约 24 秒；**Fish Speech** 大约 1 分钟；**IndexTTS-2** 最慢，约 2 分 38 秒。对于需要更高响应速度的场景，GPT-SoVITS 和 CosyVoice 更有优势。~~
 
-从部署复杂度来看，**CosyVoice** 整体最平衡，安装和调试成本相对最低；**Fish Speech** 和 **GPT-SoVITS** 都需要处理更多依赖和环境细节；**IndexTTS-2** 的网络依赖和外部模型链路较多，部署过程中的不确定性也更高。
+~~从部署复杂度来看，**CosyVoice** 整体最平衡，安装和调试成本相对最低；**Fish Speech** 和 **GPT-SoVITS** 都需要处理更多依赖和环境细节；**IndexTTS-2** 的网络依赖和外部模型链路较多，部署过程中的不确定性也更高。~~
 
-对于零样本合成场景，快速上手的话，我更推荐**CosyVoice**方案。
+~~快速上手的话，我更推荐**CosyVoice**方案。~~
+
+**VoxCPM** 部署简单，效果非常好，同时支持cpu/cuda/mps方式运行，强烈推荐！！！
