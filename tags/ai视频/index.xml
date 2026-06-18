@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>AI视频 on 流动</title>
+    <link>https://liudon.com/tags/ai%E8%A7%86%E9%A2%91/</link>
+    <description>Recent content in AI视频 on 流动</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 17 Jun 2026 15:45:03 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/ai%E8%A7%86%E9%A2%91/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>2026年对口型视频合成方案对比：Wav2Lip、VideoReTalking、 MuseTalk 部署与实测</title>
+      <link>https://liudon.com/posts/lip-sync-video-synthesis-comparison/</link>
+      <pubDate>Wed, 17 Jun 2026 15:45:03 +0800</pubDate>
+      <guid>https://liudon.com/posts/lip-sync-video-synthesis-comparison/</guid>
+      <description>实测对比 Wav2Lip、VideoReTalking 和 MuseTalk 三种对口型视频合成方案，分析部署难度、推理速度、画面质量和适用场景。</description>
+    </item>
+  </channel>
+</rss>

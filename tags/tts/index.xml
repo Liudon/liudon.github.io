@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>TTS on 流动</title>
+    <link>https://liudon.com/tags/tts/</link>
+    <description>Recent content in TTS on 流动</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 18 May 2026 15:19:23 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/tts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>2026年音色克隆方案对比：IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech、VoxCPM 部署与实测</title>
+      <link>https://liudon.com/posts/voice-cloning-solution-comparison/</link>
+      <pubDate>Mon, 18 May 2026 15:19:23 +0800</pubDate>
+      <guid>https://liudon.com/posts/voice-cloning-solution-comparison/</guid>
+      <description>系统对比 IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech、VoxCPM 五大音色克隆方案，详解部署步骤、测试方法、硬件要求、CPU 支持、优缺点与选型建议。</description>
+    </item>
+  </channel>
+</rss>

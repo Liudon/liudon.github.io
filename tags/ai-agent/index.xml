@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Ai Agent on 流动</title>
+    <link>https://liudon.com/tags/ai-agent/</link>
+    <description>Recent content in Ai Agent on 流动</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Tue, 14 Apr 2026 22:12:17 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/ai-agent/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AI Agent折腾记（OpenClaw / Hermes Agent）</title>
+      <link>https://liudon.com/posts/deploy-ai-agent/</link>
+      <pubDate>Tue, 14 Apr 2026 22:12:17 +0800</pubDate>
+      <guid>https://liudon.com/posts/deploy-ai-agent/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;AI 智能体（AI Agent）是一种能够感知环境、进行推理并自主行动以实现特定目标的智能系统。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;OpenClaw和Hermes Agent属于目前开源社区最受关注的两个项目。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
