@@ -4,7 +4,7 @@ slug: "lip-sync-video-synthesis-comparison"
 date: 2026-06-17T15:45:03+08:00
 draft: false
 description: "实测对比 Wav2Lip、VideoReTalking 和 MuseTalk 三种对口型视频合成方案，分析部署难度、推理速度、画面质量和适用场景。"
-summary: "本文基于 AutoDL RTX 4090 环境，对 Wav2Lip、VideoReTalking 和 MuseTalk 三种对口型视频合成方案进行部署验证和效果对比，并补充 Wav2Lip 输出模糊时使用 GFPGAN 做面部增强的优化方法。"
+summary: "本文基于 AutoDL RTX 4090 环境，对 Wav2Lip、VideoReTalking 和 MuseTalk 三种对口型视频合成方案进行部署验证和效果对比。"
 tags: 
   - Wav2Lip
   - VideoReTalking
