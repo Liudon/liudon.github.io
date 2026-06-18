@@ -393,7 +393,7 @@ sys     0m59.808s
 
 {{< video src="musetalk.mp4" >}}
 
-基于本次测试素材来看，MuseTalk 的画面质量最优，Video-ReTalking次之，Wav2Lip最差，抖动最明显。
+基于本次测试素材来看，MuseTalk 的画面质量最优，Video-ReTalking次之，隐约看见嘴部抖动，Wav2Lip最差，抖动最明显，可以通过 **GFPGAN** 进行后处理优化。
 
 从合成速度来看，从快到慢依次为：Wav2Lip Fast、MuseTalk、Video-ReTalking、Wav2Lip Enhanced。
 
