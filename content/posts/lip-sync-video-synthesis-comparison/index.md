@@ -30,6 +30,16 @@ keywords:
 
 上一篇我们已经讲了音色克隆，今天我们来看一下对口型视频合成的实现。
 
+## 方案总结
+
+| 方案                     | 部署难度 | 推理速度                    | 画面质量         | 适合场景           |
+| ---------------------- | ---- | ----------------------- | ------------ | -------------- |
+| Wav2Lip / Easy-Wav2Lip | 中等   | Fast 模式最快，Enhanced 模式最慢 | 一般，嘴部和脸部容易模糊，可以引入 **GFPGAN** 进行后处理优化 | 快速验证、低成本批量测试   |
+| Video-ReTalking        | 较高   | 中等偏慢                    | 较好，带人脸增强流程   | 高质量离线视频合成      |
+| MuseTalk               | 较高   | 较快                      | 本次测试最好       | 数字人、实时或准实时口型驱动 |
+
+从本次测试结果看，如果只是快速验证流程，Wav2Lip / Easy-Wav2Lip 成本最低；如果更重视最终观感，可以考虑 Video-ReTalking；如果希望在速度和效果之间取得更好的平衡，MuseTalk 是目前更推荐的方案。
+
 ## 部署验证
 
 > 本次所有测试全部在[AutoDL](https://autodl.com/)平台进行。
@@ -91,19 +101,19 @@ python install.py
 
 ```
 python inference.py \
-    --checkpoint_path checkpoints/Wav2Lip_GAN.pth \
+    --checkpoint_path checkpoints/Wav2Lip.pth \
     --face input.mp4 \
     --audio input.wav \
     --outfile output.mp4 \
     --out_height 1608
 ```
 
-默认合成的视频分辨率较低，可以通过 `--out_height` 指定输出视频高度，例如设置为原视频高度，以尽量保持输出分辨率。
+默认合成的视频分辨率较低，可以通过 `--out_height` 指定输出视频高度，这里设置为原视频高度，以尽量保持输出分辨率。
 
 实际耗时如下：
 
 ```
-# --quality Fast
+# 不指定--quality参数，默认为 Fast
 real    0m23.950s
 user    1m13.251s
 sys     1m1.965s
@@ -112,6 +122,60 @@ sys     1m1.965s
 real    13m55.324s
 user    196m45.613s
 sys     6m58.818s
+```
+
+支持三档质量模式：
+
+| 模式 | 说明 | 速度 | 质量 |
+|------|------|------|------|
+| **Fast** | 原始 Wav2Lip | 最快 | 基础 |
+| **Improved** | Wav2Lip + 嘴部羽化遮罩 | 快 | 较好，去除嘴部方块感 |
+| **Enhanced** | Wav2Lip + 遮罩 + GFPGAN 超分辨率 | 较慢 | 最好，面部清晰度大幅提升 |
+
+实际测试指定 **Improved** 或者 **Enhanced** 档质量，效果反而不如 **Fast**档；切换使用 **Wav2Lip_GAN.pth** 模型，效果也没有提升。
+
+默认合成的视频嘴部模糊抖动，可以引入 **GFPGAN** 进行面部增强。
+
+1. 安装 **GFPGAN**
+
+```
+git clone https://github.com/TencentARC/GFPGAN.git
+cd GFPGAN
+pip install -r requirements.txt
+python setup.py develop
+```
+
+2. 拆帧
+
+```
+mkdir -p /tmp/wav2lip_frames /tmp/wav2lip_enhanced
+ffmpeg -i output.mp4 /tmp/wav2lip_frames/%05d.png
+```
+
+3. GFPGAN 逐帧增强
+
+```
+python inference_gfpgan.py \
+    -i /tmp/wav2lip_frames \
+    -o /tmp/wav2lip_enhanced \
+    -v 1.4 \
+    -s 2 \
+    --bg_upsampler none
+```
+
+4. 合回视频（保留原音频）
+
+```
+ffmpeg -framerate 25 -i /tmp/wav2lip_enhanced/restored_imgs/%05d.png \
+    -i output.mp4 \
+    -map 0:v -map 1:a \
+    -c:v libx264 -crf 18 output_enhanced.mp4
+```
+
+5. 清理临时文件
+
+```
+rm -rf /tmp/wav2lip_frames /tmp/wav2lip_enhanced
 ```
 
 ### Video-ReTalking
@@ -310,22 +374,16 @@ user    8m12.693s
 sys     0m59.808s
 ```
 
-## 方案对比总结
-
-| 方案                     | 部署难度 | 推理速度                    | 画面质量         | 适合场景           |
-| ---------------------- | ---- | ----------------------- | ------------ | -------------- |
-| Wav2Lip / Easy-Wav2Lip | 中等   | Fast 模式最快，Enhanced 模式最慢 | 一般，嘴部和脸部容易模糊 | 快速验证、低成本批量测试   |
-| Video-ReTalking        | 较高   | 中等偏慢                    | 较好，带人脸增强流程   | 高质量离线视频合成      |
-| MuseTalk               | 较高   | 较快                      | 本次测试最好       | 数字人、实时或准实时口型驱动 |
-
-从本次测试结果看，如果只是快速验证流程，Wav2Lip / Easy-Wav2Lip 成本最低；如果更重视最终观感，可以考虑 Video-ReTalking；如果希望在速度和效果之间取得更好的平衡，MuseTalk 是目前更推荐的方案。
-
 
 ## 效果对比
 
 ### Wav2Lip
 
 {{< video src="wav2lip.mp4" >}}
+
+### Wav2Lip + GFPGAN面部增强
+
+{{< video src="wav2lip_gfpgan.mp4" >}}
 
 ### Video-ReTalking
 
