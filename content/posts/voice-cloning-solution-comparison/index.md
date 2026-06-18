@@ -1,5 +1,5 @@
 ---
-title: "2026 音色克隆方案对比：IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech、VoxCPM 部署与实测"
+title: "2026年 音色克隆方案对比：IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech、VoxCPM 部署与实测"
 slug: "voice-cloning-solution-comparison"
 description: "系统对比 IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech、VoxCPM 五大音色克隆方案，详解部署步骤、测试方法、硬件要求、CPU 支持、优缺点与选型建议。"
 summary: "一篇讲清楚四套主流音色克隆方案部署、测试、硬件门槛和选型建议的实战文章。"

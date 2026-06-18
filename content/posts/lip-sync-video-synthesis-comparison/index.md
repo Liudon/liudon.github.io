@@ -1,10 +1,10 @@
 ---
-title: "对口型视频合成方案对比：Wav2Lip、VideoReTalking 与 MuseTalk"
+title: "2026 年对口型视频合成方案对比：Wav2Lip、VideoReTalking 与 MuseTalk 实测"
 slug: "lip-sync-video-synthesis-comparison"
 date: 2026-06-17T15:45:03+08:00
 draft: false
-description: "对比 Wav2Lip、VideoReTalking 和 MuseTalk 三种开源对口型视频合成方案，从安装难度、合成效果、推理速度、画质表现和适用场景等角度进行分析。"
-summary: "本文对比 Wav2Lip、VideoReTalking 和 MuseTalk 三种常见对口型视频合成方案，结合实际部署体验，分析它们在效果、速度、清晰度和工程落地方面的差异。"
+description: "实测对比 Wav2Lip、VideoReTalking 和 MuseTalk 三种对口型视频合成方案，分析部署难度、推理速度、画面质量和适用场景。"
+summary: "本文基于 AutoDL RTX 4090 环境，对 Wav2Lip、VideoReTalking 和 MuseTalk 三种对口型视频合成方案进行部署验证和效果对比，并补充 Wav2Lip 输出模糊时使用 GFPGAN 做面部增强的优化方法。"
 tags: 
   - Wav2Lip
   - VideoReTalking
