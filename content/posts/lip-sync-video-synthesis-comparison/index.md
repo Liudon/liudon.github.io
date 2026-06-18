@@ -1,5 +1,5 @@
 ---
-title: "2026 年对口型视频合成方案对比：Wav2Lip、VideoReTalking 与 MuseTalk 实测"
+title: "2026 年对口型视频合成方案对比：Wav2Lip、VideoReTalking、 MuseTalk 部署与实测"
 slug: "lip-sync-video-synthesis-comparison"
 date: 2026-06-17T15:45:03+08:00
 draft: false
