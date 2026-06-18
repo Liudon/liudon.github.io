@@ -6,9 +6,9 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the code branch
   push:
-    branches: [ code ]
+    branches: [code]
   pull_request:
-    branches: [ code ]
+    branches: [code]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -44,8 +44,8 @@ jobs:
       - name: Update config.yml version
         uses: fjogeleit/yaml-update-action@main
         with:
-          valueFile: 'config.yml'
-          propertyPath: 'params.twikoo.version'
+          valueFile: "config.yml"
+          propertyPath: "params.twikoo.version"
           value: ${{ steps.twikoo.outputs.twikoo_version }}
           commitChange: false
 
@@ -85,7 +85,7 @@ jobs:
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: 'latest'
+          hugo-version: "latest"
           extended: true
 
       - name: Build
@@ -114,7 +114,7 @@ jobs:
           curl -s -L https://github.com/usk81/easyindex-cli/releases/download/v1.0.6/easyindex-cli_1.0.6_linux_amd64.tar.gz | tar xz
           chmod +x ./easyindex-cli
           ./easyindex-cli google -d -c ./url.csv
-          
+
       - name: Generate robots.txt
         run: |
           echo "User-agent: *" > ./public/robots.txt
@@ -122,13 +122,13 @@ jobs:
 
       - name: Connect to ssh in BG
         timeout-minutes: 2
-        run: | 
+        run: |
           echo "${{ secrets.SSHKEY }}" > ../privkey
           chmod 600 ../privkey
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSHHOST }} -i ../privkey -L 5001:localhost:5001 -fTN
 
       - name: IPFS upload
-        uses: filebase/ipfs-action@master
+        uses: aquiladev/ipfs-action@master
         id: deploy
         timeout-minutes: 2
         with:
@@ -139,9 +139,9 @@ jobs:
           port: 5001
           protocol: http
           key: ipfs-action
-      
+
       - name: IPFS upload to filebase
-        uses: filebase/ipfs-action@master
+        uses: aquiladev/ipfs-action@master
         with:
           path: ./public
           service: filebase
