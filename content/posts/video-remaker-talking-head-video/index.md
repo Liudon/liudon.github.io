@@ -74,7 +74,7 @@ VibeCoding使人上头，每天起床第一件事就是看 Tibo 今天有没有�
 
 但是 DeepSeek 便宜量大，速度快，希望正式版能带来更大的惊喜。
 
-我用的 OpenCode GO，DeepSeek V4 Flash 比官方的量更多一些，15$ 可以用到 60$ 的用量。
+我用的 OpenCode GO，DeepSeek V4 Flash 比官方的量更多一些，10$ 可以用到 60$ 的用量。
 
 欢迎使用[我的邀请链接](https://opencode.ai/go?ref=AYV8HRXRZS)，我们都能获得 5$ 奖励。
 
