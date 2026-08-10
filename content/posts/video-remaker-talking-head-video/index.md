@@ -26,13 +26,13 @@ keywords:
 
 做自媒体的同学，有个口播视频的需求，希望能帮忙搞个工具出来。
 
-以前没有AI的时候，我还真不敢接这活，现在有了AI，决定试试看。
+以前没有 AI 的时候，我还真不敢接这活，现在有了 AI，决定试试看。
 
 前面做了调研，核心就是[语音克隆](https://liudon.com/posts/voice-cloning-solution-comparison/)和[对口型视频合成](https://liudon.com/posts/lip-sync-video-synthesis-comparison/)两个能力。
 
-在AutoDL平台先做了分步骤的单独验证，确定可行后再开始进行实际编码。
+在 AutoDL 平台先做了分步骤的单独验证，确定可行后再开始进行实际编码。
 
-经过2个月左右的开发验证，终于VibeCoding出来第一个小工具。
+经过两个月左右的开发验证，终于 VibeCoding 出来了第一个小工具 [VideoRemaker](https://videoremaker.liudon.xyz/)。
 
 ### VideoRemaker 是做什么的
 
@@ -62,16 +62,20 @@ VideoRemaker 分为服务端和客户端。
 
 ### VibeCoding体验
 
-早期使用Claude出方案，Codex编码，但是不久Claude就被封号了，所以基本上都是Codex干的活，官网落地页和管理平台少量使用了DeepSeek进行开发。
+早期使用 Claude 出方案，Codex 编码，但是不久 Claude 就被封号了，所以基本上都是 Codex 干的活，官网落地页和管理平台少量使用了 DeepSeek 进行开发。
 
-一开始受限于Codex的5h限额，基本上一个任务就触发限额了。
+一开始受限于 Codex 的 5h 限额，基本上一个任务就触发限额了。
 
-7月份Codex不断重置，同时去掉了5h限额，终于能愉快的编码了。
+7月份 Codex 不断重置，同时去掉了 5h 限额，终于能愉快的编码了。
 
 VibeCoding使人上头，每天起床第一件事就是看 Tibo 今天有没有重置；额度用完了，整个人都不知道干什么了。
 
-好的模型事半功倍，DeepSeek做的事情总会有一些小尾巴，需要Codex再处理一下。
+好的模型事半功倍，DeepSeek 做的事情总会有一些小尾巴，需要 Codex 再处理一下。
 
-但是DeepSeek便宜量大，速度快，希望正式版能带来更大的惊喜。
+但是 DeepSeek 便宜量大，速度快，希望正式版能带来更大的惊喜。
 
-第一次VibeCoding，很有成就感，有点像第一次编程的时刻，神奇。
+我用的 OpenCode GO，DeepSeek V4 Flash 比官方的量更多一些，15$ 可以用到 60$ 的用量。
+
+欢迎使用[我的邀请链接](https://opencode.ai/go?ref=AYV8HRXRZS)，我们都能获得 5$ 奖励。
+
+第一次 VibeCoding，很神奇，很有成就感，有点像第一次编程的时刻。
