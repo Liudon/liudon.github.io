@@ -39,10 +39,10 @@ ShowBreadCrumbs: false
 
 ## 朋友们
 
-{{< friend name="Dvel’s Blog" url="https://dvel.me" logo="https://dvel.me/avatar.png" word="Less is More." >}}
+{{< friend name="Dvel’s Blog" url="https://dvel.me?referer=https://liudon.com" logo="https://dvel.me/avatar.png" word="Less is More." >}}
 
-{{< friend name="林木木木木木" url="https://immmmm.com/" logo="https://cdn.sep.cc/avatar/ba83fa02fc4b2ba621514941307e21be?d=identicon" word="木木木木木">}}
+{{< friend name="林木木木木木" url="https://immmmm.com/?referer=https://liudon.com" logo="https://cdn.sep.cc/avatar/ba83fa02fc4b2ba621514941307e21be?d=identicon" word="木木木木木">}}
 
-{{< friend name="涛叔" url="https://taoshu.in/" logo="https://taoshu.in/avatar.jpg" word="涛叔">}}
+{{< friend name="涛叔" url="https://tao.zz.ac/?referer=https://liudon.com" logo="https://tao.zz.ac/avatar.png" word="涛叔">}}
 
-{{< friend name="老张博客" url="https://laozhang.org/" logo="https://picx.s3.bitiful.net/2023/05/01/644f0e3acd666.png" word="老张博客">}}
+{{< friend name="老张博客" url="https://laozhang.org/?referer=https://liudon.com" logo="https://picx.s3.bitiful.net/2023/05/01/644f0e3acd666.png" word="老张博客">}}
