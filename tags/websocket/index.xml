@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>WebSocket on 流动</title>
+    <link>https://liudon.com/tags/websocket/</link>
+    <description>Recent content in WebSocket on 流动</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 30 Jul 2026 10:30:00 +0800</lastBuildDate>
+    <atom:link href="https://liudon.com/tags/websocket/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Caddy 转发 GOST 报 TLS internal error 问题的排查与解决</title>
+      <link>https://liudon.com/posts/caddy-forward-gost-tls-internal-error/</link>
+      <pubDate>Thu, 30 Jul 2026 10:30:00 +0800</pubDate>
+      <guid>https://liudon.com/posts/caddy-forward-gost-tls-internal-error/</guid>
+      <description>记录 GOST 客户端通过 Caddy 转发访问 GOST 服务端时出现 TLS internal error 的排查过程，最终定位为客户端通过 IP 连接时未发送 SNI，并使用域名配合 ip 参数解决。</description>
+    </item>
+  </channel>
+</rss>
