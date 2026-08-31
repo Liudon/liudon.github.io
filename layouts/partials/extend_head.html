@@ -1,6 +1,6 @@
 <meta name="google-site-verification" content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew" />
 <meta name="google-adsense-account" content="ca-pub-4739645989170648">
-{{- if .Content }}
+{{- if and .IsPage (eq .Section "posts") }}
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648"
      crossorigin="anonymous"></script>
 {{- end }}
