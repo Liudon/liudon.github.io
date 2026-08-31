@@ -63,23 +63,6 @@
 {{- $class = "post-entry tag-entry" }}
 {{- end }}
 
-{{- if eq $index 5 }}
-<article class="{{ $class }}">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648"
-  crossorigin="anonymous"></script>
-<!-- 首页广告 -->
-<ins class="adsbygoogle"
-  style="display:block"
-  data-ad-client="ca-pub-4739645989170648"
-  data-ad-slot="6329706254"
-  data-ad-format="auto"
-  data-full-width-responsive="true"></ins>
-<script>
-  (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-</article>
-{{- end }}
-
 <article class="{{ $class }}">
   {{- $isHidden := (.Param "cover.hiddenInList") | default (.Param "cover.hidden") | default false }}
   {{- partial "cover.html" (dict "cxt" . "IsSingle" false "isHidden" $isHidden) }}
