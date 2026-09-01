@@ -71,12 +71,21 @@ jobs:
       # ------------------------------------------------------
 
       - name: Restore image cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .cache/images
-          key: images-v1-${{ hashFiles('content/posts/**/*.jpg', 'content/posts/**/*.jpeg', 'content/posts/**/*.png', 'content/posts/**/*.JPG', 'content/posts/**/*.JPEG', 'content/posts/**/*.PNG', 'static/ArchitectsDaughter-Regular.ttf', '.github/scripts/process-images.sh') }}
+          key: images-v2-${{ hashFiles(
+            'content/posts/**/*.jpg',
+            'content/posts/**/*.jpeg',
+            'content/posts/**/*.png',
+            'content/posts/**/*.JPG',
+            'content/posts/**/*.JPEG',
+            'content/posts/**/*.PNG',
+            'static/ArchitectsDaughter-Regular.ttf',
+            '.github/scripts/process-images.sh'
+            ) }}
           restore-keys: |
-            images-v1-
+            images-v2-
 
       # ------------------------------------------------------
       # Install ImageMagick
@@ -88,6 +97,8 @@ jobs:
 
           sudo apt-get install -y \
             build-essential \
+            pkg-config \
+            file \
             libx11-dev \
             libxext-dev \
             zlib1g-dev \
@@ -100,6 +111,8 @@ jobs:
             libtiff-dev \
             libraw-dev \
             libheif-dev \
+            libheif-plugin-aomdec \
+            libheif-plugin-aomenc \
             libde265-dev \
             libfftw3-dev \
             libglib2.0-dev \
@@ -120,11 +133,73 @@ jobs:
 
           cd ..
 
+          echo
+          echo "========================================"
+          echo "ImageMagick version"
+          echo "========================================"
+
           magick -version
 
           echo
-          echo "Supported image formats:"
+          echo "========================================"
+          echo "Supported image formats"
+          echo "========================================"
+
           magick -list format | grep -Ei 'AVIF|HEIC|WEBP|JPEG|PNG' || true
+
+          echo
+          echo "========================================"
+          echo "Checking AVIF encoder"
+          echo "========================================"
+
+          # 必须具备 AVIF 写能力。
+          #
+          # 正常应该类似：
+          #
+          # AVIF  rw+  AV1 Image File Format
+          #
+          if ! magick -list format | grep -qE '^[[:space:]]*AVIF[[:space:]]+rw'; then
+            echo
+            echo "ERROR: ImageMagick does not support AVIF encoding"
+            echo
+            echo "Current AVIF/HEIC support:"
+            magick -list format | grep -Ei 'AVIF|HEIC' || true
+            exit 1
+          fi
+
+          # 再做一次真实的 AVIF 编码测试。
+          #
+          # 防止出现 format 列表显示正常，
+          # 但实际 encoder plugin 无法工作的情况。
+          TEST_AVIF="/tmp/imagemagick-avif-test.avif"
+
+          rm -f "$TEST_AVIF"
+
+          magick \
+            -size 100x100 \
+            xc:red \
+            -quality 50 \
+            "$TEST_AVIF"
+
+          if [[ ! -s "$TEST_AVIF" ]]; then
+            echo "ERROR: AVIF encoder generated an empty file"
+            exit 1
+          fi
+
+          if ! magick identify "$TEST_AVIF" >/dev/null 2>&1; then
+            echo "ERROR: generated AVIF cannot be decoded"
+            exit 1
+          fi
+
+          echo
+          echo "AVIF encoder test:"
+          magick identify "$TEST_AVIF"
+          file "$TEST_AVIF"
+
+          rm -f "$TEST_AVIF"
+
+          echo
+          echo "AVIF encoder: OK"
 
       # ------------------------------------------------------
       # Incremental image processing
