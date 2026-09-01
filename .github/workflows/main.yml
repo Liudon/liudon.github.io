@@ -56,31 +56,83 @@ jobs:
       #     sudo mv ./linux-generic/cavif /bin
       #     # find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec cavif {} \;
 
-      - name: Compress Image
+      # ------------------------------------------------------
+      # Restore processed image cache
+      #
+      # Exact cache key:
+      #   所有原始图片 + 字体 + 图片处理脚本
+      #
+      # 如果只有一张图片发生变化：
+      #
+      # 1. exact key miss
+      # 2. restore-keys 恢复最近一次图片缓存
+      # 3. process-images.sh 只处理变化的图片
+      # 4. job 完成后保存新的 cache key
+      # ------------------------------------------------------
+
+      - name: Restore image cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/images
+          key: images-v1-${{ hashFiles('content/posts/**/*.jpg', 'content/posts/**/*.jpeg', 'content/posts/**/*.png', 'content/posts/**/*.JPG', 'content/posts/**/*.JPEG', 'content/posts/**/*.PNG', 'static/ArchitectsDaughter-Regular.ttf', '.github/scripts/process-images.sh') }}
+          restore-keys: |
+            images-v1-
+
+      # ------------------------------------------------------
+      # Install ImageMagick
+      # ------------------------------------------------------
+
+      - name: Install ImageMagick
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libx11-dev libxext-dev zlib1g-dev \
-              libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev liblcms2-dev \
-              libopenexr-dev libtiff-dev libraw-dev libheif-dev libde265-dev \
-              libfftw3-dev libglib2.0-dev libwebp-dev
 
-          wget https://download.imagemagick.org/archive/ImageMagick.tar.gz
-          tar xvzf ImageMagick.tar.gz
+          sudo apt-get install -y \
+            build-essential \
+            libx11-dev \
+            libxext-dev \
+            zlib1g-dev \
+            libpng-dev \
+            libjpeg-dev \
+            libfreetype6-dev \
+            libxml2-dev \
+            liblcms2-dev \
+            libopenexr-dev \
+            libtiff-dev \
+            libraw-dev \
+            libheif-dev \
+            libde265-dev \
+            libfftw3-dev \
+            libglib2.0-dev \
+            libwebp-dev
+
+          wget -q https://download.imagemagick.org/archive/ImageMagick.tar.gz
+
+          tar xzf ImageMagick.tar.gz
+
           cd ImageMagick-7.*
+
           ./configure
-          make
+
+          make -j"$(nproc)"
+
           sudo make install
           sudo ldconfig /usr/local/lib
 
-          cd ../
+          cd ..
 
-          # curl -L https://imagemagick.org/archive/binaries/magick -o magick
-          # mv magick /usr/local/bin/
-          # chmod +x /usr/local/bin/magick
+          magick -version
 
-          find ./content/posts/ -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" \) -exec magick {} -pointsize 48 -fill "#909090" -font ./static/ArchitectsDaughter-Regular.ttf -gravity south -annotate +0+20 "@liudon\nhttps://liudon.com" -resize 1080x\> {} \;
-          find ./content/posts/ -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" \) -exec magick {} -quality 75 -define webp:image-hint=photo {}_1080x.webp \;
-          find ./content/posts/ -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" \) -exec magick -debug all {} {}_1080x.avif \;
+          echo
+          echo "Supported image formats:"
+          magick -list format | grep -Ei 'AVIF|HEIC|WEBP|JPEG|PNG' || true
+
+      # ------------------------------------------------------
+      # Incremental image processing
+      # ------------------------------------------------------
+
+      - name: Process images
+        run: |
+          bash .github/scripts/process-images.sh
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
