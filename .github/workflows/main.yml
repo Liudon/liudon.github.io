@@ -74,7 +74,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .cache/images
-          key: images-v2-${{ hashFiles(
+          key: images-v3-${{ hashFiles(
             'content/posts/**/*.jpg',
             'content/posts/**/*.jpeg',
             'content/posts/**/*.png',
@@ -85,7 +85,7 @@ jobs:
             '.github/scripts/process-images.sh'
             ) }}
           restore-keys: |
-            images-v2-
+            images-v3-
 
       # ------------------------------------------------------
       # Install ImageMagick

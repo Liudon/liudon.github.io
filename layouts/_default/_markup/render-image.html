@@ -1,8 +1,32 @@
-{{- $respSizes := slice 1080 -}}
-{{- $dataSizes := "(min-width: 768px) 1080px, 100vw" -}}
+{{- /*
+响应式图片尺寸：
 
-{{- $holder := "GIP" -}}
-{{- $hint := "photo" -}}
+普通大图：
+320 / 480 / 720 / 1080
+
+如果源图片小于 1080：
+还会自动加入图片实际宽度。
+
+例如：
+源图 900px
+→ 320 / 480 / 720 / 900
+
+源图 600px
+→ 320 / 480 / 600
+*/ -}}
+
+{{- $respSizes := slice 320 480 720 1080 -}}
+
+{{- /*
+auto:
+现代浏览器根据 CSS 布局后的实际尺寸选择图片。
+
+fallback:
+如果浏览器不支持 auto，则最大按照 1080px 处理。
+*/ -}}
+
+{{- $dataSizes := site.Params.responsiveImageSizes | default "auto, (min-width: 1080px) 1080px, calc(100vw - 32px)" -}}
+
 {{- $filter := "box" -}}
 
 {{- $Destination := .Destination -}}
@@ -10,41 +34,130 @@
 {{- $Text := .Text -}}
 {{- $Title := .Title -}}
 
-{{- $responsiveImages := (.Page.Params.responsiveImages | default site.Params.responsiveImages) | default true }}
+{{- $responsiveImages := (.Page.Params.responsiveImages | default site.Params.responsiveImages) | default true -}}
 
-{{ with $src := .Page.Resources.GetMatch .Destination }}
-	{{- if $responsiveImages -}}
-		{{- $imageTypes := slice -}}
-		{{- if and hugo.IsExtended (ne $src.MediaType.Type "image/webp") -}}
-			{{- $imageTypes = $imageTypes | append "avif" -}} <!-- avif need the first -->
-			{{- $imageTypes = $imageTypes | append "webp" -}}
-		{{- end -}}
-		{{- if gt (index $respSizes 0) $src.Width -}}
-			{{- $respSizes = slice $src.Width -}}
-		{{- end -}}
-		<picture>
-			{{- range $imageType := $imageTypes -}}
-			<source type="image/{{ $imageType }}" srcset="
-			{{- $compressedImage := printf "%s_1080x.%s" $Destination $imageType -}}
-			{{- $cmSrc := $Page.Resources.GetMatch $compressedImage -}}
-			{{- if $cmSrc -}}
-				{{ $cmSrc.RelPermalink | absURL}} 1080w
-			{{- else -}}
-				<!-- hugo not support avif format -->
-				{{ if ne $imageType "avif" }}
-					{{- with $respSizes -}}
-						{{- range $i, $e := . -}}
-							{{- if ge $src.Width . -}}
-								{{- if $i }}, {{ end -}}{{- ($src.Resize (print . "x " $imageType " " $filter) ).RelPermalink | absURL}} {{ . }}w
-							{{- end -}}
-						{{- end -}}
-					{{- end -}}
-				{{ end }}
-			{{- end -}}" sizes="{{ $dataSizes }}" />
-			{{- end -}}
-			<img src="{{ $Destination | safeURL }}" width="{{ .Width }}" height="{{ .Height }}" alt="{{ $Text }}" title="{{ $Title }}" loading="lazy" />
-		</picture>
-	{{- else }}
-		<img src="{{ $Destination | safeURL }}" width="{{ $src.Width }}" height="{{ $src.Height }}" alt="{{ $Text }}" title="{{ $Title }}" loading="lazy" />
-	{{- end }}
-{{ end }}
+{{- with $src := .Page.Resources.GetMatch .Destination -}}
+
+    {{- if $responsiveImages -}}
+
+        {{- /*
+        根据源图片宽度生成实际候选尺寸。
+
+        最大不会超过源图。
+        */ -}}
+
+        {{- $candidateSizes := slice -}}
+
+        {{- range $size := $respSizes -}}
+            {{- if ge $src.Width $size -}}
+                {{- $candidateSizes = $candidateSizes | append $size -}}
+            {{- end -}}
+        {{- end -}}
+
+        {{- /*
+        如果源图片实际宽度不是标准档位，
+        把实际宽度作为最后一档。
+
+        例如 900px：
+        320 / 480 / 720 / 900
+        */ -}}
+
+        {{- if not (in $candidateSizes $src.Width) -}}
+            {{- $candidateSizes = $candidateSizes | append $src.Width -}}
+        {{- end -}}
+
+        {{- /*
+        优先 AVIF，再 WebP。
+        */ -}}
+
+        {{- $imageTypes := slice "avif" "webp" -}}
+
+        <picture>
+
+            {{- range $imageType := $imageTypes -}}
+
+                {{- $srcset := slice -}}
+
+                {{- range $size := $candidateSizes -}}
+
+                    {{- $compressedImage := printf "%s_%dx.%s" $Destination $size $imageType -}}
+
+                    {{- $cmSrc := $Page.Resources.GetMatch $compressedImage -}}
+
+                    {{- if $cmSrc -}}
+
+                        {{- $url := $cmSrc.RelPermalink | absURL -}}
+
+                        {{- /*
+                        用实际图片宽度作为 descriptor，
+                        不依赖文件名里的数字。
+                        */ -}}
+
+                        {{- $candidate := printf "%s %dw" $url $cmSrc.Width -}}
+
+                        {{- $srcset = $srcset | append $candidate -}}
+
+                    {{- else if and (eq $imageType "webp") hugo.IsExtended -}}
+
+                        {{- /*
+                        本地 hugo server 没有预处理文件时，
+                        WebP 仍然可以让 Hugo 自己生成。
+
+                        AVIF 则依赖 GitHub Action 预处理。
+                        */ -}}
+
+                        {{- $resized := $src.Resize (printf "%dx %s %s" $size $imageType $filter) -}}
+
+                        {{- $url := $resized.RelPermalink | absURL -}}
+
+                        {{- $candidate := printf "%s %dw" $url $resized.Width -}}
+
+                        {{- $srcset = $srcset | append $candidate -}}
+
+                    {{- end -}}
+
+                {{- end -}}
+
+                {{- if gt (len $srcset) 0 -}}
+
+                    <source
+                        type="image/{{ $imageType }}"
+                        srcset="{{ delimit $srcset ", " }}"
+                        sizes="{{ $dataSizes }}"
+                    />
+
+                {{- end -}}
+
+            {{- end -}}
+
+            <img
+                src="{{ $Destination | safeURL }}"
+                width="{{ $src.Width }}"
+                height="{{ $src.Height }}"
+                alt="{{ $Text }}"
+                {{- with $Title }}
+                title="{{ . }}"
+                {{- end }}
+                loading="lazy"
+                decoding="async"
+            />
+
+        </picture>
+
+    {{- else -}}
+
+        <img
+            src="{{ $Destination | safeURL }}"
+            width="{{ $src.Width }}"
+            height="{{ $src.Height }}"
+            alt="{{ $Text }}"
+            {{- with $Title }}
+            title="{{ . }}"
+            {{- end }}
+            loading="lazy"
+            decoding="async"
+        />
+
+    {{- end -}}
+
+{{- end -}}
