@@ -82,6 +82,7 @@ params:
 
   twikoo:
     version: 1.5.11
+    envId: "https://comment.liudon.com"
 
   label:
     text: "流动"

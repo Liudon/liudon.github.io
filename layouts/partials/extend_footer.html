@@ -2,20 +2,146 @@
     京ICP备13029522号-2</a></span>
 </footer>
 
-{{- if .IsPage }}
-<script src="//tokinx.github.io/ViewImage/view-image.min.js" async></script>
-<script>
-    function initViewImage() {
-        window.ViewImage && ViewImage.init('.post-content img');
-    }
+{{- /*
+仅普通文章页面加载 article JS。
 
-    if (document.readyState === 'complete') {
-        initViewImage();
-    } else {
-        window.addEventListener('load', initViewImage);
-    }
-</script>
-{{- end }}
+例如：
+
+/posts/foo/        -> 加载
+
+/                  -> 不加载
+/tags/             -> 不加载
+/categories/       -> 不加载
+/posts/            -> 不加载
+*/ -}}
+
+{{- if and .IsPage (eq .Section "posts") -}}
+
+
+    {{- /*
+    判断“实际渲染后的正文”是否存在 img。
+
+    注意这里故意不用：
+
+        .Page.Resources.ByType "image"
+
+    因为文章目录里有图片资源，
+    不代表正文真的引用了图片。
+
+    render-image.html 最终一定会生成 <img>，
+    所以检查 .Content 最准确。
+    */ -}}
+
+    {{- $hasImages :=
+        strings.Contains
+            .Content
+            "<img"
+    -}}
+
+
+    {{- /*
+    article.js 中需要使用：
+
+        site.Params.twikoo.version
+        site.Params.twikoo.envId
+
+    所以先让 Hugo 把 article.js
+    当 Go Template 执行。
+    */ -}}
+
+    {{- $articleSource :=
+        resources.Get
+            "js/article.js"
+    -}}
+
+
+    {{- $article :=
+        resources.ExecuteAsTemplate
+            "js/article.generated.js"
+            site
+            $articleSource
+    -}}
+
+
+    {{- /*
+    根据当前文章是否有图片，
+    动态决定是否把 ViewImage 放入 bundle。
+    */ -}}
+
+    {{- $bundle := $article -}}
+
+
+    {{- if $hasImages -}}
+
+        {{- $viewImage :=
+            resources.Get
+                "js/vendor/view-image.min.js"
+        -}}
+
+
+        {{- /*
+        顺序非常重要：
+
+        ViewImage
+            ↓
+        article.js
+
+        article.js 执行时
+        window.ViewImage 已经存在。
+        */ -}}
+
+        {{- $bundle =
+            slice
+                $viewImage
+                $article
+            | resources.Concat
+                "js/article.js"
+        -}}
+
+    {{- else -}}
+
+        {{- /*
+        无图片时仍然经过 Concat，
+        统一最终文件名。
+        */ -}}
+
+        {{- $bundle =
+            slice
+                $article
+            | resources.Concat
+                "js/article.js"
+        -}}
+
+    {{- end -}}
+
+
+    {{- /*
+    最终：
+
+    minify
+      ↓
+    SHA256 fingerprint
+      ↓
+    SRI
+    */ -}}
+
+    {{- $bundle =
+        $bundle
+        | minify
+        | fingerprint "sha256"
+    -}}
+
+
+    <script
+        src="{{ $bundle.RelPermalink }}"
+        integrity="{{ $bundle.Data.Integrity }}"
+        crossorigin="anonymous"
+        defer>
+    </script>
+
+
+{{- end -}}
+
 <script>
 const host = window.location.host
 if (host !== 'blog.liudon.xyz' && ! host.startsWith('liudon.') && ! host.startsWith('localhost') && ! host.startsWith('127.0.0.1')) {
@@ -42,66 +168,3 @@ if (host !== 'blog.liudon.xyz' && ! host.startsWith('liudon.') && ! host.startsW
 <script>
 enScroll=!1,enFdl=!1,extCurrent=void 0,filename=void 0,targetText=void 0,splitOrigin=void 0;const lStor=localStorage,sStor=sessionStorage,doc=document,docEl=document.documentElement,docBody=document.body,docLoc=document.location,w=window,s=screen,nav=navigator||{},extensions=["pdf","xls","xlsx","doc","docx","txt","rtf","csv","exe","key","pps","ppt","pptx","7z","pkg","rar","gz","zip","avi","mov","mp4","mpe","mpeg","wmv","mid","midi","mp3","wav","wma"];function a(e,t,n,o){const j="G-G9ZDJQN9E2",r=()=>Math.floor(Math.random()*1e9)+1,c=()=>Math.floor(Date.now()/1e3),F=()=>(sStor._p||(sStor._p=r()),sStor._p),E=()=>r()+"."+c(),_=()=>(lStor.cid_v4||(lStor.cid_v4=E()),lStor.cid_v4),m=lStor.getItem("cid_v4"),v=()=>m?void 0:enScroll==!0?void 0:"1",p=()=>(sStor.sid||(sStor.sid=c()),sStor.sid),O=()=>{if(!sStor._ss)return sStor._ss="1",sStor._ss;if(sStor.getItem("_ss")=="1")return void 0},a="1",g=()=>{if(sStor.sct)if(enScroll==!0)return sStor.sct;else x=+sStor.getItem("sct")+ +a,sStor.sct=x;else sStor.sct=a;return sStor.sct},i=docLoc.search,b=new URLSearchParams(i),h=["q","s","search","query","keyword"],y=h.some(e=>i.includes("&"+e+"=")||i.includes("?"+e+"=")),u=()=>y==!0?"view_search_results":enScroll==!0?"scroll":enFdl==!0?"file_download":"page_view",f=()=>enScroll==!0?"90":void 0,C=()=>{if(u()=="view_search_results"){for(let e of b)if(h.includes(e[0]))return e[1]}else return void 0},d=encodeURIComponent,k=e=>{let t=[];for(let n in e)e.hasOwnProperty(n)&&e[n]!==void 0&&t.push(d(n)+"="+d(e[n]));return t.join("&")},A=!1,S="https://liudon.com/analytics/post",M=k({tid:j,_p:F(),v:"2",sr:(s.width*w.devicePixelRatio+"x"+s.height*w.devicePixelRatio).toString(),ul:(nav.language||void 0).toLowerCase(),cid:_(),_fv:v(),_s:"1",dl:docLoc.origin+docLoc.pathname+i,dt:doc.title||void 0,dr:doc.referrer||void 0,sid:p(),sct:g(),seg:"1",en:u(),"epn.percent_scrolled":f(),"ep.search_term":C(),"ep.file_extension":e||void 0,"ep.file_name":t||void 0,"ep.link_text":n||void 0,"ep.link_url":o||void 0,_ss:O(),_dbg:A?1:void 0}),l=S+"?"+M;if(nav.sendBeacon)nav.sendBeacon(l);else{let e=new XMLHttpRequest;e.open("POST",l,!0)}}a();function sPr(){return(docEl.scrollTop||docBody.scrollTop)/((docEl.scrollHeight||docBody.scrollHeight)-docEl.clientHeight)*100}doc.addEventListener("scroll",sEv,{passive:!0});function sEv(){const e=sPr();if(e<90)return;enScroll=!0,a(),doc.removeEventListener("scroll",sEv,{passive:!0}),enScroll=!1}document.addEventListener("DOMContentLoaded",function(){let e=document.getElementsByTagName("a");for(let t=0;t<e.length;t++)if(e[t].getAttribute("href")!=null){const n=e[t].getAttribute("href"),s=n.substring(n.lastIndexOf("/")+1),o=s.split(".").pop();(e[t].hasAttribute("download")||extensions.includes(o))&&e[t].addEventListener("click",fDl,{passive:!0})}});function fDl(e){enFdl=!0;const t=e.currentTarget.getAttribute("href"),n=t.substring(t.lastIndexOf("/")+1),s=n.split(".").pop(),o=n.replace("."+s,""),i=e.currentTarget.text,r=t.replace(docLoc.origin,"");a(s,o,i,r),enFdl=!1}
 </script>
-<!--script src="//liudon.com/analytics/vue.js" async></script-->
-<!--script>
-  <window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'GTM-5LJV5QM');
-
-  /*
-  var performance = window.performance,
-        t = performance.getEntriesByType("navigation")[0]
-        startTime = t.startTime,
-        filterNumber = function (num) { return isNaN(num) || num == Infinity || num < 0 ? void 0 : num; };
-
-    // sendGA: collect data and send.
-    function sendGA() {
-        gtag('event', 'timing_complete', {
-            'name': 'Page Load Time',
-            'value': filterNumber(t.loadEventStart - startTime || 0),
-            'event_category': 'Page Loading Time'
-            });
-        gtag('event', 'timing_complete', {
-            'name': 'Page Load Time',
-            'value': filterNumber(t.domainLookupEnd - t.domainLookupStart || 0),
-            'event_category': 'DNS Time'
-            });
-        gtag('event', 'timing_complete', {
-            'name': 'Page Load Time',
-            'value': filterNumber(t.responseEnd - t.responseStart || 0),
-            'event_category': 'Page Dowenload Time'
-            });
-        gtag('event', 'timing_complete', {
-            'name': 'Page Load Time',
-            'value': filterNumber(t.redirectEnd - t.redirectStart || 0),
-            'event_category': 'Redirect Time'
-            });
-        gtag('event', 'timing_complete', {
-            'name': 'Page Load Time',
-            'value': filterNumber(t.connectEnd - t.connectStart || 0),
-            'event_category': 'TCP Time'
-            });
-        gtag('event', 'timing_complete', {
-            'name': 'Page Load Time',
-            'value': filterNumber(t.responseStart - t.requestStart || 0),
-            'event_category': 'Server Response Time'
-            });
-        gtag('event', 'timing_complete', {
-            'name': 'Page Load Time',
-            'value': filterNumber(t.domInteractive - t.domLoading || 0),
-            'event_category': 'DOM Interactive Time'
-            });
-        gtag('event', 'timing_complete', {
-            'name': 'Page Load Time',
-            'value': filterNumber(t.domContentLoadedEventStart - startTime || 0),
-            'event_category': 'Content Loading Time'
-            });
-    }
-    if (document.readyState === 'complete') {
-        sendGA();
-    } else {
-        window.addEventListener('load', sendGA);
-    }
-    */
-</script-->
