@@ -1,0 +1,11 @@
+{
+  "name": "liudon-media-pipeline",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "sharp": "0.35.0"
+  }
+}

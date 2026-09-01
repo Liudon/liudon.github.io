@@ -29,7 +29,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout submodules
         run: git submodule update --init --recursive --remote
@@ -57,157 +57,119 @@ jobs:
       #     # find ./content/posts/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -exec cavif {} \;
 
       # ------------------------------------------------------
-      # Restore processed image cache
+      # Media cache
       #
-      # Exact cache key:
-      #   所有原始图片 + 字体 + 图片处理脚本
+      # 第一次：
       #
-      # 如果只有一张图片发生变化：
+      # media-v1 不存在
+      # -> 全量图片 + 视频处理
       #
-      # 1. exact key miss
-      # 2. restore-keys 恢复最近一次图片缓存
-      # 3. process-images.sh 只处理变化的图片
-      # 4. job 完成后保存新的 cache key
+      # 后续：
+      #
+      # source 未变化
+      # -> exact cache hit
+      #
+      # 修改一张图片/视频
+      # -> restore 最近的 media-v1
+      # -> 只处理变化文件
       # ------------------------------------------------------
 
-      - name: Restore image cache
+      - name: Restore media cache
         uses: actions/cache@v5
         with:
-          path: .cache/images
-          key: images-v3-${{ hashFiles(
-            'content/posts/**/*.jpg',
-            'content/posts/**/*.jpeg',
-            'content/posts/**/*.png',
-            'content/posts/**/*.JPG',
-            'content/posts/**/*.JPEG',
-            'content/posts/**/*.PNG',
-            'static/ArchitectsDaughter-Regular.ttf',
-            '.github/scripts/process-images.sh'
-            ) }}
+          path: .cache/media
+          key: media-v1-${{ hashFiles('content/posts/**/*.jpg', 'content/posts/**/*.jpeg', 'content/posts/**/*.png', 'content/posts/**/*.JPG', 'content/posts/**/*.JPEG', 'content/posts/**/*.PNG', 'content/posts/**/*.mp4', 'content/posts/**/*.MP4', 'static/ArchitectsDaughter-Regular.ttf', '.github/scripts/media/package.json', '.github/scripts/media/process-media.mjs') }}
           restore-keys: |
-            images-v3-
+            media-v1-
 
       # ------------------------------------------------------
-      # Install ImageMagick
+      # Node.js
       # ------------------------------------------------------
 
-      - name: Install ImageMagick
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      # ------------------------------------------------------
+      # Sharp
+      #
+      # 使用 Sharp 官方预编译 Linux 二进制。
+      #
+      # 不再需要：
+      #
+      # build-essential
+      # libheif-dev
+      # libaom-dev
+      # libwebp-dev
+      # ImageMagick configure/make
+      # ------------------------------------------------------
+
+      - name: Install Sharp
         run: |
-          sudo apt-get update
-
-          sudo apt-get install -y \
-            build-essential \
-            pkg-config \
-            file \
-            libx11-dev \
-            libxext-dev \
-            zlib1g-dev \
-            libpng-dev \
-            libjpeg-dev \
-            libfreetype6-dev \
-            libxml2-dev \
-            liblcms2-dev \
-            libopenexr-dev \
-            libtiff-dev \
-            libraw-dev \
-            libheif-dev \
-            libheif-plugin-aomdec \
-            libheif-plugin-aomenc \
-            libde265-dev \
-            libfftw3-dev \
-            libglib2.0-dev \
-            libwebp-dev
-
-          wget -q https://download.imagemagick.org/archive/ImageMagick.tar.gz
-
-          tar xzf ImageMagick.tar.gz
-
-          cd ImageMagick-7.*
-
-          ./configure
-
-          make -j"$(nproc)"
-
-          sudo make install
-          sudo ldconfig /usr/local/lib
-
-          cd ..
-
-          echo
-          echo "========================================"
-          echo "ImageMagick version"
-          echo "========================================"
-
-          magick -version
-
-          echo
-          echo "========================================"
-          echo "Supported image formats"
-          echo "========================================"
-
-          magick -list format | grep -Ei 'AVIF|HEIC|WEBP|JPEG|PNG' || true
-
-          echo
-          echo "========================================"
-          echo "Checking AVIF encoder"
-          echo "========================================"
-
-          # 必须具备 AVIF 写能力。
-          #
-          # 正常应该类似：
-          #
-          # AVIF  rw+  AV1 Image File Format
-          #
-          if ! magick -list format | grep -qE '^[[:space:]]*AVIF[[:space:]]+rw'; then
-            echo
-            echo "ERROR: ImageMagick does not support AVIF encoding"
-            echo
-            echo "Current AVIF/HEIC support:"
-            magick -list format | grep -Ei 'AVIF|HEIC' || true
-            exit 1
-          fi
-
-          # 再做一次真实的 AVIF 编码测试。
-          #
-          # 防止出现 format 列表显示正常，
-          # 但实际 encoder plugin 无法工作的情况。
-          TEST_AVIF="/tmp/imagemagick-avif-test.avif"
-
-          rm -f "$TEST_AVIF"
-
-          magick \
-            -size 100x100 \
-            xc:red \
-            -quality 50 \
-            "$TEST_AVIF"
-
-          if [[ ! -s "$TEST_AVIF" ]]; then
-            echo "ERROR: AVIF encoder generated an empty file"
-            exit 1
-          fi
-
-          if ! magick identify "$TEST_AVIF" >/dev/null 2>&1; then
-            echo "ERROR: generated AVIF cannot be decoded"
-            exit 1
-          fi
-
-          echo
-          echo "AVIF encoder test:"
-          magick identify "$TEST_AVIF"
-          file "$TEST_AVIF"
-
-          rm -f "$TEST_AVIF"
-
-          echo
-          echo "AVIF encoder: OK"
+          npm install \
+            --prefix .github/scripts/media \
+            --omit=dev \
+            --no-audit \
+            --no-fund
 
       # ------------------------------------------------------
-      # Incremental image processing
+      # FFmpeg
       # ------------------------------------------------------
 
-      - name: Process images
+      - name: Setup FFmpeg
+        shell: bash
         run: |
-          bash .github/scripts/process-images.sh
+          set -euo pipefail
+
+          NEED_APT=0
+
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            NEED_APT=1
+          fi
+
+          if ! command -v ffprobe >/dev/null 2>&1; then
+            NEED_APT=1
+          fi
+
+          if ! command -v fc-match >/dev/null 2>&1; then
+            NEED_APT=1
+          fi
+
+          if [[ "$NEED_APT" == "1" ]]; then
+            sudo apt-get update
+
+            sudo apt-get install -y \
+              ffmpeg \
+              fontconfig
+          fi
+
+          echo
+          echo "FFmpeg:"
+          ffmpeg -version | head -n 1
+
+          echo
+          echo "FFprobe:"
+          ffprobe -version | head -n 1
+
+          echo
+          echo "Checking H.264 encoder..."
+
+          if ! ffmpeg -hide_banner -encoders 2>/dev/null | grep -q libx264; then
+            echo "ERROR: FFmpeg does not contain libx264 encoder"
+            exit 1
+          fi
+
+          echo "libx264: OK"
+
+      # ------------------------------------------------------
+      # Process images + videos
+      # ------------------------------------------------------
+
+      - name: Process media
+        run: |
+          node .github/scripts/media/process-media.mjs
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3

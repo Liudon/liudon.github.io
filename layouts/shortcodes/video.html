@@ -1,8 +1,38 @@
+{{- $srcName := .Get "src" -}}
+
+{{- $video := .Page.Resources.GetMatch $srcName -}}
+
+{{- if $video -}}
+
 <figure{{ if or (.Get "class") (eq (.Get "align") "center") }} class="
            {{- if eq (.Get "align") "center" }}align-center {{ end }}
            {{- with .Get "class" }}{{ . }}{{- end }}"
 {{- end -}}>
-    <video src={{ .Get "src" }} controls>
-    你的浏览器不支持 <code>video</code> 标签。
+
+    {{- $posterName := printf "%s.poster.webp" $srcName -}}
+
+    {{- $poster := .Page.Resources.GetMatch $posterName -}}
+
+    {{- $preload := .Get "preload" | default "none" -}}
+
+    <video
+        controls
+        playsinline
+        preload="{{ $preload }}"
+        {{- with $poster }}
+        poster="{{ .RelPermalink }}"
+        width="{{ .Width }}"
+        height="{{ .Height }}"
+        {{- end }}
+    >
+        <source
+            src="{{ $video.RelPermalink }}"
+            type="video/mp4"
+        />
+
+        您的浏览器不支持 HTML5 视频。
     </video>
+
 </figure>
+
+{{- end -}}
