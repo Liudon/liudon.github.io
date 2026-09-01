@@ -88,7 +88,7 @@ x-cache-lookup: Cache Hit
   Cache-Control: public, max-age=31536000, immutable
 ```
 
-### 3. 响应式图片
+### 3. 修正响应式图片效果
 
 终于来到这次优化的重头戏了。
 
