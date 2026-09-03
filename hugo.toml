@@ -1,0 +1,119 @@
+baseURL = "https://liudon.com/"
+title = "流动"
+locale = "zh_cn"
+theme = "terminal"
+enableRobotsTXT = true
+enableInlineShortcodes = true
+enableEmoji = true
+relativeURLs = true
+hasCJKLanguage = true # 自动检测是否包含 中文日文韩文 如果文章中使用了很多中文引号的话可以开启
+
+# Posts per page (Hugo >= 0.158 key; older Hugo versions use `paginate = 10`)
+[pagination]
+  pagersize = 10
+  path = "page"
+
+[outputs]
+  home = ["html", "rss", "json", "jsonfeed"]        # json powers the built-in search
+
+[mediaTypes."application/feed+json"]
+  suffixes = [ "json" ]
+
+[outputFormats.jsonfeed]
+  mediaType = "application/feed+json"
+  baseName = "index"
+  rel = "alternate"
+  isPlainText = true
+
+[outputFormats.json]
+  mediaType = "application/json"
+  baseName = "search"
+  rel = "alternate"
+  isPlainText = true
+
+[minify]
+  disableXML = true
+  minifyOutput = true
+
+[params]
+  description = "生活就是一个流动的过程."
+  keywords = ["流动", "博客", "liudon", "生活", "技术"]
+  author = "Liudon"
+  user = "liudon"
+  host = "localhost"
+  prompt_dir = "~/blog"
+  main_sections = ["posts"]
+  status_right = "EOF"
+
+  showFullTextinJSONFeed = true
+  search_index = "search.json"
+
+  # Responsive images (default OFF). Images must be in a leaf bundle or
+  # global assets (see README → Responsive images)
+  # [params.responsive_image]
+  #   status = true                          # global switch (default: false)
+  #   widths = [320, 480, 720, 1080]         # srcset breakpoints
+  #   sizes = "auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"
+
+  [params.ascii]
+    text = "LIUDON"
+
+  # Favicons & browser chrome. The theme ships terminal-style defaults;
+  # override paths with files from your site's static/ directory.
+  # [params.assets]
+  #   favicon_svg = "favicon.svg"
+  #   favicon = "favicon.ico"
+  #   favicon16x16 = "favicon-16x16.png"
+  #   favicon32x32 = "favicon-32x32.png"
+  #   apple_touch_icon = "apple-touch-icon.png"
+  #   safari_pinned_tab = "safari-pinned-tab.svg"
+  #   safari_pinned_tab_color = "#ff9500"
+  #   logo = "apple-touch-icon.png"            # Schema.org publisher logo
+  #   theme_color_light = "#ffffff"            # browser UI in light mode
+  #   theme_color_dark = "#0a0a0a"             # browser UI in dark mode
+  #   msapplication_tile_color = "#ff9500"      # Windows start-menu tile background
+
+  # Twikoo comments (article pages only). The comment block is lazy-loaded
+  # when the reader scrolls near the bottom of the page.
+  [params.twikoo]
+    env_id = "https://comment.liudon.com" # required — Tencent CloudBase env id or backend URL
+    version = "1.7.20"                       # keep the frontend and backend versions aligned
+    lang = "zh-CN"
+  #   # Tencent CloudBase only:
+  #   # use_full = true
+  #   # region = "ap-shanghai"
+  #   # script = "https://cdn.example.com/twikoo.min.js"
+  #   # Optional SRI — only when you pin the version; supply the hash yourself:
+  #   # integrity = "sha384-..."
+
+  #[[params.social]]
+  #  name = "github"
+  #  url = "https://github.com/liudon"
+  #[[params.social]]
+  #  name = "weibo"
+  #  url = "https://weibo.com/u/1674166010"
+
+[[menu.main]]
+  name = "Posts"
+  url = "/posts/"
+  weight = 1
+[[menu.main]]
+  name = "Links"
+  url = "/links/"
+  weight = 2
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    codeFences = true
+    lineNos = false
+    # Class-based output (no inline styles) so the theme's terminal
+    # palette paints the tokens.
+    noClasses = false
+    style = ""
+    guessSyntax = true
+
+[taxonomies]
+  tag = "tags"

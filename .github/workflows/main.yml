@@ -30,6 +30,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.TOKEN }}
 
       - name: Checkout submodules
         run: git submodule update --init --recursive --remote

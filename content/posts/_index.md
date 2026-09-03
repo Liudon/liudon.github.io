@@ -1,4 +1,5 @@
 ---
 title: "文章"
-comments: true
+show_meta: false
+show_pagination: false
 ---
