@@ -1,6 +1,6 @@
 baseURL = "https://liudon.com/"
 title = "流动"
-locale = "zh_cn"
+locale = "zh-CN"
 theme = "terminal"
 enableRobotsTXT = true
 enableInlineShortcodes = true
