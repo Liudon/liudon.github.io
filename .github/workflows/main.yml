@@ -37,17 +37,49 @@ jobs:
       - name: Get twikoo version
         id: twikoo
         run: |
-          version=$(curl -s https://raw.githubusercontent.com/Liudon/twikoo-netlify/main/package.json | jq -r '.dependencies."twikoo-netlify"')
+          version=$(curl -fsSL https://raw.githubusercontent.com/Liudon/twikoo-netlify/main/package.json | jq -er '.dependencies."twikoo-netlify"')
           echo "Twikoo version: $version"
           echo "twikoo_version=$version" >> $GITHUB_OUTPUT
 
-      - name: Update config.yml version
-        uses: fjogeleit/yaml-update-action@main
-        with:
-          valueFile: "config.yml"
-          propertyPath: "params.twikoo.version"
-          value: ${{ steps.twikoo.outputs.twikoo_version }}
-          commitChange: false
+      - name: Update hugo.toml version
+        env:
+          TWIKOO_VERSION: ${{ steps.twikoo.outputs.twikoo_version }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          import tomllib
+          from pathlib import Path
+
+          version = os.environ["TWIKOO_VERSION"]
+          if not re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?", version):
+              raise SystemExit(f"Invalid Twikoo version: {version!r}")
+
+          path = Path("hugo.toml")
+          lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+          section = None
+          updated = 0
+
+          for index, line in enumerate(lines):
+              stripped = line.strip()
+              if stripped.startswith("[") and stripped.endswith("]"):
+                  section = stripped
+              elif section == "[params.twikoo]" and re.match(r"^\s*version\s*=", line):
+                  lines[index], count = re.subn(
+                      r'^(\s*version\s*=\s*)"[^"]*"',
+                      rf'\g<1>"{version}"',
+                      line,
+                      count=1,
+                  )
+                  updated += count
+
+          if updated != 1:
+              raise SystemExit(f"Expected one params.twikoo.version, updated {updated}")
+
+          content = "".join(lines)
+          tomllib.loads(content)
+          path.write_text(content, encoding="utf-8")
+          PY
 
       # - name: Compress Image
       #   run: |
