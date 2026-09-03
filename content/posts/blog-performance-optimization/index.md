@@ -45,7 +45,7 @@ blog.liudon.xyz
 
 *以下内容全部基于 PaperMod 主题进行修改。*
 
-### 1. 增加国内 CDN 节点缓存时间
+## 1. 增加国内 CDN 节点缓存时间
 
 腾讯 CDN 首页的响应：
 
@@ -71,7 +71,7 @@ Cloudflare Pages 默认返回 max-age=0, must-revalidate，这是 Pages 的正�
 /page 缓存30分钟
 ```
 
-### 2. 延长指纹资源缓存时间
+## 2. 延长指纹资源缓存时间
 
 ```
 cache-control: public, must-revalidate, max-age=14400
@@ -88,7 +88,7 @@ x-cache-lookup: Cache Hit
   Cache-Control: public, max-age=31536000, immutable
 ```
 
-### 3. 修正响应式图片效果
+## 3. 修正响应式图片效果
 
 终于来到这次优化的重头戏了。
 
@@ -130,7 +130,7 @@ x-cache-lookup: Cache Hit
 
 通过增加流水线缓存，避免每次都全量生成，只做增量更新。
 
-#### 3.1 流水线增加媒体处理逻辑
+### 3.1 流水线增加媒体处理逻辑
 
 新增.github/scripts/media/package.json文件，内容如下：
 
@@ -2246,7 +2246,7 @@ main().catch(error => {
 
 把 ImageMagic 换成了 Sharp，压缩后的文件更小一些。
 
-#### 3.2 Hugo 图片解析响应式调整
+### 3.2 Hugo 图片解析响应式调整
 
 新增 layouts/_default/_markup/render-image.html文件，内容如下：
 
@@ -2435,7 +2435,7 @@ Images cached    : N
 
 至此，图片响应式问题搞定了，流水线的耗时问题也解决了，目前控制在3分钟左右。
 
-### 4. JS 文件按需加载
+## 4. JS 文件按需加载
 
 图片从数 MB 降下来以后，Lighthouse 中最明显的问题开始变成：
 
