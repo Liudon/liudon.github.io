@@ -471,6 +471,22 @@ async function createWatermark(
 // Restore image outputs
 // ============================================================
 
+function responsiveImagePath(
+    src,
+    width,
+    format
+) {
+
+    const parsed =
+        path.parse(src);
+
+    return path.join(
+        parsed.dir,
+        `${parsed.name}_${width}x.${format}`
+    );
+}
+
+
 async function restoreImageOutputs(
     src,
     base,
@@ -495,7 +511,11 @@ async function restoreImageOutputs(
                 cacheDir,
                 `${width}.webp`
             ),
-            `${src}_${width}x.webp`
+            responsiveImagePath(
+                src,
+                width,
+                "webp"
+            )
         );
 
         await copyFile(
@@ -503,7 +523,11 @@ async function restoreImageOutputs(
                 cacheDir,
                 `${width}.avif`
             ),
-            `${src}_${width}x.avif`
+            responsiveImagePath(
+                src,
+                width,
+                "avif"
+            )
         );
     }
 }
