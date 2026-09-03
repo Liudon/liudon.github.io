@@ -50,10 +50,10 @@ hasCJKLanguage = true # 自动检测是否包含 中文日文韩文 如果文章
 
   # Responsive images (default OFF). Images must be in a leaf bundle or
   # global assets (see README → Responsive images)
-  # [params.responsive_image]
-  #   status = true                          # global switch (default: false)
-  #   widths = [320, 480, 720, 1080]         # srcset breakpoints
-  #   sizes = "auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"
+  [params.responsive_image]
+    status = true                          # global switch (default: false)
+    widths = [320, 480, 720, 1080]         # srcset breakpoints
+    sizes = "auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"
 
   [params.ascii]
     text = "LIUDON"
