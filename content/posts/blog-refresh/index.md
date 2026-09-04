@@ -3,7 +3,7 @@ title: "博客焕新，继续记录"
 date: 2026-09-04T11:41:08+08:00
 draft: false
 tags:
-  - 博客
+  - 博客优化
   - hugo
 description: "博客焕新，记录 Terminal 这一款终端主题从想法到实现的过程。"
 ---
