@@ -10,6 +10,7 @@ keywords:
   - hugo主题
   - 终端主题
 description: "博客焕新，记录 Terminal 终端主题从想法到实现的过程。"
+ascii: "TERMINAL"
 ---
 
 ## 前言
