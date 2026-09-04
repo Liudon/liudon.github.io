@@ -5,7 +5,11 @@ draft: false
 tags:
   - 博客优化
   - hugo
-description: "博客焕新，记录 Terminal 这一款终端主题从想法到实现的过程。"
+keywords:
+  - 博客美化
+  - hugo主题
+  - 终端主题
+description: "博客焕新，记录 Terminal 终端主题从想法到实现的过程。"
 ---
 
 ## 前言
@@ -22,9 +26,9 @@ meme
 PaperMod
 ```
 
-一直想换个新主题，但 Hugo 下也没有什么好的主题了。
+一直想换个新主题，但查了一下，没有找到特别喜欢的主题了。
 
-查 Hermes 资料时，偶然发现一个类似终端风格的[网站](blakecrosley.com/guides/hermes)。
+查 Hermes 资料时，偶然发现一个类似终端风格的[网站](https://blakecrosley.com/guides/hermes)。
 
 没办法，程序员，就喜欢这种终端风格。😂
 
@@ -58,7 +62,7 @@ PaperMod
 
 前前后后折腾了两天，总算搞出来了。
 
-主要使用 DeepSeek 和 Codex 配合完成，大部分由 DeepSeek 实现，Codex 辅助解决疑难和细节问题和审视方案。
+主要使用 DeepSeek 和 Codex 配合完成，大部分功能由 DeepSeek 实现，Codex 主要负责解决疑难和细节问题，以及审视方案。
 
 DeepSeek 通过 OpenCode GO 调用，共花费 $6，消耗周限额的 40%。
 
