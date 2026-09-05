@@ -1,0 +1,293 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>AI Agent折腾记（OpenClaw / Hermes Agent） | 流动</title><meta name=description content=" AI 智能体（AI Agent）是一种能够感知环境、进行推理并自主行动以实现特定目标的智能系统。
+OpenClaw和Hermes Agent属于目前开源社区最受关注的两个项目。
+"><meta name=author content="Liudon"><meta name=keywords content="ai agent,openclaw,hermes agent"><meta name=robots content="index, follow"><link rel=canonical href=https://liudon.com/posts/deploy-ai-agent/><meta property="og:title" content="AI Agent折腾记（OpenClaw / Hermes Agent） | 流动"><meta property="og:description" content=" AI 智能体（AI Agent）是一种能够感知环境、进行推理并自主行动以实现特定目标的智能系统。
+OpenClaw和Hermes Agent属于目前开源社区最受关注的两个项目。
+"><meta property="og:type" content="article"><meta property="og:url" content="https://liudon.com/posts/deploy-ai-agent/"><meta property="og:site_name" content="流动"><meta property="article:published_time" content="2026-04-14T22:12:17+08:00"><meta property="article:modified_time" content="2026-04-14T22:12:17+08:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="AI Agent折腾记（OpenClaw / Hermes Agent） | 流动"><meta name=twitter:description content=" AI 智能体（AI Agent）是一种能够感知环境、进行推理并自主行动以实现特定目标的智能系统。
+OpenClaw和Hermes Agent属于目前开源社区最受关注的两个项目。
+"><meta name=theme-color content="#ffffff" media="(prefers-color-scheme: light)"><meta name=theme-color content="#0a0a0a" media="(prefers-color-scheme: dark)"><meta name=msapplication-TileColor content="#ff9500"><link rel=icon type=image/svg+xml href=https://liudon.com/favicon.svg><link rel=icon href=https://liudon.com/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://liudon.com/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://liudon.com/favicon-32x32.png><link rel=apple-touch-icon href=https://liudon.com/apple-touch-icon.png><link rel=mask-icon href=https://liudon.com/safari-pinned-tab.svg color=#c2410c><script>(function(){try{var t=location.search.match(/[?&]theme=(dark|light)/),e=t?t[1]:localStorage.getItem("theme");e||(e=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"),e==="light"&&document.documentElement.setAttribute("data-theme","light")}catch{}})()</script><link rel="preload stylesheet" href=../../css/main.min.56a7213ca71c05c00fcffb8f5dc743b504b1e60ff9d9fb881862eed0c8082412.css as=style integrity="sha256-VqchPKccBcAPz/uPXcdDtQSx5g/52fuIGGLu0MgIJBI=" crossorigin=anonymous><script>window.__termBase="/",window.__termSearchIndex="search.json"</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","author":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"dateModified":"2026-04-14T22:12:17+08:00","datePublished":"2026-04-14T22:12:17+08:00","description":" AI 智能体（AI Agent）是一种能够感知环境、进行推理并自主行动以实现特定目标的智能系统。\nOpenClaw和Hermes Agent属于目前开源社区最受关注的两个项目。\n","headline":"AI Agent折腾记（OpenClaw / Hermes Agent）","inLanguage":"zh-CN","keywords":["ai agent","openclaw","hermes agent"],"mainEntityOfPage":{"@id":"https://liudon.com/posts/deploy-ai-agent/","@type":"WebPage"},"name":"AI Agent折腾记（OpenClaw / Hermes Agent）","publisher":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"wordCount":2773}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://liudon.com/","name":"流动","position":1},{"@type":"ListItem","item":"https://liudon.com/posts/","name":"文章","position":2},{"@type":"ListItem","item":"https://liudon.com/posts/deploy-ai-agent/","name":"AI Agent折腾记（OpenClaw / Hermes Agent）","position":3}]}</script><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous fetchpriority=low></script></head><body><a class=sr-only href=#main>Skip to content</a><header class=site-header><div class=site-header__inner><a class=site-logo href=../../ aria-label="流动 - Home">流动</a><nav class=site-nav aria-label="Main navigation"><a href=../../posts/>Posts</a>
+<a href=../../links/>Links</a></nav><div class=header-actions><button type=button class="icon-btn search-trigger" data-search-open aria-label=Search title="Search (/)">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+</button>
+<button type=button class="icon-btn theme-toggle" aria-label="Toggle light and dark mode" title="Toggle light/dark" onclick='(function(){var e=document.documentElement;if(e.getAttribute("data-theme")==="light"){e.removeAttribute("data-theme");try{localStorage.setItem("theme","dark")}catch{}}else{e.setAttribute("data-theme","light");try{localStorage.setItem("theme","light")}catch{}}})()'>
+<svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+<svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</button>
+<button type=button class="icon-btn menu-toggle" id=menu-toggle aria-label="Toggle navigation" aria-expanded=false>
+<span></span><span></span><span></span></button></div></div><div class=mobile-menu-panel id=mobile-menu><nav class=site-nav aria-label="Mobile navigation"><a href=../../posts/>Posts</a>
+<a href=../../links/>Links</a></nav></div></header><main id=main><article class=terminal-guide><div class=terminal-scanlines aria-hidden=true></div><div class=terminal-progress aria-hidden=true><div class=terminal-progress__bar id=reading-progress></div></div><div class=terminal-window><header class=terminal-titlebar><div class=terminal-buttons aria-hidden=true><span class="terminal-btn terminal-btn--close"></span>
+<span class="terminal-btn terminal-btn--minimize"></span>
+<span class="terminal-btn terminal-btn--maximize"></span></div><div class=terminal-title><span class=terminal-prompt>liudon@localhost</span>:<span class=terminal-path>~/blog</span>$ <span class=terminal-cmd>cd /posts/deploy-ai-agent</span><span class=terminal-cursor aria-hidden=true></span></div></header><div class=terminal-body><div class=terminal-output-header><h1 class=terminal-main-title>AI Agent折腾记（OpenClaw / Hermes Agent）</h1><div class=terminal-meta><span class=terminal-meta-item><span class=terminal-meta-label>author:</span> Liudon</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>date:</span> 2026-04-14</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>words:</span> 2773</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>read_time:</span> 6m</span></div><div class=terminal-tags><a class=terminal-tag href=../../tags/ai-agent/>#ai agent</a><a class=terminal-tag href=../../tags/openclaw/>#openclaw</a><a class=terminal-tag href=../../tags/hermes-agent/>#hermes agent</a></div></div><nav class=terminal-toc aria-label="Table of contents" id=inline-toc><div class=terminal-toc-header><span class=terminal-prompt>$</span> ls -la ./sections/</div><div class=terminal-dir-listing><div class=terminal-dir-header>drwxr-xr-x 7 sections</div><a class=terminal-dir-row href=#openclaw%e5%b0%8f%e9%be%99%e8%99%be data-index=0><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>01</span>
+<span class=terminal-dir-name>openclaw小龙虾.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e5%ae%89%e8%a3%85 data-index=1><span class=terminal-dir-name>└── 安装.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e9%97%ae%e9%a2%98 data-index=2><span class=terminal-dir-name>└── 问题.md</span>
+</a><a class=terminal-dir-row href=#hermes-agent data-index=3><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>04</span>
+<span class=terminal-dir-name>hermes-agent.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e5%ae%89%e8%a3%85-1 data-index=4><span class=terminal-dir-name>└── 安装-1.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e9%97%ae%e9%a2%98-1 data-index=5><span class=terminal-dir-name>└── 问题-1.md</span>
+</a><a class=terminal-dir-row href=#%e6%80%bb%e7%bb%93 data-index=6><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>07</span>
+<span class=terminal-dir-name>总结.md</span></a></div></nav><div class=terminal-content><div class=terminal-content-header><span class=terminal-prompt>$</span> less index.md</div><div class=terminal-prose id=prose-content><blockquote><p>AI 智能体（AI Agent）是一种能够感知环境、进行推理并自主行动以实现特定目标的智能系统。</p></blockquote><p>OpenClaw和Hermes Agent属于目前开源社区最受关注的两个项目。</p><h2 id=openclaw小龙虾>OpenClaw（小龙虾）</h2><blockquote><p>What is OpenClaw?</p><p>OpenClaw is a self-hosted gateway that connects your favorite chat apps and channel surfaces — built-in channels plus bundled or external channel plugins such as Discord, Google Chat, iMessage, Matrix, Microsoft Teams, Signal, Slack, Telegram, WhatsApp, Zalo, and more — to AI coding agents like Pi. You run a single Gateway process on your own machine (or a server), and it becomes the bridge between your messaging apps and an always-available AI assistant.</p></blockquote><h3 id=安装>安装</h3><p>本着快速重置的想法，基于Docker进行部署，参考<a href=https://openclaws.io/zh/blog/openclaw-docker-deployment>官方文档</a>。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># 创建根目录
+</span></span><span class=line><span class=cl>mkdir -p ~/.openclaw
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 启动openclaw容器
+</span></span><span class=line><span class=cl>docker run -d \
+</span></span><span class=line><span class=cl>  --name openclaw \
+</span></span><span class=line><span class=cl>  --restart unless-stopped \
+</span></span><span class=line><span class=cl>  --memory=&#34;3g&#34; \
+</span></span><span class=line><span class=cl>  --memory-swap=&#34;6g&#34; \
+</span></span><span class=line><span class=cl>  --memory-reservation=&#34;1g&#34; \
+</span></span><span class=line><span class=cl>  --shm-size=&#34;2gb&#34; \
+</span></span><span class=line><span class=cl>  -e TZ=Asia/Shanghai \
+</span></span><span class=line><span class=cl>  -v ~/.openclaw:/home/node/.openclaw \
+</span></span><span class=line><span class=cl>  -p 3000:3000 \
+</span></span><span class=line><span class=cl>  ghcr.io/openclaw/openclaw:latest
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 进行openclaw配置
+</span></span><span class=line><span class=cl>docker exec -it openclaw openclaw onboard
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 安装微信插件
+</span></span><span class=line><span class=cl>docker exec -it -u node openclaw npx -y @tencent-weixin/openclaw-weixin-cli@latest install
+</span></span></code></pre></div><h3 id=问题>问题</h3><ol><li>安装微信插件失败，到最后一步输出二维码时中断退出。</li></ol><p><picture><source type=image/avif srcset="https://liudon.com/posts/deploy-ai-agent/monitor.png_320x.avif 320w, https://liudon.com/posts/deploy-ai-agent/monitor.png_480x.avif 480w, https://liudon.com/posts/deploy-ai-agent/monitor.png_720x.avif 720w, https://liudon.com/posts/deploy-ai-agent/monitor.png_1080x.avif 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><source type=image/webp srcset="https://liudon.com/posts/deploy-ai-agent/monitor.png_320x.webp 320w, https://liudon.com/posts/deploy-ai-agent/monitor.png_480x.webp 480w, https://liudon.com/posts/deploy-ai-agent/monitor.png_720x.webp 720w, https://liudon.com/posts/deploy-ai-agent/monitor.png_1080x.webp 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><img src=../../posts/deploy-ai-agent/monitor.png alt width=1080 height=226 loading=lazy decoding=async></picture></p><p>查看机器监控，看到内存基本满了。</p><p>我这是一台Lighthouse主机，2核4G，配置较低。</p><p>找AI看了下错误，需要配置下swap分区，防止内存溢出。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># 1. 创建一个 2GB 的交换文件 (可以根据需要把 2G 改为 4G)
+</span></span><span class=line><span class=cl>sudo fallocate -l 2G /swapfile
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 2. 设置正确的权限（仅 root 可读写，出于安全考虑）
+</span></span><span class=line><span class=cl>sudo chmod 600 /swapfile
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 3. 将文件格式化为交换分区
+</span></span><span class=line><span class=cl>sudo mkswap /swapfile
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 4. 启用交换文件
+</span></span><span class=line><span class=cl>sudo swapon /swapfile
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 5. 验证是否成功
+</span></span><span class=line><span class=cl>sudo swapon --show
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 6. 设置开机自动挂载
+</span></span><span class=line><span class=cl>echo &#39;/swapfile none swap sw 0 0&#39; | sudo tee -a /etc/fstab
+</span></span></code></pre></div><ol start=2><li>配置cron任务，经常无法按时执行。</li></ol><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>gateway connect failed: Error: gateway closed (1000): 
+</span></span><span class=line><span class=cl>◇  
+</span></span><span class=line><span class=cl>Gateway not reachable. Is it running and accessible?
+</span></span><span class=line><span class=cl>Gateway target: ws://127.0.0.1:18789
+</span></span><span class=line><span class=cl>Source: local loopback
+</span></span><span class=line><span class=cl>Config: /home/node/.openclaw/openclaw.json
+</span></span><span class=line><span class=cl>Bind: loopback
+</span></span></code></pre></div><p>检查发现有时gateway会连接失败，这个问题时好时坏，怀疑可能还是机器配置较低引起的。</p><h2 id=hermes-agent>Hermes Agent</h2><blockquote><p>What is Hermes Agent?</p><p>It&rsquo;s not a coding copilot tethered to an IDE or a chatbot wrapper around a single API. It&rsquo;s an autonomous agent that gets more capable the longer it runs. It lives wherever you put it — a $5 VPS, a GPU cluster, or serverless infrastructure (Daytona, Modal) that costs nearly nothing when idle. Talk to it from Telegram while it works on a cloud VM you never SSH into yourself. It&rsquo;s not tied to your laptop.</p></blockquote><p>看了文档，貌似对于机器配置要求更低一些。</p><h3 id=安装-1>安装</h3><p>依旧是Docker部署。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># 创建根目录
+</span></span><span class=line><span class=cl>mkdir -p ~/.hermes
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 启动容器，配置模型/消息通道
+</span></span><span class=line><span class=cl>docker run -it --rm \
+</span></span><span class=line><span class=cl>  -v ~/.hermes:/opt/data \
+</span></span><span class=line><span class=cl>  nousresearch/hermes-agent setup
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 启动gateway
+</span></span><span class=line><span class=cl>docker run -d \
+</span></span><span class=line><span class=cl>  --name hermes \
+</span></span><span class=line><span class=cl>  --restart unless-stopped \
+</span></span><span class=line><span class=cl>  -v ~/.hermes:/opt/data \
+</span></span><span class=line><span class=cl>  nousresearch/hermes-agent gateway run
+</span></span></code></pre></div><p>模型我选择了OpenRouter，输入API Key，选择<code>nvidia/nemotron-3-super-120b-a12b:free</code>免费模型。</p><p>消息通道选择weixin，模式选择pairing，扫描二维码进行绑定。</p><p>启动gateway后，微信Clawbot会收到一个配对消息，类似如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-mysql data-lang=mysql><span class=line><span class=cl><span class=n>Hi</span><span class=o>~</span><span class=w> </span><span class=n>I</span><span class=w> </span><span class=n>don</span><span class=s1>&#39;t recognize you yet!
+</span></span></span><span class=line><span class=cl><span class=s1>
+</span></span></span><span class=line><span class=cl><span class=s1>Here&#39;</span><span class=n>s</span><span class=w> </span><span class=n>your</span><span class=w> </span><span class=n>pairing</span><span class=w> </span><span class=n>code</span><span class=p>:</span><span class=w> </span><span class=o>`</span><span class=n>RLU2WUYX</span><span class=o>`</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>Ask</span><span class=w> </span><span class=n>the</span><span class=w> </span><span class=n>bot</span><span class=w> </span><span class=n>owner</span><span class=w> </span><span class=k>to</span><span class=w> </span><span class=n>run</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=o>`</span><span class=n>hermes</span><span class=w> </span><span class=n>pairing</span><span class=w> </span><span class=n>approve</span><span class=w> </span><span class=n>weixin</span><span class=w> </span><span class=n>RLU2WUYX</span><span class=o>`</span><span class=w>
+</span></span></span></code></pre></div><p>进入hermes镜像里执行最后这个命令，之后就可以通过微信Clawbot控制了。</p><h3 id=问题-1>问题</h3><p><img src=hermes%20agent%20cost.png alt loading=lazy decoding=async></p><p>我配置的是免费模型，但是看OpenRouter的Logs，时不时会有<code>Gemini 3 Flash Preview</code>模型的调用，产生费用。</p><p>通过走读代码，终于发现问题所在了，hermes agent有主模型和辅助模型两类。</p><blockquote><p>Hermes uses lightweight &ldquo;auxiliary&rdquo; models for side tasks like image analysis, web page summarization, and browser screenshot analysis. By default, these use Gemini Flash via auto-detection — you don&rsquo;t need to configure anything.</p></blockquote><p>这里以<code>vision</code>图像识别举例：</p><p>config.yaml文件里<code>vision</code>配置默认如下，provider为auto：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>auxiliary</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>  <span class=c1># Image analysis (vision_analyze tool + browser screenshots)</span>
+</span></span><span class=line><span class=cl>  <span class=n>vision</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>provider</span><span class=p>:</span> <span class=s2>&#34;auto&#34;</span>           <span class=c1># &#34;auto&#34;, &#34;openrouter&#34;, &#34;nous&#34;, &#34;codex&#34;, &#34;main&#34;, etc.</span>
+</span></span><span class=line><span class=cl>    <span class=n>model</span><span class=p>:</span> <span class=s2>&#34;&#34;</span>                  <span class=c1># e.g. &#34;openai/gpt-4o&#34;, &#34;google/gemini-2.5-flash&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>base_url</span><span class=p>:</span> <span class=s2>&#34;&#34;</span>               <span class=c1># Custom OpenAI-compatible endpoint (overrides provider)</span>
+</span></span><span class=line><span class=cl>    <span class=n>api_key</span><span class=p>:</span> <span class=s2>&#34;&#34;</span>                <span class=c1># API key for base_url (falls back to OPENAI_API_KEY)</span>
+</span></span><span class=line><span class=cl>    <span class=n>timeout</span><span class=p>:</span> <span class=mi>120</span>               <span class=c1># seconds — LLM API call timeout; vision payloads need generous timeout</span>
+</span></span><span class=line><span class=cl>    <span class=n>download_timeout</span><span class=p>:</span> <span class=mi>30</span>       <span class=c1># seconds — image HTTP download; increase for slow connections</span>
+</span></span></code></pre></div><p>工具入口文件，tools/vision_tools.py</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=k>def</span> <span class=nf>_handle_vision_analyze</span><span class=p>(</span><span class=n>args</span><span class=p>:</span> <span class=n>Dict</span><span class=p>[</span><span class=nb>str</span><span class=p>,</span> <span class=n>Any</span><span class=p>],</span> <span class=o>**</span><span class=n>kw</span><span class=p>:</span> <span class=n>Any</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Awaitable</span><span class=p>[</span><span class=nb>str</span><span class=p>]:</span>
+</span></span><span class=line><span class=cl>    <span class=n>image_url</span> <span class=o>=</span> <span class=n>args</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&#34;image_url&#34;</span><span class=p>,</span> <span class=s2>&#34;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>question</span> <span class=o>=</span> <span class=n>args</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&#34;question&#34;</span><span class=p>,</span> <span class=s2>&#34;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>full_prompt</span> <span class=o>=</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;Fully describe and explain everything about this image, then answer the &#34;</span>
+</span></span><span class=line><span class=cl>        <span class=n>f</span><span class=s2>&#34;following question:</span><span class=se>\n\n</span><span class=s2>{question}&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=o>//</span> <span class=err>从</span><span class=n>env文件获取vision模型</span>
+</span></span><span class=line><span class=cl>    <span class=n>model</span> <span class=o>=</span> <span class=n>os</span><span class=o>.</span><span class=n>getenv</span><span class=p>(</span><span class=s2>&#34;AUXILIARY_VISION_MODEL&#34;</span><span class=p>,</span> <span class=s2>&#34;&#34;</span><span class=p>)</span><span class=o>.</span><span class=n>strip</span><span class=p>()</span> <span class=ow>or</span> <span class=n>None</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>vision_analyze_tool</span><span class=p>(</span><span class=n>image_url</span><span class=p>,</span> <span class=n>full_prompt</span><span class=p>,</span> <span class=n>model</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>//</span> <span class=err>注册工具</span>
+</span></span><span class=line><span class=cl><span class=n>registry</span><span class=o>.</span><span class=n>register</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>name</span><span class=o>=</span><span class=s2>&#34;vision_analyze&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>toolset</span><span class=o>=</span><span class=s2>&#34;vision&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>schema</span><span class=o>=</span><span class=n>VISION_ANALYZE_SCHEMA</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>handler</span><span class=o>=</span><span class=n>_handle_vision_analyze</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>check_fn</span><span class=o>=</span><span class=n>check_vision_requirements</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>is_async</span><span class=o>=</span><span class=n>True</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>emoji</span><span class=o>=</span><span class=s2>&#34;👁️&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></div><p>通过registry.register注册<code>vision_analyze</code>工具，处理逻辑在<code>_handle_vision_analyze</code>方法，从env文件里获取<code>AUXILIARY_VISION_MODEL</code>变量值作为vision模型，最终调用<code>vision_analyze_tool</code>方法。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    Analyze an image from a URL or local file path using vision AI.
+</span></span></span><span class=line><span class=cl><span class=s2>    
+</span></span></span><span class=line><span class=cl><span class=s2>    This tool accepts either an HTTP/HTTPS URL or a local file path. For URLs,
+</span></span></span><span class=line><span class=cl><span class=s2>    it downloads the image first. In both cases, the image is converted to base64
+</span></span></span><span class=line><span class=cl><span class=s2>    and processed using Gemini 3 Flash Preview via OpenRouter API.
+</span></span></span><span class=line><span class=cl><span class=s2>    
+</span></span></span><span class=line><span class=cl><span class=s2>    The user_prompt parameter is expected to be pre-formatted by the calling
+</span></span></span><span class=line><span class=cl><span class=s2>    function (typically model_tools.py) to include both full description
+</span></span></span><span class=line><span class=cl><span class=s2>    requests and specific questions.
+</span></span></span><span class=line><span class=cl><span class=s2>    
+</span></span></span><span class=line><span class=cl><span class=s2>    Args:
+</span></span></span><span class=line><span class=cl><span class=s2>        image_url (str): The URL or local file path of the image to analyze.
+</span></span></span><span class=line><span class=cl><span class=s2>                         Accepts http://, https:// URLs or absolute/relative file paths.
+</span></span></span><span class=line><span class=cl><span class=s2>        user_prompt (str): The pre-formatted prompt for the vision model
+</span></span></span><span class=line><span class=cl><span class=s2>        model (str): The vision model to use (default: google/gemini-3-flash-preview)
+</span></span></span><span class=line><span class=cl><span class=s2>    
+</span></span></span><span class=line><span class=cl><span class=s2>    Returns:
+</span></span></span><span class=line><span class=cl><span class=s2>        str: JSON string containing the analysis results with the following structure:
+</span></span></span><span class=line><span class=cl><span class=s2>             {
+</span></span></span><span class=line><span class=cl><span class=s2>                 &#34;success&#34;: bool,
+</span></span></span><span class=line><span class=cl><span class=s2>                 &#34;analysis&#34;: str (defaults to error message if None)
+</span></span></span><span class=line><span class=cl><span class=s2>             }
+</span></span></span><span class=line><span class=cl><span class=s2>    
+</span></span></span><span class=line><span class=cl><span class=s2>    Raises:
+</span></span></span><span class=line><span class=cl><span class=s2>        Exception: If download fails, analysis fails, or API key is not set
+</span></span></span><span class=line><span class=cl><span class=s2>        
+</span></span></span><span class=line><span class=cl><span class=s2>    Note:
+</span></span></span><span class=line><span class=cl><span class=s2>        - For URLs, temporary images are stored in ./temp_vision_images/ and cleaned up
+</span></span></span><span class=line><span class=cl><span class=s2>        - For local file paths, the file is used directly and NOT deleted
+</span></span></span><span class=line><span class=cl><span class=s2>        - Supports common image formats (JPEG, PNG, GIF, WebP, etc.)
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span></code></pre></div><p>根据<code>vision_analyze_tool</code>方法参数说明，model默认为google/gemini-3-flash-preview。</p><p><picture><source type=image/avif srcset="https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPwq00eJycVBYbAU8MGGrx_8.png_320x.avif 320w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPwq00eJycVBYbAU8MGGrx_8.png_480x.avif 480w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPwq00eJycVBYbAU8MGGrx_8.png_720x.avif 720w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPwq00eJycVBYbAU8MGGrx_8.png_799x.avif 799w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><source type=image/webp srcset="https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPwq00eJycVBYbAU8MGGrx_8.png_320x.webp 320w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPwq00eJycVBYbAU8MGGrx_8.png_480x.webp 480w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPwq00eJycVBYbAU8MGGrx_8.png_720x.webp 720w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPwq00eJycVBYbAU8MGGrx_8.png_799x.webp 799w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><img src=../../posts/deploy-ai-agent/AgAABTwTDPwq00eJycVBYbAU8MGGrx_8.png alt width=799 height=809 loading=lazy decoding=async></picture></p><p>env文件指定了模型的话，使用指定的模型，调用了<code>async_call_llm</code>方法。</p><p>注意，这里没有指定provider参数。</p><p><code>async_call_llm</code>方法如下：</p><p><picture><source type=image/avif srcset="https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPxxgCZdHOtLk6ZjkkU7Sk_m.png_320x.avif 320w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPxxgCZdHOtLk6ZjkkU7Sk_m.png_480x.avif 480w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPxxgCZdHOtLk6ZjkkU7Sk_m.png_720x.avif 720w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPxxgCZdHOtLk6ZjkkU7Sk_m.png_1080x.avif 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><source type=image/webp srcset="https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPxxgCZdHOtLk6ZjkkU7Sk_m.png_320x.webp 320w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPxxgCZdHOtLk6ZjkkU7Sk_m.png_480x.webp 480w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPxxgCZdHOtLk6ZjkkU7Sk_m.png_720x.webp 720w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPxxgCZdHOtLk6ZjkkU7Sk_m.png_1080x.webp 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><img src=../../posts/deploy-ai-agent/AgAABTwTDPxxgCZdHOtLk6ZjkkU7Sk_m.png alt width=1080 height=885 loading=lazy decoding=async></picture></p><p>先看<code>_resolve_task_provider_model</code>方法实现。</p><p><picture><source type=image/avif srcset="https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPyovMGw6SlFcr1DWS43cEPu.png_320x.avif 320w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPyovMGw6SlFcr1DWS43cEPu.png_480x.avif 480w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPyovMGw6SlFcr1DWS43cEPu.png_720x.avif 720w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPyovMGw6SlFcr1DWS43cEPu.png_1013x.avif 1013w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><source type=image/webp srcset="https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPyovMGw6SlFcr1DWS43cEPu.png_320x.webp 320w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPyovMGw6SlFcr1DWS43cEPu.png_480x.webp 480w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPyovMGw6SlFcr1DWS43cEPu.png_720x.webp 720w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPyovMGw6SlFcr1DWS43cEPu.png_1013x.webp 1013w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><img src=../../posts/deploy-ai-agent/AgAABTwTDPyovMGw6SlFcr1DWS43cEPu.png alt width=1013 height=1040 loading=lazy decoding=async></picture></p><p>指定了task的情况，会从config.yaml里读取对应的配置，模型会优先使用env文件的配置，为空的话使用config.yaml文件里的配置。</p><p>如果config.yaml里指定了provider，则使用对应的provider，否则返回auto。</p><p>再来看<code>resolve_vision_provider_client</code>方法实现。</p><p><picture><source type=image/avif srcset="https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPzLDU1IdRpBx5cZ9rtIzFb0.png_320x.avif 320w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPzLDU1IdRpBx5cZ9rtIzFb0.png_480x.avif 480w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPzLDU1IdRpBx5cZ9rtIzFb0.png_720x.avif 720w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPzLDU1IdRpBx5cZ9rtIzFb0.png_1080x.avif 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><source type=image/webp srcset="https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPzLDU1IdRpBx5cZ9rtIzFb0.png_320x.webp 320w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPzLDU1IdRpBx5cZ9rtIzFb0.png_480x.webp 480w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPzLDU1IdRpBx5cZ9rtIzFb0.png_720x.webp 720w, https://liudon.com/posts/deploy-ai-agent/AgAABTwTDPzLDU1IdRpBx5cZ9rtIzFb0.png_1080x.webp 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><img src=../../posts/deploy-ai-agent/AgAABTwTDPzLDU1IdRpBx5cZ9rtIzFb0.png alt width=1080 height=998 loading=lazy decoding=async></picture></p><p>_read_main_provider/_read_main_model为读取config.yaml里配置。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=k>def</span> <span class=nf>_read_main_model</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Read the user&#39;s configured main model from config.yaml.
+</span></span></span><span class=line><span class=cl><span class=s2>
+</span></span></span><span class=line><span class=cl><span class=s2>    config.yaml model.default is the single source of truth for the active
+</span></span></span><span class=line><span class=cl><span class=s2>    model. Environment variables are no longer consulted.
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>from</span> <span class=n>hermes_cli</span><span class=o>.</span><span class=n>config</span> <span class=n>import</span> <span class=n>load_config</span>
+</span></span><span class=line><span class=cl>        <span class=n>cfg</span> <span class=o>=</span> <span class=n>load_config</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=n>model_cfg</span> <span class=o>=</span> <span class=n>cfg</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&#34;model&#34;</span><span class=p>,</span> <span class=p>{})</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>isinstance</span><span class=p>(</span><span class=n>model_cfg</span><span class=p>,</span> <span class=nb>str</span><span class=p>)</span> <span class=ow>and</span> <span class=n>model_cfg</span><span class=o>.</span><span class=n>strip</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>model_cfg</span><span class=o>.</span><span class=n>strip</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>isinstance</span><span class=p>(</span><span class=n>model_cfg</span><span class=p>,</span> <span class=n>dict</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>default</span> <span class=o>=</span> <span class=n>model_cfg</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&#34;default&#34;</span><span class=p>,</span> <span class=s2>&#34;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>isinstance</span><span class=p>(</span><span class=n>default</span><span class=p>,</span> <span class=nb>str</span><span class=p>)</span> <span class=ow>and</span> <span class=n>default</span><span class=o>.</span><span class=n>strip</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span> <span class=n>default</span><span class=o>.</span><span class=n>strip</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>except</span> <span class=n>Exception</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>pass</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=s2>&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>_read_main_provider</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Read the user&#39;s configured main provider from config.yaml.
+</span></span></span><span class=line><span class=cl><span class=s2>
+</span></span></span><span class=line><span class=cl><span class=s2>    Returns the lowercase provider id (e.g. &#34;alibaba&#34;, &#34;openrouter&#34;) or &#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    if not configured.
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>from</span> <span class=n>hermes_cli</span><span class=o>.</span><span class=n>config</span> <span class=n>import</span> <span class=n>load_config</span>
+</span></span><span class=line><span class=cl>        <span class=n>cfg</span> <span class=o>=</span> <span class=n>load_config</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=n>model_cfg</span> <span class=o>=</span> <span class=n>cfg</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&#34;model&#34;</span><span class=p>,</span> <span class=p>{})</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>isinstance</span><span class=p>(</span><span class=n>model_cfg</span><span class=p>,</span> <span class=n>dict</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>provider</span> <span class=o>=</span> <span class=n>model_cfg</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&#34;provider&#34;</span><span class=p>,</span> <span class=s2>&#34;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>isinstance</span><span class=p>(</span><span class=n>provider</span><span class=p>,</span> <span class=nb>str</span><span class=p>)</span> <span class=ow>and</span> <span class=n>provider</span><span class=o>.</span><span class=n>strip</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span> <span class=n>provider</span><span class=o>.</span><span class=n>strip</span><span class=p>()</span><span class=o>.</span><span class=n>lower</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>except</span> <span class=n>Exception</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>pass</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=s2>&#34;&#34;</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>_VISION_AUTO_PROVIDER_ORDER = (
+</span></span><span class=line><span class=cl>    &#34;openrouter&#34;,
+</span></span><span class=line><span class=cl>    &#34;nous&#34;,
+</span></span><span class=line><span class=cl>)
+</span></span></code></pre></div><p>auto模式会依次尝试openrouter和nous两个提供商。</p><p>查看<code>_resolve_strict_vision_backend</code>方法实现：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>def _resolve_strict_vision_backend(provider: str) -&gt; Tuple[Optional[Any], Optional[str]]:
+</span></span><span class=line><span class=cl>    provider = _normalize_vision_provider(provider)
+</span></span><span class=line><span class=cl>    if provider == &#34;openrouter&#34;:
+</span></span><span class=line><span class=cl>        return _try_openrouter()
+</span></span><span class=line><span class=cl>    if provider == &#34;nous&#34;:
+</span></span><span class=line><span class=cl>        return _try_nous(vision=True)
+</span></span><span class=line><span class=cl>    if provider == &#34;openai-codex&#34;:
+</span></span><span class=line><span class=cl>        return _try_codex()
+</span></span><span class=line><span class=cl>    if provider == &#34;anthropic&#34;:
+</span></span><span class=line><span class=cl>        return _try_anthropic()
+</span></span><span class=line><span class=cl>    if provider == &#34;custom&#34;:
+</span></span><span class=line><span class=cl>        return _try_custom_endpoint()
+</span></span><span class=line><span class=cl>    return None, None
+</span></span></code></pre></div><p>我配置的是openrouter，查看<code>_try_openrouter</code>方法实现。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>def _try_openrouter() -&gt; Tuple[Optional[OpenAI], Optional[str]]:
+</span></span><span class=line><span class=cl>    pool_present, entry = _select_pool_entry(&#34;openrouter&#34;)
+</span></span><span class=line><span class=cl>    if pool_present:
+</span></span><span class=line><span class=cl>        or_key = _pool_runtime_api_key(entry)
+</span></span><span class=line><span class=cl>        if not or_key:
+</span></span><span class=line><span class=cl>            return None, None
+</span></span><span class=line><span class=cl>        base_url = _pool_runtime_base_url(entry, OPENROUTER_BASE_URL) or OPENROUTER_BASE_URL
+</span></span><span class=line><span class=cl>        logger.debug(&#34;Auxiliary client: OpenRouter via pool&#34;)
+</span></span><span class=line><span class=cl>        return OpenAI(api_key=or_key, base_url=base_url,
+</span></span><span class=line><span class=cl>                       default_headers=_OR_HEADERS), _OPENROUTER_MODEL
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    or_key = os.getenv(&#34;OPENROUTER_API_KEY&#34;)
+</span></span><span class=line><span class=cl>    if not or_key:
+</span></span><span class=line><span class=cl>        return None, None
+</span></span><span class=line><span class=cl>    logger.debug(&#34;Auxiliary client: OpenRouter&#34;)
+</span></span><span class=line><span class=cl>    return OpenAI(api_key=or_key, base_url=OPENROUTER_BASE_URL,
+</span></span><span class=line><span class=cl>                   default_headers=_OR_HEADERS), _OPENROUTER_MODEL
+</span></span></code></pre></div><p>注意这里调用接口时传入的model为**_OPENROUTER_MODEL**常量。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># Default auxiliary models per provider
+</span></span><span class=line><span class=cl>_OPENROUTER_MODEL = &#34;google/gemini-3-flash-preview&#34;
+</span></span><span class=line><span class=cl>_NOUS_MODEL = &#34;google/gemini-3-flash-preview&#34;
+</span></span><span class=line><span class=cl>_NOUS_FREE_TIER_VISION_MODEL = &#34;xiaomi/mimo-v2-omni&#34;
+</span></span><span class=line><span class=cl>_NOUS_FREE_TIER_AUX_MODEL = &#34;xiaomi/mimo-v2-pro&#34;
+</span></span><span class=line><span class=cl>_NOUS_DEFAULT_BASE_URL = &#34;https://inference-api.nousresearch.com/v1&#34;
+</span></span><span class=line><span class=cl>_ANTHROPIC_DEFAULT_BASE_URL = &#34;https://api.anthropic.com&#34;
+</span></span><span class=line><span class=cl>_AUTH_JSON_PATH = get_hermes_home() / &#34;auth.json&#34;
+</span></span></code></pre></div><p>auto模式下，不指定model的情况下，主provider为openrouter时，使用的是<code>google/gemini-3-flash-preview</code>模型，这就是为什么配置的免费模型，但仍产生了<code>google/gemini-3-flash-preview</code>收费模型的调用。</p><p>将配置里的<code>provider: "auto"</code>改为<code>provider: "main"</code>，使辅助模型也走主模型配置。</p><h2 id=总结>总结</h2><p>两个Agent使用下来，Hermes Agent明显更快一些，对机器的要求也更低。</p><p>把OpenClaw的cron迁移到Hermes Agent上，未执行的问题也解决了。</p></div></div><section class=terminal-comments id=comments data-env-id=https://comment.liudon.com data-region data-lang=zh-CN data-path=/posts/deploy-ai-agent/ data-script=https://cdn.jsdelivr.net/npm/twikoo@1.7.20/dist/twikoo.min.js data-integrity aria-label=Comments><div class=terminal-comments__header><span class=terminal-prompt>$</span>
+<span class=terminal-cmd>twikoo</span>
+<span class=terminal-comments__args>--page /posts/deploy-ai-agent/</span>
+<span class=terminal-comments__status id=comments-status hidden></span>
+<button type=button class=terminal-comments__retry id=comments-retry hidden>retry</button></div><div class=terminal-comments__body><div class=terminal-comments__loading id=comments-loading role=status aria-live=polite><span class=terminal-comments__dots aria-hidden=true><span>.</span><span>.</span><span>.</span></span>
+<span class=terminal-comments__loading-text>loading comments</span>
+<span class=terminal-cursor aria-hidden=true></span></div><div id=twikoo-container></div><noscript><p class=terminal-comments__noscript>JavaScript is required to load comments.</p></noscript></div></section><nav class=terminal-section-nav aria-label="Previous and next posts"><a class=terminal-section-nav__btn href=../../posts/review-2025/><span class=terminal-section-nav__arrow>&#8592;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>prev</span>
+<span class=terminal-section-nav__title>我的2025年</span>
+</span></a><a class="terminal-section-nav__btn terminal-section-nav__btn--next" href=../../posts/voice-cloning-solution-comparison/><span class=terminal-section-nav__arrow>&#8594;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>next</span>
+<span class=terminal-section-nav__title>2026年音色克隆方案对比：IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech、VoxCPM 部署与实测</span></span></a></nav><footer class=terminal-footer><div class=terminal-footer-line><span class=terminal-prompt>$</span> echo "Maintained by Liudon"</div><div class=terminal-footer-output>Maintained by <a href=../../>Liudon</a> | Last updated 2026-04-14</div><div class=terminal-status-bar><span class=terminal-status-item>NORMAL</span>
+<span class=terminal-status-item>index.md</span>
+<span class=terminal-status-item>words: 2773</span>
+<span class="terminal-status-item terminal-status-right">EOF</span></div></footer></div></div></article><aside class=terminal-sidebar id=sidebar-toc aria-label="Quick navigation"><div class=terminal-sidebar__header><span class=terminal-sidebar__title><span class=terminal-prompt>$</span> tree</span>
+<button type=button class=terminal-sidebar__hide-btn id=sidebar-collapse aria-label="Toggle sidebar" title="Toggle sidebar (H)"><span class=terminal-sidebar__key>H</span> toggle</button></div><nav class=terminal-sidebar__nav id=sidebar-nav><a class=terminal-sidebar__link href=#openclaw%e5%b0%8f%e9%be%99%e8%99%be data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>OpenClaw（小龙虾）</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%ae%89%e8%a3%85 data-index=1><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>安装</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e9%97%ae%e9%a2%98 data-index=2><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>问题</span>
+</a><a class=terminal-sidebar__link href=#hermes-agent data-index=3><span class=terminal-sidebar__num>04</span>
+<span class=terminal-sidebar__link-title>Hermes Agent</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%ae%89%e8%a3%85-1 data-index=4><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>安装</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e9%97%ae%e9%a2%98-1 data-index=5><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>问题</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%bb%e7%bb%93 data-index=6><span class=terminal-sidebar__num>07</span>
+<span class=terminal-sidebar__link-title>总结</span></a></nav><div class=terminal-sidebar__footer><span class=terminal-sidebar__key>J</span><span class=terminal-sidebar__key>K</span> nav</div></aside><button type=button class=terminal-sidebar-fab id=sidebar-expand aria-label="Show table of contents" title="Show TOC (H)">
+<span class=terminal-sidebar-fab__icon>☰</span>
+<span class=terminal-sidebar-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-toc-fab" id=toc-toggle aria-label="Toggle table of contents" aria-expanded=false>
+<span class=terminal-mobile-fab__icon>☰</span>
+<span class=terminal-mobile-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-search-fab" data-search-open aria-label=Search>
+<span class=terminal-mobile-fab__icon>/</span>
+<span class=terminal-mobile-fab__label>SEARCH</span></button><div class=terminal-drawer id=toc-drawer aria-hidden=true><div class=terminal-drawer__backdrop id=drawer-backdrop></div><div class=terminal-drawer__content><div class=terminal-drawer__header><span class=terminal-prompt>$</span> ls ./sections/
+<button class=terminal-drawer__close id=drawer-close aria-label="Close navigation">&#215;</button></div><nav class=terminal-drawer__nav id=drawer-nav><a class=terminal-sidebar__link href=#openclaw%e5%b0%8f%e9%be%99%e8%99%be data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>OpenClaw（小龙虾）</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%ae%89%e8%a3%85 data-index=1><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>安装</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e9%97%ae%e9%a2%98 data-index=2><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>问题</span>
+</a><a class=terminal-sidebar__link href=#hermes-agent data-index=3><span class=terminal-sidebar__num>04</span>
+<span class=terminal-sidebar__link-title>Hermes Agent</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%ae%89%e8%a3%85-1 data-index=4><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>安装</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e9%97%ae%e9%a2%98-1 data-index=5><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>问题</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%bb%e7%bb%93 data-index=6><span class=terminal-sidebar__num>07</span>
+<span class=terminal-sidebar__link-title>总结</span></a></nav></div></div></main><button class=terminal-back-top id=back-top aria-label="Back to top" hidden>
+<span class=terminal-back-top__arrow>&#8593;</span>
+<span class=terminal-back-top__label>TOP</span></button><footer class=site-footer role=contentinfo><p class=site-footer__copyright>&copy; 2026 Liudon &#183; Made with Hugo & Terminal · 京ICP备13029522号-2</p></footer><div class=search-modal id=search-modal role=dialog aria-modal=true aria-label=Search><div class=search-modal__backdrop></div><div class=search-modal__dialog><label class=search-modal__input-row for=search-input><span class="search-modal__prompt terminal-prompt">$</span>
+<span class=terminal-search-fixed>find . -name </span><input class=search-modal__input id=search-input type=text placeholder=query autocomplete=off spellcheck=false></label><div class=search-modal__hint><span class=terminal-key>Enter</span> open&nbsp;&nbsp;<span class=terminal-key>&#8593;</span><span class=terminal-key>&#8595;</span> navigate&nbsp;&nbsp;<span class=terminal-key>Esc</span> close</div><div class=search-modal__results id=search-results></div><div class=search-modal__empty id=search-empty>Type a query to search the site&#8230;</div></div></div><script src=../../js/site.min.e6ff269baf919b84428f8155c17bb6f178b7f7726860193703b2d195b4f54607.js integrity="sha256-5v8mm6+Rm4RCj4FVwXu28Xi393JoYBk3A7LRlbT1Rgc=" crossorigin=anonymous defer></script><script src=../../js/article-images.min.36b1f0c3c0fe4c914817cc5f696f3d56fc24f26a619e526057479aab45f9e4da.js integrity="sha256-NrHww8D+TJFIF8xfaW89Vvwk8mphnlJgV0eaq0X55No=" crossorigin=anonymous defer></script></body></html>

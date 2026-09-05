@@ -1,0 +1,208 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>一个git submodule update引发的问题 | 流动</title><meta name=description content="背景 1月份的时候，用hugo搭了这套博客系统。
+本机写md文件，更新到github，然后通过travis-ci自动发布。
+jane主题是通过git submodule引入的，.gitmodules文件内容。
+"><meta name=author content="Liudon"><meta name=keywords content="git"><meta name=robots content="index, follow"><link rel=canonical href=https://liudon.com/posts/a-issues-of-git-submodule-update/><meta property="og:title" content="一个git submodule update引发的问题 | 流动"><meta property="og:description" content="背景 1月份的时候，用hugo搭了这套博客系统。
+本机写md文件，更新到github，然后通过travis-ci自动发布。
+jane主题是通过git submodule引入的，.gitmodules文件内容。
+"><meta property="og:type" content="article"><meta property="og:url" content="https://liudon.com/posts/a-issues-of-git-submodule-update/"><meta property="og:site_name" content="流动"><meta property="article:published_time" content="2019-09-06T15:13:51+08:00"><meta property="article:modified_time" content="2019-09-06T15:13:51+08:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="一个git submodule update引发的问题 | 流动"><meta name=twitter:description content="背景 1月份的时候，用hugo搭了这套博客系统。
+本机写md文件，更新到github，然后通过travis-ci自动发布。
+jane主题是通过git submodule引入的，.gitmodules文件内容。
+"><meta name=theme-color content="#ffffff" media="(prefers-color-scheme: light)"><meta name=theme-color content="#0a0a0a" media="(prefers-color-scheme: dark)"><meta name=msapplication-TileColor content="#ff9500"><link rel=icon type=image/svg+xml href=https://liudon.com/favicon.svg><link rel=icon href=https://liudon.com/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://liudon.com/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://liudon.com/favicon-32x32.png><link rel=apple-touch-icon href=https://liudon.com/apple-touch-icon.png><link rel=mask-icon href=https://liudon.com/safari-pinned-tab.svg color=#c2410c><script>(function(){try{var t=location.search.match(/[?&]theme=(dark|light)/),e=t?t[1]:localStorage.getItem("theme");e||(e=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"),e==="light"&&document.documentElement.setAttribute("data-theme","light")}catch{}})()</script><link rel="preload stylesheet" href=../../css/main.min.56a7213ca71c05c00fcffb8f5dc743b504b1e60ff9d9fb881862eed0c8082412.css as=style integrity="sha256-VqchPKccBcAPz/uPXcdDtQSx5g/52fuIGGLu0MgIJBI=" crossorigin=anonymous><script>window.__termBase="/",window.__termSearchIndex="search.json"</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","author":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"dateModified":"2019-09-06T15:13:51+08:00","datePublished":"2019-09-06T15:13:51+08:00","description":"背景 1月份的时候，用hugo搭了这套博客系统。\n本机写md文件，更新到github，然后通过travis-ci自动发布。\njane主题是通过git submodule引入的，.gitmodules文件内容。\n","headline":"一个git submodule update引发的问题","inLanguage":"zh-CN","keywords":["git"],"mainEntityOfPage":{"@id":"https://liudon.com/posts/a-issues-of-git-submodule-update/","@type":"WebPage"},"name":"一个git submodule update引发的问题","publisher":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"wordCount":1748}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://liudon.com/","name":"流动","position":1},{"@type":"ListItem","item":"https://liudon.com/posts/","name":"文章","position":2},{"@type":"ListItem","item":"https://liudon.com/posts/a-issues-of-git-submodule-update/","name":"一个git submodule update引发的问题","position":3}]}</script><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous fetchpriority=low></script></head><body><a class=sr-only href=#main>Skip to content</a><header class=site-header><div class=site-header__inner><a class=site-logo href=../../ aria-label="流动 - Home">流动</a><nav class=site-nav aria-label="Main navigation"><a href=../../posts/>Posts</a>
+<a href=../../links/>Links</a></nav><div class=header-actions><button type=button class="icon-btn search-trigger" data-search-open aria-label=Search title="Search (/)">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+</button>
+<button type=button class="icon-btn theme-toggle" aria-label="Toggle light and dark mode" title="Toggle light/dark" onclick='(function(){var e=document.documentElement;if(e.getAttribute("data-theme")==="light"){e.removeAttribute("data-theme");try{localStorage.setItem("theme","dark")}catch{}}else{e.setAttribute("data-theme","light");try{localStorage.setItem("theme","light")}catch{}}})()'>
+<svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+<svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</button>
+<button type=button class="icon-btn menu-toggle" id=menu-toggle aria-label="Toggle navigation" aria-expanded=false>
+<span></span><span></span><span></span></button></div></div><div class=mobile-menu-panel id=mobile-menu><nav class=site-nav aria-label="Mobile navigation"><a href=../../posts/>Posts</a>
+<a href=../../links/>Links</a></nav></div></header><main id=main><article class=terminal-guide><div class=terminal-scanlines aria-hidden=true></div><div class=terminal-progress aria-hidden=true><div class=terminal-progress__bar id=reading-progress></div></div><div class=terminal-window><header class=terminal-titlebar><div class=terminal-buttons aria-hidden=true><span class="terminal-btn terminal-btn--close"></span>
+<span class="terminal-btn terminal-btn--minimize"></span>
+<span class="terminal-btn terminal-btn--maximize"></span></div><div class=terminal-title><span class=terminal-prompt>liudon@localhost</span>:<span class=terminal-path>~/blog</span>$ <span class=terminal-cmd>cd /posts/a-issues-of-git-submodule-update</span><span class=terminal-cursor aria-hidden=true></span></div></header><div class=terminal-body><div class=terminal-output-header><h1 class=terminal-main-title>一个git submodule update引发的问题</h1><div class=terminal-meta><span class=terminal-meta-item><span class=terminal-meta-label>author:</span> Liudon</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>date:</span> 2019-09-06</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>words:</span> 1748</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>read_time:</span> 4m</span></div><div class=terminal-tags><a class=terminal-tag href=../../tags/git/>#git</a></div></div><div class=terminal-content><div class=terminal-content-header><span class=terminal-prompt>$</span> less index.md</div><div class=terminal-prose id=prose-content><h4 id=背景>背景</h4><p>1月份的时候，用<code>hugo</code>搭了这套博客系统。</p><p>本机写md文件，更新到<code>github</code>，然后通过<code>travis-ci</code>自动发布。</p><p>jane主题是通过<code>git submodule</code>引入的，<code>.gitmodules</code>文件内容。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[submodule &#34;themes/jane&#34;]
+</span></span><span class=line><span class=cl>	path = themes/jane
+</span></span><span class=line><span class=cl>	url = https://github.com/xianmin/hugo-theme-jane.git
+</span></span></code></pre></div><h4 id=问题>问题</h4><p>最近几天更新完文章后，发现首页显示出了问题。</p><p>一开始以为是主题有问题，具体描述见<a href=https://github.com/xianmin/hugo-theme-jane/issues/244>首页文章不显示了</a>。</p><p>在<code>issue</code>里：
+<code>shaform</code>提到使用的并不是最新的版本。
+<code>RocFang</code>提到是<code>git submodule</code>使用的问题。</p><p>但是<code>travis-ci</code>每次都是通过<code>git submodule update --init --recursive</code>更新子仓库代码的，为什么会不是最新的代码呢。</p><h4 id=问题重现>问题重现</h4><p>接下来，我们用一个新的仓库，来模拟重现一下。</p><ol><li><p>克隆仓库。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[root@VM_81_18_centos xx]# git clone git@github.com:Liudon/test.git
+</span></span><span class=line><span class=cl>Cloning into &#39;test&#39;...
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]# 
+</span></span></code></pre></div></li><li><p>添加文件。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl> [root@VM_81_18_centos xx]# cd test/
+</span></span><span class=line><span class=cl> [root@VM_81_18_centos test]# echo &#34;# test&#34; &gt;&gt; README.md
+</span></span><span class=line><span class=cl> [root@VM_81_18_centos test]# git add README.md
+</span></span><span class=line><span class=cl> [root@VM_81_18_centos test]# 
+</span></span></code></pre></div></li><li><p>引用子仓库。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl> [root@VM_81_18_centos test]# git submodule add git@github.com:xianmin/hugo-theme-jane.git theme/jane
+</span></span><span class=line><span class=cl> Cloning into &#39;theme/jane&#39;...
+</span></span><span class=line><span class=cl> remote: Enumerating objects: 216, done.
+</span></span><span class=line><span class=cl> remote: Counting objects: 100% (216/216), done.
+</span></span><span class=line><span class=cl> remote: Compressing objects: 100% (128/128), done.
+</span></span><span class=line><span class=cl> remote: Total 6165 (delta 102), reused 159 (delta 65), pack-reused 5949
+</span></span><span class=line><span class=cl> Receiving objects: 100% (6165/6165), 3.05 MiB | 1.70 MiB/s, done.
+</span></span><span class=line><span class=cl> Resolving deltas: 100% (3443/3443), done.
+</span></span></code></pre></div></li><li><p>查看文件列表。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl> [root@VM_81_18_centos test]# ll
+</span></span><span class=line><span class=cl> total 8
+</span></span><span class=line><span class=cl> -rw-r--r-- 1 root root    5 Sep  6 16:05 README.md
+</span></span><span class=line><span class=cl> drwxr-xr-x 7 root root 4096 Sep  6 16:08 typecho
+</span></span><span class=line><span class=cl> [root@VM_81_18_centos test]# 
+</span></span></code></pre></div></li><li><p>查看状态。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[root@VM_81_18_centos test]# git status
+</span></span><span class=line><span class=cl># On branch master
+</span></span><span class=line><span class=cl>#
+</span></span><span class=line><span class=cl># Initial commit
+</span></span><span class=line><span class=cl>#
+</span></span><span class=line><span class=cl># Changes to be committed:
+</span></span><span class=line><span class=cl>#   (use &#34;git rm --cached &lt;file&gt;...&#34; to unstage)
+</span></span><span class=line><span class=cl>#
+</span></span><span class=line><span class=cl>#	new file:   .gitmodules
+</span></span><span class=line><span class=cl>#	new file:   README.md
+</span></span><span class=line><span class=cl>#	new file:   typecho
+</span></span><span class=line><span class=cl>#
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]# 
+</span></span></code></pre></div></li><li><p>查看修改。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[root@VM_81_18_centos test]# git diff --cached
+</span></span><span class=line><span class=cl>diff --git a/.gitmodules b/.gitmodules
+</span></span><span class=line><span class=cl>new file mode 100644
+</span></span><span class=line><span class=cl>index 0000000..b1ddf70
+</span></span><span class=line><span class=cl>--- /dev/null
+</span></span><span class=line><span class=cl>+++ b/.gitmodules
+</span></span><span class=line><span class=cl>@@ -0,0 +1,3 @@
+</span></span><span class=line><span class=cl>+[submodule &#34;typecho&#34;]
+</span></span><span class=line><span class=cl>+       path = typecho
+</span></span><span class=line><span class=cl>+       url = https://github.com/Liudon/typecho
+</span></span><span class=line><span class=cl>diff --git a/README.md b/README.md
+</span></span><span class=line><span class=cl>new file mode 100644
+</span></span><span class=line><span class=cl>index 0000000..9daeafb
+</span></span><span class=line><span class=cl>--- /dev/null
+</span></span><span class=line><span class=cl>+++ b/README.md
+</span></span><span class=line><span class=cl>@@ -0,0 +1 @@
+</span></span><span class=line><span class=cl>+test
+</span></span><span class=line><span class=cl>diff --git a/typecho b/typecho
+</span></span><span class=line><span class=cl>new file mode 160000
+</span></span><span class=line><span class=cl>index 0000000..b0c4cc7
+</span></span><span class=line><span class=cl>--- /dev/null
+</span></span><span class=line><span class=cl>+++ b/typecho
+</span></span><span class=line><span class=cl>@@ -0,0 +1 @@
+</span></span><span class=line><span class=cl>+Subproject commit b0c4cc77a7f8f04661fb9f75d4ba6d4d7915b0f1
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]# 
+</span></span></code></pre></div><p>注意最后一行<code>Subproject commit b0c4cc77a7f8f04661fb9f75d4ba6d4d7915b0f1</code>。</p><p>这个<code>commitId</code>是子仓库最新提交的记录id，对应的<a href=https://github.com/Liudon/typecho/commit/b0c4cc77a7f8f04661fb9f75d4ba6d4d7915b0f1>修改记录</a>。</p></li><li><p>提交修改。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[root@VM_81_18_centos test]# git push -u origin master
+</span></span><span class=line><span class=cl>Counting objects: 4, done.
+</span></span><span class=line><span class=cl>Compressing objects: 100% (3/3), done.
+</span></span><span class=line><span class=cl>Writing objects: 100% (4/4), 362 bytes | 0 bytes/s, done.
+</span></span><span class=line><span class=cl>Total 4 (delta 0), reused 0 (delta 0)
+</span></span><span class=line><span class=cl>To git@github.com:Liudon/test.git
+</span></span><span class=line><span class=cl>* [new branch]      master -&gt; master
+</span></span><span class=line><span class=cl>Branch master set up to track remote branch master from origin.
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]# 
+</span></span></code></pre></div><p><img src=https://static.liudon.com/64412246-9050f100-d0c1-11e9-893a-f9b0766533ad.png alt=提交后Github显示 loading=lazy decoding=async></p><p>提交后，在github上子仓库后面会多显示一个<code>@xxxxx</code>，这里就是引用的<code>commitId</code>，对应到前面<code>git diff</code>最后一行。</p><p>点击查看<a href=https://github.com/Liudon/test/commit/5b11d515db8ad8d299ef1691f115590e0015c3b7>提交记录</a>。</p><p><img src=https://static.liudon.com/64412419-e4f46c00-d0c1-11e9-8c2d-6fa1581529f3.png alt=提交记录 loading=lazy decoding=async></p><p>本次提交的<code>commitId</code>为<code>5b11d515db8ad8d299ef1691f115590e0015c3b7</code>，子仓库typecho单独记录了引入时的<code>commitId</code>，为<code>b0c4cc77a7f8f04661fb9f75d4ba6d4d7915b0f1</code>，对应的<a href=https://github.com/Liudon/typecho/tree/b0c4cc77a7f8f04661fb9f75d4ba6d4d7915b0f1>提交记录</a>。</p></li><li><p>接下来克隆子仓库，进行更新提交。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[root@VM_81_18_centos xx]# git clone git@github.com:Liudon/typecho.git
+</span></span><span class=line><span class=cl>Cloning into &#39;typecho&#39;...
+</span></span><span class=line><span class=cl>remote: Enumerating objects: 1, done.
+</span></span><span class=line><span class=cl>remote: Counting objects: 100% (1/1), done.
+</span></span><span class=line><span class=cl>remote: Total 7179 (delta 0), reused 0 (delta 0), pack-reused 7178
+</span></span><span class=line><span class=cl>Receiving objects: 100% (7179/7179), 7.26 MiB | 2.02 MiB/s, done.
+</span></span><span class=line><span class=cl>Resolving deltas: 100% (4844/4844), done.
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos xx]# 
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos xx]# cd typecho/
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos typecho]# git log -n 1
+</span></span><span class=line><span class=cl>commit b0c4cc77a7f8f04661fb9f75d4ba6d4d7915b0f1
+</span></span><span class=line><span class=cl>Merge: c904005 8fd7492
+</span></span><span class=line><span class=cl>Author: 祁宁 &lt;magike.net@gmail.com&gt;
+</span></span><span class=line><span class=cl>Date:   Tue Nov 18 13:59:52 2014 +0800
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    Merge branch &#39;master&#39; of https://github.com/typecho/typecho
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos typecho]#
+</span></span></code></pre></div><p>通过<code>git log</code>，确认最新的提交commitId为<code>b0c4cc77a7f8f04661fb9f75d4ba6d4d7915b0f1</code>，与前面的引入的一致。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[root@VM_81_18_centos typecho]# echo &#34;xxx&#34; &gt; test
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos typecho]# 
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos typecho]# git add test
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos typecho]# git commit -m &#39;test&#39;
+</span></span><span class=line><span class=cl>[master 5dcc8f4] test
+</span></span><span class=line><span class=cl>1 file changed, 1 insertion(+)
+</span></span><span class=line><span class=cl>create mode 100644 test
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos typecho]# git push
+</span></span><span class=line><span class=cl>Counting objects: 4, done.
+</span></span><span class=line><span class=cl>Compressing objects: 100% (2/2), done.
+</span></span><span class=line><span class=cl>Writing objects: 100% (3/3), 252 bytes | 0 bytes/s, done.
+</span></span><span class=line><span class=cl>Total 3 (delta 1), reused 0 (delta 0)
+</span></span><span class=line><span class=cl>remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+</span></span><span class=line><span class=cl>To git@github.com:Liudon/typecho.git
+</span></span><span class=line><span class=cl>b0c4cc7..5dcc8f4  master -&gt; master
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos typecho]# 
+</span></span></code></pre></div><p>修改文件提交。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[root@VM_81_18_centos typecho]# git log -n 1
+</span></span><span class=line><span class=cl>commit 5dcc8f4e91cc724ba82aba5b9e7955727b58c5c2
+</span></span><span class=line><span class=cl>Author: liudon &lt;i.mu@qq.com&gt;
+</span></span><span class=line><span class=cl>Date:   Fri Sep 6 16:26:47 2019 +0800
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    test
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos typecho]#
+</span></span></code></pre></div><p>最新提交的<code>commitId</code>为<code>5dcc8f4e91cc724ba82aba5b9e7955727b58c5c2</code>。</p></li><li><p>重新克隆<code>test</code>库。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[root@VM_81_18_centos yy]# git clone git@github.com:Liudon/test.git
+</span></span><span class=line><span class=cl>Cloning into &#39;test&#39;...
+</span></span><span class=line><span class=cl>remote: Enumerating objects: 4, done.
+</span></span><span class=line><span class=cl>remote: Counting objects: 100% (4/4), done.
+</span></span><span class=line><span class=cl>remote: Compressing objects: 100% (3/3), done.
+</span></span><span class=line><span class=cl>remote: Total 4 (delta 0), reused 4 (delta 0), pack-reused 0
+</span></span><span class=line><span class=cl>Receiving objects: 100% (4/4), done.
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos yy]# cd test/
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]# ll
+</span></span><span class=line><span class=cl>total 8
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root    5 Sep  6 16:31 README.md
+</span></span><span class=line><span class=cl>drwxr-xr-x 2 root root 4096 Sep  6 16:31 typecho
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]# ll typecho/
+</span></span><span class=line><span class=cl>total 0
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]# 
+</span></span></code></pre></div><p>这里可以看到<code>typecho</code>目录下是没有文件的。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[root@VM_81_18_centos test]# git submodule update --init --recursive
+</span></span><span class=line><span class=cl>Submodule &#39;typecho&#39; (https://github.com/Liudon/typecho) registered for path &#39;typecho&#39;
+</span></span><span class=line><span class=cl>Cloning into &#39;typecho&#39;...
+</span></span><span class=line><span class=cl>remote: Enumerating objects: 4, done.
+</span></span><span class=line><span class=cl>remote: Counting objects: 100% (4/4), done.
+</span></span><span class=line><span class=cl>remote: Compressing objects: 100% (3/3), done.
+</span></span><span class=line><span class=cl>remote: Total 7182 (delta 0), reused 2 (delta 0), pack-reused 7178
+</span></span><span class=line><span class=cl>Receiving objects: 100% (7182/7182), 7.26 MiB | 1.26 MiB/s, done.
+</span></span><span class=line><span class=cl>Resolving deltas: 100% (4844/4844), done.
+</span></span><span class=line><span class=cl>Submodule path &#39;typecho&#39;: checked out &#39;b0c4cc77a7f8f04661fb9f75d4ba6d4d7915b0f1&#39;
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]#
+</span></span></code></pre></div><p>更新子仓库代码，这里可以看到最终<code>checkout</code>的版本为<code>b0c4cc77a7f8f04661fb9f75d4ba6d4d7915b0f1</code>，与前面提交时的版本一致。</p></li></ol><h4 id=问题分析>问题分析</h4><p><code>git submodule add</code>的时候，会记录当时引入时子仓库的版本id。</p><p><code>git submodule update --init --recursive</code>，会检出引入时的仓库版本，这就是为啥代码没有更新了。</p><h4 id=问题解决>问题解决</h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[root@VM_81_18_centos yy]# git clone git@github.com:Liudon/test.git
+</span></span><span class=line><span class=cl>Cloning into &#39;test&#39;...
+</span></span><span class=line><span class=cl>remote: Enumerating objects: 4, done.
+</span></span><span class=line><span class=cl>remote: Counting objects: 100% (4/4), done.
+</span></span><span class=line><span class=cl>remote: Compressing objects: 100% (3/3), done.
+</span></span><span class=line><span class=cl>remote: Total 4 (delta 0), reused 4 (delta 0), pack-reused 0
+</span></span><span class=line><span class=cl>Receiving objects: 100% (4/4), done.
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos yy]# 
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos yy]# 
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos yy]# cd test/
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]# ll
+</span></span><span class=line><span class=cl>total 8
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root    5 Sep  6 16:37 README.md
+</span></span><span class=line><span class=cl>drwxr-xr-x 2 root root 4096 Sep  6 16:37 typecho
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]# ll typecho/
+</span></span><span class=line><span class=cl>total 0
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]# 
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]# git submodule update --init --remote --recursive
+</span></span><span class=line><span class=cl>Submodule &#39;typecho&#39; (https://github.com/Liudon/typecho) registered for path &#39;typecho&#39;
+</span></span><span class=line><span class=cl>Cloning into &#39;typecho&#39;...
+</span></span><span class=line><span class=cl>remote: Enumerating objects: 4, done.
+</span></span><span class=line><span class=cl>remote: Counting objects: 100% (4/4), done.
+</span></span><span class=line><span class=cl>remote: Compressing objects: 100% (3/3), done.
+</span></span><span class=line><span class=cl>remote: Total 7182 (delta 0), reused 2 (delta 0), pack-reused 7178
+</span></span><span class=line><span class=cl>Receiving objects: 100% (7182/7182), 7.26 MiB | 1.24 MiB/s, done.
+</span></span><span class=line><span class=cl>Resolving deltas: 100% (4844/4844), done.
+</span></span><span class=line><span class=cl>Submodule path &#39;typecho&#39;: checked out &#39;5dcc8f4e91cc724ba82aba5b9e7955727b58c5c2&#39;
+</span></span><span class=line><span class=cl>[root@VM_81_18_centos test]#
+</span></span></code></pre></div><p>使用<code>git submodule update --init --remote --recursive</code>命令。</p></div></div><section class=terminal-comments id=comments data-env-id=https://comment.liudon.com data-region data-lang=zh-CN data-path=/posts/a-issues-of-git-submodule-update/ data-script=https://cdn.jsdelivr.net/npm/twikoo@1.7.20/dist/twikoo.min.js data-integrity aria-label=Comments><div class=terminal-comments__header><span class=terminal-prompt>$</span>
+<span class=terminal-cmd>twikoo</span>
+<span class=terminal-comments__args>--page /posts/a-issues-of-git-submodule-update/</span>
+<span class=terminal-comments__status id=comments-status hidden></span>
+<button type=button class=terminal-comments__retry id=comments-retry hidden>retry</button></div><div class=terminal-comments__body><div class=terminal-comments__loading id=comments-loading role=status aria-live=polite><span class=terminal-comments__dots aria-hidden=true><span>.</span><span>.</span><span>.</span></span>
+<span class=terminal-comments__loading-text>loading comments</span>
+<span class=terminal-cursor aria-hidden=true></span></div><div id=twikoo-container></div><noscript><p class=terminal-comments__noscript>JavaScript is required to load comments.</p></noscript></div></section><nav class=terminal-section-nav aria-label="Previous and next posts"><a class=terminal-section-nav__btn href=../../posts/curl-cost-time-long/><span class=terminal-section-nav__arrow>&#8592;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>prev</span>
+<span class=terminal-section-nav__title>一个Curl的耗时长的问题</span>
+</span></a><a class="terminal-section-nav__btn terminal-section-nav__btn--next" href=../../posts/swoft-event-processor-analysis/><span class=terminal-section-nav__arrow>&#8594;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>next</span>
+<span class=terminal-section-nav__title>Swoft 框架运行分析（四） —— EventProcessor模块分析</span></span></a></nav><footer class=terminal-footer><div class=terminal-footer-line><span class=terminal-prompt>$</span> echo "Maintained by Liudon"</div><div class=terminal-footer-output>Maintained by <a href=../../>Liudon</a> | Last updated 2019-09-06</div><div class=terminal-status-bar><span class=terminal-status-item>NORMAL</span>
+<span class=terminal-status-item>index.md</span>
+<span class=terminal-status-item>words: 1748</span>
+<span class="terminal-status-item terminal-status-right">EOF</span></div></footer></div></div></article></main><button class=terminal-back-top id=back-top aria-label="Back to top" hidden>
+<span class=terminal-back-top__arrow>&#8593;</span>
+<span class=terminal-back-top__label>TOP</span></button><footer class=site-footer role=contentinfo><p class=site-footer__copyright>&copy; 2026 Liudon &#183; Made with Hugo & Terminal · 京ICP备13029522号-2</p></footer><div class=search-modal id=search-modal role=dialog aria-modal=true aria-label=Search><div class=search-modal__backdrop></div><div class=search-modal__dialog><label class=search-modal__input-row for=search-input><span class="search-modal__prompt terminal-prompt">$</span>
+<span class=terminal-search-fixed>find . -name </span><input class=search-modal__input id=search-input type=text placeholder=query autocomplete=off spellcheck=false></label><div class=search-modal__hint><span class=terminal-key>Enter</span> open&nbsp;&nbsp;<span class=terminal-key>&#8593;</span><span class=terminal-key>&#8595;</span> navigate&nbsp;&nbsp;<span class=terminal-key>Esc</span> close</div><div class=search-modal__results id=search-results></div><div class=search-modal__empty id=search-empty>Type a query to search the site&#8230;</div></div></div><script src=../../js/site.min.e6ff269baf919b84428f8155c17bb6f178b7f7726860193703b2d195b4f54607.js integrity="sha256-5v8mm6+Rm4RCj4FVwXu28Xi393JoYBk3A7LRlbT1Rgc=" crossorigin=anonymous defer></script><script src=../../js/article-images.min.36b1f0c3c0fe4c914817cc5f696f3d56fc24f26a619e526057479aab45f9e4da.js integrity="sha256-NrHww8D+TJFIF8xfaW89Vvwk8mphnlJgV0eaq0X55No=" crossorigin=anonymous defer></script></body></html>

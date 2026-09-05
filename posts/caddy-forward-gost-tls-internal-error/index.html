@@ -1,0 +1,306 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Caddy 转发 GOST 报 TLS internal error 问题的排查与解决 | 流动</title><meta name=description content="记录 GOST 客户端通过 Caddy 转发访问 GOST 服务端时出现 TLS internal error 的排查过程，最终定位为客户端通过 IP 连接时未发送 SNI，并使用域名配合 ip 参数解决。"><meta name=author content="Liudon"><meta name=keywords content="Caddy,GOST,TLS,SNI,WebSocket,tshark"><meta name=robots content="index, follow"><link rel=canonical href=https://liudon.com/posts/caddy-forward-gost-tls-internal-error/><meta property="og:title" content="Caddy 转发 GOST 报 TLS internal error 问题的排查与解决 | 流动"><meta property="og:description" content="记录 GOST 客户端通过 Caddy 转发访问 GOST 服务端时出现 TLS internal error 的排查过程，最终定位为客户端通过 IP 连接时未发送 SNI，并使用域名配合 ip 参数解决。"><meta property="og:type" content="article"><meta property="og:url" content="https://liudon.com/posts/caddy-forward-gost-tls-internal-error/"><meta property="og:site_name" content="流动"><meta property="article:published_time" content="2026-07-30T10:30:00+08:00"><meta property="article:modified_time" content="2026-07-30T10:30:00+08:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="Caddy 转发 GOST 报 TLS internal error 问题的排查与解决 | 流动"><meta name=twitter:description content="记录 GOST 客户端通过 Caddy 转发访问 GOST 服务端时出现 TLS internal error 的排查过程，最终定位为客户端通过 IP 连接时未发送 SNI，并使用域名配合 ip 参数解决。"><meta name=theme-color content="#ffffff" media="(prefers-color-scheme: light)"><meta name=theme-color content="#0a0a0a" media="(prefers-color-scheme: dark)"><meta name=msapplication-TileColor content="#ff9500"><link rel=icon type=image/svg+xml href=https://liudon.com/favicon.svg><link rel=icon href=https://liudon.com/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://liudon.com/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://liudon.com/favicon-32x32.png><link rel=apple-touch-icon href=https://liudon.com/apple-touch-icon.png><link rel=mask-icon href=https://liudon.com/safari-pinned-tab.svg color=#c2410c><script>(function(){try{var t=location.search.match(/[?&]theme=(dark|light)/),e=t?t[1]:localStorage.getItem("theme");e||(e=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"),e==="light"&&document.documentElement.setAttribute("data-theme","light")}catch{}})()</script><link rel="preload stylesheet" href=../../css/main.min.56a7213ca71c05c00fcffb8f5dc743b504b1e60ff9d9fb881862eed0c8082412.css as=style integrity="sha256-VqchPKccBcAPz/uPXcdDtQSx5g/52fuIGGLu0MgIJBI=" crossorigin=anonymous><script>window.__termBase="/",window.__termSearchIndex="search.json"</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","author":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"dateModified":"2026-07-30T10:30:00+08:00","datePublished":"2026-07-30T10:30:00+08:00","description":"记录 GOST 客户端通过 Caddy 转发访问 GOST 服务端时出现 TLS internal error 的排查过程，最终定位为客户端通过 IP 连接时未发送 SNI，并使用域名配合 ip 参数解决。","headline":"Caddy 转发 GOST 报 TLS internal error 问题的排查与解决","inLanguage":"zh-CN","keywords":["Caddy","GOST","TLS","SNI","WebSocket","tshark"],"mainEntityOfPage":{"@id":"https://liudon.com/posts/caddy-forward-gost-tls-internal-error/","@type":"WebPage"},"name":"Caddy 转发 GOST 报 TLS internal error 问题的排查与解决","publisher":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"wordCount":2717}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://liudon.com/","name":"流动","position":1},{"@type":"ListItem","item":"https://liudon.com/posts/","name":"文章","position":2},{"@type":"ListItem","item":"https://liudon.com/posts/caddy-forward-gost-tls-internal-error/","name":"Caddy 转发 GOST 报 TLS internal error 问题的排查与解决","position":3}]}</script><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous fetchpriority=low></script></head><body><a class=sr-only href=#main>Skip to content</a><header class=site-header><div class=site-header__inner><a class=site-logo href=../../ aria-label="流动 - Home">流动</a><nav class=site-nav aria-label="Main navigation"><a href=../../posts/>Posts</a>
+<a href=../../links/>Links</a></nav><div class=header-actions><button type=button class="icon-btn search-trigger" data-search-open aria-label=Search title="Search (/)">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+</button>
+<button type=button class="icon-btn theme-toggle" aria-label="Toggle light and dark mode" title="Toggle light/dark" onclick='(function(){var e=document.documentElement;if(e.getAttribute("data-theme")==="light"){e.removeAttribute("data-theme");try{localStorage.setItem("theme","dark")}catch{}}else{e.setAttribute("data-theme","light");try{localStorage.setItem("theme","light")}catch{}}})()'>
+<svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+<svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</button>
+<button type=button class="icon-btn menu-toggle" id=menu-toggle aria-label="Toggle navigation" aria-expanded=false>
+<span></span><span></span><span></span></button></div></div><div class=mobile-menu-panel id=mobile-menu><nav class=site-nav aria-label="Mobile navigation"><a href=../../posts/>Posts</a>
+<a href=../../links/>Links</a></nav></div></header><main id=main><article class=terminal-guide><div class=terminal-scanlines aria-hidden=true></div><div class=terminal-progress aria-hidden=true><div class=terminal-progress__bar id=reading-progress></div></div><div class=terminal-window><header class=terminal-titlebar><div class=terminal-buttons aria-hidden=true><span class="terminal-btn terminal-btn--close"></span>
+<span class="terminal-btn terminal-btn--minimize"></span>
+<span class="terminal-btn terminal-btn--maximize"></span></div><div class=terminal-title><span class=terminal-prompt>liudon@localhost</span>:<span class=terminal-path>~/blog</span>$ <span class=terminal-cmd>cd /posts/caddy-forward-gost-tls-internal-error</span><span class=terminal-cursor aria-hidden=true></span></div></header><div class=terminal-body><div class=terminal-output-header><h1 class=terminal-main-title>Caddy 转发 GOST 报 TLS internal error 问题的排查与解决</h1><p class=terminal-description># 记录 GOST 客户端通过 Caddy 转发访问 GOST 服务端时出现 TLS internal error 的排查过程，最终定位为客户端通过 IP 连接时未发送 SNI，并使用域名配合 ip 参数解决。</p><div class=terminal-meta><span class=terminal-meta-item><span class=terminal-meta-label>author:</span> Liudon</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>date:</span> 2026-07-30</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>words:</span> 2717</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>read_time:</span> 6m</span></div><div class=terminal-tags><a class=terminal-tag href=../../tags/caddy/>#Caddy</a><a class=terminal-tag href=../../tags/gost/>#GOST</a><a class=terminal-tag href=../../tags/tls/>#TLS</a><a class=terminal-tag href=../../tags/sni/>#SNI</a><a class=terminal-tag href=../../tags/websocket/>#WebSocket</a><a class=terminal-tag href=../../tags/tshark/>#tshark</a></div></div><nav class=terminal-toc aria-label="Table of contents" id=inline-toc><div class=terminal-toc-header><span class=terminal-prompt>$</span> ls -la ./sections/</div><div class=terminal-dir-listing><div class=terminal-dir-header>drwxr-xr-x 14 sections</div><a class=terminal-dir-row href=#%e9%97%ae%e9%a2%98%e7%8e%b0%e8%b1%a1 data-index=0><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>01</span>
+<span class=terminal-dir-name>问题现象.md</span>
+</a><a class=terminal-dir-row href=#%e4%b8%a4%e7%a7%8d%e9%83%a8%e7%bd%b2%e6%9e%b6%e6%9e%84 data-index=1><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>02</span>
+<span class=terminal-dir-name>两种部署架构.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e6%9e%b6%e6%9e%84%e4%b8%80gost-%e5%ae%a2%e6%88%b7%e7%ab%af%e7%9b%b4%e8%bf%9e-gost-%e6%9c%8d%e5%8a%a1%e7%ab%af data-index=2><span class=terminal-dir-name>└── 架构一gost-客户端直连-gost-服务端.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e6%9e%b6%e6%9e%84%e4%ba%8cgost-%e5%ae%a2%e6%88%b7%e7%ab%af%e9%80%9a%e8%bf%87-caddy-%e8%ae%bf%e9%97%ae-gost data-index=3><span class=terminal-dir-name>└── 架构二gost-客户端通过-caddy-访问-gost.md</span>
+</a><a class=terminal-dir-row href=#%e6%8e%92%e6%9f%a5%e8%bf%87%e7%a8%8b data-index=4><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>05</span>
+<span class=terminal-dir-name>排查过程.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e7%a1%ae%e8%ae%a4-sni-%e5%92%8c-host-%e6%89%80%e5%9c%a8%e7%9a%84%e9%98%b6%e6%ae%b5 data-index=5><span class=terminal-dir-name>└── 确认-sni-和-host-所在的阶段.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e4%bd%bf%e7%94%a8-curl-%e9%aa%8c%e8%af%81-caddy-%e6%9c%ac%e8%ba%ab data-index=6><span class=terminal-dir-name>└── 使用-curl-验证-caddy-本身.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e4%bd%bf%e7%94%a8-tshark-%e6%a3%80%e6%9f%a5%e5%ae%a2%e6%88%b7%e7%ab%af%e6%98%af%e5%90%a6%e5%8f%91%e9%80%81-sni data-index=7><span class=terminal-dir-name>└── 使用-tshark-检查客户端是否发送-sni.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e6%8a%93%e5%8f%96%e5%ae%8c%e6%95%b4%e8%af%b7%e6%b1%82%e7%a1%ae%e8%ae%a4%e5%a4%b1%e8%b4%a5%e4%bd%8d%e7%bd%ae data-index=8><span class=terminal-dir-name>└── 抓取完整请求确认失败位置.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e6%9f%a5%e7%9c%8b-tls-alert data-index=9><span class=terminal-dir-name>└── 查看-tls-alert.md</span>
+</a><a class=terminal-dir-row href=#%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88 data-index=10><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>11</span>
+<span class=terminal-dir-name>解决方案.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e6%8e%a8%e8%8d%90%e6%96%b9%e6%a1%88%e5%9f%9f%e5%90%8d%e4%bd%9c%e4%b8%ba%e8%8a%82%e7%82%b9%e5%9c%b0%e5%9d%80%e4%bd%bf%e7%94%a8-ip-%e6%8c%87%e5%ae%9a%e5%ae%9e%e9%99%85%e6%9c%8d%e5%8a%a1%e5%99%a8 data-index=11><span class=terminal-dir-name>└── 推荐方案域名作为节点地址使用-ip-指定实际服务器.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e5%85%bc%e5%ae%b9%e6%96%b9%e6%a1%88caddy-%e8%ae%be%e7%bd%ae-default_sni data-index=12><span class=terminal-dir-name>└── 兼容方案caddy-设置-default_sni.md</span>
+</a><a class=terminal-dir-row href=#%e6%80%bb%e7%bb%93 data-index=13><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>14</span>
+<span class=terminal-dir-name>总结.md</span></a></div></nav><div class=terminal-content><div class=terminal-content-header><span class=terminal-prompt>$</span> less index.md</div><div class=terminal-prose id=prose-content><h2 id=问题现象>问题现象</h2><p>原本 GOST 服务端直接监听公网 <code>443</code>，Windows GOST 客户端通过服务器 IP 连接时可以正常使用。</p><p>后来为了让公网 <code>443</code> 端口由 Caddy 统一管理，将 GOST 调整为监听本机端口，再由 Caddy 通过域名反向代理到 GOST。</p><p>改造后，Windows GOST 客户端连接失败，并出现：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>remote error: tls: internal error
+</span></span></code></pre></div><p>开启 GOST 调试日志后，本地代理调用方还会收到：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>HTTP/1.1 503 Service Unavailable
+</span></span><span class=line><span class=cl>Proxy-Agent: gost/2.12.0
+</span></span><span class=line><span class=cl>Content-Length: 0
+</span></span></code></pre></div><p>一开始容易将问题理解为：</p><ul><li>Caddy 返回了 HTTP 503；</li><li>GOST 服务端没有正常监听；</li><li>Caddy 的 <code>reverse_proxy</code> 配置错误；</li><li>WebSocket 路径不一致；</li><li>用户名或密码错误。</li></ul><p>但后续抓包表明，请求根本没有进入 Caddy 的 HTTP 反向代理阶段，真正的错误发生在 TLS 握手过程中。</p><h2 id=两种部署架构>两种部署架构</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>代理域名：proxy.example.com
+</span></span><span class=line><span class=cl>服务器公网 IP：203.0.113.10
+</span></span><span class=line><span class=cl>GOST 本地端口：127.0.0.1:10443
+</span></span></code></pre></div><h3 id=架构一gost-客户端直连-gost-服务端>架构一：GOST 客户端直连 GOST 服务端</h3><p>原来的部署结构如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>┌─────────────────────────┐
+</span></span><span class=line><span class=cl>│ GOST Client             │
+</span></span><span class=line><span class=cl>│ relay+mwss              │
+</span></span><span class=line><span class=cl>│                         │
+</span></span><span class=line><span class=cl>│ 连接 203.0.113.10:443   │
+</span></span><span class=line><span class=cl>└────────────┬────────────┘
+</span></span><span class=line><span class=cl>             │
+</span></span><span class=line><span class=cl>             │ TLS
+</span></span><span class=line><span class=cl>             │ WebSocket
+</span></span><span class=line><span class=cl>             │ Relay
+</span></span><span class=line><span class=cl>             ▼
+</span></span><span class=line><span class=cl>┌─────────────────────────┐
+</span></span><span class=line><span class=cl>│ GOST Server             │
+</span></span><span class=line><span class=cl>│ relay+mwss              │
+</span></span><span class=line><span class=cl>│                         │
+</span></span><span class=line><span class=cl>│ 监听 0.0.0.0:443        │
+</span></span><span class=line><span class=cl>│ GOST 自己处理 TLS       │
+</span></span><span class=line><span class=cl>└─────────────────────────┘
+</span></span></code></pre></div><p>GOST 服务端示例：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>docker run -d <span class=se>\
+</span></span></span><span class=line><span class=cl>  --name gost <span class=se>\
+</span></span></span><span class=line><span class=cl>  --restart unless-stopped <span class=se>\
+</span></span></span><span class=line><span class=cl>  --network host <span class=se>\
+</span></span></span><span class=line><span class=cl>  -v <span class=s2>&#34;</span><span class=si>${</span><span class=nv>CERT_DIR</span><span class=si>}</span><span class=s2>:</span><span class=si>${</span><span class=nv>CERT_DIR</span><span class=si>}</span><span class=s2>:ro&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>  ginuerzh/gost <span class=se>\
+</span></span></span><span class=line><span class=cl>  -L <span class=s2>&#34;relay+mwss://</span><span class=si>${</span><span class=nv>USER</span><span class=si>}</span><span class=s2>:</span><span class=si>${</span><span class=nv>PASS</span><span class=si>}</span><span class=s2>@0.0.0.0:443?cert=</span><span class=si>${</span><span class=nv>CERT</span><span class=si>}</span><span class=s2>&amp;key=</span><span class=si>${</span><span class=nv>KEY</span><span class=si>}</span><span class=s2>&#34;</span>
+</span></span></code></pre></div><p>客户端使用服务器 IP 连接：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>-F <span class=s2>&#34;relay+mwss://user:password@203.0.113.10:443?host=proxy.example.com&amp;sni=proxy.example.com&#34;</span>
+</span></span></code></pre></div><p>在这一架构下连接正常。</p><h3 id=架构二gost-客户端通过-caddy-访问-gost>架构二：GOST 客户端通过 Caddy 访问 GOST</h3><p>调整后的部署结构如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>┌─────────────────────────┐
+</span></span><span class=line><span class=cl>│ GOST Client             │
+</span></span><span class=line><span class=cl>│ relay+mwss              │
+</span></span><span class=line><span class=cl>│                         │
+</span></span><span class=line><span class=cl>│ 连接 Caddy 公网 443     │
+</span></span><span class=line><span class=cl>└────────────┬────────────┘
+</span></span><span class=line><span class=cl>             │
+</span></span><span class=line><span class=cl>             │ TLS
+</span></span><span class=line><span class=cl>             │ WebSocket
+</span></span><span class=line><span class=cl>             ▼
+</span></span><span class=line><span class=cl>┌─────────────────────────┐
+</span></span><span class=line><span class=cl>│ Caddy                   │
+</span></span><span class=line><span class=cl>│                         │
+</span></span><span class=line><span class=cl>│ 监听公网 :443           │
+</span></span><span class=line><span class=cl>│ 终止 TLS                │
+</span></span><span class=line><span class=cl>│ 根据域名选择站点        │
+</span></span><span class=line><span class=cl>└────────────┬────────────┘
+</span></span><span class=line><span class=cl>             │
+</span></span><span class=line><span class=cl>             │ 明文 WebSocket
+</span></span><span class=line><span class=cl>             ▼
+</span></span><span class=line><span class=cl>┌─────────────────────────┐
+</span></span><span class=line><span class=cl>│ GOST Server             │
+</span></span><span class=line><span class=cl>│ relay+mws               │
+</span></span><span class=line><span class=cl>│                         │
+</span></span><span class=line><span class=cl>│ 127.0.0.1:10443         │
+</span></span><span class=line><span class=cl>└─────────────────────────┘
+</span></span></code></pre></div><p>此时 TLS 由 Caddy 处理：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>客户端 → Caddy：relay+mwss
+</span></span><span class=line><span class=cl>Caddy → GOST：relay+mws
+</span></span></code></pre></div><p>GOST 服务端改为：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>docker run -d <span class=se>\
+</span></span></span><span class=line><span class=cl>  --name gost <span class=se>\
+</span></span></span><span class=line><span class=cl>  --restart unless-stopped <span class=se>\
+</span></span></span><span class=line><span class=cl>  --network host <span class=se>\
+</span></span></span><span class=line><span class=cl>  ginuerzh/gost <span class=se>\
+</span></span></span><span class=line><span class=cl>  -L <span class=s2>&#34;relay+mws://</span><span class=si>${</span><span class=nv>USER</span><span class=si>}</span><span class=s2>:</span><span class=si>${</span><span class=nv>PASS</span><span class=si>}</span><span class=s2>@127.0.0.1:10443&#34;</span>
+</span></span></code></pre></div><p>Caddy 配置为：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-caddyfile data-lang=caddyfile><span class=line><span class=cl><span class=gh>proxy.example.com</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>reverse_proxy</span> <span class=n>127.0.0.1</span><span class=p>:</span><span class=mi>10443</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>客户端仍然使用原来的 IP 连接方式：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>-F <span class=s2>&#34;relay+mwss://user:password@203.0.113.10:443?host=proxy.example.com&amp;sni=proxy.example.com&#34;</span>
+</span></span></code></pre></div><p>此时开始出现：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>remote error: tls: internal error
+</span></span></code></pre></div><h2 id=排查过程>排查过程</h2><h3 id=确认-sni-和-host-所在的阶段>确认 SNI 和 Host 所在的阶段</h3><p>一次 <code>mwss</code> 连接大致经过：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>1. 建立 TCP 连接
+</span></span><span class=line><span class=cl>2. 发送 TLS ClientHello
+</span></span><span class=line><span class=cl>3. 在 ClientHello 中携带 SNI
+</span></span><span class=line><span class=cl>4. 完成 TLS 握手
+</span></span><span class=line><span class=cl>5. 发送 WebSocket HTTP 请求
+</span></span><span class=line><span class=cl>6. 在 HTTP 请求中携带 Host
+</span></span><span class=line><span class=cl>7. 进行 GOST Relay 握手
+</span></span></code></pre></div><p>因此：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>SNI：在 TLS 握手阶段发送
+</span></span><span class=line><span class=cl>Host：在 TLS 完成后的 HTTP 请求中发送
+</span></span></code></pre></div><p>如果 TLS 阶段已经失败，那么客户端配置中的：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>host=proxy.example.com
+</span></span></code></pre></div><p>根本没有机会发送到 Caddy。</p><p>这意味着排查时不能只看客户端命令行参数，还必须确认它实际发出的 TLS ClientHello 中是否存在 SNI。</p><h3 id=使用-curl-验证-caddy-本身>使用 curl 验证 Caddy 本身</h3><p>先使用 <code>curl</code> 强制将域名解析到指定服务器 IP：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=n>curl</span><span class=p>.</span><span class=py>exe</span> <span class=n>-vk</span> <span class=p>`</span>
+</span></span><span class=line><span class=cl>  <span class=p>-</span><span class=n>-resolve</span> <span class=n>proxy</span><span class=p>.</span><span class=py>example</span><span class=p>.</span><span class=n>com</span><span class=err>:</span><span class=mf>443</span><span class=err>:</span><span class=mf>203.0</span><span class=p>.</span><span class=py>113</span><span class=p>.</span><span class=py>10</span> <span class=p>`</span>
+</span></span><span class=line><span class=cl>  <span class=n>https</span><span class=err>:</span><span class=p>//</span><span class=n>proxy</span><span class=p>.</span><span class=py>example</span><span class=p>.</span><span class=n>com</span><span class=p>/</span>
+</span></span></code></pre></div><p>如果能正常完成 TLS 并返回类似：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>HTTP/2 404
+</span></span></code></pre></div><p>说明以下部分基本正常：</p><ul><li>公网 <code>443</code> 可达；</li><li>Caddy 正在监听；</li><li>Caddy 管理的证书可用；</li><li><code>proxy.example.com</code> 站点能够正确匹配；</li><li>使用域名作为 SNI 时，TLS 握手可以完成。</li></ul><p>这里返回 <code>404</code> 并不代表 GOST 有问题。</p><p>普通 <code>curl</code> 请求不是合法的 GOST WebSocket 请求，因此返回普通 HTTP 错误是正常现象。这个测试的目的只是验证 Caddy 的 TLS 和站点匹配。</p><h3 id=使用-tshark-检查客户端是否发送-sni>使用 tshark 检查客户端是否发送 SNI</h3><p>安装 <code>tshark</code>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo apt update
+</span></span><span class=line><span class=cl>sudo apt install -y tshark
+</span></span></code></pre></div><p>实时查看访问公网 <code>443</code> 的 TLS ClientHello：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo tshark <span class=se>\
+</span></span></span><span class=line><span class=cl>  -i any <span class=se>\
+</span></span></span><span class=line><span class=cl>  -f <span class=s1>&#39;tcp port 443&#39;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>  -Y <span class=s1>&#39;tls.handshake.type == 1&#39;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>  -T fields <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e ip.src <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e tcp.srcport <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e tls.handshake.extensions_server_name
+</span></span></code></pre></div><p>启动 Windows GOST 客户端后，输出类似：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>198.51.100.25    17619
+</span></span><span class=line><span class=cl>198.51.100.25    17620
+</span></span></code></pre></div><p>最后一列本应显示：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>proxy.example.com
+</span></span></code></pre></div><p>但实际为空。</p><p>这说明客户端真实发送的是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>TCP 目标：203.0.113.10:443
+</span></span><span class=line><span class=cl>TLS SNI：空
+</span></span></code></pre></div><p>虽然客户端参数里配置了：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>sni=proxy.example.com
+</span></span></code></pre></div><p>但在当前使用的 GOST v2.12.0 和 <code>relay+mwss</code> 组合下，该参数没有真正进入 TLS ClientHello。</p><h3 id=抓取完整请求确认失败位置>抓取完整请求确认失败位置</h3><p>为了确认请求是否进入 GOST 后端，可以同时抓取公网 <code>443</code> 和本机 <code>10443</code>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo tshark <span class=se>\
+</span></span></span><span class=line><span class=cl>  -i any <span class=se>\
+</span></span></span><span class=line><span class=cl>  -f <span class=s1>&#39;tcp port 443 or tcp port 10443&#39;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>  -w /tmp/gost-test.pcapng
+</span></span></code></pre></div><p>客户端连接一次，出现错误后停止抓包。</p><p>查看 TLS ClientHello：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo tshark <span class=se>\
+</span></span></span><span class=line><span class=cl>  -r /tmp/gost-test.pcapng <span class=se>\
+</span></span></span><span class=line><span class=cl>  -Y <span class=s1>&#39;tcp.dstport == 443 &amp;&amp; tls.handshake.type == 1&#39;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>  -T fields <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e frame.number <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e frame.time <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e ip.src <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e tcp.srcport <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e tls.handshake.extensions_server_name
+</span></span></code></pre></div><p>结果类似：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>16  Jul 30, 2026 09:56:08.224178672 CST  198.51.100.25  17619
+</span></span><span class=line><span class=cl>26  Jul 30, 2026 09:56:08.466286059 CST  198.51.100.25  17620
+</span></span></code></pre></div><p>SNI 字段仍然为空。</p><p>接着查看 Caddy 是否向 GOST 后端发送了请求：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo tshark <span class=se>\
+</span></span></span><span class=line><span class=cl>  -r /tmp/gost-test.pcapng <span class=se>\
+</span></span></span><span class=line><span class=cl>  -Y <span class=s1>&#39;tcp.dstport == 10443 &amp;&amp; http.request&#39;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>  -T fields <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e frame.number <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e frame.time <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e http.request.method <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e http.host <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e http.request.uri <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e http.upgrade
+</span></span></code></pre></div><p>没有任何输出。</p><p>这说明请求没有进入：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>127.0.0.1:10443
+</span></span></code></pre></div><p>也就是 Caddy 尚未执行：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-caddyfile data-lang=caddyfile><span class=line><span class=cl><span class=gh>reverse_proxy</span> <span class=gh>127.0.0.1:10443</span><span class=p>
+</span></span></span></code></pre></div><p>连接就已经失败。</p><h3 id=查看-tls-alert>查看 TLS Alert</h3><p>继续查看 TLS Alert：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo tshark <span class=se>\
+</span></span></span><span class=line><span class=cl>  -r /tmp/gost-test.pcapng <span class=se>\
+</span></span></span><span class=line><span class=cl>  -Y <span class=s1>&#39;tls.alert_message&#39;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>  -T fields <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e frame.number <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e frame.time <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e ip.src <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e ip.dst <span class=se>\
+</span></span></span><span class=line><span class=cl>  -e tls.alert_message
+</span></span></code></pre></div><p>输出类似：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>18  Jul 30, 2026 09:56:08.224555864 CST  203.0.113.10  198.51.100.25  1
+</span></span><span class=line><span class=cl>28  Jul 30, 2026 09:56:08.466625388 CST  203.0.113.10  198.51.100.25  1
+</span></span></code></pre></div><p>查看其中一个数据包的详细内容：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo tshark <span class=se>\
+</span></span></span><span class=line><span class=cl>  -r /tmp/gost-test.pcapng <span class=se>\
+</span></span></span><span class=line><span class=cl>  -Y <span class=s1>&#39;frame.number == 18&#39;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>  -V
+</span></span></code></pre></div><p>可以看到：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Transport Layer Security
+</span></span><span class=line><span class=cl>    TLSv1.2 Record Layer: Alert
+</span></span><span class=line><span class=cl>        Level: Fatal
+</span></span><span class=line><span class=cl>        Description: Internal Error
+</span></span></code></pre></div><p>完整失败路径已经明确：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Windows GOST
+</span></span><span class=line><span class=cl>→ 连接 203.0.113.10:443
+</span></span><span class=line><span class=cl>→ ClientHello 没有 SNI
+</span></span><span class=line><span class=cl>→ Caddy 在 TLS 阶段返回 Fatal Internal Error
+</span></span><span class=line><span class=cl>→ 未进入 HTTP/WebSocket
+</span></span><span class=line><span class=cl>→ 未转发到 127.0.0.1:10443
+</span></span><span class=line><span class=cl>→ Windows 本地 GOST 返回 HTTP 503
+</span></span></code></pre></div><h2 id=解决方案>解决方案</h2><h3 id=推荐方案域名作为节点地址使用-ip-指定实际服务器>推荐方案：域名作为节点地址，使用 ip 指定实际服务器</h3><p>推荐将客户端配置改为：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>-F <span class=s2>&#34;relay+mwss://user:password@proxy.example.com:443?ip=203.0.113.10&#34;</span>
+</span></span></code></pre></div><p>这里将两个概念分开：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>proxy.example.com：
+</span></span><span class=line><span class=cl>- 用于 TLS SNI
+</span></span><span class=line><span class=cl>- 用于 WebSocket Host
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>203.0.113.10：
+</span></span><span class=line><span class=cl>- 用于实际建立 TCP 连接
+</span></span></code></pre></div><p>客户端实际行为变为：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>TCP 连接目标：203.0.113.10:443
+</span></span><span class=line><span class=cl>TLS SNI：proxy.example.com
+</span></span><span class=line><span class=cl>WebSocket Host：proxy.example.com
+</span></span></code></pre></div><p>这相当于只为当前 GOST 节点指定了一个固定 IP，但不会修改系统 hosts，也不会依赖该域名当前的公共 DNS 解析结果。</p><p>Caddy 不需要任何特殊兼容配置：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-caddyfile data-lang=caddyfile><span class=line><span class=cl><span class=gh>proxy.example.com</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>reverse_proxy</span> <span class=n>127.0.0.1</span><span class=p>:</span><span class=mi>10443</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><h3 id=兼容方案caddy-设置-default_sni>兼容方案：Caddy 设置 default_sni</h3><p>如果客户端无法调整，仍然只能使用 IP 作为节点地址：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>-F <span class=s2>&#34;relay+mwss://user:password@203.0.113.10:443?host=proxy.example.com&amp;sni=proxy.example.com&#34;</span>
+</span></span></code></pre></div><p>可以在 Caddy 中配置：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-caddyfile data-lang=caddyfile><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>default_sni</span> <span class=s>proxy.example.com</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=gh>proxy.example.com</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>reverse_proxy</span> <span class=n>127.0.0.1</span><span class=p>:</span><span class=mi>10443</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p><code>default_sni</code> 的作用是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>当客户端完全没有发送 SNI 时，
+</span></span><span class=line><span class=cl>Caddy 将连接按 proxy.example.com 处理。
+</span></span></code></pre></div><p>这样即使客户端 ClientHello 中的 SNI 为空，Caddy 仍可以选择对应证书并完成 TLS 握手。</p><p>不过，这种方式更适合作为旧客户端或特殊客户端的兼容方案。</p><p>注意：通过 default_sni 的方式兼容，则不能开启 strict_sni_host 校验，否则会导致校验失败出现TLS错误。</p><h2 id=总结>总结</h2><p>这次故障的直接原因是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>GOST 客户端使用服务器 IP 作为 relay+mwss 节点地址时，
+</span></span><span class=line><span class=cl>配置中的 sni 参数没有真正进入 TLS ClientHello。
+</span></span></code></pre></div><p>抓包结果显示：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>TLS SNI：空
+</span></span><span class=line><span class=cl>TLS Alert：Fatal Internal Error
+</span></span><span class=line><span class=cl>GOST 后端 10443：没有任何请求
+</span></span></code></pre></div><p>因此可以排除：</p><ul><li>GOST 后端监听异常；</li><li>Caddy 到 GOST 的反向代理异常；</li><li>WebSocket Host 或路径异常；</li><li>用户名密码错误。</li></ul><p>请求在进入这些阶段之前，就已经在 Caddy 的 TLS 握手处失败。</p><p>两种架构表现不同，关键在于谁负责处理公网 TLS。</p><p>在 GOST 客户端直连 GOST 服务端的架构中：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>客户端
+</span></span><span class=line><span class=cl>→ GOST :443
+</span></span></code></pre></div><p>公网 <code>443</code> 只有一个 GOST TLS 监听器。</p><p>GOST 不需要根据 SNI 区分多个 HTTPS 站点，即使客户端不发送 SNI，请求也仍然会进入这个唯一监听器，因此连接可以成功。</p><p>而在 Caddy 转发 GOST 的架构中：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>客户端
+</span></span><span class=line><span class=cl>→ Caddy :443
+</span></span><span class=line><span class=cl>→ GOST 127.0.0.1:10443
+</span></span></code></pre></div><p>公网 TLS 由 Caddy 处理。</p><p>Caddy 需要在 TLS ClientHello 阶段根据 SNI 选择：</p><ul><li>对应的站点；</li><li>对应的 TLS 证书；</li><li>后续的 HTTP 路由。</li></ul><p>当客户端没有发送 SNI 时，Caddy 无法正常完成对应域名的 TLS 处理，于是在 WebSocket Host、Relay 认证和反向代理发生之前，直接返回：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Fatal Internal Error
+</span></span></code></pre></div></div></div><section class=terminal-comments id=comments data-env-id=https://comment.liudon.com data-region data-lang=zh-CN data-path=/posts/caddy-forward-gost-tls-internal-error/ data-script=https://cdn.jsdelivr.net/npm/twikoo@1.7.20/dist/twikoo.min.js data-integrity aria-label=Comments><div class=terminal-comments__header><span class=terminal-prompt>$</span>
+<span class=terminal-cmd>twikoo</span>
+<span class=terminal-comments__args>--page /posts/caddy-forward-gost-tls-internal-error/</span>
+<span class=terminal-comments__status id=comments-status hidden></span>
+<button type=button class=terminal-comments__retry id=comments-retry hidden>retry</button></div><div class=terminal-comments__body><div class=terminal-comments__loading id=comments-loading role=status aria-live=polite><span class=terminal-comments__dots aria-hidden=true><span>.</span><span>.</span><span>.</span></span>
+<span class=terminal-comments__loading-text>loading comments</span>
+<span class=terminal-cursor aria-hidden=true></span></div><div id=twikoo-container></div><noscript><p class=terminal-comments__noscript>JavaScript is required to load comments.</p></noscript></div></section><nav class=terminal-section-nav aria-label="Previous and next posts"><a class=terminal-section-nav__btn href=../../posts/lip-sync-video-synthesis-comparison/><span class=terminal-section-nav__arrow>&#8592;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>prev</span>
+<span class=terminal-section-nav__title>2026年对口型视频合成方案对比：Wav2Lip、VideoReTalking、 MuseTalk 部署与实测</span>
+</span></a><a class="terminal-section-nav__btn terminal-section-nav__btn--next" href=../../posts/windows-codex-update-failed/><span class=terminal-section-nav__arrow>&#8594;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>next</span>
+<span class=terminal-section-nav__title>Windows 下 Codex Cli 更新报 Move-Item is denied 错误的解决</span></span></a></nav><footer class=terminal-footer><div class=terminal-footer-line><span class=terminal-prompt>$</span> echo "Maintained by Liudon"</div><div class=terminal-footer-output>Maintained by <a href=../../>Liudon</a> | Last updated 2026-07-30</div><div class=terminal-status-bar><span class=terminal-status-item>NORMAL</span>
+<span class=terminal-status-item>index.md</span>
+<span class=terminal-status-item>words: 2717</span>
+<span class="terminal-status-item terminal-status-right">EOF</span></div></footer></div></div></article><aside class=terminal-sidebar id=sidebar-toc aria-label="Quick navigation"><div class=terminal-sidebar__header><span class=terminal-sidebar__title><span class=terminal-prompt>$</span> tree</span>
+<button type=button class=terminal-sidebar__hide-btn id=sidebar-collapse aria-label="Toggle sidebar" title="Toggle sidebar (H)"><span class=terminal-sidebar__key>H</span> toggle</button></div><nav class=terminal-sidebar__nav id=sidebar-nav><a class=terminal-sidebar__link href=#%e9%97%ae%e9%a2%98%e7%8e%b0%e8%b1%a1 data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>问题现象</span>
+</a><a class=terminal-sidebar__link href=#%e4%b8%a4%e7%a7%8d%e9%83%a8%e7%bd%b2%e6%9e%b6%e6%9e%84 data-index=1><span class=terminal-sidebar__num>02</span>
+<span class=terminal-sidebar__link-title>两种部署架构</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%9e%b6%e6%9e%84%e4%b8%80gost-%e5%ae%a2%e6%88%b7%e7%ab%af%e7%9b%b4%e8%bf%9e-gost-%e6%9c%8d%e5%8a%a1%e7%ab%af data-index=2><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>架构一：GOST 客户端直连 GOST 服务端</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%9e%b6%e6%9e%84%e4%ba%8cgost-%e5%ae%a2%e6%88%b7%e7%ab%af%e9%80%9a%e8%bf%87-caddy-%e8%ae%bf%e9%97%ae-gost data-index=3><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>架构二：GOST 客户端通过 Caddy 访问 GOST</span>
+</a><a class=terminal-sidebar__link href=#%e6%8e%92%e6%9f%a5%e8%bf%87%e7%a8%8b data-index=4><span class=terminal-sidebar__num>05</span>
+<span class=terminal-sidebar__link-title>排查过程</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e7%a1%ae%e8%ae%a4-sni-%e5%92%8c-host-%e6%89%80%e5%9c%a8%e7%9a%84%e9%98%b6%e6%ae%b5 data-index=5><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>确认 SNI 和 Host 所在的阶段</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e4%bd%bf%e7%94%a8-curl-%e9%aa%8c%e8%af%81-caddy-%e6%9c%ac%e8%ba%ab data-index=6><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>使用 curl 验证 Caddy 本身</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e4%bd%bf%e7%94%a8-tshark-%e6%a3%80%e6%9f%a5%e5%ae%a2%e6%88%b7%e7%ab%af%e6%98%af%e5%90%a6%e5%8f%91%e9%80%81-sni data-index=7><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>使用 tshark 检查客户端是否发送 SNI</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%8a%93%e5%8f%96%e5%ae%8c%e6%95%b4%e8%af%b7%e6%b1%82%e7%a1%ae%e8%ae%a4%e5%a4%b1%e8%b4%a5%e4%bd%8d%e7%bd%ae data-index=8><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>抓取完整请求确认失败位置</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%9f%a5%e7%9c%8b-tls-alert data-index=9><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>查看 TLS Alert</span>
+</a><a class=terminal-sidebar__link href=#%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88 data-index=10><span class=terminal-sidebar__num>11</span>
+<span class=terminal-sidebar__link-title>解决方案</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%8e%a8%e8%8d%90%e6%96%b9%e6%a1%88%e5%9f%9f%e5%90%8d%e4%bd%9c%e4%b8%ba%e8%8a%82%e7%82%b9%e5%9c%b0%e5%9d%80%e4%bd%bf%e7%94%a8-ip-%e6%8c%87%e5%ae%9a%e5%ae%9e%e9%99%85%e6%9c%8d%e5%8a%a1%e5%99%a8 data-index=11><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>推荐方案：域名作为节点地址，使用 ip 指定实际服务器</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%85%bc%e5%ae%b9%e6%96%b9%e6%a1%88caddy-%e8%ae%be%e7%bd%ae-default_sni data-index=12><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>兼容方案：Caddy 设置 default_sni</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%bb%e7%bb%93 data-index=13><span class=terminal-sidebar__num>14</span>
+<span class=terminal-sidebar__link-title>总结</span></a></nav><div class=terminal-sidebar__footer><span class=terminal-sidebar__key>J</span><span class=terminal-sidebar__key>K</span> nav</div></aside><button type=button class=terminal-sidebar-fab id=sidebar-expand aria-label="Show table of contents" title="Show TOC (H)">
+<span class=terminal-sidebar-fab__icon>☰</span>
+<span class=terminal-sidebar-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-toc-fab" id=toc-toggle aria-label="Toggle table of contents" aria-expanded=false>
+<span class=terminal-mobile-fab__icon>☰</span>
+<span class=terminal-mobile-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-search-fab" data-search-open aria-label=Search>
+<span class=terminal-mobile-fab__icon>/</span>
+<span class=terminal-mobile-fab__label>SEARCH</span></button><div class=terminal-drawer id=toc-drawer aria-hidden=true><div class=terminal-drawer__backdrop id=drawer-backdrop></div><div class=terminal-drawer__content><div class=terminal-drawer__header><span class=terminal-prompt>$</span> ls ./sections/
+<button class=terminal-drawer__close id=drawer-close aria-label="Close navigation">&#215;</button></div><nav class=terminal-drawer__nav id=drawer-nav><a class=terminal-sidebar__link href=#%e9%97%ae%e9%a2%98%e7%8e%b0%e8%b1%a1 data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>问题现象</span>
+</a><a class=terminal-sidebar__link href=#%e4%b8%a4%e7%a7%8d%e9%83%a8%e7%bd%b2%e6%9e%b6%e6%9e%84 data-index=1><span class=terminal-sidebar__num>02</span>
+<span class=terminal-sidebar__link-title>两种部署架构</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%9e%b6%e6%9e%84%e4%b8%80gost-%e5%ae%a2%e6%88%b7%e7%ab%af%e7%9b%b4%e8%bf%9e-gost-%e6%9c%8d%e5%8a%a1%e7%ab%af data-index=2><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>架构一：GOST 客户端直连 GOST 服务端</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%9e%b6%e6%9e%84%e4%ba%8cgost-%e5%ae%a2%e6%88%b7%e7%ab%af%e9%80%9a%e8%bf%87-caddy-%e8%ae%bf%e9%97%ae-gost data-index=3><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>架构二：GOST 客户端通过 Caddy 访问 GOST</span>
+</a><a class=terminal-sidebar__link href=#%e6%8e%92%e6%9f%a5%e8%bf%87%e7%a8%8b data-index=4><span class=terminal-sidebar__num>05</span>
+<span class=terminal-sidebar__link-title>排查过程</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e7%a1%ae%e8%ae%a4-sni-%e5%92%8c-host-%e6%89%80%e5%9c%a8%e7%9a%84%e9%98%b6%e6%ae%b5 data-index=5><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>确认 SNI 和 Host 所在的阶段</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e4%bd%bf%e7%94%a8-curl-%e9%aa%8c%e8%af%81-caddy-%e6%9c%ac%e8%ba%ab data-index=6><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>使用 curl 验证 Caddy 本身</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e4%bd%bf%e7%94%a8-tshark-%e6%a3%80%e6%9f%a5%e5%ae%a2%e6%88%b7%e7%ab%af%e6%98%af%e5%90%a6%e5%8f%91%e9%80%81-sni data-index=7><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>使用 tshark 检查客户端是否发送 SNI</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%8a%93%e5%8f%96%e5%ae%8c%e6%95%b4%e8%af%b7%e6%b1%82%e7%a1%ae%e8%ae%a4%e5%a4%b1%e8%b4%a5%e4%bd%8d%e7%bd%ae data-index=8><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>抓取完整请求确认失败位置</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%9f%a5%e7%9c%8b-tls-alert data-index=9><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>查看 TLS Alert</span>
+</a><a class=terminal-sidebar__link href=#%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88 data-index=10><span class=terminal-sidebar__num>11</span>
+<span class=terminal-sidebar__link-title>解决方案</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%8e%a8%e8%8d%90%e6%96%b9%e6%a1%88%e5%9f%9f%e5%90%8d%e4%bd%9c%e4%b8%ba%e8%8a%82%e7%82%b9%e5%9c%b0%e5%9d%80%e4%bd%bf%e7%94%a8-ip-%e6%8c%87%e5%ae%9a%e5%ae%9e%e9%99%85%e6%9c%8d%e5%8a%a1%e5%99%a8 data-index=11><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>推荐方案：域名作为节点地址，使用 ip 指定实际服务器</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%85%bc%e5%ae%b9%e6%96%b9%e6%a1%88caddy-%e8%ae%be%e7%bd%ae-default_sni data-index=12><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>兼容方案：Caddy 设置 default_sni</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%bb%e7%bb%93 data-index=13><span class=terminal-sidebar__num>14</span>
+<span class=terminal-sidebar__link-title>总结</span></a></nav></div></div></main><button class=terminal-back-top id=back-top aria-label="Back to top" hidden>
+<span class=terminal-back-top__arrow>&#8593;</span>
+<span class=terminal-back-top__label>TOP</span></button><footer class=site-footer role=contentinfo><p class=site-footer__copyright>&copy; 2026 Liudon &#183; Made with Hugo & Terminal · 京ICP备13029522号-2</p></footer><div class=search-modal id=search-modal role=dialog aria-modal=true aria-label=Search><div class=search-modal__backdrop></div><div class=search-modal__dialog><label class=search-modal__input-row for=search-input><span class="search-modal__prompt terminal-prompt">$</span>
+<span class=terminal-search-fixed>find . -name </span><input class=search-modal__input id=search-input type=text placeholder=query autocomplete=off spellcheck=false></label><div class=search-modal__hint><span class=terminal-key>Enter</span> open&nbsp;&nbsp;<span class=terminal-key>&#8593;</span><span class=terminal-key>&#8595;</span> navigate&nbsp;&nbsp;<span class=terminal-key>Esc</span> close</div><div class=search-modal__results id=search-results></div><div class=search-modal__empty id=search-empty>Type a query to search the site&#8230;</div></div></div><script src=../../js/site.min.e6ff269baf919b84428f8155c17bb6f178b7f7726860193703b2d195b4f54607.js integrity="sha256-5v8mm6+Rm4RCj4FVwXu28Xi393JoYBk3A7LRlbT1Rgc=" crossorigin=anonymous defer></script><script src=../../js/article-comments.min.ad02af1bdddfb88d9e633bbaae895e05d2600adc813e02a307614b286f9ed88e.js integrity="sha256-rQKvG93fuI2eYzu6roleBdJgCtyBPgKjB2FLKG+e2I4=" crossorigin=anonymous defer></script></body></html>
