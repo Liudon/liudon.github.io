@@ -1,13 +1,22 @@
 (function () {
+  const host = window.location.host; // 含端口，方便本地调试
+
+  // 精确白名单：本人可控的部署域名
   const allowedHosts = new Set([
     "liudon.com",
     "blog.liudon.xyz",
-    "localhost",
-    "127.0.0.1",
-    "::1"
+    "liudon.xyz",
+    "liudon.sol.build",
+    "liudon.eth.limo"
+    // 以后新增网关/部署域名，继续加在这里
   ]);
 
-  if (allowedHosts.has(window.location.hostname)) return;
+  const isLocalDev =
+    host === "localhost" || host.startsWith("localhost:") ||
+    host === "127.0.0.1" || host.startsWith("127.0.0.1:") ||
+    host === "[::1]" || host.startsWith("[::1]:");
+
+  if (allowedHosts.has(host) || isLocalDev) return;
 
   document.body.innerHTML = [
     '<div style="margin: auto;">',
