@@ -125,23 +125,25 @@ tags:
 ![](tangyuan.jpg)
 ![](xiandian.jpg)
 
-![](shengmudian-1.jpg)
-![](shengmudian-2.jpg)
-
-圣母殿前的盘龙柱，最有意思的两个：点赞龙和比耶龙。
+圣母殿和左右护法。
 
 ![](shengmudian.jpg)
 
+![](shengmudian-1.jpg)
+![](shengmudian-2.jpg)
+
+殿前的盘龙柱，最有意思的两个：点赞龙和比耶龙。
+
 ![](dianzanlong.jpg)
 ![](biyelong.jpg)
-
-各种古树古建，还有西游记里孙悟空变的小房子。
 
 ![](shu-1.jpg)
 ![](shu-2.jpg)
 ![](shu-3.jpg)
 
 ![](xiaofangzi.jpg)
+
+各种古树古建，还有西游记里孙悟空变的小房子。
 
 逛了一圈3个小时，走的时候打包了一瓶晋祠水。
 
