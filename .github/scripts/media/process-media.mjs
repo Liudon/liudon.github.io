@@ -818,7 +818,9 @@ async function processImage(
     // Generate fallback/base
     // --------------------------------------------------------
 
-    let pipeline =
+    // Keep a lossless, watermarked pixel buffer. Each output format is
+    // encoded independently, without inheriting JPEG fallback artifacts.
+    const prepared = await
         sharp(src)
             .rotate()
             .resize({
@@ -843,7 +845,19 @@ async function processImage(
 
                     top,
                 },
-            ]);
+            ])
+            .raw()
+            .toBuffer({ resolveWithObject: true });
+
+    const fromPrepared = () => sharp(prepared.data, {
+        raw: {
+            width: prepared.info.width,
+            height: prepared.info.height,
+            channels: prepared.info.channels,
+        },
+    });
+
+    let pipeline = fromPrepared();
 
 
     if (ext === ".png") {
@@ -934,7 +948,7 @@ async function processImage(
             );
 
 
-        await sharp(base)
+        await fromPrepared()
             .resize({
                 width,
 
@@ -954,7 +968,7 @@ async function processImage(
             .toFile(webp);
 
 
-        await sharp(base)
+        await fromPrepared()
             .resize({
                 width,
 
