@@ -110,7 +110,8 @@ jobs:
       # ------------------------------------------------------
 
       - name: Restore media cache
-        uses: actions/cache@v5
+        id: media-cache
+        uses: actions/cache/restore@v5
         with:
           path: .cache/media
           key: media-v1-${{ hashFiles('content/posts/**/*.jpg', 'content/posts/**/*.jpeg', 'content/posts/**/*.png', 'content/posts/**/*.JPG', 'content/posts/**/*.JPEG', 'content/posts/**/*.PNG', 'content/posts/**/*.mp4', 'content/posts/**/*.MP4', 'static/ArchitectsDaughter-Regular.ttf', '.github/scripts/media/package.json', '.github/scripts/media/process-media.mjs') }}
@@ -205,6 +206,15 @@ jobs:
       - name: Process media
         run: |
           node .github/scripts/media/process-media.mjs
+
+      # 媒体处理成功后立即保存，后续构建或发布失败时重跑可复用。
+      # 复用恢复步骤计算的 key，避免处理脚本改写源文件后重新计算哈希。
+      - name: Save media cache
+        if: steps.media-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .cache/media
+          key: ${{ steps.media-cache.outputs.cache-primary-key }}
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
