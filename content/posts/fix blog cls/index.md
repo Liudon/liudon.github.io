@@ -1,15 +1,17 @@
 ---
 title: "优化博客的累计布局偏移(CLS)问题"
 date: 2022-08-20T07:27:22+08:00
+lastmod: 2026-09-09T00:00:00+08:00
 draft: false
 slug: fix blog cls
+description: "记录通过补充图片宽高改善 Hugo 页面累计布局偏移（CLS）的早期方案，并提供本站当前响应式图片方案入口。"
 tags: 
 - 博客优化
 - CLS
 - PagerMod
 ---
 
-此文已过期，优化方案参考[累计布局偏移修复方案改进 —— 自动生成图片宽高](https://liudon.com/posts/hugo-auto-generate-image-width-and-height/).
+> **更新说明（2026-09）**：本文是早期 CLS 修复记录，当前站点已经改用本地 Page Bundle、响应式图片和预生成 AVIF/WebP，详见[博客加速实践](https://liudon.com/posts/blog-performance-optimization/)。后续演进记录可参考[自动生成图片宽高](https://liudon.com/posts/hugo-auto-generate-image-width-and-height/)。
 
 #### 问题表现
 

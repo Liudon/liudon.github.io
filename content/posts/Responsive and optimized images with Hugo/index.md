@@ -1,11 +1,15 @@
 ---
 title: "使用Hugo实现响应式和优化的图片"
 date: 2023-12-10T08:29:05+08:00
+lastmod: 2026-09-09T00:00:00+08:00
 draft: false
+description: "记录基于 Hugo Image Processing 和 Page Bundle 生成响应式 WebP 图片的历史实现。本站当前方案已升级为多尺寸 AVIF/WebP 预生成与构建缓存。"
 tags:
 - hugo
 - 博客优化
 ---
+
+> **更新说明（2026-09）**：本文记录的是 2023 年基于 PaperMod 的 Hugo 响应式图片方案，代码已不再用于本站。当前实现改为 Sharp 预生成多尺寸 AVIF/WebP、媒体缓存和 Terminal 主题共享图片组件，详见[博客加速实践](https://liudon.com/posts/blog-performance-optimization/)。
 
 继续我们的[博客优化之旅](/tags/博客优化/)，本篇内容我们将介绍如何使用`Hugo`实现响应式和优化的图片。
 
@@ -58,7 +62,7 @@ content/
 
 目录结构调整完毕后，接下来修改图片显示文件代码。
 
-这里需要生成`webp`格式图片，所以**需要使用`hugo`的extended版本**。
+本文当时使用的 Hugo 版本需要 Extended 版本生成 WebP；当前 Hugo 的图片处理能力已经更新，具体格式支持请以[官方 Image Processing 文档](https://gohugo.io/content-management/image-processing/)为准。
 
 `PagerMod`主题涉及到图片显示的一共三个文件：
 

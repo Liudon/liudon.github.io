@@ -1,7 +1,9 @@
 ---
 title: "当Hugo遇上AVIF，优化图片加载"
 date: 2024-09-30T22:01:45+08:00
+lastmod: 2026-09-09T00:00:00+08:00
 draft: false
+description: "记录 2024 年通过 GitHub Actions 和 ImageMagick 为 Hugo 预生成 AVIF/WebP 图片的实践，以及本站后续升级后的多尺寸响应式方案。"
 tags:
     - 博客优化
     - hugo
@@ -9,6 +11,8 @@ tags:
     - imagemagic
     - github
 ---
+
+> **更新说明（2026-09）**：本文记录的是 2024 年使用 ImageMagick 全量生成单一 1080px AVIF/WebP 文件的历史方案。本站当前已改用 Sharp 预生成多个尺寸并复用构建缓存；当前 Hugo 也已经支持 AVIF 图片处理。最新实现见[博客加速实践](https://liudon.com/posts/blog-performance-optimization/)。
 
 ![avif-on-hugo](avif-on-hugo.png)
 
@@ -156,4 +160,3 @@ run: |
 唯一的缺点就是每次都是全量生成图片，Workflow执行略久些（我的要5分钟左右），这里后面再优化。
 
 从23年11月开始有的想法，在24年9月最后一天终于实现了。🎉🎉🎉
-

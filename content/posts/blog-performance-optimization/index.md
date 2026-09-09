@@ -1,6 +1,7 @@
 ---
 title: "博客加速实践"
 date: 2026-09-01T15:14:02+08:00
+lastmod: 2026-09-09T00:00:00+08:00
 draft: false
 tags:
   - Hugo
@@ -42,8 +43,6 @@ blog.liudon.xyz
 但总感觉博客访问不快，随便打开一个页面，页面完全处理完都要在秒级，实在是慢。
 
 通过 Lighthouse 测试，借助 AI 的能力，又做了一轮新的优化。
-
-*以下内容全部基于 PaperMod 主题进行修改。*
 
 ## 1. 增加国内 CDN 节点缓存时间
 
@@ -148,7 +147,7 @@ x-cache-lookup: Cache Hit
 }
 ```
 
-新增.github/scripts/media/process-media.mjs文件，这里还加了视频处理/视频封面生成等逻辑，内容如下：
+新增 `.github/scripts/media/process-media.mjs` 文件，这里还加了视频处理和视频封面生成等逻辑，内容如下。完整实现以仓库中的 [`process-media.mjs`](https://github.com/Liudon/liudon.github.io/blob/code/.github/scripts/media/process-media.mjs) 为准：
 
 ```
 import sharp from "sharp";
@@ -2244,9 +2243,11 @@ main().catch(error => {
           node .github/scripts/media/process-media.mjs
 ```
 
-把 ImageMagic 换成了 Sharp，压缩后的文件更小一些。
+把 ImageMagick 换成了 Sharp，压缩后的文件更小一些。
 
 ### 3.2 Hugo 图片解析响应式调整
+
+[当前 Hugo 已经可以处理 AVIF](https://gohugo.io/content-management/image-processing/)；本站继续在 GitHub Actions 中使用 Sharp 预生成 AVIF/WebP，是为了复用媒体缓存，并避免在 Hugo 生产构建阶段集中处理大量原图。当前主题将 Markdown 图片和 `figure` 短代码共用的逻辑收敛到了 [`responsive-image.html`](https://github.com/Liudon/liudon.github.io/blob/code/themes/terminal/layouts/partials/responsive-image.html)，下面保留的是本次优化时的实现记录。
 
 新增 layouts/_default/_markup/render-image.html文件，内容如下：
 
@@ -2434,6 +2435,14 @@ Images cached    : N
 ```
 
 至此，图片响应式问题搞定了，流水线的耗时问题也解决了，目前控制在3分钟左右。
+
+本地预览可以使用 development 环境，跳过响应式图片变体生成：
+
+```bash
+hugo server --environment development
+```
+
+生产构建前需要先运行媒体预处理脚本。否则缺少预生成文件时，主题可能回退到 Hugo 生成 WebP；原图尺寸过大或数量较多时，会明显增加构建内存。对于远大于站点最大展示尺寸的原图，建议先缩小再进入构建流程。
 
 ## 4. JS 文件按需加载
 

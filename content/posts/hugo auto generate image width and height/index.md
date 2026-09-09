@@ -1,8 +1,10 @@
 ---
 title: "累计布局偏移修复方案改进 —— 自动生成图片宽高"
 date: 2022-08-24T12:37:22+08:00
+lastmod: 2026-09-09T00:00:00+08:00
 draft: false
 slug: hugo auto generate image width and height
+description: "记录通过远程图片信息自动补充宽高、降低 Hugo 页面 CLS 的历史方案，以及本站当前响应式图片实现入口。"
 tags: 
 - 博客优化
 - CLS
@@ -15,7 +17,7 @@ cover:
     hidden: true
 ---
 
-本站已不再采用本方案，新方案见[使用Hugo实现响应式和优化的图片](/posts/responsive-and-optimized-images-with-hugo/)
+> **更新说明（2026-09）**：本站已不再采用通过远程接口读取图片宽高的方案。当前图片处理已升级为本地 Page Bundle、Sharp 多尺寸 AVIF/WebP 预生成和构建缓存，详见[博客加速实践](https://liudon.com/posts/blog-performance-optimization/)。2023 年的中间演进方案可参考[使用 Hugo 实现响应式和优化的图片](/posts/responsive-and-optimized-images-with-hugo/)。
 
 #### 遗留的问题
 
