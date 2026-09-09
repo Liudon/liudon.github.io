@@ -1,13 +1,26 @@
 ---
 title: "AI Agent折腾记（OpenClaw / Hermes Agent）"
 date: 2026-04-14T22:12:17+08:00
+lastmod: 2026-09-09T00:00:00+08:00
 draft: false
+description: "记录在 2 核 4G 云服务器上部署和使用 OpenClaw、Hermes Agent 的过程，以及内存、定时任务和辅助模型计费问题。"
 tags: ["ai agent","openclaw","hermes agent"]
 ---
 
 > AI 智能体（AI Agent）是一种能够感知环境、进行推理并自主行动以实现特定目标的智能系统。
 
-OpenClaw和Hermes Agent属于目前开源社区最受关注的两个项目。
+本文记录我在一台 2 核 4G 云服务器上部署 OpenClaw 和 Hermes Agent 的过程，以及实际遇到的问题。
+
+> **版本说明**
+>
+> 本文命令和现象基于 2026 年 4 月的实际部署环境。两个项目更新较快，当前安装方式请优先参考 [OpenClaw Docker 文档](https://docs.openclaw.ai/install/docker)和 [Hermes Agent 安装文档](https://hermes-agent.nousresearch.com/docs/getting-started/installation)，本文保留当时的命令用于说明问题复现环境。
+
+两次体验没有做标准化性能测试，下面只是同一台低配服务器上的实际感受：
+
+| 项目 | 本次部署体验 | 实际遇到的问题 |
+| --- | --- | --- |
+| OpenClaw | Docker 部署，安装微信插件时出现明显内存压力 | 插件安装中断；Gateway 偶发连接失败，Cron 未按时执行 |
+| Hermes Agent | Docker 部署，交互响应主观上更快 | 辅助模型默认配置可能调用与主模型不同的收费模型 |
 
 ## OpenClaw（小龙虾）
 
@@ -17,7 +30,7 @@ OpenClaw和Hermes Agent属于目前开源社区最受关注的两个项目。
 
 ### 安装
 
-本着快速重置的想法，基于Docker进行部署，参考[官方文档](https://openclaws.io/zh/blog/openclaw-docker-deployment)。
+本着方便重置环境的想法，当时直接使用 Docker 容器部署。OpenClaw 当前官方 Docker 文档使用 Docker Compose 和安装脚本，下面保留的是我测试时使用的单容器命令：
 
 ```
 # 创建根目录
@@ -53,7 +66,7 @@ docker exec -it -u node openclaw npx -y @tencent-weixin/openclaw-weixin-cli@late
 
 我这是一台Lighthouse主机，2核4G，配置较低。
 
-找AI看了下错误，需要配置下swap分区，防止内存溢出。
+结合监控中的内存占用，我为机器增加了 Swap，避免安装过程再次因可用内存不足而中断。
 
 ```
 # 1. 创建一个 2GB 的交换文件 (可以根据需要把 2G 改为 4G)
@@ -95,11 +108,17 @@ Bind: loopback
 >
 > It's not a coding copilot tethered to an IDE or a chatbot wrapper around a single API. It's an autonomous agent that gets more capable the longer it runs. It lives wherever you put it — a $5 VPS, a GPU cluster, or serverless infrastructure (Daytona, Modal) that costs nearly nothing when idle. Talk to it from Telegram while it works on a cloud VM you never SSH into yourself. It's not tied to your laptop.
 
-看了文档，貌似对于机器配置要求更低一些。
+在这台 2 核 4G 服务器上的实际使用中，Hermes Agent 的运行体感更轻一些。
 
 ### 安装
 
-依旧是Docker部署。
+当时依旧使用 Docker 部署。Hermes Agent 当前官方文档推荐使用安装脚本，下面是本文测试时的容器命令：
+
+```bash
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+```
+
+如果要复现本文的 Docker 环境，可以继续使用下面的命令，但参数应以当前项目文档为准。
 
 ```
 # 创建根目录
@@ -359,6 +378,6 @@ auto模式下，不指定model的情况下，主provider为openrouter时，使�
 
 ## 总结
 
-两个Agent使用下来，Hermes Agent明显更快一些，对机器的要求也更低。
+在这台 2 核 4G 服务器上，Hermes Agent 的响应体感更快，占用资源也更适合我的环境。这个结论来自个人使用体验，不是标准化性能测试。
 
-把OpenClaw的cron迁移到Hermes Agent上，未执行的问题也解决了。
+把 OpenClaw 的 Cron 任务迁移到 Hermes Agent 后，我在本文测试期间没有再遇到未执行的问题。

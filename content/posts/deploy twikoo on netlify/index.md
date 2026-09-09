@@ -1,7 +1,9 @@
 ---
 title: "在Netlify上部署Twikoo评论系统"
 date: 2023-10-19T19:46:32+08:00
+lastmod: 2026-09-09T00:00:00+08:00
 draft: false
+description: "记录在 Netlify 部署 Twikoo 评论系统、配置 MongoDB、自定义域名，以及排查 CORS、404 和云函数路径问题的过程。"
 tags:
 - netlify
 - twikoo
@@ -13,9 +15,13 @@ tags:
 
 > 在本篇文章里，我会介绍如何在Netlify上部署Twikoo评论系统，如何接入到静态博客Hugo，以及如何实现Twikoo系统版本自动更新。
 
-*2024年7月30日更新：因为[Github接口策略调整](https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting)，原有的匿名通过接口获取版本号方法失效，已更改为带token方式请求接口获取版本号，详见workflow里Get twikoo version步骤配置。*
+> **2026 年更新说明**
+>
+> Twikoo 官方目前仍提供 [Netlify 部署方式](https://twikoo.js.org/backend.html#netlify-%E9%83%A8%E7%BD%B2)：Fork `twikoojs/twikoo-netlify`、配置 `MONGODB_URI`，并将前端 `envId` 设置为以 `/.netlify/functions/twikoo` 结尾的地址。本文的 CORS、根路径 Rewrite 和自动更新属于我在此基础上的实际部署记录。
 
-#### 背景
+*2024年7月30日更新：因为 [GitHub REST API 有请求频率限制](https://docs.github.com/rest/using-the-rest-api/rate-limits-for-the-rest-api)，原有的匿名请求版本号方式失效，已改为携带 Token 请求，详见工作流里的 `Get twikoo version` 步骤。*
+
+## 背景
 
 博客之前通过`Vercel`部署了`Twikoo`评论系统，但是最近发现加载很慢。
 
@@ -23,7 +29,7 @@ tags:
 
 迁移过程中遇到了一些问题，网上搜了一番，发现`Netlify`下部署`Twikoo`的信息很少，这篇文章我会介绍整个操作过程。
 
-#### 部署
+## 部署 Twikoo
 
 参考[官网文档](https://twikoo.js.org/backend.html#netlify-%E9%83%A8%E7%BD%B2)，部署即可。
 
@@ -38,6 +44,8 @@ tags:
 部署后，通过`https://comment.liudon.com`访问，返回200。
 
 但是访问`https://liudon.com`，提示`CORS跨域错误`，搜索一番网上资料也没找到相关信息。
+
+## 排查 CORS 与 404
 
 ![CORS报错](20231019190935.png)
 
@@ -85,7 +93,7 @@ tags:
 
 注意一定不要漏了`force`参数，因为根目录文件是存在的，不带这个参数的话`Rewrite`是不生效的，必须指定这个。
 
-这下访问彻底ok了。
+这下访问彻底正常了。
 
 不过很快又发现另外一个问题，看到别人博客上`Twikoo`版本已经是`1.6.22`，自己的还是`1.5.11`。
 
@@ -104,11 +112,13 @@ tags:
 
 对于一个程序员，我们的追求就是自动化。
 
-#### 自动版本更新
+## 自动更新 Twikoo 版本
 
 1. 服务端版本自动更新
 
-这里利用`Github Actions`定时任务，通过接口拉取[twikoo](https://github.com/twikoojs/twikoo/releases)最新的版本，然后更新到`package.json`文件，从而实现版本自动更新。
+这里利用`GitHub Actions`定时任务，通过接口拉取[Twikoo](https://github.com/twikoojs/twikoo/releases)最新的版本，然后更新到`package.json`文件，从而实现版本自动更新。
+
+自动跟随最新版可能遇到不兼容更新，生产环境建议先在测试环境验证，再决定是否更新版本。
 
 在自己`twikoo-netlify`仓库下，新增`Actions`，代码如下：
 
@@ -183,7 +193,7 @@ jobs:
 <script src="https://cdn.staticfile.org/twikoo/{{ .Site.Params.twikoo.version }}/twikoo.all.min.js">
 ```
 
-`config.tml`配置修改：
+`config.yml`配置修改：
 
 ```
 params:
@@ -229,7 +239,7 @@ params:
     run: hugo --gc --minify --cleanDestinationDir 
 ```
 
-`####`内代码即为获取版本号，更新`config.tml`版本号逻辑，然后再进行`hugo`部署。
+`####`内代码即为获取版本号、更新`config.yml`版本号的逻辑，然后再进行 Hugo 部署。
 
 需要将`https://raw.githubusercontent.com/Liudon/twikoo-netlify/main/package.json`这个url里的`Liudon/twikoo-netlify`改为你的仓库名。
 
