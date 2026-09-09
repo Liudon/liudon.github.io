@@ -280,7 +280,7 @@ x-cache-lookup: Cache Hit
 
 ### 3.2 Hugo 图片解析响应式调整
 
-[当前 Hugo 已经可以处理 AVIF](https://gohugo.io/content-management/image-processing/)；本站继续在 GitHub Actions 中使用 Sharp 预生成 AVIF/WebP，是为了复用媒体缓存，并避免在 Hugo 生产构建阶段集中处理大量原图。当前主题将 Markdown 图片和 `figure` 短代码共用的逻辑收敛到了 [`responsive-image.html`](https://github.com/Liudon/liudon.github.io/blob/code/themes/terminal/layouts/partials/responsive-image.html)，下面保留的是本次优化时的实现记录。
+[当前 Hugo 已经可以处理 AVIF](https://gohugo.io/content-management/image-processing/)；本站继续在 GitHub Actions 中使用 Sharp 预生成 AVIF/WebP，是为了复用媒体缓存，并避免在 Hugo 生产构建阶段集中处理大量原图。
 
 新增 layouts/_default/_markup/render-image.html文件，内容如下：
 
@@ -322,6 +322,14 @@ fallback:
 {{- $Title := .Title -}}
 
 {{- $responsiveImages := (.Page.Params.responsiveImages | default site.Params.responsiveImages) | default true -}}
+
+{{- /*
+development 环境只输出原图，避免本地预览时生成响应式变体。
+*/ -}}
+
+{{- if not hugo.IsProduction -}}
+    {{- $responsiveImages = false -}}
+{{- end -}}
 
 {{- with $src := .Page.Resources.GetMatch .Destination -}}
 
@@ -387,7 +395,7 @@ fallback:
                     {{- else if and (eq $imageType "webp") hugo.IsExtended -}}
 
                         {{- /*
-                        本地 hugo server 没有预处理文件时，
+                        生产构建没有预处理文件时，
                         WebP 仍然可以让 Hugo 自己生成。
 
                         AVIF 则依赖 GitHub Action 预处理。
@@ -469,7 +477,7 @@ Images cached    : N
 
 至此，图片响应式问题搞定了，流水线的耗时问题也解决了，目前控制在3分钟左右。
 
-本地预览可以使用 development 环境，跳过响应式图片变体生成：
+模板通过 `hugo.IsProduction` 判断构建环境。本地预览使用 development 环境时，`responsiveImages` 会被设为 `false`，只输出带有宽高属性的原图，不会进入 `$src.Resize` 分支：
 
 ```bash
 hugo server --environment development
