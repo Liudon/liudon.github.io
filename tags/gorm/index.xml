@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Gorm on 流动</title>
+		<link>https://liudon.com/tags/gorm/</link>
+		<description>Recent content in Gorm on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Mon, 07 Sep 2026 00:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/gorm/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>sqlcommenter 原理与 GORM 实践：为 SQL 添加请求标识</title>
+				<link>https://liudon.com/posts/gorm-supports-sqlcommenter/</link>
+				<pubDate>Thu, 18 Apr 2024 21:25:24 +0800</pubDate>
+				<guid>https://liudon.com/posts/gorm-supports-sqlcommenter/</guid>
+				<description>&lt;p&gt;sqlcommenter（SQL commenter）通过在 SQL 注释中携带应用上下文，帮助把数据库查询与发起它的代码或请求关联起来。本文以 GORM 为例，介绍如何从 Context 读取请求 ID，通过插件自动添加 SQL 注释，减少逐条修改业务查询的工作。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>GORM 源码分析：从 processor.Execute 看 SQL 是如何生成的</title>
+				<link>https://liudon.com/posts/how-gorm-generates-sql/</link>
+				<pubDate>Thu, 18 Apr 2024 21:14:24 +0800</pubDate>
+				<guid>https://liudon.com/posts/how-gorm-generates-sql/</guid>
+				<description>&lt;p&gt;在 &lt;code&gt;gorm&lt;/code&gt; 下实现 &lt;a href=&#34;https://google.github.io/sqlcommenter/&#34;&gt;sqlcommenter&lt;/a&gt; 的过程中遇到一些问题，顺便把 GORM 从查询方法到 SQL 生成、执行的流程梳理了一遍。&lt;/p&gt;&#xA;&lt;p&gt;如果你在阅读 GORM 源码或者 Debug 调用链时追踪到了 &lt;code&gt;callbacks.go&lt;/code&gt; 中的 &lt;code&gt;func (p *processor) Execute&lt;/code&gt;，可能会发现：&lt;code&gt;Execute&lt;/code&gt; 本身并没有直接拼接 SQL。那么调用 &lt;code&gt;First&lt;/code&gt;、&lt;code&gt;Find&lt;/code&gt; 等方法后，SQL 到底是在哪里生成的？&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>CLS on 流动</title>
+		<link>https://liudon.com/tags/cls/</link>
+		<description>Recent content in CLS on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 09 Sep 2026 00:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/cls/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>累计布局偏移修复方案改进 —— 自动生成图片宽高</title>
+				<link>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</link>
+				<pubDate>Wed, 24 Aug 2022 12:37:22 +0800</pubDate>
+				<guid>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</guid>
+				<description>&lt;blockquote&gt;&#xA;&lt;p&gt;&lt;strong&gt;更新说明（2026-09）&lt;/strong&gt;：本站已不再采用通过远程接口读取图片宽高的方案。当前图片处理已升级为本地 Page Bundle、Sharp 多尺寸 AVIF/WebP 预生成和构建缓存，详见&lt;a href=&#34;https://liudon.com/posts/blog-performance-optimization/&#34;&gt;博客加速实践&lt;/a&gt;。2023 年的中间演进方案可参考&lt;a href=&#34;../../posts/responsive-and-optimized-images-with-hugo/&#34;&gt;使用 Hugo 实现响应式和优化的图片&lt;/a&gt;。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>优化博客的累计布局偏移(CLS)问题</title>
+				<link>https://liudon.com/posts/fix-blog-cls/</link>
+				<pubDate>Sat, 20 Aug 2022 07:27:22 +0800</pubDate>
+				<guid>https://liudon.com/posts/fix-blog-cls/</guid>
+				<description>&lt;blockquote&gt;&#xA;&lt;p&gt;&lt;strong&gt;更新说明（2026-09）&lt;/strong&gt;：本文是早期 CLS 修复记录，当前站点已经改用本地 Page Bundle、响应式图片和预生成 AVIF/WebP，详见&lt;a href=&#34;https://liudon.com/posts/blog-performance-optimization/&#34;&gt;博客加速实践&lt;/a&gt;。后续演进记录可参考&lt;a href=&#34;https://liudon.com/posts/hugo-auto-generate-image-width-and-height/&#34;&gt;自动生成图片宽高&lt;/a&gt;。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;h4 id=&#34;问题表现&#34;&gt;问题表现&lt;/h4&gt;&#xA;&lt;p&gt;7月份将博客部署由&lt;code&gt;Github&lt;/code&gt;迁移到&lt;code&gt;Cloudflare&lt;/code&gt;后，开始关注博客的性能问题。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

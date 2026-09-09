@@ -1,0 +1,325 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>WrenAI GenBI Classic 本地部署：Docker + Ollama 配置本地 LLM | 流动</title><meta name=description content="记录 WrenAI GenBI Classic 的本地部署过程：通过 Docker 部署 Ollama，并配置 Phi-4、nomic-embed-text、Qdrant 与 WrenAI 旧版 Web UI。本文基于 WrenAI 0.15.x 历史配置。"><meta name=author content="Liudon"><meta name=keywords content="wrenAI,llm,docker,ollama"><meta name=robots content="index, follow"><link rel=canonical href=https://liudon.com/posts/wrenai-local-llm-usage-guide/><meta property="og:title" content="WrenAI GenBI Classic 本地部署：Docker + Ollama 配置本地 LLM | 流动"><meta property="og:description" content="记录 WrenAI GenBI Classic 的本地部署过程：通过 Docker 部署 Ollama，并配置 Phi-4、nomic-embed-text、Qdrant 与 WrenAI 旧版 Web UI。本文基于 WrenAI 0.15.x 历史配置。"><meta property="og:type" content="article"><meta property="og:url" content="https://liudon.com/posts/wrenai-local-llm-usage-guide/"><meta property="og:site_name" content="流动"><meta property="article:published_time" content="2025-03-16T17:28:10+08:00"><meta property="article:modified_time" content="2026-09-09T00:00:00+08:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="WrenAI GenBI Classic 本地部署：Docker + Ollama 配置本地 LLM | 流动"><meta name=twitter:description content="记录 WrenAI GenBI Classic 的本地部署过程：通过 Docker 部署 Ollama，并配置 Phi-4、nomic-embed-text、Qdrant 与 WrenAI 旧版 Web UI。本文基于 WrenAI 0.15.x 历史配置。"><meta name=theme-color content="#ffffff" media="(prefers-color-scheme: light)"><meta name=theme-color content="#0a0a0a" media="(prefers-color-scheme: dark)"><meta name=msapplication-TileColor content="#ff9500"><link rel=icon type=image/svg+xml href=https://liudon.com/favicon.svg><link rel=icon href=https://liudon.com/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://liudon.com/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://liudon.com/favicon-32x32.png><link rel=apple-touch-icon href=https://liudon.com/apple-touch-icon.png><link rel=mask-icon href=https://liudon.com/safari-pinned-tab.svg color=#c2410c><script>(function(){try{var t=location.search.match(/[?&]theme=(dark|light)/),e=t?t[1]:localStorage.getItem("theme");e||(e=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"),e==="light"&&document.documentElement.setAttribute("data-theme","light")}catch{}})()</script><link rel="preload stylesheet" href=../../css/main.min.ac79bbd12bfa7d0081ca76f8768dd393fc42277a12b25d5aa63bb82f4ab4fd25.css as=style integrity="sha256-rHm70Sv6fQCBynb4do3Tk/xCJ3oSsl1apju4L0q0/SU=" crossorigin=anonymous><script>window.__termBase="/",window.__termSearchIndex="search.json"</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","author":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"dateModified":"2026-09-09T00:00:00+08:00","datePublished":"2025-03-16T17:28:10+08:00","description":"记录 WrenAI GenBI Classic 的本地部署过程：通过 Docker 部署 Ollama，并配置 Phi-4、nomic-embed-text、Qdrant 与 WrenAI 旧版 Web UI。本文基于 WrenAI 0.15.x 历史配置。","headline":"WrenAI GenBI Classic 本地部署：Docker + Ollama 配置本地 LLM","inLanguage":"zh-CN","keywords":["wrenAI","llm","docker","ollama"],"mainEntityOfPage":{"@id":"https://liudon.com/posts/wrenai-local-llm-usage-guide/","@type":"WebPage"},"name":"WrenAI GenBI Classic 本地部署：Docker + Ollama 配置本地 LLM","publisher":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"wordCount":2038}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://liudon.com/","name":"流动","position":1},{"@type":"ListItem","item":"https://liudon.com/posts/","name":"文章","position":2},{"@type":"ListItem","item":"https://liudon.com/posts/wrenai-local-llm-usage-guide/","name":"WrenAI GenBI Classic 本地部署：Docker + Ollama 配置本地 LLM","position":3}]}</script><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous fetchpriority=low></script></head><body><a class=sr-only href=#main>Skip to content</a><header class=site-header><div class=site-header__inner><a class=site-logo href=../../ aria-label="流动 - Home">流动</a><nav class=site-nav aria-label="Main navigation"><a href=../../posts/>Posts</a>
+<a href=../../links/>Links</a></nav><div class=header-actions><button type=button class="icon-btn search-trigger" data-search-open aria-label=Search title="Search (/)">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+</button>
+<button type=button class="icon-btn theme-toggle" aria-label="Toggle light and dark mode" title="Toggle light/dark" onclick='(function(){var e=document.documentElement;if(e.getAttribute("data-theme")==="light"){e.removeAttribute("data-theme");try{localStorage.setItem("theme","dark")}catch{}}else{e.setAttribute("data-theme","light");try{localStorage.setItem("theme","light")}catch{}}})()'>
+<svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+<svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</button>
+<button type=button class="icon-btn menu-toggle" id=menu-toggle aria-label="Toggle navigation" aria-expanded=false>
+<span></span><span></span><span></span></button></div></div><div class=mobile-menu-panel id=mobile-menu><nav class=site-nav aria-label="Mobile navigation"><a href=../../posts/>Posts</a>
+<a href=../../links/>Links</a></nav></div></header><main id=main><article class=terminal-guide><div class=terminal-scanlines aria-hidden=true></div><div class=terminal-progress aria-hidden=true><div class=terminal-progress__bar id=reading-progress></div></div><div class=terminal-window><header class=terminal-titlebar><div class=terminal-buttons aria-hidden=true><span class="terminal-btn terminal-btn--close"></span>
+<span class="terminal-btn terminal-btn--minimize"></span>
+<span class="terminal-btn terminal-btn--maximize"></span></div><div class=terminal-title><span class=terminal-prompt>liudon@localhost</span>:<span class=terminal-path>~/blog</span>$ <span class=terminal-cmd>cd /posts/wrenai-local-llm-usage-guide</span><span class=terminal-cursor aria-hidden=true></span></div></header><div class=terminal-body><div class=terminal-output-header><h1 class=terminal-main-title>WrenAI GenBI Classic 本地部署：Docker + Ollama 配置本地 LLM</h1><p class=terminal-description># 记录 WrenAI GenBI Classic 的本地部署过程：通过 Docker 部署 Ollama，并配置 Phi-4、nomic-embed-text、Qdrant 与 WrenAI 旧版 Web UI。本文基于 WrenAI 0.15.x 历史配置。</p><div class=terminal-meta><span class=terminal-meta-item><span class=terminal-meta-label>author:</span> Liudon</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>date:</span> 2025-03-16</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>updated:</span> 2026-09-09</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>words:</span> 2038</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>read_time:</span> 5m</span></div><div class=terminal-tags><a class=terminal-tag href=../../tags/wrenai/>#wrenAI</a><a class=terminal-tag href=../../tags/llm/>#llm</a><a class=terminal-tag href=../../tags/docker/>#docker</a><a class=terminal-tag href=../../tags/ollama/>#ollama</a></div></div><nav class=terminal-toc aria-label="Table of contents" id=inline-toc><div class=terminal-toc-header><span class=terminal-prompt>$</span> ls -la ./sections/</div><div class=terminal-dir-listing><div class=terminal-dir-header>drwxr-xr-x 10 sections</div><a class=terminal-dir-row href=#wrenai-genbi-classic-%e6%9c%ac%e5%9c%b0%e9%83%a8%e7%bd%b2%e6%96%b9%e6%a1%88 data-index=0><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>01</span>
+<span class=terminal-dir-name>wrenai-genbi-classic-本地部署方案.md</span>
+</a><a class=terminal-dir-row href=#%e4%bd%bf%e7%94%a8-docker-%e9%83%a8%e7%bd%b2-ollama data-index=1><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>02</span>
+<span class=terminal-dir-name>使用-docker-部署-ollama.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e4%b8%8b%e8%bd%bd%e6%9c%ac%e5%9c%b0-llm-%e5%92%8c-embedding-%e6%a8%a1%e5%9e%8b data-index=2><span class=terminal-dir-name>└── 下载本地-llm-和-embedding-模型.md</span>
+</a><a class=terminal-dir-row href=#%e9%85%8d%e7%bd%ae%e5%b9%b6%e9%83%a8%e7%bd%b2-wrenai-genbi-classic data-index=3><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>04</span>
+<span class=terminal-dir-name>配置并部署-wrenai-genbi-classic.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e5%88%9b%e5%bb%ba%e9%85%8d%e7%bd%ae%e7%9b%ae%e5%bd%95 data-index=4><span class=terminal-dir-name>└── 创建配置目录.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e9%85%8d%e7%bd%ae-env data-index=5><span class=terminal-dir-name>└── 配置-env.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e9%85%8d%e7%bd%ae-configyaml data-index=6><span class=terminal-dir-name>└── 配置-configyaml.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e5%90%af%e5%8a%a8-wrenai-web-ui data-index=7><span class=terminal-dir-name>└── 启动-wrenai-web-ui.md</span>
+</a><a class=terminal-dir-row href=#%e5%bd%93%e6%97%b6%e7%9a%84%e7%8e%af%e5%a2%83%e8%ae%b0%e5%bd%95%e4%b8%8e%e9%99%90%e5%88%b6 data-index=8><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>09</span>
+<span class=terminal-dir-name>当时的环境记录与限制.md</span>
+</a><a class=terminal-dir-row href=#%e5%bd%93%e5%89%8d%e4%b8%bb%e7%ba%bfwren-cli--ai-agent data-index=9><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>10</span>
+<span class=terminal-dir-name>当前主线wren-cli--ai-agent.md</span></a></div></nav><div class=terminal-content><div class=terminal-content-header><span class=terminal-prompt>$</span> less index.md</div><div class=terminal-prose id=prose-content><blockquote><p>本文记录 WrenAI GenBI Classic 的 Docker + Ollama 本地模型部署过程。</p></blockquote><blockquote><p><strong>版本说明（2026-09 更新）</strong></p><p>本文最初写于 2025 年 3 月，配置基于 WrenAI 0.15.x 的 GenBI UI 架构。2026 年 5 月，WrenAI 已将旧的 GenBI 应用归档至 <a href=https://github.com/Canner/WrenAI/tree/legacy/v1><code>legacy/v1</code></a>：<code>wren-ui</code>、<code>wren-ai-service</code>、<code>wren-launcher</code> 与 Docker 部署均属于该路线。它仍可使用，但已冻结，不再获得新功能和安全更新。</p><p>当前主线是面向 AI Agent 的 Context Engine、Wren CLI、MDL 和 Memory；首次使用 WrenAI 请优先阅读<a href=https://github.com/Canner/WrenAI/blob/main/docs/core/get_started/quickstart.md>官方 Quickstart</a>。本文仅适合需要部署 <strong>WrenAI GenBI Classic / 旧版 Web UI</strong> 的读者，文中的版本号不能直接替换为当前主线版本。</p></blockquote><p>WrenAI GenBI Classic 是一个开源的 Text-to-SQL 工具：导入数据库结构后，可以通过提问生成 SQL。</p><h2 id=wrenai-genbi-classic-本地部署方案>WrenAI GenBI Classic 本地部署方案</h2><p>本文的目标是不调用 OpenAI 等外部 LLM API，而是让 SQL 生成和 Embedding 都使用 Ollama 提供的本地模型。部署架构如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>浏览器
+</span></span><span class=line><span class=cl>  ↓
+</span></span><span class=line><span class=cl>WrenAI UI
+</span></span><span class=line><span class=cl>  ↓
+</span></span><span class=line><span class=cl>Wren AI Service
+</span></span><span class=line><span class=cl>  ├── LLM ───────→ Ollama → Phi-4
+</span></span><span class=line><span class=cl>  ├── Embedder ──→ Ollama → nomic-embed-text
+</span></span><span class=line><span class=cl>  └── Vector DB ─→ Qdrant
+</span></span></code></pre></div><p><picture><source type=image/avif srcset="https://liudon.com/posts/wrenai-local-llm-usage-guide/wren_workflow.png_320x.avif 320w, https://liudon.com/posts/wrenai-local-llm-usage-guide/wren_workflow.png_480x.avif 480w, https://liudon.com/posts/wrenai-local-llm-usage-guide/wren_workflow.png_720x.avif 720w, https://liudon.com/posts/wrenai-local-llm-usage-guide/wren_workflow.png_1080x.avif 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><source type=image/webp srcset="https://liudon.com/posts/wrenai-local-llm-usage-guide/wren_workflow.png_320x.webp 320w, https://liudon.com/posts/wrenai-local-llm-usage-guide/wren_workflow.png_480x.webp 480w, https://liudon.com/posts/wrenai-local-llm-usage-guide/wren_workflow.png_720x.webp 720w, https://liudon.com/posts/wrenai-local-llm-usage-guide/wren_workflow.png_1080x.webp 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><img src=../../posts/wrenai-local-llm-usage-guide/wren_workflow.png alt="WrenAI GenBI Classic 使用 Ollama 本地模型的工作流程" width=1080 height=437 loading=lazy decoding=async></picture></p><p>出于数据不离开本地环境的考虑，本文使用 Ollama 部署本地 LLM。</p><h2 id=使用-docker-部署-ollama>使用 Docker 部署 Ollama</h2><p>参考安装文档：https://hub.docker.com/r/ollama/ollama</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>curl</span> <span class=o>-</span><span class=n>fsSL</span> <span class=n>https</span><span class=p>:</span><span class=o>//</span><span class=n>nvidia</span><span class=o>.</span><span class=n>github</span><span class=o>.</span><span class=n>io</span><span class=o>/</span><span class=n>libnvidia</span><span class=o>-</span><span class=n>container</span><span class=o>/</span><span class=n>gpgkey</span> \
+</span></span><span class=line><span class=cl>    <span class=o>|</span> <span class=n>sudo</span> <span class=n>gpg</span> <span class=o>--</span><span class=n>dearmor</span> <span class=o>-</span><span class=n>o</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>share</span><span class=o>/</span><span class=n>keyrings</span><span class=o>/</span><span class=n>nvidia</span><span class=o>-</span><span class=n>container</span><span class=o>-</span><span class=n>toolkit</span><span class=o>-</span><span class=n>keyring</span><span class=o>.</span><span class=n>gpg</span>
+</span></span><span class=line><span class=cl><span class=n>curl</span> <span class=o>-</span><span class=n>s</span> <span class=o>-</span><span class=n>L</span> <span class=n>https</span><span class=p>:</span><span class=o>//</span><span class=n>nvidia</span><span class=o>.</span><span class=n>github</span><span class=o>.</span><span class=n>io</span><span class=o>/</span><span class=n>libnvidia</span><span class=o>-</span><span class=n>container</span><span class=o>/</span><span class=n>stable</span><span class=o>/</span><span class=n>deb</span><span class=o>/</span><span class=n>nvidia</span><span class=o>-</span><span class=n>container</span><span class=o>-</span><span class=n>toolkit</span><span class=o>.</span><span class=n>list</span> \
+</span></span><span class=line><span class=cl>    <span class=o>|</span> <span class=n>sed</span> <span class=s1>&#39;s#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g&#39;</span> \
+</span></span><span class=line><span class=cl>    <span class=o>|</span> <span class=n>sudo</span> <span class=n>tee</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>apt</span><span class=o>/</span><span class=n>sources</span><span class=o>.</span><span class=n>list</span><span class=o>.</span><span class=n>d</span><span class=o>/</span><span class=n>nvidia</span><span class=o>-</span><span class=n>container</span><span class=o>-</span><span class=n>toolkit</span><span class=o>.</span><span class=n>list</span>
+</span></span><span class=line><span class=cl><span class=n>sudo</span> <span class=n>apt</span><span class=o>-</span><span class=n>get</span> <span class=n>update</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>sudo</span> <span class=n>apt</span><span class=o>-</span><span class=n>get</span> <span class=n>install</span> <span class=o>-</span><span class=n>y</span> <span class=n>nvidia</span><span class=o>-</span><span class=n>container</span><span class=o>-</span><span class=n>toolkit</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>sudo</span> <span class=n>nvidia</span><span class=o>-</span><span class=n>ctk</span> <span class=n>runtime</span> <span class=n>configure</span> <span class=o>--</span><span class=n>runtime</span><span class=o>=</span><span class=n>docker</span>
+</span></span><span class=line><span class=cl><span class=n>sudo</span> <span class=n>systemctl</span> <span class=n>restart</span> <span class=n>docker</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>docker</span> <span class=n>run</span> <span class=o>-</span><span class=n>d</span> <span class=o>--</span><span class=n>gpus</span><span class=o>=</span><span class=n>all</span> <span class=o>-</span><span class=n>v</span> <span class=n>ollama</span><span class=p>:</span><span class=o>/</span><span class=n>root</span><span class=o>/.</span><span class=n>ollama</span> <span class=o>-</span><span class=n>p</span> <span class=mi>11434</span><span class=p>:</span><span class=mi>11434</span> <span class=o>--</span><span class=n>name</span> <span class=n>ollama</span> <span class=n>ollama</span><span class=o>/</span><span class=n>ollama</span>
+</span></span></code></pre></div><h3 id=下载本地-llm-和-embedding-模型>下载本地 LLM 和 Embedding 模型</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>docker exec ollama ollama pull nomic-embed-text:latest
+</span></span><span class=line><span class=cl>docker exec ollama ollama pull phi4:14b
+</span></span></code></pre></div><blockquote><p><strong>安全提示</strong>：11434 是 Ollama API，不应直接向公网或安全组全量放通。若 WrenAI 与 Ollama 不在同一 Docker 网络或同一主机，请仅允许必要的私网来源访问，并通过防火墙或 VPN 限制来源。下文以部署机器 IP 为示例；同机 Docker 部署时，优先让两个容器加入同一私有网络并使用容器名访问。</p></blockquote><h2 id=配置并部署-wrenai-genbi-classic>配置并部署 WrenAI GenBI Classic</h2><blockquote><p><strong>历史配置提示</strong>：以下 <code>.env</code>、<code>config.yaml</code> 与启动命令是 2025 年的部署快照，未按 2026 年冻结后的 GenBI Classic 环境重新验证。<code>releases/latest</code> 已可能指向当前主线，不应与下方 0.15.x 配置混用。需要新建旧版环境时，请从 <a href=https://github.com/Canner/WrenAI/tree/legacy/v1><code>legacy/v1</code></a> 获取相互匹配的镜像、Launcher 和配置文件；本文保留原始步骤供维护既有部署时参考。</p></blockquote><p>旧版 Custom LLM 文档：https://docs.getwren.ai/oss/installation/custom_llm</p><h3 id=创建配置目录>创建配置目录</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>mkdir -p ~/.wrenai
+</span></span></code></pre></div><h3 id=配置-env>配置 <code>.env</code></h3><p>配置目录下新增 <code>.env</code> 文件，内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>COMPOSE_PROJECT_NAME=wrenai
+</span></span><span class=line><span class=cl>PLATFORM=linux/amd64
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>PROJECT_DIR=/root/.wrenai
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># service port
+</span></span><span class=line><span class=cl>WREN_ENGINE_PORT=8080
+</span></span><span class=line><span class=cl>WREN_ENGINE_SQL_PORT=7432
+</span></span><span class=line><span class=cl>WREN_AI_SERVICE_PORT=5555
+</span></span><span class=line><span class=cl>WREN_UI_PORT=3000
+</span></span><span class=line><span class=cl>IBIS_SERVER_PORT=8000
+</span></span><span class=line><span class=cl>WREN_UI_ENDPOINT=http://wren-ui:${WREN_UI_PORT}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>LLM_PROVIDER=litellm_llm
+</span></span><span class=line><span class=cl># 自定义 LLM 模型
+</span></span><span class=line><span class=cl>GENERATION_MODEL=phi4:14b
+</span></span><span class=line><span class=cl>LLM_OLLAMA_URL=http://部署机器IP:11434
+</span></span><span class=line><span class=cl>EMBEDDER_OLLAMA_URL=http://部署机器IP:11434
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>EMBEDDER_PROVIDER=litellm_embedder
+</span></span><span class=line><span class=cl># embedding 模型
+</span></span><span class=line><span class=cl>EMBEDDING_MODEL=nomic-embed-text
+</span></span><span class=line><span class=cl>EMBEDDING_MODEL_DIMENSION=768
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># ai service settings
+</span></span><span class=line><span class=cl>QDRANT_HOST=qdrant
+</span></span><span class=line><span class=cl>SHOULD_FORCE_DEPLOY=1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># vendor keys
+</span></span><span class=line><span class=cl>LLM_OPENAI_API_KEY=
+</span></span><span class=line><span class=cl>EMBEDDER_OPENAI_API_KEY=
+</span></span><span class=line><span class=cl>LLM_AZURE_OPENAI_API_KEY=
+</span></span><span class=line><span class=cl>EMBEDDER_AZURE_OPENAI_API_KEY=
+</span></span><span class=line><span class=cl>QDRANT_API_KEY=
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># version
+</span></span><span class=line><span class=cl># 本文经过验证的 GenBI Classic 历史版本；不要替换为当前主线 WrenAI 版本
+</span></span><span class=line><span class=cl>WREN_PRODUCT_VERSION=0.15.3
+</span></span><span class=line><span class=cl>WREN_ENGINE_VERSION=0.13.1
+</span></span><span class=line><span class=cl>WREN_AI_SERVICE_VERSION=0.15.9
+</span></span><span class=line><span class=cl>IBIS_SERVER_VERSION=0.13.1
+</span></span><span class=line><span class=cl>WREN_UI_VERSION=0.20.1
+</span></span><span class=line><span class=cl>WREN_BOOTSTRAP_VERSION=0.1.5
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># user id (uuid v4)
+</span></span><span class=line><span class=cl>USER_UUID=
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># for other services
+</span></span><span class=line><span class=cl>POSTHOG_API_KEY=phc_nhF32aj4xHXOZb0oqr2cn4Oy9uiWzz6CCP4KZmRq9aE
+</span></span><span class=line><span class=cl>POSTHOG_HOST=https://app.posthog.com
+</span></span><span class=line><span class=cl>TELEMETRY_ENABLED=false
+</span></span><span class=line><span class=cl># this is for telemetry to know the model, i think ai-service might be able to provide a endpoint to get the information
+</span></span><span class=line><span class=cl>#GENERATION_MODEL=gpt-4o-mini
+</span></span><span class=line><span class=cl>LANGFUSE_SECRET_KEY=
+</span></span><span class=line><span class=cl>LANGFUSE_PUBLIC_KEY=
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># the port exposes to the host
+</span></span><span class=line><span class=cl># OPTIONAL: change the port if you have a conflict
+</span></span><span class=line><span class=cl>HOST_PORT=3000
+</span></span><span class=line><span class=cl>AI_SERVICE_FORWARD_PORT=5555
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># Wren UI
+</span></span><span class=line><span class=cl>EXPERIMENTAL_ENGINE_RUST_VERSION=false
+</span></span></code></pre></div><h3 id=配置-configyaml>配置 <code>config.yaml</code></h3><p>配置目录下新增 <code>config.yaml</code> 文件，内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># you should rename this file to config.yaml and put it in ~/.wrenai
+</span></span><span class=line><span class=cl># please pay attention to the comments starting with # and adjust the config accordingly
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>type: llm
+</span></span><span class=line><span class=cl>provider: litellm_llm
+</span></span><span class=line><span class=cl>timeout: 600
+</span></span><span class=line><span class=cl>models:
+</span></span><span class=line><span class=cl>- api_base: http://部署机器IP:11434/v1  # change this to your ollama host, api_base should be &lt;ollama_url&gt;/v1
+</span></span><span class=line><span class=cl>  model: openai/phi4:14b  # openai/&lt;ollama_model_name&gt;
+</span></span><span class=line><span class=cl>  kwargs:
+</span></span><span class=line><span class=cl>    n: 1
+</span></span><span class=line><span class=cl>    temperature: 0
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>---
+</span></span><span class=line><span class=cl>type: embedder
+</span></span><span class=line><span class=cl>provider: litellm_embedder
+</span></span><span class=line><span class=cl>models:
+</span></span><span class=line><span class=cl>- model: openai/nomic-embed-text  # put your ollama embedder model name here
+</span></span><span class=line><span class=cl>  api_base: http://部署机器IP:11434/v1  # change this to your ollama host, url should be &lt;ollama_url&gt;
+</span></span><span class=line><span class=cl>  timeout: 120 # 如果是CPU模式，需要调大这个超时时间
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>---
+</span></span><span class=line><span class=cl>type: engine
+</span></span><span class=line><span class=cl>provider: wren_ui
+</span></span><span class=line><span class=cl>endpoint: http://wren-ui:3000
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>---
+</span></span><span class=line><span class=cl>type: document_store
+</span></span><span class=line><span class=cl>provider: qdrant
+</span></span><span class=line><span class=cl>location: http://qdrant:6333
+</span></span><span class=line><span class=cl>embedding_model_dim: 768  # put your embedding model dimension here
+</span></span><span class=line><span class=cl>timeout: 120
+</span></span><span class=line><span class=cl>recreate_index: false
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>---
+</span></span><span class=line><span class=cl># the format of llm and embedder should be &lt;provider&gt;.&lt;model_name&gt; such as litellm_llm.gpt-4o-2024-08-06
+</span></span><span class=line><span class=cl># 此管道配置仅对应 GenBI Classic 0.15.x，不要引用 main 分支的当前主线配置。
+</span></span><span class=line><span class=cl># 0.15.3 历史配置：
+</span></span><span class=line><span class=cl># https://raw.githubusercontent.com/Canner/WrenAI/0.15.3/docker/config.example.yaml
+</span></span><span class=line><span class=cl>type: pipeline
+</span></span><span class=line><span class=cl>pipes:
+</span></span><span class=line><span class=cl>  - name: db_schema_indexing
+</span></span><span class=line><span class=cl>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span class=line><span class=cl>    document_store: qdrant
+</span></span><span class=line><span class=cl>  - name: historical_question_indexing
+</span></span><span class=line><span class=cl>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span class=line><span class=cl>    document_store: qdrant
+</span></span><span class=line><span class=cl>  - name: table_description_indexing
+</span></span><span class=line><span class=cl>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span class=line><span class=cl>    document_store: qdrant
+</span></span><span class=line><span class=cl>  - name: db_schema_retrieval
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span class=line><span class=cl>    document_store: qdrant
+</span></span><span class=line><span class=cl>  - name: historical_question_retrieval
+</span></span><span class=line><span class=cl>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span class=line><span class=cl>    document_store: qdrant
+</span></span><span class=line><span class=cl>  - name: sql_generation
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>    engine: wren_ui
+</span></span><span class=line><span class=cl>  - name: sql_correction
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>    engine: wren_ui
+</span></span><span class=line><span class=cl>  - name: followup_sql_generation
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>    engine: wren_ui
+</span></span><span class=line><span class=cl>  - name: sql_summary
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>  - name: sql_answer
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>    engine: wren_ui
+</span></span><span class=line><span class=cl>  - name: sql_breakdown
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>    engine: wren_ui
+</span></span><span class=line><span class=cl>  - name: sql_expansion
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>    engine: wren_ui
+</span></span><span class=line><span class=cl>  - name: sql_explanation
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>  - name: sql_regeneration
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>    engine: wren_ui
+</span></span><span class=line><span class=cl>  - name: semantics_description
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>  - name: relationship_recommendation
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>    engine: wren_ui
+</span></span><span class=line><span class=cl>  - name: question_recommendation
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>  - name: question_recommendation_db_schema_retrieval
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span class=line><span class=cl>    document_store: qdrant
+</span></span><span class=line><span class=cl>  - name: question_recommendation_sql_generation
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>    engine: wren_ui
+</span></span><span class=line><span class=cl>  - name: chart_generation
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>  - name: chart_adjustment
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>  - name: intent_classification
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span class=line><span class=cl>    document_store: qdrant
+</span></span><span class=line><span class=cl>  - name: data_assistance
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>  - name: sql_pairs_indexing
+</span></span><span class=line><span class=cl>    document_store: qdrant
+</span></span><span class=line><span class=cl>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span class=line><span class=cl>  - name: sql_pairs_deletion
+</span></span><span class=line><span class=cl>    document_store: qdrant
+</span></span><span class=line><span class=cl>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span class=line><span class=cl>  - name: sql_pairs_retrieval
+</span></span><span class=line><span class=cl>    document_store: qdrant
+</span></span><span class=line><span class=cl>    embedder: litellm_embedder.openai/nomic-embed-text
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>  - name: preprocess_sql_data
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>  - name: sql_executor
+</span></span><span class=line><span class=cl>    engine: wren_ui
+</span></span><span class=line><span class=cl>  - name: sql_question_generation
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>  - name: sql_generation_reasoning
+</span></span><span class=line><span class=cl>    llm: litellm_llm.openai/phi4:14b
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>---
+</span></span><span class=line><span class=cl>settings:
+</span></span><span class=line><span class=cl>  column_indexing_batch_size: 50
+</span></span><span class=line><span class=cl>  table_retrieval_size: 10
+</span></span><span class=line><span class=cl>  table_column_retrieval_size: 100
+</span></span><span class=line><span class=cl>  allow_using_db_schemas_without_pruning: false
+</span></span><span class=line><span class=cl>  query_cache_maxsize: 1000
+</span></span><span class=line><span class=cl>  query_cache_ttl: 3600
+</span></span><span class=line><span class=cl>  langfuse_host: https://cloud.langfuse.com
+</span></span><span class=line><span class=cl>  langfuse_enable: false
+</span></span><span class=line><span class=cl>  logging_level: DEBUG
+</span></span><span class=line><span class=cl>  development: true
+</span></span></code></pre></div><h3 id=启动-wrenai-web-ui>启动 WrenAI Web UI</h3><p>当时通过 WrenAI Launcher 的 Custom 模式完成部署。由于 <code>releases/latest</code> 可能与本文的 0.15.x 配置不匹配，这里不再保留指向最新版 Launcher 的下载命令。需要重建旧环境时，请从 <a href=https://github.com/Canner/WrenAI/tree/legacy/v1><code>legacy/v1</code></a> 和 <a href=https://github.com/Canner/WrenAI/releases>WrenAI Releases</a> 中选择与配置相匹配的历史版本。</p><p>选择Custom模式，点击确定，部署成功。</p><p><picture><source type=image/avif srcset="https://liudon.com/posts/wrenai-local-llm-usage-guide/deploy_wrenai.png_320x.avif 320w, https://liudon.com/posts/wrenai-local-llm-usage-guide/deploy_wrenai.png_480x.avif 480w, https://liudon.com/posts/wrenai-local-llm-usage-guide/deploy_wrenai.png_720x.avif 720w, https://liudon.com/posts/wrenai-local-llm-usage-guide/deploy_wrenai.png_1080x.avif 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><source type=image/webp srcset="https://liudon.com/posts/wrenai-local-llm-usage-guide/deploy_wrenai.png_320x.webp 320w, https://liudon.com/posts/wrenai-local-llm-usage-guide/deploy_wrenai.png_480x.webp 480w, https://liudon.com/posts/wrenai-local-llm-usage-guide/deploy_wrenai.png_720x.webp 720w, https://liudon.com/posts/wrenai-local-llm-usage-guide/deploy_wrenai.png_1080x.webp 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><img src=../../posts/wrenai-local-llm-usage-guide/deploy_wrenai.png alt="WrenAI Launcher Custom 模式部署成功" width=1080 height=544 loading=lazy decoding=async></picture></p><p>如需从其他机器访问 Web UI，仅对可信来源放通 3000 端口；不要公开暴露管理界面。</p><p>部署完成后，通过浏览器访问 <code>http://部署机器IP:3000</code> 使用 WrenAI 服务。</p><h2 id=当时的环境记录与限制>当时的环境记录与限制</h2><p>以下内容是 2025 年该部署环境的记录，不代表当前 WrenAI CLI/Context Engine 的能力或限制：</p><ul><li>本文原始记录为“MySQL 仅支持 8.0 以上版本”，该限制仅对应当时的 GenBI Classic 版本。</li><li>纯 CPU 环境单次提问耗时超过 15 分钟；腾讯云 GPU 计算型 GN7（8 核、32 GB）约为 5 分钟。实际耗时受模型、显存、数据库结构和问题复杂度影响。</li></ul><h2 id=当前主线wren-cli--ai-agent>当前主线：Wren CLI + AI Agent</h2><p>如果目标是新部署，建议安装当前 <code>wrenai</code> Python 包，并让 Codex、Claude Code、Cursor 等 Agent 通过 Wren CLI 或 MCP 服务使用 MDL、Context 和 Memory：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>pip install <span class=s2>&#34;wrenai[memory,main]&#34;</span>
+</span></span><span class=line><span class=cl>wren version
+</span></span><span class=line><span class=cl>npx skills add Canner/WrenAI
+</span></span></code></pre></div><p>完整步骤请参阅 <a href=https://github.com/Canner/WrenAI/blob/main/docs/core/get_started/quickstart.md>WrenAI 当前 Quickstart</a>。</p></div></div><section class=terminal-comments id=comments data-env-id=https://comment.liudon.com data-region data-lang=zh-CN data-path=/posts/wrenai-local-llm-usage-guide/ data-script=https://cdn.jsdelivr.net/npm/twikoo@1.7.22/dist/twikoo.min.js data-integrity aria-label=Comments><div class=terminal-comments__header><span class=terminal-prompt>$</span>
+<span class=terminal-cmd>twikoo</span>
+<span class=terminal-comments__args>--page /posts/wrenai-local-llm-usage-guide/</span>
+<span class=terminal-comments__status id=comments-status hidden></span>
+<button type=button class=terminal-comments__retry id=comments-retry hidden>retry</button></div><div class=terminal-comments__body><div class=terminal-comments__loading id=comments-loading role=status aria-live=polite><span class=terminal-comments__dots aria-hidden=true><span>.</span><span>.</span><span>.</span></span>
+<span class=terminal-comments__loading-text>loading comments</span>
+<span class=terminal-cursor aria-hidden=true></span></div><div id=twikoo-container></div><noscript><p class=terminal-comments__noscript>JavaScript is required to load comments.</p></noscript></div></section><nav class=terminal-section-nav aria-label="Previous and next posts"><a class=terminal-section-nav__btn href=../../posts/the-trip-of-tianjin/><span class=terminal-section-nav__arrow>&#8592;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>prev</span>
+<span class=terminal-section-nav__title>天津一日游</span>
+</span></a><a class="terminal-section-nav__btn terminal-section-nav__btn--next" href=../../posts/heavy-snow-in-beijing/><span class=terminal-section-nav__arrow>&#8594;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>next</span>
+<span class=terminal-section-nav__title>北京的三月飞雪</span></span></a></nav><footer class=terminal-footer><div class=terminal-footer-line><span class=terminal-prompt>$</span> echo "Maintained by Liudon"</div><div class=terminal-footer-output>Maintained by <a href=../../>Liudon</a> | Last updated 2026-09-09</div><div class=terminal-status-bar><span class=terminal-status-item>NORMAL</span>
+<span class=terminal-status-item>index.md</span>
+<span class=terminal-status-item>words: 2038</span>
+<span class="terminal-status-item terminal-status-right">EOF</span></div></footer></div></div></article><aside class=terminal-sidebar id=sidebar-toc aria-label="Quick navigation"><div class=terminal-sidebar__header><span class=terminal-sidebar__title><span class=terminal-prompt>$</span> tree</span>
+<button type=button class=terminal-sidebar__hide-btn id=sidebar-collapse aria-label="Toggle sidebar" title="Toggle sidebar (H)"><span class=terminal-sidebar__key>H</span> toggle</button></div><nav class=terminal-sidebar__nav id=sidebar-nav><a class=terminal-sidebar__link href=#wrenai-genbi-classic-%e6%9c%ac%e5%9c%b0%e9%83%a8%e7%bd%b2%e6%96%b9%e6%a1%88 data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>WrenAI GenBI Classic 本地部署方案</span>
+</a><a class=terminal-sidebar__link href=#%e4%bd%bf%e7%94%a8-docker-%e9%83%a8%e7%bd%b2-ollama data-index=1><span class=terminal-sidebar__num>02</span>
+<span class=terminal-sidebar__link-title>使用 Docker 部署 Ollama</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e4%b8%8b%e8%bd%bd%e6%9c%ac%e5%9c%b0-llm-%e5%92%8c-embedding-%e6%a8%a1%e5%9e%8b data-index=2><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>下载本地 LLM 和 Embedding 模型</span>
+</a><a class=terminal-sidebar__link href=#%e9%85%8d%e7%bd%ae%e5%b9%b6%e9%83%a8%e7%bd%b2-wrenai-genbi-classic data-index=3><span class=terminal-sidebar__num>04</span>
+<span class=terminal-sidebar__link-title>配置并部署 WrenAI GenBI Classic</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%88%9b%e5%bb%ba%e9%85%8d%e7%bd%ae%e7%9b%ae%e5%bd%95 data-index=4><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>创建配置目录</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e9%85%8d%e7%bd%ae-env data-index=5><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>配置 &lt;code>.env&lt;/code></span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e9%85%8d%e7%bd%ae-configyaml data-index=6><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>配置 &lt;code>config.yaml&lt;/code></span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%90%af%e5%8a%a8-wrenai-web-ui data-index=7><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>启动 WrenAI Web UI</span>
+</a><a class=terminal-sidebar__link href=#%e5%bd%93%e6%97%b6%e7%9a%84%e7%8e%af%e5%a2%83%e8%ae%b0%e5%bd%95%e4%b8%8e%e9%99%90%e5%88%b6 data-index=8><span class=terminal-sidebar__num>09</span>
+<span class=terminal-sidebar__link-title>当时的环境记录与限制</span>
+</a><a class=terminal-sidebar__link href=#%e5%bd%93%e5%89%8d%e4%b8%bb%e7%ba%bfwren-cli--ai-agent data-index=9><span class=terminal-sidebar__num>10</span>
+<span class=terminal-sidebar__link-title>当前主线：Wren CLI + AI Agent</span></a></nav><div class=terminal-sidebar__footer><span class=terminal-sidebar__key>J</span><span class=terminal-sidebar__key>K</span> nav</div></aside><button type=button class=terminal-sidebar-fab id=sidebar-expand aria-label="Show table of contents" title="Show TOC (H)">
+<span class=terminal-sidebar-fab__icon>☰</span>
+<span class=terminal-sidebar-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-toc-fab" id=toc-toggle aria-label="Toggle table of contents" aria-expanded=false>
+<span class=terminal-mobile-fab__icon>☰</span>
+<span class=terminal-mobile-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-search-fab" data-search-open aria-label=Search>
+<span class=terminal-mobile-fab__icon>/</span>
+<span class=terminal-mobile-fab__label>SEARCH</span></button><div class=terminal-drawer id=toc-drawer aria-hidden=true><div class=terminal-drawer__backdrop id=drawer-backdrop></div><div class=terminal-drawer__content><div class=terminal-drawer__header><span class=terminal-prompt>$</span> ls ./sections/
+<button class=terminal-drawer__close id=drawer-close aria-label="Close navigation">&#215;</button></div><nav class=terminal-drawer__nav id=drawer-nav><a class=terminal-sidebar__link href=#wrenai-genbi-classic-%e6%9c%ac%e5%9c%b0%e9%83%a8%e7%bd%b2%e6%96%b9%e6%a1%88 data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>WrenAI GenBI Classic 本地部署方案</span>
+</a><a class=terminal-sidebar__link href=#%e4%bd%bf%e7%94%a8-docker-%e9%83%a8%e7%bd%b2-ollama data-index=1><span class=terminal-sidebar__num>02</span>
+<span class=terminal-sidebar__link-title>使用 Docker 部署 Ollama</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e4%b8%8b%e8%bd%bd%e6%9c%ac%e5%9c%b0-llm-%e5%92%8c-embedding-%e6%a8%a1%e5%9e%8b data-index=2><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>下载本地 LLM 和 Embedding 模型</span>
+</a><a class=terminal-sidebar__link href=#%e9%85%8d%e7%bd%ae%e5%b9%b6%e9%83%a8%e7%bd%b2-wrenai-genbi-classic data-index=3><span class=terminal-sidebar__num>04</span>
+<span class=terminal-sidebar__link-title>配置并部署 WrenAI GenBI Classic</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%88%9b%e5%bb%ba%e9%85%8d%e7%bd%ae%e7%9b%ae%e5%bd%95 data-index=4><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>创建配置目录</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e9%85%8d%e7%bd%ae-env data-index=5><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>配置 &lt;code>.env&lt;/code></span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e9%85%8d%e7%bd%ae-configyaml data-index=6><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>配置 &lt;code>config.yaml&lt;/code></span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%90%af%e5%8a%a8-wrenai-web-ui data-index=7><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>启动 WrenAI Web UI</span>
+</a><a class=terminal-sidebar__link href=#%e5%bd%93%e6%97%b6%e7%9a%84%e7%8e%af%e5%a2%83%e8%ae%b0%e5%bd%95%e4%b8%8e%e9%99%90%e5%88%b6 data-index=8><span class=terminal-sidebar__num>09</span>
+<span class=terminal-sidebar__link-title>当时的环境记录与限制</span>
+</a><a class=terminal-sidebar__link href=#%e5%bd%93%e5%89%8d%e4%b8%bb%e7%ba%bfwren-cli--ai-agent data-index=9><span class=terminal-sidebar__num>10</span>
+<span class=terminal-sidebar__link-title>当前主线：Wren CLI + AI Agent</span></a></nav></div></div></main><button class=terminal-back-top id=back-top aria-label="Back to top" hidden>
+<span class=terminal-back-top__arrow>&#8593;</span>
+<span class=terminal-back-top__label>TOP</span></button><footer class=site-footer role=contentinfo><p class=site-footer__copyright>&copy; 2026 Liudon &#183; Made with Hugo & Terminal · 京ICP备13029522号-2</p></footer><div class=search-modal id=search-modal role=dialog aria-modal=true aria-label=Search><div class=search-modal__backdrop></div><div class=search-modal__dialog><label class=search-modal__input-row for=search-input><span class="search-modal__prompt terminal-prompt">$</span>
+<span class=terminal-search-fixed>find . -name </span><input class=search-modal__input id=search-input type=text placeholder=query autocomplete=off spellcheck=false></label><div class=search-modal__hint><span class=terminal-key>Enter</span> open&nbsp;&nbsp;<span class=terminal-key>&#8593;</span><span class=terminal-key>&#8595;</span> navigate&nbsp;&nbsp;<span class=terminal-key>Esc</span> close</div><div class=search-modal__results id=search-results></div><div class=search-modal__empty id=search-empty>Type a query to search the site&#8230;</div></div></div><script src=../../js/site.min.2e3c7c5662bddcb9ea47564053b6c79be76f6f6b0821e7dbf425f6efb6d08b6f.js integrity="sha256-Ljx8VmK93LnqR1ZAU7bHm+dvb2sIIefb9CX277bQi28=" crossorigin=anonymous defer></script><script src=../../js/article-images.min.36b1f0c3c0fe4c914817cc5f696f3d56fc24f26a619e526057479aab45f9e4da.js integrity="sha256-NrHww8D+TJFIF8xfaW89Vvwk8mphnlJgV0eaq0X55No=" crossorigin=anonymous defer></script></body></html>
