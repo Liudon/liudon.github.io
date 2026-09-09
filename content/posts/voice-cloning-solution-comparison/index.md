@@ -2,8 +2,9 @@
 title: "2026年音色克隆方案对比：IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech、VoxCPM 部署与实测"
 slug: "voice-cloning-solution-comparison"
 description: "系统对比 IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech、VoxCPM 五大音色克隆方案，详解部署步骤、测试方法、硬件要求、CPU 支持、优缺点与选型建议。"
-summary: "一篇讲清楚四套主流音色克隆方案部署、测试、硬件门槛和选型建议的实战文章。"
+summary: "一篇讲清楚五套主流音色克隆方案部署、测试、硬件门槛和选型建议的实战文章。"
 date: 2026-05-18T15:19:23+08:00
+lastmod: 2026-09-09T00:00:00+08:00
 draft: false
 tags: 
   - 音色克隆
@@ -739,14 +740,16 @@ voxcpm clone \
 
 ## 方案总结
 
-结合这次在同一测试环境、同一参考音频和同一目标文本下的部署与试听结果，可以得到一个比较清晰的结论：
+以下结论基于同一测试环境、同一参考音频和同一目标文本下的部署与试听结果，只用于本次选型记录：
 
-~~从样本音色相似度来看，**Fish Speech** 和 **CosyVoice** 的整体表现更突出，**IndexTTS-2** 次之，**GPT-SoVITS** 在当前测试中的效果相对一般。如果目标是尽快验证“零样本音色克隆是否可用”，CosyVoice 会是更稳妥的选择。~~
+| 方案 | 本文实测耗时 | 本次测试记录 |
+| --- | --- | --- |
+| IndexTTS-2 | 2 分钟以上 | 试听完成度较高，但合成耗时明显更长。 |
+| CosyVoice | 约 24 秒 | 试听完成度较高。 |
+| GPT-SoVITS | 10 秒内 | 已完成部署与试听验证。 |
+| Fish Speech | 命令行 1 分钟以上；API 30 秒以上 | 试听完成度较高。 |
+| VoxCPM | 约 7 秒 | 部署简单、试听效果很好，并支持 CPU、CUDA、MPS 运行。 |
 
-~~从推理耗时来看，**GPT-SoVITS** 最快，单次合成大约在 10 秒左右；**CosyVoice** 次之，约 24 秒；**Fish Speech** 大约 1 分钟；**IndexTTS-2** 最慢，约 2 分 38 秒。对于需要更高响应速度的场景，GPT-SoVITS 和 CosyVoice 更有优势。~~
+如果只推荐一个用于快速上手，我目前更推荐 **VoxCPM**：它在本次测试中部署简单、效果符合预期，并且运行方式覆盖 CPU、CUDA、MPS。具体效果仍应以自己的参考音频、目标文本和硬件环境复测为准。
 
-~~从部署复杂度来看，**CosyVoice** 整体最平衡，安装和调试成本相对最低；**Fish Speech** 和 **GPT-SoVITS** 都需要处理更多依赖和环境细节；**IndexTTS-2** 的网络依赖和外部模型链路较多，部署过程中的不确定性也更高。~~
-
-~~快速上手的话，我更推荐**CosyVoice**方案。~~
-
-**VoxCPM** 部署简单，效果非常好，同时支持cpu/cuda/mps方式运行，强烈推荐！！！
+如果要把生成的配音进一步制作成真人口播视频，还需要处理音频与嘴型的同步；可继续阅读[对口型视频合成方案对比](https://liudon.com/posts/lip-sync-video-synthesis-comparison/)。这两类能力串联后的实际应用，可以参考我做的[口播短视频二创工具 VideoRemaker](https://liudon.com/posts/video-remaker-talking-head-video/)。
