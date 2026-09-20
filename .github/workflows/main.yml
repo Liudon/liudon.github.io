@@ -278,7 +278,7 @@ jobs:
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         id: ipfs
         timeout-minutes: 10
-        # ipshipyard/ipfs-deploy-action v2, pinned to the current v2 commit.
+        # Use the official v2 tag so compatible v2 fixes are picked up automatically.
         uses: ipshipyard/ipfs-deploy-action@v2
         with:
           path-to-deploy: ./public
