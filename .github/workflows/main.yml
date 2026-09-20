@@ -585,8 +585,8 @@ jobs:
           echo "Filebase IPNS: OK"
 
       # Only a fully successful Kubo + Filebase + dual-IPNS deployment reaches
-      # this step. latest.json powers future skip decisions; history.json is
-      # retained for the future Hugo "IPFS time machine" page.
+      # this step. latest.json powers future skip decisions. Historical CIDs are
+      # append-only JSONL records split by UTC month for the future time-machine UI.
       - name: Record IPFS deployment state
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         env:
@@ -602,7 +602,6 @@ jobs:
           git worktree add --detach "$HISTORY_DIR" origin/ipfs-history
 
           export HISTORY_DIR
-          export DEPLOYED_AT
           DEPLOYED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           export DEPLOYED_AT
 
@@ -613,16 +612,18 @@ jobs:
 
           root = Path(os.environ["HISTORY_DIR"])
           latest_path = root / "latest.json"
-          history_path = root / "history.json"
+          months_path = root / "months.json"
+          history_dir = root / "history"
+          history_dir.mkdir(parents=True, exist_ok=True)
 
           cid = os.environ["CID"]
           digest = os.environ["DIGEST"]
           profile = os.environ["CID_PROFILE"]
           commit = os.environ["GITHUB_SHA"]
           deployed_at = os.environ["DEPLOYED_AT"]
+          month = deployed_at[:7]
 
-          latest = {
-              "version": 1,
+          record = {
               "digest": digest,
               "cid": cid,
               "cid_profile": profile,
@@ -630,39 +631,60 @@ jobs:
               "deployed_at": deployed_at,
           }
 
-          try:
-              history = json.loads(history_path.read_text(encoding="utf-8"))
-          except FileNotFoundError:
-              history = {"version": 1, "entries": []}
-
-          entries = history.setdefault("entries", [])
-          existing = next((entry for entry in entries if entry.get("cid") == cid), None)
-
-          if existing is None:
-              entries.insert(0, {
-                  "digest": digest,
-                  "cid": cid,
-                  "cid_profile": profile,
-                  "source_commit": commit,
-                  "deployed_at": deployed_at,
-              })
-          elif not existing.get("digest"):
-              # Bootstrap the first CIDv1 record created before digest tracking.
-              existing["digest"] = digest
-
+          latest = {
+              "version": 1,
+              **record,
+          }
           latest_path.write_text(
               json.dumps(latest, ensure_ascii=False, indent=2) + "\n",
               encoding="utf-8",
           )
-          history_path.write_text(
-              json.dumps(history, ensure_ascii=False, indent=2) + "\n",
+
+          # Keep one historical row per immutable CID, even if a forced
+          # redeploy publishes the same CID again later.
+          exists = False
+          for path in sorted(history_dir.glob("*.jsonl")):
+              for line in path.read_text(encoding="utf-8").splitlines():
+                  if not line.strip():
+                      continue
+                  entry = json.loads(line)
+                  if entry.get("cid") == cid:
+                      exists = True
+                      break
+              if exists:
+                  break
+
+          if not exists:
+              month_path = history_dir / f"{month}.jsonl"
+              with month_path.open("a", encoding="utf-8") as f:
+                  f.write(
+                      json.dumps(
+                          record,
+                          ensure_ascii=False,
+                          separators=(",", ":"),
+                      )
+                      + "\n"
+                  )
+
+          try:
+              months = json.loads(months_path.read_text(encoding="utf-8"))
+          except FileNotFoundError:
+              months = {"version": 1, "months": []}
+
+          month_list = months.setdefault("months", [])
+          if month not in month_list:
+              month_list.append(month)
+          month_list.sort(reverse=True)
+
+          months_path.write_text(
+              json.dumps(months, ensure_ascii=False, indent=2) + "\n",
               encoding="utf-8",
           )
           PY
 
           git -C "$HISTORY_DIR" config user.name "github-actions[bot]"
           git -C "$HISTORY_DIR" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C "$HISTORY_DIR" add latest.json history.json
+          git -C "$HISTORY_DIR" add latest.json months.json history
 
           if git -C "$HISTORY_DIR" diff --cached --quiet; then
             echo "IPFS deployment state is already up to date."
