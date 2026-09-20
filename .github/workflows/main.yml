@@ -227,7 +227,7 @@ jobs:
           ls -l ./
           hugo --gc --minify --cleanDestinationDir
 
-# ------------------------------------------------------
+      # ------------------------------------------------------
       # Production deploy
       #
       # Pull requests only build and validate the site.
@@ -279,7 +279,7 @@ jobs:
         id: ipfs
         timeout-minutes: 10
         # ipshipyard/ipfs-deploy-action v2, pinned to the current v2 commit.
-        uses: ipshipyard/ipfs-deploy-action@a18ef08993e485391c5879770d9bc9f1143653ce
+        uses: ipshipyard/ipfs-deploy-action@v2
         with:
           path-to-deploy: ./public
 
@@ -316,10 +316,20 @@ jobs:
         run: |
           set -euo pipefail
 
-          ssh             -o BatchMode=yes             -o StrictHostKeyChecking=yes             -o ExitOnForwardFailure=yes             -o ServerAliveInterval=30             -o ServerAliveCountMax=3             -i ~/.ssh/ipfs_deploy             -L 5001:localhost:5001             -fNT             "${{ secrets.SSHHOST }}"
+          ssh \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o ExitOnForwardFailure=yes \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=3 \
+            -i ~/.ssh/ipfs_deploy \
+            -L 5001:localhost:5001 \
+            -fNT \
+            "${{ secrets.SSHHOST }}"
 
           # Verify both the SSH tunnel and the remote Kubo RPC endpoint.
-          curl -fsS -X POST             http://127.0.0.1:5001/api/v0/version | jq .
+          curl -fsS -X POST \
+            http://127.0.0.1:5001/api/v0/version | jq .
 
       - name: Import CAR to Kubo
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
@@ -333,11 +343,15 @@ jobs:
           echo "Generated CID: $CID"
           echo "CAR: $CAR_PATH"
 
-          RESPONSE=$(curl -fsS -X POST             -F "file=@${CAR_PATH}"             "http://127.0.0.1:5001/api/v0/dag/import?pin-roots=true&stats=true")
+          RESPONSE=$(curl -fsS -X POST \
+            -F "file=@${CAR_PATH}" \
+            "http://127.0.0.1:5001/api/v0/dag/import?pin-roots=true&stats=true")
 
           echo "$RESPONSE"
 
-          KUBO_CID=$(printf '%s\n' "$RESPONSE"             | jq -r '.Root.Cid["/"] // empty'             | tail -n 1)
+          KUBO_CID=$(printf '%s\n' "$RESPONSE" \
+            | jq -r '.Root.Cid["/"] // empty' \
+            | tail -n 1)
 
           if [[ -z "$KUBO_CID" ]]; then
             echo "ERROR: Unable to obtain imported CID from Kubo"
@@ -374,7 +388,13 @@ jobs:
           # Keep one current CAR object instead of accumulating every deploy.
           OBJECT_KEY="liudon-blog-latest.car"
 
-          aws             --endpoint-url https://s3.filebase.com             s3 cp             "$CAR_PATH"             "s3://${FILEBASE_BUCKET}/${OBJECT_KEY}"             --metadata 'import=car'             --only-show-errors
+          aws \
+            --endpoint-url https://s3.filebase.com \
+            s3 cp \
+            "$CAR_PATH" \
+            "s3://${FILEBASE_BUCKET}/${OBJECT_KEY}" \
+            --metadata 'import=car' \
+            --only-show-errors
 
           echo "Filebase CAR upload: OK"
           echo "CID: $CID"
@@ -392,7 +412,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          RESPONSE=$(curl -fsS -X POST             "http://127.0.0.1:5001/api/v0/name/publish?arg=/ipfs/${CID}&key=ipfs-action")
+          RESPONSE=$(curl -fsS -X POST \
+            "http://127.0.0.1:5001/api/v0/name/publish?arg=/ipfs/${CID}&key=ipfs-action")
 
           echo "$RESPONSE"
 
@@ -415,13 +436,23 @@ jobs:
         run: |
           set -euo pipefail
 
-          AUTH=$(printf '%s:%s'             "$FILEBASE_KEY"             "$FILEBASE_SECRET"             | base64 -w 0)
+          AUTH=$(printf '%s:%s' \
+            "$FILEBASE_KEY" \
+            "$FILEBASE_SECRET" \
+            | base64 -w 0)
 
-          curl -fsS             -X PUT             -H "Authorization: Bearer ${AUTH}"             -H "Content-Type: application/json"             -d "{\"cid\":\"${CID}\"}"             "https://api.filebase.io/v1/names/ipfs-action"
+          curl -fsS \
+            -X PUT \
+            -H "Authorization: Bearer ${AUTH}" \
+            -H "Content-Type: application/json" \
+            -d "{\"cid\":\"${CID}\"}" \
+            "https://api.filebase.io/v1/names/ipfs-action"
 
           echo
 
-          RESPONSE=$(curl -fsS             -H "Authorization: Bearer ${AUTH}"             "https://api.filebase.io/v1/names/ipfs-action")
+          RESPONSE=$(curl -fsS \
+            -H "Authorization: Bearer ${AUTH}" \
+            "https://api.filebase.io/v1/names/ipfs-action")
 
           FILEBASE_CID=$(printf '%s\n' "$RESPONSE" | jq -r '.cid // empty')
 
