@@ -2,7 +2,7 @@
   "version": 1,
   "entries": [
     {
-      "digest": null,
+      "digest": "sha256:e4d07503e1642d1b5c5a9d5a99dd5a5391261d62477437893bcf25c8db90cbb7",
       "cid": "bafybeifntctbjpsrndtrcqajd2yqyaru3ztfff7smnrogz5x7uhyfqdlqa",
       "cid_profile": "unixfs-v1-2025",
       "source_commit": "0c66dcb6651a095f4080679383df562c140ae366",
