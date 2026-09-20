@@ -10,6 +10,11 @@ on:
   pull_request:
     branches: [code]
 
+  # Touch the media cache before GitHub's default inactive-cache eviction.
+  # Scheduled runs stop after restoring the cache and do not build or deploy.
+  schedule:
+    - cron: "17 3 */6 * *"
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -17,6 +22,10 @@ permissions:
   contents: read
   pages: write
   id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -32,12 +41,14 @@ jobs:
         uses: actions/checkout@v6
         with:
           token: ${{ secrets.TOKEN }}
-          submodules: recursive
+          submodules: ${{ github.event_name == 'schedule' && 'false' || 'recursive' }}
 
       - name: Checkout submodules
+        if: github.event_name != 'schedule'
         run: git submodule update --init --recursive --remote
 
       - name: Get twikoo version
+        if: github.event_name != 'schedule'
         id: twikoo
         run: |
           version=$(curl -fsSL https://raw.githubusercontent.com/Liudon/twikoo-netlify/main/package.json | jq -er '.dependencies."twikoo-netlify"')
@@ -45,6 +56,7 @@ jobs:
           echo "twikoo_version=$version" >> $GITHUB_OUTPUT
 
       - name: Update hugo.toml version
+        if: github.event_name != 'schedule'
         env:
           TWIKOO_VERSION: ${{ steps.twikoo.outputs.twikoo_version }}
         run: |
@@ -123,6 +135,7 @@ jobs:
       # ------------------------------------------------------
 
       - name: Setup Node.js
+        if: github.event_name != 'schedule'
         uses: actions/setup-node@v7
         with:
           node-version: "24"
@@ -143,6 +156,7 @@ jobs:
       # ------------------------------------------------------
 
       - name: Install Sharp
+        if: github.event_name != 'schedule'
         run: |
           npm install \
             --prefix .github/scripts/media \
@@ -155,6 +169,7 @@ jobs:
       # ------------------------------------------------------
 
       - name: Setup FFmpeg
+        if: github.event_name != 'schedule'
         shell: bash
         run: |
           set -euo pipefail
@@ -204,25 +219,28 @@ jobs:
       # ------------------------------------------------------
 
       - name: Process media
+        if: github.event_name != 'schedule'
         run: |
           node .github/scripts/media/process-media.mjs
 
       # 媒体处理成功后立即保存，后续构建或发布失败时重跑可复用。
       # 复用恢复步骤计算的 key，避免处理脚本改写源文件后重新计算哈希。
       - name: Save media cache
-        if: steps.media-cache.outputs.cache-hit != 'true'
+        if: github.event_name != 'schedule' && steps.media-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v5
         with:
           path: .cache/media
           key: ${{ steps.media-cache.outputs.cache-primary-key }}
 
       - name: Setup Hugo
+        if: github.event_name != 'schedule'
         uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: "latest"
           extended: true
 
       - name: Build
+        if: github.event_name != 'schedule'
         run: |
           ls -l ./
           hugo --gc --minify --cleanDestinationDir
