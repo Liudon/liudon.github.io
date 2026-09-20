@@ -301,9 +301,8 @@ jobs:
         with:
           path-to-deploy: ./public
 
-          # Keep the legacy UnixFS/CID behavior for this migration.
-          # Move to unixfs-v1-2025 separately after this pipeline is stable.
-          cid-profile: unixfs-v0-2015
+          # Use the modern deterministic UnixFS/CID profile.
+          cid-profile: unixfs-v1-2025
 
           github-token: ${{ github.token }}
           upload-car-artifact: "false"
