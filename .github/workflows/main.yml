@@ -227,7 +227,15 @@ jobs:
           ls -l ./
           hugo --gc --minify --cleanDestinationDir
 
+# ------------------------------------------------------
+      # Production deploy
+      #
+      # Pull requests only build and validate the site.
+      # Production publishing only runs for pushes to code or manual runs.
+      # ------------------------------------------------------
+
       - name: Push
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.TOKEN }}
@@ -237,6 +245,7 @@ jobs:
           cname: liudon.com
 
       - name: Easyindex
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
           echo '${{ secrets.GOOGLE_INDEXING_API_TOKEN }}' > ./credentials.json
 
@@ -249,38 +258,194 @@ jobs:
           chmod +x ./easyindex-cli
           ./easyindex-cli google -d -c ./url.csv
 
-      - name: Generate robots.txt
+      # GitHub Pages has already been published above. Only the IPFS copy gets
+      # this robots.txt, so liudon.com remains indexable.
+      - name: Generate IPFS robots.txt
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
           echo "User-agent: *" > ./public/robots.txt
           echo "Disallow: /" >> ./public/robots.txt
 
-      - name: Connect to ssh in BG
+      # ------------------------------------------------------
+      # IPFS
+      #
+      # Merkleize ./public exactly once and produce one CAR/root CID.
+      # The same CAR is then imported by both the self-hosted Kubo node and
+      # Filebase, so both sides pin exactly the same root CID.
+      # ------------------------------------------------------
+
+      - name: Create IPFS CAR
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        id: ipfs
+        timeout-minutes: 10
+        # ipshipyard/ipfs-deploy-action v2, pinned to the current v2 commit.
+        uses: ipshipyard/ipfs-deploy-action@a18ef08993e485391c5879770d9bc9f1143653ce
+        with:
+          path-to-deploy: ./public
+
+          # Keep the legacy UnixFS/CID behavior for this migration.
+          # Move to unixfs-v1-2025 separately after this pipeline is stable.
+          cid-profile: unixfs-v0-2015
+
+          github-token: ${{ github.token }}
+          upload-car-artifact: "false"
+          set-github-status: "false"
+          set-pr-comment: "false"
+
+      # ------------------------------------------------------
+      # SSH tunnel -> self-hosted Kubo RPC
+      # ------------------------------------------------------
+
+      - name: Prepare SSH
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "${{ secrets.SSHKEY }}" > ~/.ssh/ipfs_deploy
+          chmod 600 ~/.ssh/ipfs_deploy
+
+          printf '%s\n' "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Connect to Kubo
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         timeout-minutes: 2
         run: |
-          echo "${{ secrets.SSHKEY }}" > ../privkey
-          chmod 600 ../privkey
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSHHOST }} -i ../privkey -L 5001:localhost:5001 -fTN
+          set -euo pipefail
 
-      - name: IPFS upload
-        uses: filebase/ipfs-action@master
-        id: deploy
-        timeout-minutes: 2
-        with:
-          path: ./public
-          service: ipfs
-          verbose: true
-          host: localhost
-          port: 5001
-          protocol: http
-          key: ipfs-action
+          ssh             -o BatchMode=yes             -o StrictHostKeyChecking=yes             -o ExitOnForwardFailure=yes             -o ServerAliveInterval=30             -o ServerAliveCountMax=3             -i ~/.ssh/ipfs_deploy             -L 5001:localhost:5001             -fNT             "${{ secrets.SSHHOST }}"
 
-      - name: IPFS upload to filebase
-        uses: filebase/ipfs-action@master
-        with:
-          path: ./public
-          service: filebase
-          pinName: ipfs-action
-          filebaseBucket: ${{ secrets.FILEBASE_BUCKET }}
-          filebaseKey: ${{ secrets.FILEBASE_KEY }}
-          filebaseSecret: ${{ secrets.FILEBASE_SECRET }}
-          key: ipfs-action
+          # Verify both the SSH tunnel and the remote Kubo RPC endpoint.
+          curl -fsS -X POST             http://127.0.0.1:5001/api/v0/version | jq .
+
+      - name: Import CAR to Kubo
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        timeout-minutes: 10
+        env:
+          CID: ${{ steps.ipfs.outputs.cid }}
+          CAR_PATH: ${{ steps.ipfs.outputs.car-path }}
+        run: |
+          set -euo pipefail
+
+          echo "Generated CID: $CID"
+          echo "CAR: $CAR_PATH"
+
+          RESPONSE=$(curl -fsS -X POST             -F "file=@${CAR_PATH}"             "http://127.0.0.1:5001/api/v0/dag/import?pin-roots=true&stats=true")
+
+          echo "$RESPONSE"
+
+          KUBO_CID=$(printf '%s\n' "$RESPONSE"             | jq -r '.Root.Cid["/"] // empty'             | tail -n 1)
+
+          if [[ -z "$KUBO_CID" ]]; then
+            echo "ERROR: Unable to obtain imported CID from Kubo"
+            exit 1
+          fi
+
+          if [[ "$KUBO_CID" != "$CID" ]]; then
+            echo "ERROR: CID mismatch"
+            echo "Generated: $CID"
+            echo "Kubo:      $KUBO_CID"
+            exit 1
+          fi
+
+          echo "Kubo CID check: OK"
+
+      # ------------------------------------------------------
+      # Upload the exact same CAR to Filebase.
+      # import=car tells Filebase to unpack the CAR and pin its root CID.
+      # ------------------------------------------------------
+
+      - name: Upload CAR to Filebase
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        timeout-minutes: 10
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.FILEBASE_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.FILEBASE_SECRET }}
+          AWS_REGION: us-east-1
+          FILEBASE_BUCKET: ${{ secrets.FILEBASE_BUCKET }}
+          CID: ${{ steps.ipfs.outputs.cid }}
+          CAR_PATH: ${{ steps.ipfs.outputs.car-path }}
+        run: |
+          set -euo pipefail
+
+          # Keep one current CAR object instead of accumulating every deploy.
+          OBJECT_KEY="liudon-blog-latest.car"
+
+          aws             --endpoint-url https://s3.filebase.com             s3 cp             "$CAR_PATH"             "s3://${FILEBASE_BUCKET}/${OBJECT_KEY}"             --metadata 'import=car'             --only-show-errors
+
+          echo "Filebase CAR upload: OK"
+          echo "CID: $CID"
+
+      # ------------------------------------------------------
+      # Update the same IPNS identity on both publishers.
+      # Both Kubo and Filebase already hold the same ipfs-action private key.
+      # ------------------------------------------------------
+
+      - name: Publish Kubo IPNS
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        timeout-minutes: 5
+        env:
+          CID: ${{ steps.ipfs.outputs.cid }}
+        run: |
+          set -euo pipefail
+
+          RESPONSE=$(curl -fsS -X POST             "http://127.0.0.1:5001/api/v0/name/publish?arg=/ipfs/${CID}&key=ipfs-action")
+
+          echo "$RESPONSE"
+
+          VALUE=$(printf '%s\n' "$RESPONSE" | jq -r '.Value // empty')
+
+          if [[ "$VALUE" != "/ipfs/$CID" ]]; then
+            echo "ERROR: Kubo IPNS publish verification failed"
+            exit 1
+          fi
+
+          echo "Kubo IPNS: OK"
+
+      - name: Publish Filebase IPNS
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        timeout-minutes: 5
+        env:
+          FILEBASE_KEY: ${{ secrets.FILEBASE_KEY }}
+          FILEBASE_SECRET: ${{ secrets.FILEBASE_SECRET }}
+          CID: ${{ steps.ipfs.outputs.cid }}
+        run: |
+          set -euo pipefail
+
+          AUTH=$(printf '%s:%s'             "$FILEBASE_KEY"             "$FILEBASE_SECRET"             | base64 -w 0)
+
+          curl -fsS             -X PUT             -H "Authorization: Bearer ${AUTH}"             -H "Content-Type: application/json"             -d "{\"cid\":\"${CID}\"}"             "https://api.filebase.io/v1/names/ipfs-action"
+
+          echo
+
+          RESPONSE=$(curl -fsS             -H "Authorization: Bearer ${AUTH}"             "https://api.filebase.io/v1/names/ipfs-action")
+
+          FILEBASE_CID=$(printf '%s\n' "$RESPONSE" | jq -r '.cid // empty')
+
+          if [[ "$FILEBASE_CID" != "$CID" ]]; then
+            echo "ERROR: Filebase IPNS verification failed"
+            echo "Expected: $CID"
+            echo "Actual:   $FILEBASE_CID"
+            exit 1
+          fi
+
+          echo "Filebase IPNS: OK"
+
+      - name: IPFS deployment summary
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          CID: ${{ steps.ipfs.outputs.cid }}
+        run: |
+          {
+            echo "## IPFS deployment"
+            echo
+            echo "- CID: $CID"
+            echo "- VPS Kubo: OK"
+            echo "- Filebase: OK"
+            echo "- Kubo IPNS: updated"
+            echo "- Filebase IPNS: updated"
+          } >> "$GITHUB_STEP_SUMMARY"
+
