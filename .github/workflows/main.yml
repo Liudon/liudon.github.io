@@ -17,6 +17,12 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      force_ipfs:
+        description: "Force IPFS deployment even when content is unchanged"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -24,7 +30,9 @@ permissions:
   id-token: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  # Push and manual production runs share a group so IPFS state updates cannot race.
+  # Scheduled cache keepalive runs remain independent.
+  group: ${{ github.workflow }}-${{ github.event_name == 'schedule' && 'media-cache' || github.ref }}
   cancel-in-progress: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -284,6 +292,100 @@ jobs:
           echo "User-agent: *" > ./public/robots.txt
           echo "Disallow: /" >> ./public/robots.txt
 
+      # Hash exactly the tree that will be merkleized for IPFS. The digest is
+      # independent of mtimes/ownership, but includes paths, directories,
+      # symlink targets and file bytes.
+      - name: Calculate IPFS content digest
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        id: ipfs-content
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          DIGEST=$(python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+
+          root = Path("public")
+          h = hashlib.sha256()
+
+          def add_field(tag: bytes, value: bytes) -> None:
+              h.update(tag)
+              h.update(len(value).to_bytes(8, "big"))
+              h.update(value)
+
+          entries = sorted(
+              root.rglob("*"),
+              key=lambda p: p.relative_to(root).as_posix(),
+          )
+
+          for path in entries:
+              rel = path.relative_to(root).as_posix().encode("utf-8")
+
+              if path.is_symlink():
+                  add_field(b"L", rel)
+                  add_field(b"T", path.readlink().as_posix().encode("utf-8"))
+              elif path.is_dir():
+                  add_field(b"D", rel)
+              elif path.is_file():
+                  add_field(b"F", rel)
+                  with path.open("rb") as f:
+                      while chunk := f.read(1024 * 1024):
+                          h.update(chunk)
+              else:
+                  raise SystemExit(f"Unsupported filesystem entry: {path}")
+
+          print("sha256:" + h.hexdigest())
+          PY
+          )
+
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "IPFS content digest: $DIGEST"
+
+      - name: Check previous IPFS deployment
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        id: ipfs-state
+        env:
+          GH_TOKEN: ${{ secrets.TOKEN }}
+          CURRENT_DIGEST: ${{ steps.ipfs-content.outputs.digest }}
+          CID_PROFILE: unixfs-v1-2025
+          FORCE_IPFS: ${{ inputs.force_ipfs || 'false' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          STATE_FILE=$(mktemp)
+
+          if gh api             "/repos/${GITHUB_REPOSITORY}/contents/latest.json?ref=ipfs-history"             --jq '.content'             | tr -d '\n'             | base64 --decode > "$STATE_FILE"; then
+            LAST_DIGEST=$(jq -r '.digest // empty' "$STATE_FILE")
+            LAST_CID=$(jq -r '.cid // empty' "$STATE_FILE")
+            LAST_PROFILE=$(jq -r '.cid_profile // empty' "$STATE_FILE")
+          else
+            echo "No previous IPFS deployment state found; deployment is required."
+            LAST_DIGEST=""
+            LAST_CID=""
+            LAST_PROFILE=""
+          fi
+
+          echo "last_cid=$LAST_CID" >> "$GITHUB_OUTPUT"
+
+          if [[ "$FORCE_IPFS" == "true" ]]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+            echo "IPFS deployment forced by workflow_dispatch."
+          elif [[ "$CURRENT_DIGEST" == "$LAST_DIGEST" && "$CID_PROFILE" == "$LAST_PROFILE" ]]; then
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "IPFS content unchanged."
+            echo "Last CID: $LAST_CID"
+            echo "Skipping CAR generation and IPFS deployment."
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+            echo "IPFS deployment required."
+            echo "Current digest: $CURRENT_DIGEST"
+            echo "Previous digest: ${LAST_DIGEST:-<none>}"
+            echo "CID profile: $CID_PROFILE"
+            echo "Previous profile: ${LAST_PROFILE:-<none>}"
+          fi
+
       # ------------------------------------------------------
       # IPFS
       #
@@ -293,7 +395,7 @@ jobs:
       # ------------------------------------------------------
 
       - name: Create IPFS CAR
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         id: ipfs
         timeout-minutes: 10
         # Use the official v2 tag so compatible v2 fixes are picked up automatically.
@@ -314,7 +416,7 @@ jobs:
       # ------------------------------------------------------
 
       - name: Prepare SSH
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         run: |
           set -euo pipefail
 
@@ -328,7 +430,7 @@ jobs:
           chmod 600 ~/.ssh/known_hosts
 
       - name: Connect to Kubo
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         timeout-minutes: 2
         run: |
           set -euo pipefail
@@ -349,7 +451,7 @@ jobs:
             http://127.0.0.1:5001/api/v0/version | jq .
 
       - name: Import CAR to Kubo
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         timeout-minutes: 10
         env:
           CID: ${{ steps.ipfs.outputs.cid }}
@@ -390,7 +492,7 @@ jobs:
       # ------------------------------------------------------
 
       - name: Upload CAR to Filebase
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         timeout-minutes: 10
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.FILEBASE_KEY }}
@@ -422,7 +524,7 @@ jobs:
       # ------------------------------------------------------
 
       - name: Publish Kubo IPNS
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         timeout-minutes: 5
         env:
           CID: ${{ steps.ipfs.outputs.cid }}
@@ -444,7 +546,7 @@ jobs:
           echo "Kubo IPNS: OK"
 
       - name: Publish Filebase IPNS
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         timeout-minutes: 5
         env:
           FILEBASE_KEY: ${{ secrets.FILEBASE_KEY }}
@@ -482,18 +584,120 @@ jobs:
 
           echo "Filebase IPNS: OK"
 
+      # Only a fully successful Kubo + Filebase + dual-IPNS deployment reaches
+      # this step. latest.json powers future skip decisions; history.json is
+      # retained for the future Hugo "IPFS time machine" page.
+      - name: Record IPFS deployment state
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
+        env:
+          CID: ${{ steps.ipfs.outputs.cid }}
+          DIGEST: ${{ steps.ipfs-content.outputs.digest }}
+          CID_PROFILE: unixfs-v1-2025
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          HISTORY_DIR=$(mktemp -d)
+          git fetch origin ipfs-history
+          git worktree add --detach "$HISTORY_DIR" origin/ipfs-history
+
+          export HISTORY_DIR
+          export DEPLOYED_AT
+          DEPLOYED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          export DEPLOYED_AT
+
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["HISTORY_DIR"])
+          latest_path = root / "latest.json"
+          history_path = root / "history.json"
+
+          cid = os.environ["CID"]
+          digest = os.environ["DIGEST"]
+          profile = os.environ["CID_PROFILE"]
+          commit = os.environ["GITHUB_SHA"]
+          deployed_at = os.environ["DEPLOYED_AT"]
+
+          latest = {
+              "version": 1,
+              "digest": digest,
+              "cid": cid,
+              "cid_profile": profile,
+              "source_commit": commit,
+              "deployed_at": deployed_at,
+          }
+
+          try:
+              history = json.loads(history_path.read_text(encoding="utf-8"))
+          except FileNotFoundError:
+              history = {"version": 1, "entries": []}
+
+          entries = history.setdefault("entries", [])
+          existing = next((entry for entry in entries if entry.get("cid") == cid), None)
+
+          if existing is None:
+              entries.insert(0, {
+                  "digest": digest,
+                  "cid": cid,
+                  "cid_profile": profile,
+                  "source_commit": commit,
+                  "deployed_at": deployed_at,
+              })
+          elif not existing.get("digest"):
+              # Bootstrap the first CIDv1 record created before digest tracking.
+              existing["digest"] = digest
+
+          latest_path.write_text(
+              json.dumps(latest, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          history_path.write_text(
+              json.dumps(history, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+          git -C "$HISTORY_DIR" config user.name "github-actions[bot]"
+          git -C "$HISTORY_DIR" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$HISTORY_DIR" add latest.json history.json
+
+          if git -C "$HISTORY_DIR" diff --cached --quiet; then
+            echo "IPFS deployment state is already up to date."
+          else
+            git -C "$HISTORY_DIR" commit -m "record IPFS deployment ${CID:0:20}"
+            git -C "$HISTORY_DIR" push origin HEAD:ipfs-history
+            echo "IPFS deployment state recorded on ipfs-history."
+          fi
+
+          git worktree remove "$HISTORY_DIR"
+
       - name: IPFS deployment summary
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         env:
+          DEPLOY: ${{ steps.ipfs-state.outputs.deploy }}
           CID: ${{ steps.ipfs.outputs.cid }}
+          LAST_CID: ${{ steps.ipfs-state.outputs.last_cid }}
+          DIGEST: ${{ steps.ipfs-content.outputs.digest }}
         run: |
           {
             echo "## IPFS deployment"
             echo
-            echo "- CID: $CID"
-            echo "- VPS Kubo: OK"
-            echo "- Filebase: OK"
-            echo "- Kubo IPNS: updated"
-            echo "- Filebase IPNS: updated"
+            echo "- Content digest: $DIGEST"
+
+            if [[ "$DEPLOY" == "true" ]]; then
+              echo "- Status: deployed"
+              echo "- CID: $CID"
+              echo "- VPS Kubo: OK"
+              echo "- Filebase: OK"
+              echo "- Kubo IPNS: updated"
+              echo "- Filebase IPNS: updated"
+              echo "- History: recorded"
+            else
+              echo "- Status: skipped (content unchanged)"
+              echo "- CID: $LAST_CID"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
