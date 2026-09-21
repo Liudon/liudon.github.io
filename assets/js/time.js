@@ -254,10 +254,26 @@
     }, 90);
   }
 
+  function resetSnapshotReveal() {
+    frame.classList.remove("is-loading", "is-emerging", "is-visible");
+    travel.classList.remove("is-revealing");
+  }
+
+  function beginSnapshotReveal() {
+    frame.classList.add("is-loading");
+    travel.classList.add("is-revealing");
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        frame.classList.add("is-emerging");
+      });
+    });
+  }
+
   function showTravel() {
     stopWaitingIndicator();
     past.classList.remove("is-visible");
-    frame.classList.remove("is-visible");
+    resetSnapshotReveal();
     travel.classList.remove("is-hidden");
     travelLines.forEach((line) => line.classList.remove("is-visible"));
     hideError();
@@ -329,6 +345,7 @@
       if (token !== loadToken || errorBox.classList.contains("is-visible")) {
         return;
       }
+      beginSnapshotReveal();
       startWaitingIndicator(token);
     });
 
@@ -350,9 +367,11 @@
       if (token !== loadToken) return;
 
       currentSnapshot = snapshot;
+      frame.classList.remove("is-loading", "is-emerging");
       frame.classList.add("is-visible");
       revealPast(snapshot);
       travel.classList.add("is-hidden");
+      travel.classList.remove("is-revealing");
     } catch (error) {
       stopWaitingIndicator();
       if (token !== loadToken) return;
