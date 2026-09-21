@@ -585,13 +585,13 @@ jobs:
           echo "Filebase IPNS: OK"
 
       # Only a fully successful Kubo + Filebase + dual-IPNS deployment reaches
-      # this step. latest.json powers future skip decisions. Historical CIDs are
-      # append-only JSONL records split by UTC month for the future time-machine UI.
+      # this step. Normalize the whole history so workflow re-runs and repeated
+      # immutable CIDs never inflate the Time Machine snapshot count.
       - name: Record IPFS deployment state
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         env:
-          CID: ${{ steps.ipfs.outputs.cid }}
-          DIGEST: ${{ steps.ipfs-content.outputs.digest }}
+          CID: \${{ steps.ipfs.outputs.cid }}
+          DIGEST: \${{ steps.ipfs-content.outputs.digest }}
           CID_PROFILE: unixfs-v1-2025
         shell: bash
         run: |
@@ -601,6 +601,11 @@ jobs:
           git fetch origin ipfs-history
           git worktree add --detach "$HISTORY_DIR" origin/ipfs-history
 
+          cleanup() {
+            git worktree remove --force "$HISTORY_DIR" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
           export HISTORY_DIR
           DEPLOYED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           export DEPLOYED_AT
@@ -608,6 +613,7 @@ jobs:
           python3 - <<'PY'
           import json
           import os
+          from collections import defaultdict
           from pathlib import Path
 
           root = Path(os.environ["HISTORY_DIR"])
@@ -621,65 +627,165 @@ jobs:
           profile = os.environ["CID_PROFILE"]
           commit = os.environ["GITHUB_SHA"]
           deployed_at = os.environ["DEPLOYED_AT"]
-          month = deployed_at[:7]
+          workflow_run_id = int(os.environ["GITHUB_RUN_ID"])
+          workflow_run_attempt = int(os.environ["GITHUB_RUN_ATTEMPT"])
 
-          record = {
+          current = {
               "digest": digest,
               "cid": cid,
               "cid_profile": profile,
               "source_commit": commit,
               "deployed_at": deployed_at,
+              "workflow_run_id": workflow_run_id,
+              "workflow_run_attempt": workflow_run_attempt,
           }
 
+          # Load every existing snapshot row. Historical recovered rows may not
+          # have workflow_run_id / workflow_run_attempt; keep them as-is.
+          records = []
+          for path in sorted(history_dir.glob("*.jsonl")):
+              for line_number, line in enumerate(
+                  path.read_text(encoding="utf-8").splitlines(),
+                  start=1,
+              ):
+                  if not line.strip():
+                      continue
+                  try:
+                      entry = json.loads(line)
+                  except json.JSONDecodeError as exc:
+                      raise SystemExit(
+                          f"Invalid JSON in {path.name}:{line_number}: {exc}"
+                      )
+
+                  if not entry.get("cid") or not entry.get("deployed_at"):
+                      raise SystemExit(
+                          f"Missing cid/deployed_at in {path.name}:{line_number}"
+                      )
+                  records.append(entry)
+
+          records.append(current)
+
+          # Stage 1: one final successful record per workflow run.
+          # Legacy rows without workflow_run_id cannot be grouped safely, so
+          # they remain independent and are handled by CID deduplication below.
+          by_run = {}
+          legacy = []
+
+          for entry in records:
+              run_id = entry.get("workflow_run_id")
+              if run_id is None:
+                  legacy.append(entry)
+                  continue
+
+              try:
+                  run_id = int(run_id)
+                  attempt = int(entry.get("workflow_run_attempt", 1))
+              except (TypeError, ValueError):
+                  raise SystemExit(
+                      f"Invalid workflow run metadata for CID {entry.get('cid')}"
+                  )
+
+              entry["workflow_run_id"] = run_id
+              entry["workflow_run_attempt"] = attempt
+
+              previous = by_run.get(run_id)
+              if previous is None:
+                  by_run[run_id] = entry
+                  continue
+
+              previous_attempt = int(previous.get("workflow_run_attempt", 1))
+              if attempt > previous_attempt:
+                  by_run[run_id] = entry
+              elif attempt == previous_attempt:
+                  # A single attempt should have one successful deployment.
+                  # If duplicate rows exist, keep the later deployment record.
+                  if entry["deployed_at"] > previous["deployed_at"]:
+                      by_run[run_id] = entry
+
+          normalized = legacy + list(by_run.values())
+
+          # Stage 2: one immutable snapshot per CID globally.
+          # If separate runs publish the same CID, the first successful
+          # deployment is the historical point represented by that snapshot.
+          by_cid = {}
+          for entry in normalized:
+              existing = by_cid.get(entry["cid"])
+              if existing is None or entry["deployed_at"] < existing["deployed_at"]:
+                  by_cid[entry["cid"]] = entry
+
+          snapshots = sorted(
+              by_cid.values(),
+              key=lambda entry: (entry["deployed_at"], entry["cid"]),
+          )
+
+          # Re-shard the normalized history from scratch. This also removes a
+          # stale row when a later attempt of the same workflow run wins.
+          for path in history_dir.glob("*.jsonl"):
+              path.unlink()
+
+          by_month = defaultdict(list)
+          for entry in snapshots:
+              month = entry["deployed_at"][:7]
+              if len(month) != 7 or month[4] != "-":
+                  raise SystemExit(
+                      f"Invalid deployed_at for CID {entry['cid']}: "
+                      f"{entry['deployed_at']!r}"
+                  )
+              by_month[month].append(entry)
+
+          for month in sorted(by_month):
+              month_path = history_dir / f"{month}.jsonl"
+              month_path.write_text(
+                  "".join(
+                      json.dumps(
+                          entry,
+                          ensure_ascii=False,
+                          separators=(",", ":"),
+                      )
+                      + "\n"
+                      for entry in by_month[month]
+                  ),
+                  encoding="utf-8",
+              )
+
+          months = {
+              "version": 2,
+              "total": len(snapshots),
+              "months": [
+                  {
+                      "month": month,
+                      "count": len(by_month[month]),
+                  }
+                  for month in sorted(by_month, reverse=True)
+              ],
+          }
+
+          if months["total"] != sum(item["count"] for item in months["months"]):
+              raise SystemExit("months.json count validation failed")
+
+          months_path.write_text(
+              json.dumps(months, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+
+          # latest.json describes the current successful deployment, even if
+          # its CID already existed historically and was deduplicated there.
           latest = {
               "version": 1,
-              **record,
+              **current,
           }
           latest_path.write_text(
               json.dumps(latest, ensure_ascii=False, indent=2) + "\n",
               encoding="utf-8",
           )
 
-          # Keep one historical row per immutable CID, even if a forced
-          # redeploy publishes the same CID again later.
-          exists = False
-          for path in sorted(history_dir.glob("*.jsonl")):
-              for line in path.read_text(encoding="utf-8").splitlines():
-                  if not line.strip():
-                      continue
-                  entry = json.loads(line)
-                  if entry.get("cid") == cid:
-                      exists = True
-                      break
-              if exists:
-                  break
-
-          if not exists:
-              month_path = history_dir / f"{month}.jsonl"
-              with month_path.open("a", encoding="utf-8") as f:
-                  f.write(
-                      json.dumps(
-                          record,
-                          ensure_ascii=False,
-                          separators=(",", ":"),
-                      )
-                      + "\n"
-                  )
-
-          try:
-              months = json.loads(months_path.read_text(encoding="utf-8"))
-          except FileNotFoundError:
-              months = {"version": 1, "months": []}
-
-          month_list = months.setdefault("months", [])
-          if month not in month_list:
-              month_list.append(month)
-          month_list.sort(reverse=True)
-
-          months_path.write_text(
-              json.dumps(months, ensure_ascii=False, indent=2) + "\n",
-              encoding="utf-8",
+          print(
+              "History normalized: "
+              f"{len(records)} input rows -> "
+              f"{len(snapshots)} unique snapshot CIDs"
           )
+          for item in months["months"]:
+              print(f"  {item['month']}: {item['count']}")
           PY
 
           git -C "$HISTORY_DIR" config user.name "github-actions[bot]"
@@ -689,12 +795,10 @@ jobs:
           if git -C "$HISTORY_DIR" diff --cached --quiet; then
             echo "IPFS deployment state is already up to date."
           else
-            git -C "$HISTORY_DIR" commit -m "record IPFS deployment ${CID:0:20}"
+            git -C "$HISTORY_DIR" commit -m "record normalized IPFS deployment history"
             git -C "$HISTORY_DIR" push origin HEAD:ipfs-history
-            echo "IPFS deployment state recorded on ipfs-history."
+            echo "Normalized IPFS deployment history recorded on ipfs-history."
           fi
-
-          git worktree remove "$HISTORY_DIR"
 
       - name: IPFS deployment summary
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
