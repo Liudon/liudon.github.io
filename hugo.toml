@@ -78,7 +78,7 @@ hasCJKLanguage = true # 自动检测是否包含 中文日文韩文 如果文章
   # Twikoo comments (article pages only). The comment block is lazy-loaded
   # when the reader scrolls near the bottom of the page.
   [params.twikoo]
-    env_id = "https://comment.liudon.com" # required — Tencent CloudBase env id or backend URL
+    env_id = "https://comment.liudon.com/.netlify/functions/twikoo" # required — Tencent CloudBase env id or backend URL
     version = "1.7.20"                       # keep the frontend and backend versions aligned
     lang = "zh-CN"
   #   # Tencent CloudBase only:
