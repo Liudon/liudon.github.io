@@ -15,13 +15,14 @@
         {{- range .Params.travel_lines }}
         <p class="time-line">{{ . }}</p>
         {{- end }}
+        <p id="travel-waiting" class="time-line time-waiting" data-text="{{ .Params.travel_waiting | default "loading snapshot..." }}"></p>
       </div>
 
       <div id="error" class="time-error" role="alert">
         <p id="error-title" class="time-error__title">connection to the past was lost.</p>
         <p id="error-message" class="time-error__message">无法加载这个历史快照。</p>
         <div class="time-actions">
-          <button id="retry" class="time-btn" type="button">🎲 再随机一次</button>
+          <button id="retry" class="time-btn" type="button">🎲 再次随机</button>
           <a class="time-btn" href="{{ site.Home.RelPermalink }}">↩ 回到现在</a>
         </div>
       </div>
@@ -40,7 +41,7 @@
       <p id="past-date" class="past__date">----</p>
       <p class="past__copy">你正在浏览博客过去的一个不可变快照。</p>
       <div class="time-actions">
-        <button id="random-again" class="time-btn" type="button">🎲 再随机一次</button>
+        <button id="random-again" class="time-btn" type="button">🎲 再次随机</button>
         <a class="time-btn" href="{{ site.Home.RelPermalink }}">↩ 回到现在</a>
       </div>
     </div>
