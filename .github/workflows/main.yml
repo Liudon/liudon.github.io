@@ -590,8 +590,8 @@ jobs:
       - name: Record IPFS deployment state
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         env:
-          CID: \${{ steps.ipfs.outputs.cid }}
-          DIGEST: \${{ steps.ipfs-content.outputs.digest }}
+          CID: ${{ steps.ipfs.outputs.cid }}
+          DIGEST: ${{ steps.ipfs-content.outputs.digest }}
           CID_PROFILE: unixfs-v1-2025
         shell: bash
         run: |
