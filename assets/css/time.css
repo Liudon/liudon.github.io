@@ -86,6 +86,10 @@ body.time-machine-page {
   display: block;
 }
 
+.time-waiting {
+  color: var(--term-phosphor-bright);
+}
+
 .time-line::before {
   content: "> ";
   color: var(--term-text-dim);
