@@ -9,5 +9,7 @@ travel_lines:
   - "locating a point in blog history..."
   - "reading immutable snapshots..."
   - "travelling..."
+
+travel_waiting: "loading snapshot..."
 ---
 
