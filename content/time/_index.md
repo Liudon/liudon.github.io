@@ -11,5 +11,6 @@ travel_lines:
   - "循光而返…"
 
 travel_waiting: "急急如律令…"
+travel_line_delay_ms: 650
 ---
 
