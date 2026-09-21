@@ -70,11 +70,20 @@ body.time-machine-page {
   text-shadow: var(--term-text-glow);
 }
 
+.time-lines {
+  min-height: 1px;
+}
+
 .time-line {
+  display: none;
   margin: 6px 0;
   color: var(--term-text);
   font-size: 14px;
   line-height: 1.65;
+}
+
+.time-line.is-visible {
+  display: block;
 }
 
 .time-line::before {
