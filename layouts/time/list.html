@@ -11,9 +11,11 @@
   <div id="travel" class="travel" aria-live="polite">
     <div class="time-terminal">
       <p class="time-prompt">$ time<span class="time-cursor" aria-hidden="true"></span></p>
-      <p class="time-line">locating a point in blog history...</p>
-      <p class="time-line">reading immutable snapshots...</p>
-      <p class="time-line">travelling...</p>
+      <div id="travel-lines" class="time-lines" data-line-delay="{{ .Params.travel_line_delay_ms | default 320 }}">
+        {{- range .Params.travel_lines }}
+        <p class="time-line">{{ . }}</p>
+        {{- end }}
+      </div>
 
       <div id="error" class="time-error" role="alert">
         <p id="error-title" class="time-error__title">connection to the past was lost.</p>
