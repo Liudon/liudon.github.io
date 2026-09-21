@@ -3,7 +3,7 @@
 
   const HISTORY_BASE =
     "https://gh-proxy.org/https://raw.githubusercontent.com/Liudon/liudon.github.io/ipfs-history";
-  const SNAPSHOT_BASE = "https://liudon.xyz/ipfs";
+  const SNAPSHOT_BASE = "https://liudon.com/ipfs";
   const FRAME_SOFT_TIMEOUT_MS = 5000;
   const MIN_TRAVEL_MS = 650;
   const SNAPSHOT_REVEAL_MS = 1200;
