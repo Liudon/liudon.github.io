@@ -6,7 +6,6 @@
   const SNAPSHOT_BASE = "https://liudon.xyz/ipfs";
   const LOAD_TIMEOUT_MS = 15000;
   const MIN_TRAVEL_MS = 650;
-  const AUTO_COLLAPSE_MS = 1800;
   const MAX_RANDOM_ATTEMPTS = 40;
   const DEFAULT_LINE_DELAY_MS = 320;
 
@@ -18,8 +17,9 @@
   const retryButton = document.getElementById("retry");
   const travelLinesRoot = document.getElementById("travel-lines");
   const travelLines = travelLinesRoot
-    ? Array.from(travelLinesRoot.querySelectorAll(".time-line"))
+    ? Array.from(travelLinesRoot.querySelectorAll(".time-line:not(.time-waiting)"))
     : [];
+  const waitingLine = document.getElementById("travel-waiting");
   const configuredLineDelay = travelLinesRoot
     ? Number.parseInt(travelLinesRoot.dataset.lineDelay, 10)
     : DEFAULT_LINE_DELAY_MS;
@@ -39,8 +39,7 @@
   let latestCid = null;
   let currentSnapshot = null;
   let loadToken = 0;
-  let autoCollapseTimer = null;
-  let userControlledPanel = false;
+  let waitingTimer = null;
 
   function fetchJson(path) {
     return fetch(HISTORY_BASE + "/" + path, {
@@ -220,8 +219,43 @@
     errorBox.classList.add("is-visible");
   }
 
+  function stopWaitingIndicator() {
+    if (waitingTimer !== null) {
+      window.clearInterval(waitingTimer);
+      waitingTimer = null;
+    }
+
+    if (waitingLine) {
+      waitingLine.classList.remove("is-visible");
+      waitingLine.textContent = "";
+    }
+  }
+
+  function startWaitingIndicator(token) {
+    if (!waitingLine) return;
+
+    stopWaitingIndicator();
+
+    const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+    const text = waitingLine.dataset.text || "loading snapshot...";
+    let frameIndex = 0;
+
+    waitingLine.textContent = text + " " + frames[frameIndex];
+    waitingLine.classList.add("is-visible");
+
+    waitingTimer = window.setInterval(() => {
+      if (token !== loadToken) {
+        stopWaitingIndicator();
+        return;
+      }
+
+      frameIndex = (frameIndex + 1) % frames.length;
+      waitingLine.textContent = text + " " + frames[frameIndex];
+    }, 90);
+  }
+
   function showTravel() {
-    clearTimeout(autoCollapseTimer);
+    stopWaitingIndicator();
     past.classList.remove("is-visible");
     frame.classList.remove("is-visible");
     travel.classList.remove("is-hidden");
@@ -242,21 +276,11 @@
     }
   }
 
-  function expandPast(manual = false) {
-    if (manual) {
-      userControlledPanel = true;
-      clearTimeout(autoCollapseTimer);
-    }
-
+  function expandPast() {
     past.classList.remove("is-collapsed");
   }
 
-  function collapsePast(manual = false) {
-    if (manual) {
-      userControlledPanel = true;
-      clearTimeout(autoCollapseTimer);
-    }
-
+  function collapsePast() {
     past.classList.add("is-collapsed");
   }
 
@@ -265,15 +289,8 @@
 
     pastDate.textContent = formatted.full;
     pastDateShort.textContent = formatted.short;
-    userControlledPanel = false;
-
     expandPast();
     past.classList.add("is-visible");
-
-    clearTimeout(autoCollapseTimer);
-    autoCollapseTimer = window.setTimeout(() => {
-      if (!userControlledPanel) collapsePast();
-    }, AUTO_COLLAPSE_MS);
   }
 
   function waitForFrame(token) {
@@ -314,17 +331,20 @@
       const snapshot = await randomSnapshot();
       if (token !== loadToken) return;
 
+      await travelOutput;
+      if (token !== loadToken) return;
+
+      startWaitingIndicator(token);
+
       const loaded = waitForFrame(token);
       frame.src = SNAPSHOT_BASE + "/" + snapshot.cid + "/";
       await loaded;
+      stopWaitingIndicator();
 
       const remaining = MIN_TRAVEL_MS - (performance.now() - startedAt);
-      const minimumDelay =
-        remaining > 0
-          ? new Promise((resolve) => setTimeout(resolve, remaining))
-          : Promise.resolve();
-
-      await Promise.all([travelOutput, minimumDelay]);
+      if (remaining > 0) {
+        await new Promise((resolve) => setTimeout(resolve, remaining));
+      }
 
       if (token !== loadToken) return;
 
@@ -333,6 +353,7 @@
       revealPast(snapshot);
       travel.classList.add("is-hidden");
     } catch (error) {
+      stopWaitingIndicator();
       if (token !== loadToken) return;
 
       console.error(error);
@@ -365,8 +386,8 @@
     }
   }
 
-  pastCollapsed.addEventListener("click", () => expandPast(true));
-  pastClose.addEventListener("click", () => collapsePast(true));
+  pastCollapsed.addEventListener("click", expandPast);
+  pastClose.addEventListener("click", collapsePast);
   randomAgain.addEventListener("click", travelToRandomSnapshot);
   retryButton.addEventListener("click", travelToRandomSnapshot);
 
