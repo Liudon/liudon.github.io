@@ -325,20 +325,21 @@
     const startedAt = performance.now();
 
     showTravel();
-    const travelOutput = printTravelLines(token);
+    const travelOutput = printTravelLines(token).then(() => {
+      if (token !== loadToken || errorBox.classList.contains("is-visible")) {
+        return;
+      }
+      startWaitingIndicator(token);
+    });
 
     try {
       const snapshot = await randomSnapshot();
       if (token !== loadToken) return;
 
-      await travelOutput;
-      if (token !== loadToken) return;
-
-      startWaitingIndicator(token);
-
       const loaded = waitForFrame(token);
       frame.src = SNAPSHOT_BASE + "/" + snapshot.cid + "/";
-      await loaded;
+
+      await Promise.all([loaded, travelOutput]);
       stopWaitingIndicator();
 
       const remaining = MIN_TRAVEL_MS - (performance.now() - startedAt);
