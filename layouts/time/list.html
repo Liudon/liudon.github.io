@@ -47,7 +47,12 @@
     </div>
   </aside>
 
-  {{- $timeJS := resources.Get "js/time.js" | minify | fingerprint }}
+  {{- $timeParts := slice
+      (resources.Get "js/custom/google-analytics.js")
+      (resources.Get "js/time.js")
+  -}}
+  {{- $timeJS := $timeParts | resources.Concat "js/time-machine.js" | minify | fingerprint }}
   <script src="{{ $timeJS.RelPermalink }}" integrity="{{ $timeJS.Data.Integrity }}" crossorigin="anonymous" defer></script>
+  {{ partial "extend_footer.html" . }}
 </body>
 </html>
