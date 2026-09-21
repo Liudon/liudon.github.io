@@ -26,11 +26,36 @@ body.time-machine-page {
   border: 0;
   background: var(--term-bg);
   opacity: 0;
-  transition: opacity 180ms ease;
+  filter: blur(16px);
+  transform: scale(1.025);
+  transform-origin: center;
+  transition:
+    opacity 900ms ease,
+    filter 4s ease-out,
+    transform 4s ease-out;
+  will-change: opacity, filter, transform;
+}
+
+.snapshot.is-loading {
+  opacity: 0.32;
+  filter: blur(16px);
+  transform: scale(1.025);
+}
+
+.snapshot.is-loading.is-emerging {
+  opacity: 0.82;
+  filter: blur(5px);
+  transform: scale(1.008);
 }
 
 .snapshot.is-visible {
   opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+  transition:
+    opacity 420ms ease,
+    filter 650ms ease,
+    transform 650ms ease;
 }
 
 .travel {
@@ -43,7 +68,16 @@ body.time-machine-page {
   background:
     radial-gradient(circle at center, var(--term-accent-10), transparent 48%),
     var(--term-bg);
-  transition: opacity 180ms ease, visibility 180ms ease;
+  transition:
+    opacity 180ms ease,
+    visibility 180ms ease,
+    background 1200ms ease;
+}
+
+.travel.is-revealing {
+  background:
+    radial-gradient(circle at center, rgba(255, 149, 0, 0.08), transparent 48%),
+    rgba(10, 10, 10, 0.58);
 }
 
 .travel.is-hidden {
@@ -277,6 +311,18 @@ body.time-machine-page {
   .travel,
   .past {
     transition: none;
+  }
+
+  .snapshot.is-loading,
+  .snapshot.is-loading.is-emerging {
+    opacity: 0.72;
+    filter: blur(4px);
+    transform: none;
+  }
+
+  .snapshot.is-visible {
+    filter: none;
+    transform: none;
   }
 
   .time-cursor {
