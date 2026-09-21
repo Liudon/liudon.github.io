@@ -8,7 +8,7 @@
   const MIN_TRAVEL_MS = 650;
   const SNAPSHOT_REVEAL_MS = 1200;
   const MAX_RANDOM_ATTEMPTS = 40;
-  const DEFAULT_LINE_DELAY_MS = 320;
+  const DEFAULT_LINE_DELAY_MS = 650;
 
   let frame = document.getElementById("snapshot");
   const travel = document.getElementById("travel");
@@ -301,7 +301,7 @@
       if (token !== loadToken) return;
 
       await new Promise((resolve) =>
-        window.setTimeout(resolve, index === 0 ? 120 : travelLineDelayMs)
+        window.setTimeout(resolve, index === 0 ? 300 : travelLineDelayMs)
       );
 
       if (token !== loadToken) return;
