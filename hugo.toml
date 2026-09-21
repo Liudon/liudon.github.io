@@ -103,6 +103,12 @@ hasCJKLanguage = true # 自动检测是否包含 中文日文韩文 如果文章
   name = "Links"
   url = "/links/"
   weight = 2
+[[menu.main]]
+  name = "Time"
+  url = "https://liudon.com/time/"
+  weight = 3
+  [menu.main.params]
+    target = "_top"
 
 [markup]
   [markup.goldmark]
