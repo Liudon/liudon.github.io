@@ -65,19 +65,17 @@ body.time-machine-page {
   display: grid;
   place-items: center;
   padding: 24px;
-  background:
-    radial-gradient(circle at center, var(--term-accent-10), transparent 48%),
-    var(--term-bg);
+  background-image:
+    radial-gradient(circle at center, var(--term-accent-10), transparent 48%);
+  background-color: var(--term-bg);
   transition:
     opacity 180ms ease,
     visibility 180ms ease,
-    background 1200ms ease;
+    background-color 1200ms ease;
 }
 
 .travel.is-revealing {
-  background:
-    radial-gradient(circle at center, rgba(255, 149, 0, 0.08), transparent 48%),
-    rgba(10, 10, 10, 0.58);
+  background-color: rgba(10, 10, 10, 0.58);
 }
 
 .travel.is-hidden {
