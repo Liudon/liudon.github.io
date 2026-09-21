@@ -6,10 +6,10 @@ outputs:
   - HTML
 
 travel_lines:
-  - "locating a point in blog history..."
-  - "reading immutable snapshots..."
-  - "travelling..."
+  - "溯流寻迹…"
+  - "定格如昨…"
+  - "循光而返…"
 
-travel_waiting: "loading snapshot..."
+travel_waiting: "急急如律令…"
 ---
 
