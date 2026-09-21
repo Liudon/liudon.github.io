@@ -6,10 +6,11 @@
   const SNAPSHOT_BASE = "https://liudon.xyz/ipfs";
   const FRAME_SOFT_TIMEOUT_MS = 5000;
   const MIN_TRAVEL_MS = 650;
+  const SNAPSHOT_REVEAL_MS = 1200;
   const MAX_RANDOM_ATTEMPTS = 40;
   const DEFAULT_LINE_DELAY_MS = 320;
 
-  const frame = document.getElementById("snapshot");
+  let frame = document.getElementById("snapshot");
   const travel = document.getElementById("travel");
   const errorBox = document.getElementById("error");
   const errorTitle = document.getElementById("error-title");
@@ -254,8 +255,24 @@
     }, 90);
   }
 
-  function resetSnapshotReveal() {
-    frame.classList.remove("is-loading", "is-emerging", "is-visible");
+  function createBlankSnapshotFrame() {
+    const nextFrame = document.createElement("iframe");
+    nextFrame.id = "snapshot";
+    nextFrame.className = "snapshot";
+    nextFrame.title = "博客历史快照";
+    nextFrame.referrerPolicy = "strict-origin-when-cross-origin";
+
+    frame.replaceWith(nextFrame);
+    frame = nextFrame;
+  }
+
+  function resetSnapshotReveal({ replaceFrame = false } = {}) {
+    if (replaceFrame) {
+      createBlankSnapshotFrame();
+    } else {
+      frame.classList.remove("is-loading", "is-emerging", "is-visible");
+    }
+
     travel.classList.remove("is-revealing");
   }
 
@@ -273,7 +290,7 @@
   function showTravel() {
     stopWaitingIndicator();
     past.classList.remove("is-visible");
-    resetSnapshotReveal();
+    resetSnapshotReveal({ replaceFrame: true });
     travel.classList.remove("is-hidden");
     travelLines.forEach((line) => line.classList.remove("is-visible"));
     hideError();
@@ -351,7 +368,6 @@
       if (token !== loadToken || errorBox.classList.contains("is-visible")) {
         return;
       }
-      beginSnapshotReveal();
       startWaitingIndicator(token);
     });
 
@@ -363,13 +379,18 @@
       frame.src = SNAPSHOT_BASE + "/" + snapshot.cid + "/";
 
       const [frameResult] = await Promise.all([loaded, travelOutput]);
-      stopWaitingIndicator();
 
       if (frameResult === "soft-timeout") {
         console.debug(
           "Snapshot iframe is still loading subresources; revealing rendered content."
         );
       }
+
+      if (token !== loadToken) return;
+
+      beginSnapshotReveal();
+      await new Promise((resolve) => setTimeout(resolve, SNAPSHOT_REVEAL_MS));
+      stopWaitingIndicator();
 
       const remaining = MIN_TRAVEL_MS - (performance.now() - startedAt);
       if (remaining > 0) {
@@ -387,6 +408,9 @@
     } catch (error) {
       stopWaitingIndicator();
       if (token !== loadToken) return;
+
+      resetSnapshotReveal({ replaceFrame: true });
+      travel.classList.remove("is-hidden", "is-revealing");
 
       console.error(error);
 
