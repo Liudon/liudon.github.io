@@ -4,7 +4,7 @@
   const HISTORY_BASE =
     "https://raw.githubusercontent.com/Liudon/liudon.github.io/ipfs-history";
   const SNAPSHOT_BASE = "https://liudon.xyz/ipfs";
-  const LOAD_TIMEOUT_MS = 15000;
+  const FRAME_SOFT_TIMEOUT_MS = 5000;
   const MIN_TRAVEL_MS = 650;
   const MAX_RANDOM_ATTEMPTS = 40;
   const DEFAULT_LINE_DELAY_MS = 320;
@@ -313,8 +313,14 @@
     return new Promise((resolve, reject) => {
       const timeout = window.setTimeout(() => {
         cleanup();
-        reject(new Error("Snapshot load timed out"));
-      }, LOAD_TIMEOUT_MS);
+
+        if (token !== loadToken) {
+          reject(new Error("Snapshot load superseded"));
+          return;
+        }
+
+        resolve("soft-timeout");
+      }, FRAME_SOFT_TIMEOUT_MS);
 
       function cleanup() {
         clearTimeout(timeout);
@@ -329,7 +335,7 @@
           return;
         }
 
-        resolve();
+        resolve("load");
       }
 
       frame.addEventListener("load", onLoad, { once: true });
@@ -356,8 +362,14 @@
       const loaded = waitForFrame(token);
       frame.src = SNAPSHOT_BASE + "/" + snapshot.cid + "/";
 
-      await Promise.all([loaded, travelOutput]);
+      const [frameResult] = await Promise.all([loaded, travelOutput]);
       stopWaitingIndicator();
+
+      if (frameResult === "soft-timeout") {
+        console.debug(
+          "Snapshot iframe is still loading subresources; revealing rendered content."
+        );
+      }
 
       const remaining = MIN_TRAVEL_MS - (performance.now() - startedAt);
       if (remaining > 0) {
