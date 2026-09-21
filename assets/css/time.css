@@ -30,9 +30,9 @@ body.time-machine-page {
   transform: scale(1.025);
   transform-origin: center;
   transition:
-    opacity 900ms ease,
-    filter 4s ease-out,
-    transform 4s ease-out;
+    opacity 650ms ease,
+    filter 1200ms ease-out,
+    transform 1200ms ease-out;
   will-change: opacity, filter, transform;
 }
 
@@ -43,9 +43,9 @@ body.time-machine-page {
 }
 
 .snapshot.is-loading.is-emerging {
-  opacity: 0.82;
-  filter: blur(5px);
-  transform: scale(1.008);
+  opacity: 0.92;
+  filter: blur(2px);
+  transform: scale(1.004);
 }
 
 .snapshot.is-visible {
@@ -75,7 +75,7 @@ body.time-machine-page {
 }
 
 .travel.is-revealing {
-  background-color: rgba(10, 10, 10, 0.58);
+  background-color: rgba(10, 10, 10, 0.38);
 }
 
 .travel.is-hidden {
