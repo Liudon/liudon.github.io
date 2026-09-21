@@ -1,0 +1,344 @@
+(() => {
+  "use strict";
+
+  const HISTORY_BASE =
+    "https://raw.githubusercontent.com/Liudon/liudon.github.io/ipfs-history";
+  const SNAPSHOT_BASE = "https://liudon.xyz/ipfs";
+  const LOAD_TIMEOUT_MS = 15000;
+  const MIN_TRAVEL_MS = 650;
+  const AUTO_COLLAPSE_MS = 1800;
+  const MAX_RANDOM_ATTEMPTS = 40;
+
+  const frame = document.getElementById("snapshot");
+  const travel = document.getElementById("travel");
+  const errorBox = document.getElementById("error");
+  const errorTitle = document.getElementById("error-title");
+  const errorMessage = document.getElementById("error-message");
+  const retryButton = document.getElementById("retry");
+  const past = document.getElementById("past");
+  const pastCollapsed = document.getElementById("past-collapsed");
+  const pastClose = document.getElementById("past-close");
+  const randomAgain = document.getElementById("random-again");
+  const pastDate = document.getElementById("past-date");
+  const pastDateShort = document.getElementById("past-date-short");
+
+  const monthCache = new Map();
+  let historyIndex = null;
+  let latestCid = null;
+  let currentSnapshot = null;
+  let loadToken = 0;
+  let autoCollapseTimer = null;
+  let userControlledPanel = false;
+
+  function fetchJson(path) {
+    return fetch(HISTORY_BASE + "/" + path, {
+      cache: "no-store",
+      headers: { Accept: "application/json" }
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status + " while loading " + path);
+      }
+      return response.json();
+    });
+  }
+
+  async function loadHistoryIndex() {
+    if (historyIndex) return historyIndex;
+
+    const [months, latest] = await Promise.all([
+      fetchJson("months.json"),
+      fetchJson("latest.json")
+    ]);
+
+    if (
+      months.version !== 2 ||
+      !Number.isInteger(months.total) ||
+      months.total < 1 ||
+      !Array.isArray(months.months)
+    ) {
+      throw new Error("Invalid months.json");
+    }
+
+    const calculatedTotal = months.months.reduce((sum, item) => {
+      if (
+        !item ||
+        typeof item.month !== "string" ||
+        !Number.isInteger(item.count) ||
+        item.count < 0
+      ) {
+        throw new Error("Invalid month index entry");
+      }
+      return sum + item.count;
+    }, 0);
+
+    if (calculatedTotal !== months.total) {
+      throw new Error("Timeline index count mismatch");
+    }
+
+    historyIndex = months;
+    latestCid = typeof latest.cid === "string" ? latest.cid : null;
+    return historyIndex;
+  }
+
+  async function loadMonth(month) {
+    if (monthCache.has(month)) return monthCache.get(month);
+
+    const response = await fetch(
+      HISTORY_BASE + "/history/" + month + ".jsonl",
+      { cache: "no-store" }
+    );
+
+    if (!response.ok) {
+      throw new Error("HTTP " + response.status + " while loading " + month);
+    }
+
+    const text = await response.text();
+    const seen = new Set();
+    const rows = [];
+
+    for (const rawLine of text.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line) continue;
+
+      const row = JSON.parse(line);
+      if (
+        !row ||
+        typeof row.cid !== "string" ||
+        typeof row.deployed_at !== "string"
+      ) {
+        continue;
+      }
+
+      if (seen.has(row.cid)) continue;
+      seen.add(row.cid);
+      rows.push(row);
+    }
+
+    monthCache.set(month, rows);
+    return rows;
+  }
+
+  function locateGlobalIndex(globalIndex) {
+    let offset = globalIndex;
+
+    for (const item of historyIndex.months) {
+      if (offset < item.count) {
+        return {
+          month: item.month,
+          index: offset,
+          expectedCount: item.count
+        };
+      }
+      offset -= item.count;
+    }
+
+    throw new Error("Random index outside timeline");
+  }
+
+  async function randomSnapshot() {
+    await loadHistoryIndex();
+
+    if (historyIndex.total <= 1 && latestCid) {
+      throw new Error("NO_HISTORY");
+    }
+
+    for (let attempt = 0; attempt < MAX_RANDOM_ATTEMPTS; attempt += 1) {
+      const globalIndex = Math.floor(Math.random() * historyIndex.total);
+      const location = locateGlobalIndex(globalIndex);
+      const rows = await loadMonth(location.month);
+
+      if (rows.length !== location.expectedCount) {
+        throw new Error(
+          "Timeline shard mismatch for " +
+            location.month +
+            ": " +
+            rows.length +
+            " != " +
+            location.expectedCount
+        );
+      }
+
+      const snapshot = rows[location.index];
+      if (!snapshot) continue;
+      if (latestCid && snapshot.cid === latestCid) continue;
+      if (currentSnapshot && snapshot.cid === currentSnapshot.cid) continue;
+
+      return snapshot;
+    }
+
+    throw new Error("NO_ALTERNATIVE");
+  }
+
+  function formatSnapshotTime(iso) {
+    const date = new Date(iso);
+
+    if (Number.isNaN(date.getTime())) {
+      return { full: iso, short: iso.slice(0, 10) };
+    }
+
+    const parts = new Intl.DateTimeFormat("zh-CN", {
+      timeZone: "Asia/Shanghai",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23"
+    }).formatToParts(date);
+
+    const values = Object.fromEntries(
+      parts.map((part) => [part.type, part.value])
+    );
+
+    const short = values.year + "-" + values.month + "-" + values.day;
+
+    return {
+      full: short + " · " + values.hour + ":" + values.minute,
+      short
+    };
+  }
+
+  function hideError() {
+    errorBox.classList.remove("is-visible");
+  }
+
+  function showError(title, message) {
+    errorTitle.textContent = title;
+    errorMessage.textContent = message;
+    errorBox.classList.add("is-visible");
+  }
+
+  function showTravel() {
+    clearTimeout(autoCollapseTimer);
+    past.classList.remove("is-visible");
+    frame.classList.remove("is-visible");
+    travel.classList.remove("is-hidden");
+    hideError();
+  }
+
+  function expandPast(manual = false) {
+    if (manual) {
+      userControlledPanel = true;
+      clearTimeout(autoCollapseTimer);
+    }
+
+    past.classList.remove("is-collapsed");
+  }
+
+  function collapsePast(manual = false) {
+    if (manual) {
+      userControlledPanel = true;
+      clearTimeout(autoCollapseTimer);
+    }
+
+    past.classList.add("is-collapsed");
+  }
+
+  function revealPast(snapshot) {
+    const formatted = formatSnapshotTime(snapshot.deployed_at);
+
+    pastDate.textContent = formatted.full;
+    pastDateShort.textContent = formatted.short;
+    userControlledPanel = false;
+
+    expandPast();
+    past.classList.add("is-visible");
+
+    clearTimeout(autoCollapseTimer);
+    autoCollapseTimer = window.setTimeout(() => {
+      if (!userControlledPanel) collapsePast();
+    }, AUTO_COLLAPSE_MS);
+  }
+
+  function waitForFrame(token) {
+    return new Promise((resolve, reject) => {
+      const timeout = window.setTimeout(() => {
+        cleanup();
+        reject(new Error("Snapshot load timed out"));
+      }, LOAD_TIMEOUT_MS);
+
+      function cleanup() {
+        clearTimeout(timeout);
+        frame.removeEventListener("load", onLoad);
+      }
+
+      function onLoad() {
+        cleanup();
+
+        if (token !== loadToken) {
+          reject(new Error("Snapshot load superseded"));
+          return;
+        }
+
+        resolve();
+      }
+
+      frame.addEventListener("load", onLoad, { once: true });
+    });
+  }
+
+  async function travelToRandomSnapshot() {
+    const token = ++loadToken;
+    const startedAt = performance.now();
+
+    showTravel();
+
+    try {
+      const snapshot = await randomSnapshot();
+      if (token !== loadToken) return;
+
+      const loaded = waitForFrame(token);
+      frame.src = SNAPSHOT_BASE + "/" + snapshot.cid + "/";
+      await loaded;
+
+      const remaining = MIN_TRAVEL_MS - (performance.now() - startedAt);
+      if (remaining > 0) {
+        await new Promise((resolve) => setTimeout(resolve, remaining));
+      }
+
+      if (token !== loadToken) return;
+
+      currentSnapshot = snapshot;
+      frame.classList.add("is-visible");
+      revealPast(snapshot);
+      travel.classList.add("is-hidden");
+    } catch (error) {
+      if (token !== loadToken) return;
+
+      console.error(error);
+
+      if (error.message === "NO_HISTORY") {
+        showError(
+          "no historical snapshots available yet.",
+          "当前没有可用于时间旅行的历史快照。"
+        );
+      } else if (error.message === "NO_ALTERNATIVE") {
+        showError(
+          "no other point in time is available.",
+          "目前没有另一个可随机的历史快照。"
+        );
+      } else if (
+        /months\.json|latest\.json|Timeline|month index|HTTP/.test(
+          error.message
+        )
+      ) {
+        showError(
+          "unable to locate the timeline.",
+          "读取博客历史索引失败，可以重新尝试。"
+        );
+      } else {
+        showError(
+          "connection to the past was lost.",
+          "历史快照加载失败，可以随机尝试另一个时间点。"
+        );
+      }
+    }
+  }
+
+  pastCollapsed.addEventListener("click", () => expandPast(true));
+  pastClose.addEventListener("click", () => collapsePast(true));
+  randomAgain.addEventListener("click", travelToRandomSnapshot);
+  retryButton.addEventListener("click", travelToRandomSnapshot);
+
+  travelToRandomSnapshot();
+})();
