@@ -8,6 +8,7 @@
   const MIN_TRAVEL_MS = 650;
   const AUTO_COLLAPSE_MS = 1800;
   const MAX_RANDOM_ATTEMPTS = 40;
+  const DEFAULT_LINE_DELAY_MS = 320;
 
   const frame = document.getElementById("snapshot");
   const travel = document.getElementById("travel");
@@ -15,6 +16,17 @@
   const errorTitle = document.getElementById("error-title");
   const errorMessage = document.getElementById("error-message");
   const retryButton = document.getElementById("retry");
+  const travelLinesRoot = document.getElementById("travel-lines");
+  const travelLines = travelLinesRoot
+    ? Array.from(travelLinesRoot.querySelectorAll(".time-line"))
+    : [];
+  const configuredLineDelay = travelLinesRoot
+    ? Number.parseInt(travelLinesRoot.dataset.lineDelay, 10)
+    : DEFAULT_LINE_DELAY_MS;
+  const travelLineDelayMs =
+    Number.isFinite(configuredLineDelay) && configuredLineDelay >= 0
+      ? configuredLineDelay
+      : DEFAULT_LINE_DELAY_MS;
   const past = document.getElementById("past");
   const pastCollapsed = document.getElementById("past-collapsed");
   const pastClose = document.getElementById("past-close");
@@ -213,7 +225,21 @@
     past.classList.remove("is-visible");
     frame.classList.remove("is-visible");
     travel.classList.remove("is-hidden");
+    travelLines.forEach((line) => line.classList.remove("is-visible"));
     hideError();
+  }
+
+  async function printTravelLines(token) {
+    for (let index = 0; index < travelLines.length; index += 1) {
+      if (token !== loadToken) return;
+
+      await new Promise((resolve) =>
+        window.setTimeout(resolve, index === 0 ? 120 : travelLineDelayMs)
+      );
+
+      if (token !== loadToken) return;
+      travelLines[index].classList.add("is-visible");
+    }
   }
 
   function expandPast(manual = false) {
@@ -282,6 +308,7 @@
     const startedAt = performance.now();
 
     showTravel();
+    const travelOutput = printTravelLines(token);
 
     try {
       const snapshot = await randomSnapshot();
@@ -292,9 +319,12 @@
       await loaded;
 
       const remaining = MIN_TRAVEL_MS - (performance.now() - startedAt);
-      if (remaining > 0) {
-        await new Promise((resolve) => setTimeout(resolve, remaining));
-      }
+      const minimumDelay =
+        remaining > 0
+          ? new Promise((resolve) => setTimeout(resolve, remaining))
+          : Promise.resolve();
+
+      await Promise.all([travelOutput, minimumDelay]);
 
       if (token !== loadToken) return;
 
