@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language.Locale | default site.Language.Lang | default "zh-CN" }}">
+<head>
+  {{ partial "head.html" . }}
+  {{- $timeCSS := resources.Get "css/time.css" | minify | fingerprint }}
+  <link rel="stylesheet" href="{{ $timeCSS.RelPermalink }}" integrity="{{ $timeCSS.Data.Integrity }}" crossorigin="anonymous">
+</head>
+<body class="time-machine-page">
+  <iframe id="snapshot" class="snapshot" title="博客历史快照" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+
+  <div id="travel" class="travel" aria-live="polite">
+    <div class="time-terminal">
+      <p class="time-prompt">$ time<span class="time-cursor" aria-hidden="true"></span></p>
+      <p class="time-line">locating a point in blog history...</p>
+      <p class="time-line">reading immutable snapshots...</p>
+      <p class="time-line">travelling...</p>
+
+      <div id="error" class="time-error" role="alert">
+        <p id="error-title" class="time-error__title">connection to the past was lost.</p>
+        <p id="error-message" class="time-error__message">无法加载这个历史快照。</p>
+        <div class="time-actions">
+          <button id="retry" class="time-btn" type="button">🎲 再随机一次</button>
+          <a class="time-btn" href="{{ site.Home.RelPermalink }}">↩ 回到现在</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside id="past" class="past" aria-label="Time Machine 控制面板">
+    <button id="past-collapsed" class="past__collapsed" type="button">
+      PAST · <span id="past-date-short">----</span>
+    </button>
+
+    <div class="past__expanded">
+      <button id="past-close" class="past__close" type="button" aria-label="收起 Time Machine">×</button>
+      <p class="past__eyebrow">BLOG TIME MACHINE</p>
+      <p class="past__label">PAST</p>
+      <p id="past-date" class="past__date">----</p>
+      <p class="past__copy">你正在浏览博客过去的一个不可变快照。</p>
+      <div class="time-actions">
+        <button id="random-again" class="time-btn" type="button">🎲 再随机一次</button>
+        <a class="time-btn" href="{{ site.Home.RelPermalink }}">↩ 回到现在</a>
+      </div>
+    </div>
+  </aside>
+
+  {{- $timeJS := resources.Get "js/time.js" | minify | fingerprint }}
+  <script src="{{ $timeJS.RelPermalink }}" integrity="{{ $timeJS.Data.Integrity }}" crossorigin="anonymous" defer></script>
+</body>
+</html>
