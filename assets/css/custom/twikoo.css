@@ -274,6 +274,21 @@
   font: inherit;
 }
 
+/* Twikoo 2.x toggles admin actions with display:none -> display:inline on
+   comment hover. Because .tk-meta is a wrapping flex row, inserting the
+   actions at hover time can reflow the row and shift the comment content.
+   Keep the actions in layout and only toggle visibility instead. */
+.terminal-comments .twikoo .tk-actions {
+  display: inline;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.terminal-comments .twikoo .tk-comment:hover .tk-actions {
+  visibility: visible;
+  pointer-events: auto;
+}
+
 .terminal-comments .twikoo :is(.tk-sort-item, .tk-action-link, .tk-action-icon, .tk-icon.__comments),
 .terminal-comments .twikoo .tk-actions button {
   color: var(--term-text-dim);
