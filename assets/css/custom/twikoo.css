@@ -1,0 +1,658 @@
+/* --------------------------------------------------------------------------
+   Twikoo 2.x — site-specific terminal theme overrides
+
+   Twikoo 2.x replaced Element UI's .el-* controls with its own .tk-* classes.
+   Keep these overrides in the site repo rather than coupling them to the
+   reusable hugo-terminal theme.
+
+   The Twikoo stylesheet is injected at runtime, after site.css. Selectors
+   intentionally include both .terminal-comments and .twikoo so our site
+   palette wins by specificity without relying on !important.
+   -------------------------------------------------------------------------- */
+
+.terminal-comments .twikoo,
+.terminal-comments .twikoo * {
+  box-sizing: border-box;
+  font-family: var(--term-font);
+}
+
+.terminal-comments .twikoo {
+  color: var(--term-text);
+  font-size: var(--font-sm);
+  line-height: 1.5;
+}
+
+.terminal-comments .twikoo .tk-comments-title {
+  color: var(--term-phosphor);
+  font-size: var(--font-base);
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+  text-shadow: 0 0 12px var(--term-phosphor-glow);
+}
+
+.terminal-comments .twikoo .tk-comments-count {
+  color: var(--term-text-dim);
+  font-size: var(--font-xs);
+  font-weight: 400;
+}
+
+/* Inputs ------------------------------------------------------------------ */
+
+.terminal-comments .twikoo .tk-input__inner,
+.terminal-comments .twikoo .tk-textarea__inner {
+  background-color: var(--term-bg-input);
+  border-color: var(--term-border);
+  border-radius: var(--radius-sm);
+  color: var(--term-text);
+  font-family: var(--term-font);
+}
+
+.terminal-comments .twikoo .tk-input__inner:focus,
+.terminal-comments .twikoo .tk-textarea__inner:focus {
+  background-color: var(--term-bg-input);
+  border-color: var(--term-phosphor);
+  box-shadow: 0 0 0 1px var(--term-phosphor-glow), 0 0 12px var(--term-phosphor-glow);
+}
+
+.terminal-comments .twikoo .tk-input__inner::placeholder,
+.terminal-comments .twikoo .tk-textarea__inner::placeholder {
+  color: var(--term-text-dim);
+}
+
+/* Twikoo 2.x input groups: prepend owns no right border and the input keeps
+   its left border, which becomes the separator/focus edge. */
+.terminal-comments .twikoo .tk-input-group__prepend,
+.terminal-comments .twikoo .tk-input-group__append {
+  background-color: var(--term-bg-elevated);
+  border-color: var(--term-border);
+  color: var(--term-text-dim);
+}
+
+.terminal-comments .twikoo .tk-input-group__prepend {
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.terminal-comments .twikoo .tk-input-group__append {
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.terminal-comments .twikoo .tk-input--group .tk-input__inner {
+  border-radius: 0;
+}
+
+.terminal-comments .twikoo .tk-input--group:focus-within .tk-input-group__prepend,
+.terminal-comments .twikoo .tk-input--group:focus-within .tk-input-group__append {
+  border-color: var(--term-phosphor);
+}
+
+/* Buttons ----------------------------------------------------------------- */
+
+.terminal-comments .twikoo .tk-button {
+  border-radius: var(--radius-sm);
+  font-family: var(--term-font);
+}
+
+.terminal-comments .twikoo .tk-button:not(.tk-button--primary):not(.tk-button--text) {
+  background-color: var(--term-bg-elevated);
+  border-color: var(--term-border);
+  color: var(--term-text-dim);
+}
+
+.terminal-comments .twikoo .tk-button:not(.tk-button--primary):not(.tk-button--text):not(.is-disabled):is(:hover, :focus, :active) {
+  background-color: var(--term-accent-10);
+  border-color: var(--term-phosphor);
+  color: var(--term-phosphor);
+  box-shadow: 0 0 10px var(--term-phosphor-glow);
+}
+
+.terminal-comments .twikoo .tk-button--primary {
+  background-color: var(--term-phosphor);
+  border-color: var(--term-phosphor);
+  color: var(--term-bg);
+  font-weight: 600;
+}
+
+.terminal-comments .twikoo .tk-button--primary:not(.is-disabled):is(:hover, :focus, :active) {
+  background-color: var(--term-phosphor-bright);
+  border-color: var(--term-phosphor-bright);
+  color: var(--term-bg);
+  box-shadow: 0 0 12px var(--term-phosphor-glow);
+}
+
+.terminal-comments .twikoo .tk-button--primary.is-disabled,
+.terminal-comments .twikoo .tk-button--primary:disabled {
+  background-color: var(--term-phosphor-dim);
+  border-color: var(--term-phosphor-dim);
+  color: var(--term-bg);
+  opacity: 0.6;
+}
+
+.terminal-comments .twikoo .tk-button--text {
+  color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo .tk-button--text:not(.is-disabled):is(:hover, :focus, :active) {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--term-phosphor-bright);
+}
+
+.terminal-comments .twikoo .tk-submit .tk-preview.tk-button {
+  background-color: var(--term-bg-elevated);
+  border-color: var(--term-border);
+  color: var(--term-text-dim);
+}
+
+.terminal-comments .twikoo .tk-submit .tk-preview.tk-button:is(:hover, :focus, :active) {
+  background-color: var(--term-accent-10);
+  border-color: var(--term-phosphor);
+  color: var(--term-phosphor);
+  box-shadow: 0 0 10px var(--term-phosphor-glow);
+}
+
+.terminal-comments .twikoo .tk-submit .tk-send.tk-button--primary.is-disabled,
+.terminal-comments .twikoo .tk-submit .tk-send.tk-button--primary.is-disabled:is(:hover, :focus, :active),
+.terminal-comments .twikoo .tk-submit .tk-send.tk-button--primary:disabled {
+  background-color: var(--term-phosphor-dim);
+  border-color: var(--term-phosphor-dim);
+  color: var(--term-bg);
+  opacity: 0.6;
+}
+
+.terminal-comments .twikoo .tk-button.is-loading .tk-button__spinner {
+  color: var(--term-bg);
+}
+
+/* Loading ----------------------------------------------------------------- */
+
+.terminal-comments .twikoo .tk-loading-spinner__circle,
+.terminal-comments .twikoo .tk-loading-text {
+  color: var(--term-phosphor);
+}
+
+/* Comment list ------------------------------------------------------------- */
+
+.terminal-comments .twikoo .tk-avatar.tk-has-avatar {
+  background-color: var(--term-accent-10);
+}
+
+.terminal-comments .twikoo .tk-avatar .tk-avatar-img {
+  color: var(--term-text-dim);
+}
+
+.terminal-comments .twikoo .tk-content {
+  color: var(--term-text);
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+/* Keep action counters from stretching the metadata row. */
+.terminal-comments .twikoo .tk-main > .tk-row {
+  align-items: center;
+  min-height: 0;
+}
+
+.terminal-comments .twikoo .tk-action-link,
+.terminal-comments .twikoo .tk-action-count {
+  line-height: 1;
+}
+
+.terminal-comments .twikoo .tk-action-count {
+  height: 1em;
+}
+
+.terminal-comments .twikoo .tk-comment {
+  margin-top: var(--space-3);
+}
+
+.terminal-comments .twikoo .tk-replies .tk-comment {
+  margin-top: var(--space-2);
+}
+
+.terminal-comments .twikoo .tk-meta {
+  color: var(--term-text-dim);
+  font-size: var(--font-xs);
+  line-height: 1.3;
+}
+
+.terminal-comments .twikoo .tk-nick,
+.terminal-comments .twikoo .tk-nick-link {
+  color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo .tk-nick-link:hover {
+  color: var(--term-phosphor-bright);
+}
+
+.terminal-comments .twikoo .tk-extras {
+  color: var(--term-text-dim);
+  gap: 0 var(--space-3);
+  margin-top: 6px;
+}
+
+.terminal-comments .twikoo .tk-extra {
+  margin: 0;
+}
+
+.terminal-comments .twikoo .tk-tag {
+  border-radius: 3px;
+  line-height: 1.4;
+}
+
+.terminal-comments .twikoo .tk-tag-green {
+  background-color: var(--term-accent-10);
+  border-color: var(--term-phosphor);
+  color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo .tk-tag-yellow {
+  background-color: var(--term-accent-05);
+  border-color: var(--term-phosphor-dim);
+  color: var(--term-phosphor-bright);
+}
+
+.terminal-comments .twikoo .tk-tag-blue {
+  background-color: var(--term-accent-05);
+  border-color: var(--term-cyan);
+  color: var(--term-cyan);
+}
+
+.terminal-comments .twikoo .tk-tag-red {
+  background-color: var(--term-accent-05);
+  border-color: var(--term-red);
+  color: var(--term-red);
+}
+
+/* Admin hide/pin buttons are revealed on hover. Inherit metadata typography
+   so revealing them never changes the line box. */
+.terminal-comments .twikoo .tk-actions,
+.terminal-comments .twikoo .tk-actions button {
+  font: inherit;
+}
+
+.terminal-comments .twikoo :is(.tk-sort-item, .tk-action-link, .tk-action-icon, .tk-icon.__comments),
+.terminal-comments .twikoo .tk-actions button {
+  color: var(--term-text-dim);
+  transition: color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.terminal-comments .twikoo :is(.tk-sort-item, .tk-action-link, .tk-icon.__comments):hover,
+.terminal-comments .twikoo :is(.tk-sort-item, .tk-action-link):focus,
+.terminal-comments .twikoo .tk-sort-item.__active,
+.terminal-comments .twikoo :is(.tk-action-link.tk-liked, .tk-action-link.tk-disliked),
+.terminal-comments .twikoo .tk-actions button:is(:hover, :focus-visible, :active) {
+  color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo .tk-action-link:is(:hover, :focus-visible, .tk-liked, .tk-disliked) .tk-action-icon {
+  color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo .tk-action-link:active .tk-action-icon {
+  color: var(--term-phosphor-bright);
+}
+
+.terminal-comments .twikoo .tk-icon.__comments.__active {
+  background: var(--term-phosphor);
+  box-shadow: 0 0 0 0.2rem var(--term-phosphor), 0 0 10px var(--term-phosphor-glow);
+  color: var(--term-bg);
+}
+
+.terminal-comments .twikoo :is(.tk-sort-item, .tk-action-link, .tk-actions button):disabled,
+.terminal-comments .twikoo :is(.tk-sort-item, .tk-action-link, .tk-actions button).is-disabled {
+  color: var(--term-text-dim);
+  cursor: default;
+  opacity: 0.6;
+}
+
+.terminal-comments .twikoo .tk-replies {
+  border-left: 0;
+  margin-top: var(--space-1);
+  padding-left: var(--space-2);
+}
+
+/* Markdown content --------------------------------------------------------- */
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) p {
+  margin: 0 0 var(--space-2);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) p:last-child {
+  margin-bottom: 0;
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) h2,
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) h3,
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) h4 {
+  color: var(--term-phosphor);
+  font-weight: 600;
+  line-height: 1.35;
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) h2 {
+  border-bottom: 1px solid var(--term-border);
+  font-size: var(--font-lg);
+  padding-bottom: var(--space-1);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) h3 {
+  color: var(--term-phosphor-dim);
+  font-size: var(--font-base);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) h4 {
+  color: var(--term-cyan);
+  font-size: var(--font-sm);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) a {
+  border-bottom: 1px dashed var(--term-phosphor);
+  color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) a:hover {
+  border-color: var(--term-phosphor-bright);
+  color: var(--term-phosphor-bright);
+}
+
+.terminal-comments .twikoo .tk-content a.tk-ruser {
+  border-bottom: 0;
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) strong {
+  color: var(--term-phosphor);
+  font-weight: 600;
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) em {
+  color: var(--term-phosphor-dim);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) ul,
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) ol {
+  margin: 0 0 var(--space-2);
+  padding-left: var(--space-5);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) li {
+  margin-bottom: var(--space-1);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) li::marker {
+  color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) code {
+  background: var(--term-accent-10);
+  border: 1px solid var(--term-border);
+  border-radius: 4px;
+  color: var(--term-phosphor);
+  font-family: var(--term-font);
+  font-size: 0.88em;
+  padding: 2px 6px;
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) pre {
+  background: var(--term-bg) !important;
+  border: 1px solid var(--term-border);
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+  margin: var(--space-2) 0;
+  overflow-x: auto;
+  padding: var(--space-3);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) pre code {
+  background: transparent !important;
+  border: 0;
+  color: var(--term-text) !important;
+  display: block;
+  padding: 0;
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) blockquote {
+  background: var(--term-accent-05);
+  border-left: 3px solid var(--term-phosphor);
+  color: var(--term-phosphor-dim);
+  font-style: italic;
+  margin: var(--space-2) 0;
+  padding: var(--space-1) var(--space-3);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) table {
+  border-collapse: collapse;
+  display: block;
+  font-size: var(--font-xs);
+  margin: var(--space-2) 0;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) th,
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) td {
+  border: 1px solid var(--term-border);
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) th {
+  background: var(--term-accent-10);
+  color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo :is(.tk-content, .tk-preview-container) hr {
+  background: linear-gradient(90deg, transparent, var(--term-phosphor), transparent);
+  border: 0;
+  height: 1px;
+  margin: var(--space-3) 0;
+  opacity: 0.5;
+}
+
+/* Empty/error/pagination/footer ------------------------------------------ */
+
+.terminal-comments .twikoo .tk-comments-no {
+  color: var(--term-text-dim);
+}
+
+.terminal-comments .twikoo .tk-comments-error {
+  color: var(--term-red);
+}
+
+.terminal-comments .twikoo .tk-pagination {
+  color: var(--term-text);
+  font-family: var(--term-font);
+}
+
+.terminal-comments .twikoo .tk-pagination-options {
+  gap: var(--space-1);
+  line-height: 28px;
+}
+
+.terminal-comments .twikoo .tk-pagination-pagers {
+  gap: 2px;
+}
+
+.terminal-comments .twikoo .tk-pagination-pager {
+  border-radius: var(--radius-sm);
+  color: var(--term-text);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.terminal-comments .twikoo .tk-pagination-pager:not(.__current):hover {
+  background-color: var(--term-accent-10);
+  color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo .tk-pagination-pager.__current {
+  background-color: var(--term-phosphor);
+  color: var(--term-bg);
+}
+
+.terminal-comments .twikoo .tk-pagination .tk-input {
+  height: 28px;
+  line-height: 28px;
+  margin: 0;
+}
+
+.terminal-comments .twikoo .tk-pagination .tk-input__inner {
+  height: 28px;
+  line-height: 26px;
+  padding: 0;
+  text-align: center;
+}
+
+.terminal-comments .twikoo .tk-footer {
+  color: var(--term-text-dim);
+}
+
+.terminal-comments .twikoo .tk-footer a {
+  color: var(--term-text-dim);
+  transition: color 0.15s ease;
+}
+
+.terminal-comments .twikoo .tk-footer a:hover {
+  color: var(--term-phosphor);
+}
+
+/* Admin ------------------------------------------------------------------- */
+
+.terminal-comments .twikoo .tk-admin-close {
+  box-sizing: content-box;
+  color: var(--term-phosphor);
+  z-index: 1;
+}
+
+.terminal-comments .twikoo .tk-admin-close:hover,
+.terminal-comments .twikoo .tk-admin-close:focus-visible {
+  color: var(--term-phosphor-bright);
+}
+
+.terminal-comments .twikoo .tk-admin {
+  background-color: var(--term-bg);
+  color: var(--term-text);
+}
+
+.terminal-comments .twikoo .tk-admin::-webkit-scrollbar-thumb {
+  background-color: var(--term-accent-40);
+}
+
+.terminal-comments .twikoo :is(.tk-panel, .tk-login-title, .tk-login-msg) {
+  color: var(--term-text);
+}
+
+.terminal-comments .twikoo .tk-password .tk-input-group__prepend {
+  background-color: var(--term-bg-elevated);
+  border-color: var(--term-border);
+  color: var(--term-text-dim);
+}
+
+.terminal-comments .twikoo .tk-password .tk-input-group__append {
+  background-color: var(--term-phosphor);
+  border-color: var(--term-phosphor);
+  color: var(--term-bg);
+}
+
+.terminal-comments .twikoo .tk-password .tk-input-group__append .tk-button {
+  background-color: var(--term-phosphor);
+  border-color: var(--term-phosphor);
+  color: var(--term-bg);
+  font-family: var(--term-font);
+  font-weight: 600;
+}
+
+.terminal-comments .twikoo .tk-password .tk-input-group__append .tk-button:is(:hover, :focus-visible, :active) {
+  background-color: var(--term-phosphor-bright);
+  border-color: var(--term-phosphor-bright);
+  color: var(--term-bg);
+  box-shadow: 0 0 10px var(--term-phosphor-glow);
+}
+
+.terminal-comments .twikoo .tk-admin a {
+  color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo .tk-admin a:hover {
+  color: var(--term-phosphor-bright);
+}
+
+.terminal-comments .twikoo .tk-panel .tk-tabs {
+  border-bottom-color: var(--term-border);
+}
+
+.terminal-comments .twikoo .tk-panel .tk-tab {
+  color: var(--term-text-dim);
+}
+
+.terminal-comments .twikoo .tk-panel .tk-tab:is(:hover, :focus-visible),
+.terminal-comments .twikoo .tk-panel .tk-tab.__active {
+  border-bottom-color: var(--term-phosphor);
+  color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo .tk-admin-warn {
+  background-color: var(--term-accent-10);
+  border-left-color: var(--term-phosphor);
+  color: var(--term-text);
+}
+
+.terminal-comments .twikoo .tk-admin-comment-filter-type,
+.terminal-comments .twikoo .tk-admin-config-select {
+  background-color: var(--term-bg-input);
+  border-color: var(--term-border);
+  color: var(--term-text);
+}
+
+.terminal-comments .twikoo .tk-admin-comment-filter-type:focus,
+.terminal-comments .twikoo .tk-admin-config-select:focus {
+  border-color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo .tk-admin-comment-filter-type option,
+.terminal-comments .twikoo .tk-admin-config-select option {
+  background-color: var(--term-bg-elevated);
+  color: var(--term-text);
+}
+
+.terminal-comments .twikoo .tk-admin .tk-button--text {
+  color: var(--term-phosphor);
+}
+
+.terminal-comments .twikoo .tk-admin .tk-button--text:is(:hover, :focus, :active) {
+  background-color: var(--term-accent-10);
+  border-color: var(--term-border);
+  color: var(--term-phosphor-bright);
+}
+
+.terminal-comments .twikoo .tk-admin-actions {
+  border-bottom-color: var(--term-border);
+}
+
+/* Emoticon / lightbox ----------------------------------------------------- */
+
+body.has-twikoo-comments .OwO .OwO-body {
+  background-color: var(--term-bg-elevated);
+  border: 1px solid var(--term-border);
+  border-radius: var(--radius-sm);
+  color: var(--term-text);
+}
+
+body.has-twikoo-comments .OwO .OwO-title {
+  color: var(--term-text-dim);
+}
+
+body.has-twikoo-comments .OwO .OwO-item {
+  color: var(--term-text);
+}
+
+body.has-twikoo-comments .OwO .OwO-item:hover {
+  background-color: var(--term-accent-10);
+}
+
+body.has-twikoo-comments .tk-lightbox {
+  background: var(--overlay);
+}
