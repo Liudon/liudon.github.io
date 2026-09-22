@@ -215,6 +215,8 @@ CORS Header 丢失
 
 ## 临时解决方案
 
+**请参考长期解决方案，升级版本即可解决。**
+
 如果现在就需要恢复评论，可以先修改自己部署项目里的：
 
 ```text
@@ -320,6 +322,8 @@ Access-Control-Allow-Methods: POST
 
 长期方案就是等待 PR 合并，官方重新发布版本后升级 `twikoo-netlify`，再删除前面的临时 Wrapper。
 
+**PR 已合并，官方已打包 2.0.7 版本，请升级版本即可。**
+
 ## 总结
 
 如果升级 Twikoo 2.x 后，Netlify 部署的评论突然挂掉，可以先看两个地方：
@@ -376,4 +380,4 @@ No 'Access-Control-Allow-Origin' header
 
 然后从 CORS 一路查到 Netlify、Node.js，最后再翻到 Adapter 源码。
 
-希望后续版本升级能稳一点。
+因为版本问题太多，官方一天更新了几个版本，希望后续版本升级做好测试，先灰度测试，不要一把全量，毕竟好多人都在用的。
