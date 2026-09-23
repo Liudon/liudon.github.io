@@ -1,11 +1,6 @@
 name: Build IPFS Visual Index
 
 on:
-  push:
-    branches: [code]
-    paths:
-      - ".github/scripts/ipfs-history/generate-visual-index.mjs"
-      - ".github/workflows/ipfs-history-visual-index.yml"
   workflow_run:
     workflows:
       - CI
@@ -16,10 +11,6 @@ on:
 
 permissions:
   contents: read
-
-concurrency:
-  group: ipfs-history-visual-index
-  cancel-in-progress: true
 
 jobs:
   build:
