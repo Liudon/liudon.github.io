@@ -151,8 +151,27 @@ jobs:
             echo "No repaired screenshots to commit."
           else
             git -C "$HISTORY_DIR" commit -m "repair IPFS history screenshots"
-            git -C "$HISTORY_DIR" push origin HEAD:ipfs-history
-            echo "Repaired IPFS history screenshots pushed."
+
+            # ipfs-history is also written by the main deploy workflow.
+            # Rebase onto the newest remote head before each push attempt so
+            # concurrent history/screenshot commits are preserved.
+            for attempt in {1..5}; do
+              echo "Push attempt $attempt/5"
+              git -C "$HISTORY_DIR" fetch origin ipfs-history
+              git -C "$HISTORY_DIR" rebase origin/ipfs-history
+
+              if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
+                echo "Repaired IPFS history screenshots pushed."
+                break
+              fi
+
+              if [[ "$attempt" == "5" ]]; then
+                echo "ERROR: unable to push repaired screenshots after 5 attempts"
+                exit 1
+              fi
+
+              sleep $((attempt * 2))
+            done
           fi
 
       - name: Repair summary
