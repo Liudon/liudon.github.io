@@ -1,6 +1,6 @@
 {
-  "capture_version": 7,
-  "captured_at": "2026-09-23T09:18:18.404Z",
+  "capture_version": 8,
+  "captured_at": "2026-09-23T10:26:10.824Z",
   "viewport_width": 1440,
   "viewport_height": 900,
   "format": "webp",
@@ -10,6 +10,8 @@
   "reduced_motion": "reduce",
   "color_scheme": "light",
   "animations_disabled": true,
+  "ads_blocked": true,
+  "ad_containers_removed": true,
   "visible_text": "流动 Home Posts Workouts  \n About 🔍 Hi there 👋 Welcome to my blog 广府古城一日游 6月底给家里添置了辆车，还在磨合期。\n平时爸妈开的不多，这次暑假回家，想着找一天带爸妈出门逛逛。\n上午带老妈去医院做了个CT检查，检查完结果要4个小时才能出来。\n... 2026-08-27  ·  3 min  ·  1155 words  ·  Liudon 我做了一个口播短视频二创工具：VideoRemaker 做自媒体的同学，有个口播视频的需求，希望能帮忙搞个工具出来。\n以前没有 AI 的时候，我还真不敢接这活，现在有了 AI，决定试试看。\n前面做了调研，核心就是语音克隆和对口型视频合成两个能力。\n... 2026-08-10  ·  3 min  ·  1174 words  ·  Liudon Windows 下 Codex Cli 更新报 Move-Item is denied 错误的解决 记录 Windows 下 Codex Cli 更新报 Move-Item is denied 错误的解决过程，最终定位是杀毒软件防护的原因导致。 2026-07-30  ·  1 min  ·  352 words  ·  Liudon Caddy 转发 GOST 报 TLS internal error 问题的排查与解决 GOST 客户端直连 GOST 服务端正常，改为经 Caddy 转发后却报 tls: internal error。本文通过 tshark 抓包定位 TLS 握手失败原因，并给出 domain + ip 参数和 default_sni 两种解决方案。 2026-07-30  ·  6 min  ·  2717 words  ·  Liudon 2026年对口型视频合成方案对比：Wav2Lip、VideoReTalking、 MuseTalk 部署与实测 本文基于 AutoDL RTX 4090 环境，对 Wav2Lip、VideoReTalking 和 MuseTalk 三种对口型视频合成方案进行部署验证和效果对比。 2026-06-17  ·  4 min  ·  1837 words  ·  Liudon 2026年音色克隆方案对比：IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech、VoxCPM 部署与实测 一篇讲清楚四套主流音色克隆方案部署、测试、硬件门槛和选型建议的实战文章。 2026-05-18  ·  13 min  ·  6015 words  ·  Liudon AI Agent折腾记（OpenClaw / Hermes Agent） AI 智能体（AI Agent）是一种能够感知环境、进行推理并自主行动以实现特定目标的智能系统。\nOpenClaw和Hermes Agent属于目前开源社区最受关注的两个项目。\n... 2026-04-14  ·  6 min  ·  2773 words  ·  Liudon 我的2025年 2025年，会是我人生的一个重要节点。\n工作 这一年，处于一种持续性、高强度的加班状态，晚上9点算是早下班了。\n24年底，接手了一个历史模块，对于一直在做运营开发的我来说，算是一个不小的挑战。\n... 2026-04-07  ·  2 min  ·  609 words  ·  Liudon 大连之行 6月底，趁着娃刚考完试，学校也没课了，请假带娃去大连玩了一趟。\n这次是跟娃好朋友一起出行，人两口子以前做旅行社的，直接搞了一个行程表，我们就跟报了个旅行团一样。\n... 2025-08-03  ·  2 min  ·  598 words  ·  Liudon 回家收麦 家里有两块地，一块离的远租出去了，另一块近的老爸老妈还在自己种。\n自从上高中后，就很少下地了，现在让我下地，我都找不到自家地。\n老爸生日回家，刚好赶上收麦，记录一下。\n... 2025-08-03  ·  1 min  ·  173 words  ·  Liudon 六一儿童节爬长城 六一儿童节，娃和好朋友约好一起爬长城。\n去年我们去过慕田峪长城，人不多、好爬不累，两家商量后决定还是去慕田峪。\n早上打车到清河站，还是粉色的小火车。\n这次人多没占到位置，俩小朋友只能席地而坐了。\n... 2025-08-03  ·  1 min  ·  240 words  ·  Liudon Golang database/sql 数据库断线自动重连机制解析 最近有个交接服务的数据库要升级版本，升级最后切换瞬间会有一个闪断。\n这里业务侧需要确保有自动重连机制，否则会影响服务。\n因为是交接的服务，得通过代码再确认一下。\n... 2025-04-30  ·  1 min  ·  397 words  ·  Liudon Golang默认Http Client导致的cannot assign requested address错误 问题表现 重现代码：\npackage main import ( \"fmt\" \"io\" \"net/http\" \"time\" ) func main() { client := &http.Client{ Timeout: time.Duration(3) * time.Second, } for i := 0; i < 100; i++ { go func() { for { req, _ := http.NewRequest(http.MethodGet, \"https://baidu.com\", nil) rsp, err := client.Do(req) if err != nil { fmt.Println(\"request failed\", err) continue } rsp.Body.Close() body, err := io.ReadAll(rsp.Body) if err != nil { fmt.Println(\"read body failed\", err) continue } fmt.Println(string(body)) } }() } select {} } 启动后，随着请求越来越多，很快就出现了\"cannot assign requested address\"错误，服务器出现大量TIME_WAIT连接。\n... 2025-04-29  ·  2 min  ·  529 words  ·  Liudon 清明踏春，爬山看海 自从买了登山杖，娃一直说想去爬山。\n前段时间天气一直不好，山上也还是光秃秃的，就一直没去。\n趁着清明假期，带娃爬山去。\n去年假期去过一次香山，路上超堵，这次还是选择了离家不远的百望山：好爬不累。\n... 2025-04-06  ·  1 min  ·  409 words  ·  Liudon 购入小牛G400T电动车 去年10月底，考虑到老的绿源电动车已经骑了5年，电池越来越不行，马上要冬天了，考虑换个新电动车。\n到各个品牌店里转了一圈，发现都没有车子，说是新规的缘故，要到11月份才能有新车。\n... 2025-03-26  ·  1 min  ·  296 words  ·  Liudon 北京的三月飞雪 盼了一冬天的雪没下，开春了，来了场大雪。\n你的浏览器不支持 video 标签。 2025-03-16  ·  1 min  ·  32 words  ·  Liudon wrenAI本地LLM模型部署 Open-source GenBI AI Agent that empowers data-driven teams to chat with their data to generate Text-to-SQL, charts, spreadsheets, reports, and BI.\nWrenAI 是一个开源的Text-SQL 的工具，通过导入数据库结构，通过提问的方式生成SQL。\n... 2025-03-16  ·  3 min  ·  1169 words  ·  Liudon 天津一日游 娃看完中华寻宝记，一直想去天津转转。\n大年初九，返京第二天，带娃错峰去一趟天津。\n7点出门，直奔北京南站，一路不敢耽搁，在发车前10分钟赶上了车。\n... 2025-03-16  ·  1 min  ·  413 words  ·  Liudon 2024年终总结 2024年已经过去3个月了，这篇年终总结从元旦拖到了现在。\n2024年是我的本命年，这一年发生了很多事，这一年过的并不太如意。\n早就想要总结这一年，但不知道从哪下笔。\n... 2025-03-07  ·  2 min  ·  531 words  ·  Liudon 停止使用staticfile.org服务 昨天像往常一样打开博客，发现评论没有加载出来。\n一开始以为是手机网络问题，用电脑复现了一下，发现twikoo的js访问报错了。\n... 2024-10-17  ·  2 min  ·  526 words  ·  Liudon Next  » © 2026  流动  ·\n Powered by\n Hugo  &\n PaperMod 京ICP备13029522号-2",
   "background": "rgba(175, 184, 193, 0.2)",
   "effective_background": "rgb(255, 255, 255)",
@@ -17,9 +19,9 @@
   "light_verified": true,
   "theme": "light",
   "text_hash": "c3fa9d93752813341a4288c57f60e5ce7b295c17123afdc21c7b6584a49bdd67",
-  "image_hash": "66f2ca245c789aa5f81c09e3abeada7bf06ebfcd43b9128334acf23f2261f2af",
+  "image_hash": "674a0dfd72a490de9f56a8d3a60731f014534a07a9d2562cbde6dcd526dfb6ce",
   "profile": {
-    "browser": "153.0.8010.52",
+    "browser": "152.0.7977.82",
     "platform": "linux",
     "viewport": [
       1440,
@@ -28,6 +30,6 @@
     "device_scale_factor": 1,
     "locale": "zh-CN",
     "timezone": "UTC",
-    "capture_version": 7
+    "capture_version": 8
   }
 }

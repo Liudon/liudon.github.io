@@ -1,6 +1,6 @@
 {
-  "capture_version": 7,
-  "captured_at": "2026-09-23T09:20:14.027Z",
+  "capture_version": 8,
+  "captured_at": "2026-09-23T10:28:06.385Z",
   "viewport_width": 1440,
   "viewport_height": 900,
   "format": "webp",
@@ -10,6 +10,8 @@
   "reduced_motion": "reduce",
   "color_scheme": "light",
   "animations_disabled": true,
+  "ads_blocked": true,
+  "ad_containers_removed": true,
   "visible_text": "流动 Posts Links Time liudon@localhost : ~/blog $  ls ██╗      ██╗ ██╗   ██╗ ██████╗   ██████╗  ███╗   ██╗ \n██║      ██║ ██║   ██║ ██╔══██╗ ██╔═══██╗ ████╗  ██║ \n██║      ██║ ██║   ██║ ██║  ██║ ██║   ██║ ██╔██╗ ██║ \n██║      ██║ ██║   ██║ ██║  ██║ ██║   ██║ ██║╚██╗██║ \n███████╗ ██║ ╚██████╔╝ ██████╔╝ ╚██████╔╝ ██║ ╚████║ \n╚══════╝ ╚═╝  ╚═════╝  ╚═════╝   ╚═════╝  ╚═╝  ╚═══╝  序 # 生活就是一个流动的过程. $  cat README.md 80后，已婚，育有一女。 不善言辞，偶在此记些文字。 自2011年起，断断续续，记录至今。 $  ls -la ./posts/ | head -10 total 100 -rw-r--r-- \n 1.5K \n Sep 23 2026 \n Muse AI 注册教程：借助 Google Gemini Spark 完成注册/ -rw-r--r-- \n 9.3K \n Sep 23 2026 \n 给 Twikoo 接入 Jev，用 AI 判断博客评论是不是广告/ -rw-r--r-- \n 7.8K \n Sep 22 2026 \n Twikoo 2.x 升级踩坑：Netlify CORS 报错与解决方案/ -rw-r--r-- \n 21.9K \n Sep 21 2026 \n 我给博客做了一个时光机/ -rw-r--r-- \n 4.2K \n Sep 07 2026 \n 山西之旅/ -rw-r--r-- \n 2.7K \n Sep 04 2026 \n 博客焕新，记录继续/ -rw-r--r-- \n 22.4K \n Sep 01 2026 \n 博客加速实践/ -rw-r--r-- \n 3.8K \n Aug 27 2026 \n 广府古城一日游/ -rw-r--r-- \n 4.0K \n Aug 10 2026 \n 我做了一个口播短视频二创工具：VideoRemaker/ -rw-r--r-- \n 2.2K \n Jul 30 2026 \n Windows 下 Codex Cli 更新报 Move-Item is denied 错误的解决/ $  echo \"Maintained by Liudon\" Maintained by  Liudon  | Last updated 2026-09-23 NORMAL _index.md words: 43 EOF © 2026 Liudon · Made with Hugo & Terminal · 京ICP备13029522号-2",
   "background": "rgb(255, 255, 255)",
   "effective_background": "rgb(255, 255, 255)",
@@ -19,7 +21,7 @@
   "text_hash": "9e7f7f00c6a963fd69b9cdfa4f7c968880a0eeb35986746262559d3bbda5d846",
   "image_hash": "77f461dbbe00d14f9d941c6d0675d82213245d7b2ff4d81ae0deb892f70a3743",
   "profile": {
-    "browser": "153.0.8010.52",
+    "browser": "152.0.7977.82",
     "platform": "linux",
     "viewport": [
       1440,
@@ -28,6 +30,6 @@
     "device_scale_factor": 1,
     "locale": "zh-CN",
     "timezone": "UTC",
-    "capture_version": 7
+    "capture_version": 8
   }
 }
