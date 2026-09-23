@@ -14,12 +14,14 @@ const screenshotDir = path.join(historyRoot, "screenshots");
 const indexPath = path.join(historyRoot, "visual-index.json");
 const diffPath = path.join(historyRoot, "visual-diffs.jsonl");
 
-const algorithmVersion = 1;
+const algorithmVersion = 2;
 const sampleWidth = Number(process.env.VISUAL_SAMPLE_WIDTH || 480);
 const pixelDelta = Number(process.env.VISUAL_PIXEL_DELTA || 18);
-const overallChangedMax = Number(process.env.VISUAL_OVERALL_CHANGED_MAX || 0.0015);
-const tileChangedMax = Number(process.env.VISUAL_TILE_CHANGED_MAX || 0.025);
-const meanDeltaMax = Number(process.env.VISUAL_MEAN_DELTA_MAX || 1.2);
+const blurSigma = Number(process.env.VISUAL_BLUR_SIGMA || 0.8);
+const overallChangedMax = Number(process.env.VISUAL_OVERALL_CHANGED_MAX || 0.002);
+const tileChangedMax = Number(process.env.VISUAL_TILE_CHANGED_MAX || 0.08);
+const meanDeltaMax = Number(process.env.VISUAL_MEAN_DELTA_MAX || 0.35);
+const significantTileRatio = Number(process.env.VISUAL_SIGNIFICANT_TILE_RATIO || 0.01);
 const tileSize = Number(process.env.VISUAL_TILE_SIZE || 48);
 const heightDeltaMax = Number(process.env.VISUAL_HEIGHT_DELTA_MAX || 2);
 
@@ -81,6 +83,7 @@ async function sampleScreenshot(snapshot) {
       fit: "fill",
       kernel: sharp.kernel.lanczos3,
     })
+    .blur(blurSigma)
     .removeAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
@@ -154,6 +157,7 @@ function compareSamples(baseline, candidate) {
 
   let maxTileChangedRatio = 0;
   let changedTiles = 0;
+  let significantTiles = 0;
 
   for (let i = 0; i < tilePixels.length; i += 1) {
     if (!tilePixels[i]) continue;
@@ -163,6 +167,10 @@ function compareSamples(baseline, candidate) {
 
     if (tileChanged[i] > 0) {
       changedTiles += 1;
+    }
+
+    if (ratio >= significantTileRatio) {
+      significantTiles += 1;
     }
   }
 
@@ -179,6 +187,7 @@ function compareSamples(baseline, candidate) {
     max_tile_changed_ratio: Number(maxTileChangedRatio.toFixed(8)),
     mean_channel_delta: Number(meanChannelDelta.toFixed(6)),
     changed_tiles: changedTiles,
+    significant_tiles: significantTiles,
   };
 }
 
@@ -201,7 +210,7 @@ if (snapshots.length === 0) {
 
 console.log(`History snapshots: ${snapshots.length}`);
 console.log(
-  `Visual algorithm v${algorithmVersion}: width=${sampleWidth}, pixelDelta=${pixelDelta}, overall<=${overallChangedMax}, tile<=${tileChangedMax}, mean<=${meanDeltaMax}`,
+  `Visual algorithm v${algorithmVersion}: width=${sampleWidth}, blur=${blurSigma}, pixelDelta=${pixelDelta}, overall<=${overallChangedMax}, tile<=${tileChangedMax}, mean<=${meanDeltaMax}`,
 );
 
 const frames = [];
@@ -249,12 +258,14 @@ const visualIndex = {
   version: 1,
   algorithm: {
     version: algorithmVersion,
-    strategy: "baseline-pixel-tiles",
+    strategy: "baseline-blurred-pixel-tiles",
     sample_width: sampleWidth,
+    blur_sigma: blurSigma,
     pixel_delta: pixelDelta,
     overall_changed_max: overallChangedMax,
     tile_changed_max: tileChangedMax,
     mean_delta_max: meanDeltaMax,
+    significant_tile_ratio: significantTileRatio,
     tile_size: tileSize,
     height_delta_max: heightDeltaMax,
   },
