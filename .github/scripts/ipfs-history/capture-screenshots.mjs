@@ -193,9 +193,24 @@ if (targetCid) {
   }
 }
 
-const missing = candidates.filter(
-  (snapshot) => !fs.existsSync(path.join(screenshotDir, `${snapshot.cid}.webp`)),
-);
+function screenshotIsValid(snapshot) {
+  const target = path.join(screenshotDir, `${snapshot.cid}.webp`);
+  if (!fs.existsSync(target)) {
+    return false;
+  }
+
+  return fs.statSync(target).size >= 10_000;
+}
+
+const missing = candidates.filter((snapshot) => !screenshotIsValid(snapshot));
+
+for (const snapshot of missing) {
+  const target = path.join(screenshotDir, `${snapshot.cid}.webp`);
+  if (fs.existsSync(target)) {
+    console.log(`Removing invalid existing screenshot: ${path.relative(historyRoot, target)}`);
+    fs.rmSync(target, { force: true });
+  }
+}
 
 console.log(`Snapshots in history: ${snapshots.length}`);
 if (targetCid) {
