@@ -5,10 +5,10 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import sharp from "sharp";
-import { hash, normalizeText, captureIsValid } from "./capture-data.mjs";
+import { hash, normalizeText, captureIsValid, captureVersion } from "./capture-data.mjs";
 
 async function fixture(t, texts, colors = []) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "visual-v7-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "visual-v8-"));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   fs.mkdirSync(path.join(root, "history"));
   fs.mkdirSync(path.join(root, "screenshots/meta"), { recursive: true });
@@ -19,7 +19,7 @@ async function fixture(t, texts, colors = []) {
       background: colors[i] || "white" } }).webp({ lossless: true }).toBuffer();
     fs.writeFileSync(path.join(root, "screenshots", `${cid}.webp`), image);
     fs.writeFileSync(path.join(root, "screenshots/meta", `${cid}.json`), JSON.stringify({
-      capture_version: 7, javascript_enabled: true, light_verified: true, lossless: true,
+      capture_version: captureVersion, ads_blocked: true, ad_containers_removed: true, javascript_enabled: true, light_verified: true, lossless: true,
       visible_text: text, text_hash: hash(normalizeText(text)), image_hash: hash(image),
       profile: { browser: "fixture" },
     }));
@@ -54,12 +54,12 @@ test("same text with color change is retained", async t => {
 test("old capture version is rejected without replacing existing index", async t => {
   const root = await fixture(t, ["same"]);
   const file = path.join(root, "screenshots/meta/sample-0.json");
-  const meta = JSON.parse(fs.readFileSync(file));meta.capture_version = 6;fs.writeFileSync(file, JSON.stringify(meta));
+  const meta = JSON.parse(fs.readFileSync(file));meta.capture_version = 7;fs.writeFileSync(file, JSON.stringify(meta));
   fs.writeFileSync(path.join(root, "visual-index.json"), "previous index");
   assert.notEqual(run(root).status, 0);
   assert.equal(fs.readFileSync(path.join(root, "visual-index.json"), "utf8"), "previous index");
 });
-test("missing/corrupt image is invalid even when metadata says v7", async t => {
+test("missing/corrupt image is invalid even when metadata says current version", async t => {
   const root = await fixture(t, ["same"]);
   assert.equal(captureIsValid(root, "sample-0"), true);
   fs.writeFileSync(path.join(root, "screenshots/sample-0.webp"), "broken");
@@ -81,4 +81,16 @@ test("sparse low-amplitude raster noise merges", async t => {
   const file = path.join(root, "screenshots/meta/sample-1.json");
   const meta = JSON.parse(fs.readFileSync(file));meta.image_hash = hash(image);fs.writeFileSync(file, JSON.stringify(meta));
   assert.equal(run(root).status, 0);assert.equal(index(root).visual_count, 1);
+});
+
+
+test("capture without ad exclusion evidence is invalid", async t => {
+  const root = await fixture(t, ["same"]);
+  const file = path.join(root, "screenshots/meta/sample-0.json");
+  const original = JSON.parse(fs.readFileSync(file));
+  for (const key of ["ads_blocked", "ad_containers_removed"]) {
+    const meta = { ...original }; delete meta[key];
+    fs.writeFileSync(file, JSON.stringify(meta));
+    assert.equal(captureIsValid(root, "sample-0"), false);
+  }
 });

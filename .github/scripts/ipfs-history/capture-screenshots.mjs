@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
+import { blockAdRequests, removeAdContainers } from "./capture-ads.mjs";
 import { captureVersion, captureIsValid, hash, normalizeText } from "./capture-data.mjs";
 
 const historyRoot = process.argv[2];
@@ -75,6 +76,8 @@ const stableStyle = `*, *::before, *::after {
 
 async function stabilizePage(page) {
   await page.waitForLoadState("domcontentloaded", { timeout: 30_000 });
+  const removedAds = await removeAdContainers(page);
+  console.log(`  removed ${removedAds} ad container(s)`);
   await page.addStyleTag({ content: stableStyle });
   // Terminal and PaperMod use different theme attributes/storage keys.
   await page.evaluate(() => {
@@ -227,6 +230,7 @@ async function captureOne(browser, snapshot) {
         localStorage.setItem("pref-theme", "light");
       } catch {}
     });
+    await blockAdRequests(context);
     const page = await context.newPage();
 
     try {
@@ -286,7 +290,7 @@ async function captureOne(browser, snapshot) {
         viewport_width: viewportWidth, viewport_height: viewportHeight,
         format: "webp", lossless: true, javascript_enabled: true,
         service_workers: "block", reduced_motion: "reduce", color_scheme: "light",
-        animations_disabled: true, ...evidence,
+        animations_disabled: true, ads_blocked: true, ad_containers_removed: true, ...evidence,
         text_hash: hash(normalizeText(evidence.visible_text)), image_hash: hash(webp),
         profile: { browser: browser.version(), platform: process.platform,
           viewport: [viewportWidth, viewportHeight], device_scale_factor: 1,
@@ -387,3 +391,4 @@ if (failures.length > 0) {
 }
 
 console.log(`\nCaptured ${missing.length} screenshot(s).`);
+

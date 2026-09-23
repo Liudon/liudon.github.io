@@ -6,6 +6,8 @@ on:
     paths:
       - ".github/scripts/ipfs-history/capture-screenshots.mjs"
       - ".github/scripts/ipfs-history/capture-data.mjs"
+      - ".github/scripts/ipfs-history/capture-ads.mjs"
+      - ".github/scripts/ipfs-history/capture-ads.test.mjs"
       - ".github/scripts/ipfs-history/check-capture.mjs"
       - ".github/workflows/ipfs-history-screenshots.yml"
   schedule:
@@ -82,6 +84,10 @@ jobs:
 
           npx playwright install --with-deps chromium
 
+      - name: Test ad exclusion
+        if: steps.missing.outputs.count != '0'
+        run: node --test .github/scripts/ipfs-history/capture-ads.test.mjs
+
       - name: Repair missing screenshots
         if: steps.missing.outputs.count != '0'
         env:
@@ -113,7 +119,7 @@ jobs:
           else
             # Save the repaired files outside Git. Before each push attempt,
             # rebuild the commit on top of the latest remote ipfs-history.
-            # If main CI already published the same CID at capture_version 7,
+            # If main CI already published the same CID at the current capture version,
             # keep the remote copy instead of creating a binary merge conflict.
             PATCH_DIR="${RUNNER_TEMP}/ipfs-history-repair-patch"
             rm -rf "$PATCH_DIR"
@@ -144,7 +150,7 @@ jobs:
                 repaired_webp="$PATCH_DIR/screenshots/$cid.webp"
 
                 if node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR" "$cid"; then
-                  echo "Remote already has capture v7 for $cid; keeping remote copy."
+                  echo "Remote already has a valid current capture for $cid; keeping remote copy."
                   continue
                 fi
 
@@ -203,3 +209,4 @@ jobs:
           if [[ -n "${HISTORY_DIR:-}" ]]; then
             git worktree remove --force "$HISTORY_DIR" >/dev/null 2>&1 || true
           fi
+
