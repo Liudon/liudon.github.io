@@ -1,6 +1,11 @@
 name: Repair IPFS History Screenshots
 
 on:
+  push:
+    branches: [code]
+    paths:
+      - ".github/scripts/ipfs-history/capture-screenshots.mjs"
+      - ".github/workflows/ipfs-history-screenshots.yml"
   schedule:
     # Run off the top of the hour to reduce GitHub Actions schedule congestion.
     - cron: "37 3 * * *"
@@ -76,7 +81,17 @@ jobs:
           missing = []
           for cid in sorted(cids):
               screenshot = screenshot_dir / f"{cid}.webp"
-              if not screenshot.exists() or screenshot.stat().st_size < 10_000:
+              metadata = screenshot_dir / "meta" / f"{cid}.json"
+              valid = screenshot.exists() and screenshot.stat().st_size >= 10_000
+
+              if valid:
+                  try:
+                      meta = json.loads(metadata.read_text(encoding="utf-8"))
+                      valid = meta.get("capture_version") == 2
+                  except (FileNotFoundError, json.JSONDecodeError):
+                      valid = False
+
+              if not valid:
                   missing.append(cid)
 
           print(len(missing))
@@ -86,9 +101,17 @@ jobs:
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
           echo "Missing/invalid IPFS history screenshots: $COUNT"
 
-      - name: Install Playwright core
+      - name: Install screenshot dependencies
         if: steps.missing.outputs.count != '0'
+        shell: bash
         run: |
+          set -euo pipefail
+
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          fc-cache -f
+          fc-match "Noto Sans CJK SC"
+
           npm install \
             --no-save \
             --package-lock=false \
@@ -104,6 +127,7 @@ jobs:
           SCREENSHOT_HEIGHT: "900"
           SCREENSHOT_QUALITY: "72"
           SCREENSHOT_ATTEMPTS: "3"
+          SCREENSHOT_CAPTURE_VERSION: "2"
         run: |
           node .github/scripts/ipfs-history/capture-screenshots.mjs \
             "${{ steps.history.outputs.dir }}"
@@ -159,7 +183,17 @@ jobs:
           missing = 0
           for cid in cids:
               screenshot = screenshot_dir / f"{cid}.webp"
-              if screenshot.exists() and screenshot.stat().st_size >= 10_000:
+              metadata = screenshot_dir / "meta" / f"{cid}.json"
+              is_valid = screenshot.exists() and screenshot.stat().st_size >= 10_000
+
+              if is_valid:
+                  try:
+                      meta = json.loads(metadata.read_text(encoding="utf-8"))
+                      is_valid = meta.get("capture_version") == 2
+                  except (FileNotFoundError, json.JSONDecodeError):
+                      is_valid = False
+
+              if is_valid:
                   valid += 1
               else:
                   missing += 1
