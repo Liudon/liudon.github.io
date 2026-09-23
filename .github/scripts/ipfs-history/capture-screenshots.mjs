@@ -18,7 +18,7 @@ const viewportWidth = Number(process.env.SCREENSHOT_WIDTH || 1440);
 const viewportHeight = Number(process.env.SCREENSHOT_HEIGHT || 900);
 const webpQuality = Number(process.env.SCREENSHOT_QUALITY || 72);
 const maxAttempts = Number(process.env.SCREENSHOT_ATTEMPTS || 3);
-const captureVersion = Number(process.env.SCREENSHOT_CAPTURE_VERSION || 5);
+const captureVersion = Number(process.env.SCREENSHOT_CAPTURE_VERSION || 6);
 
 function readSnapshots() {
   const byCid = new Map();
@@ -110,6 +110,7 @@ function writeCaptureMetadata(snapshot) {
     javascript_enabled: false,
     service_workers: "block",
     reduced_motion: "reduce",
+    color_scheme: "light",
     animations_disabled: true,
   };
 
@@ -306,7 +307,7 @@ if (!chrome) {
 
 console.log(`Browser: ${chrome}`);
 console.log(`Viewport: ${viewportWidth}x${viewportHeight}, WebP quality: ${webpQuality}`);
-console.log("Capture mode: JavaScript disabled, service workers blocked, native stabilization only.");
+console.log("Capture mode: JavaScript disabled, light color scheme, service workers blocked, native stabilization only.");
 
 const { chromium } = await import("playwright-core");
 
@@ -325,6 +326,7 @@ const context = await browser.newContext({
   javaScriptEnabled: false,
   serviceWorkers: "block",
   reducedMotion: "reduce",
+  colorScheme: "light",
 });
 
 
