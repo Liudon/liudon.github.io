@@ -118,34 +118,32 @@ function writeCaptureMetadata(snapshot) {
 }
 
 async function stabilizePage(page) {
-  // Disable CSS-driven motion as well. JavaScript is disabled at the browser
-  // context level, but CSS animations/transitions can still create unstable
-  // pixels between otherwise identical deployments.
-  await page.addStyleTag({
-    content: `
-      *,
-      *::before,
-      *::after {
-        animation: none !important;
-        animation-delay: 0s !important;
-        transition: none !important;
-        caret-color: transparent !important;
-        scroll-behavior: auto !important;
-      }
-    `,
-  });
+  // JavaScript is disabled in the browser context. Keep stabilization limited
+  // to native browser operations so this step cannot depend on page script
+  // execution or DOM injection.
+  await page.waitForTimeout(500);
 
-  await page.waitForTimeout(600);
-
-  // Warm native lazy-loaded images without relying on site JavaScript.
-  // Fixed wheel steps keep this compatible with javaScriptEnabled: false.
-  for (let step = 0; step < 20; step += 1) {
-    await page.mouse.wheel(0, Math.max(800, viewportHeight - 100));
-    await page.waitForTimeout(45);
+  // Warm native lazy-loaded resources with a small bounded number of scrolls.
+  // Each action has its own short timeout guard so one old snapshot cannot
+  // stall the whole repair job.
+  for (let step = 0; step < 8; step += 1) {
+    await Promise.race([
+      page.mouse.wheel(0, Math.max(900, viewportHeight)),
+      page.waitForTimeout(1_500).then(() => {
+        throw new Error("scroll warmup timed out");
+      }),
+    ]);
+    await page.waitForTimeout(60);
   }
 
-  await page.keyboard.press("Home");
-  await page.waitForTimeout(350);
+  await Promise.race([
+    page.keyboard.press("Home"),
+    page.waitForTimeout(1_500).then(() => {
+      throw new Error("return-to-top timed out");
+    }),
+  ]);
+
+  await page.waitForTimeout(250);
 }
 
 function snapshotUrl(snapshot) {
