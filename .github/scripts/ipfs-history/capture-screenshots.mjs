@@ -306,6 +306,7 @@ if (!chrome) {
 
 console.log(`Browser: ${chrome}`);
 console.log(`Viewport: ${viewportWidth}x${viewportHeight}, WebP quality: ${webpQuality}`);
+console.log("Capture mode: JavaScript disabled, service workers blocked, native stabilization only.");
 
 const { chromium } = await import("playwright-core");
 
