@@ -1,8 +1,8 @@
 {
   "version": 1,
   "algorithm": {
-    "version": 2,
-    "strategy": "baseline-blurred-pixel-tiles",
+    "version": 3,
+    "strategy": "visible-text-and-lossless-pixel-tiles",
     "sample_width": 480,
     "blur_sigma": 0.8,
     "pixel_delta": 18,
@@ -18,7 +18,7 @@
     "latest_cid": "bafybeid2qnn3ftha4rzjzhozgs5lywmfj44qj4ztjixuuv32eqfipmbpb4",
     "latest_deployed_at": "2026-09-23T06:22:24Z"
   },
-  "visual_count": 15,
+  "visual_count": 24,
   "frames": [
     {
       "cid": "Qmdiv1UNNYZprByDhLBzNQGVwRWMkjxRfjY1JyL5dAEZV2",
@@ -41,7 +41,23 @@
       "deployed_at": "2026-08-10T04:30:52.7536982Z",
       "source_commit": "77888799e3adae06b63d10eadeadb45d383a3612",
       "screenshot": "screenshots/QmVb6UDkUNMPkKaXN9S8GqyvfbLFPFKNNeZpr6cQKj9FRp.webp",
-      "unchanged_deployments": 6,
+      "unchanged_deployments": 1,
+      "same_until": "2026-08-10T04:58:05.2464539Z"
+    },
+    {
+      "cid": "QmYwqdWwGoRxMKaegaPTc5sWXe7Vx4trrtMDSf42jmWvpS",
+      "deployed_at": "2026-08-11T04:42:02.2686675Z",
+      "source_commit": "3c1ea125557d4eca1edf68067a3dfba9c460d05e",
+      "screenshot": "screenshots/QmYwqdWwGoRxMKaegaPTc5sWXe7Vx4trrtMDSf42jmWvpS.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-08-11T04:42:02.2686675Z"
+    },
+    {
+      "cid": "QmQ81o9xkiuv5LfnXtnfjkUCmyyR2fFoDYbg9fETe543WK",
+      "deployed_at": "2026-08-12T07:45:54.8105318Z",
+      "source_commit": "2c50cd0bb159a0b579573b697f5b72f527acf7dc",
+      "screenshot": "screenshots/QmQ81o9xkiuv5LfnXtnfjkUCmyyR2fFoDYbg9fETe543WK.webp",
+      "unchanged_deployments": 3,
       "same_until": "2026-08-14T04:45:37.0289135Z"
     },
     {
@@ -49,7 +65,23 @@
       "deployed_at": "2026-08-27T07:29:31.8926069Z",
       "source_commit": "0eb6659a5bba7c05303baafb22aec0792d146ff7",
       "screenshot": "screenshots/QmWhv7jvE9xj87ev2jf4obpzVZDTsmZzbRkNqbSqwD9a99.webp",
-      "unchanged_deployments": 4,
+      "unchanged_deployments": 1,
+      "same_until": "2026-08-27T07:53:19.1572992Z"
+    },
+    {
+      "cid": "QmYMXkynuwyYa79faMSUBcEA4PBxqiLCTKqKnytSiuHemC",
+      "deployed_at": "2026-08-27T08:08:21.1241168Z",
+      "source_commit": "f74b0f02fcafd1525e9e48fe23aa5e4509e7fa1c",
+      "screenshot": "screenshots/QmYMXkynuwyYa79faMSUBcEA4PBxqiLCTKqKnytSiuHemC.webp",
+      "unchanged_deployments": 1,
+      "same_until": "2026-08-31T02:44:01.9955611Z"
+    },
+    {
+      "cid": "QmPXbDa3akxehtkZGKC8vfzgb2uJjrd4bd7bHc3NWLq7fb",
+      "deployed_at": "2026-08-31T03:57:05.0168883Z",
+      "source_commit": "fc80fd852e113e658ebf887d6643cd41a29726ff",
+      "screenshot": "screenshots/QmPXbDa3akxehtkZGKC8vfzgb2uJjrd4bd7bHc3NWLq7fb.webp",
+      "unchanged_deployments": 0,
       "same_until": "2026-08-31T03:57:05.0168883Z"
     },
     {
@@ -89,7 +121,15 @@
       "deployed_at": "2026-09-07T08:16:28.9660169Z",
       "source_commit": "b538afb8b4126ab239ad7bdabf18b3e32e529100",
       "screenshot": "screenshots/QmT9UmVwywgPoZq42WGSLCgb8n1sQac4vhAFeqWGoKoL9G.webp",
-      "unchanged_deployments": 6,
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-07T08:16:28.9660169Z"
+    },
+    {
+      "cid": "QmSYNsRKoVrYcWXkRkc6pHSqXTcNkgxBpx68WVnhuvKWjR",
+      "deployed_at": "2026-09-07T11:38:38.0083670Z",
+      "source_commit": "664383c44167e0f6609e12d21f089ba8d2ffde7e",
+      "screenshot": "screenshots/QmSYNsRKoVrYcWXkRkc6pHSqXTcNkgxBpx68WVnhuvKWjR.webp",
+      "unchanged_deployments": 5,
       "same_until": "2026-09-08T12:01:21.9999486Z"
     },
     {
@@ -97,7 +137,23 @@
       "deployed_at": "2026-09-09T06:14:25.1193913Z",
       "source_commit": "dd29becbf1ed86ba972aa8a8b34c422d1fde8ed1",
       "screenshot": "screenshots/QmYHSNJDhtn3dyqmt5SRra8yWiiSdi82PBs5CuYJLHFsC6.webp",
-      "unchanged_deployments": 15,
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-09T06:14:25.1193913Z"
+    },
+    {
+      "cid": "QmTvL4HCt2mqJ7pPrGT9YCpHAea8kzdEAqqgnpZzj2orui",
+      "deployed_at": "2026-09-09T06:28:17.1385043Z",
+      "source_commit": "54b9d13e4d07f0538e2f0f5ab27708e677c210db",
+      "screenshot": "screenshots/QmTvL4HCt2mqJ7pPrGT9YCpHAea8kzdEAqqgnpZzj2orui.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-09T06:28:17.1385043Z"
+    },
+    {
+      "cid": "QmerCmTVDZvYrYkGgBqQLW78mKsMeK15UuoC2UHLKZXaaV",
+      "deployed_at": "2026-09-09T06:45:48.0233467Z",
+      "source_commit": "50ef1b467d5196e4cd185f34fb7b42371e163349",
+      "screenshot": "screenshots/QmerCmTVDZvYrYkGgBqQLW78mKsMeK15UuoC2UHLKZXaaV.webp",
+      "unchanged_deployments": 13,
       "same_until": "2026-09-21T06:51:17Z"
     },
     {
@@ -121,7 +177,15 @@
       "deployed_at": "2026-09-21T17:06:02Z",
       "source_commit": "f88fd6715e0955909f0ab78585cbb26289a2f13d",
       "screenshot": "screenshots/bafybeihopfc2xh7qjmmxpf7dhpwabrtfegkx4bphmu4mmvc3hyataedipa.webp",
-      "unchanged_deployments": 3,
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-21T17:06:02Z"
+    },
+    {
+      "cid": "bafybeigvtkmm6ghpjhdojv5jjhvt2eajy45xquuc5gof7vfckzblesf4sy",
+      "deployed_at": "2026-09-22T00:31:45Z",
+      "source_commit": "2cbc14c650ed531ab1fbfa67dd62055a67a8e5a3",
+      "screenshot": "screenshots/bafybeigvtkmm6ghpjhdojv5jjhvt2eajy45xquuc5gof7vfckzblesf4sy.webp",
+      "unchanged_deployments": 2,
       "same_until": "2026-09-22T04:11:02Z"
     },
     {
@@ -129,7 +193,15 @@
       "deployed_at": "2026-09-23T03:04:08Z",
       "source_commit": "60bee98aca1ef4096737e89a845c62a73890f5ca",
       "screenshot": "screenshots/bafybeiggtsc3we2zwtk3fcdv3qritvh7xn6tgkdb6fqdcinls6n6bajqau.webp",
-      "unchanged_deployments": 1,
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-23T03:04:08Z"
+    },
+    {
+      "cid": "bafybeie3oryrmhwjwaffiigpiag3rzct4b3xy6fgmes6r3fhseta4s3doi",
+      "deployed_at": "2026-09-23T04:47:20Z",
+      "source_commit": "9d6dc63c8c53d710a23ba65b11450d45dfd85802",
+      "screenshot": "screenshots/bafybeie3oryrmhwjwaffiigpiag3rzct4b3xy6fgmes6r3fhseta4s3doi.webp",
+      "unchanged_deployments": 0,
       "same_until": "2026-09-23T04:47:20Z"
     },
     {
