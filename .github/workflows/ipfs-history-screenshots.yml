@@ -168,26 +168,31 @@ jobs:
               git -C "$HISTORY_DIR" fetch origin ipfs-history
               git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
 
-              find "$PATCH_DIR/screenshots" -maxdepth 1 -type f -name '*.webp' -print0 |
-              while IFS= read -r -d '' repaired; do
-                name=$(basename "$repaired")
-                cid="${name%.webp}"
+              # Metadata is the authoritative list of recaptured CIDs.
+              # A recapture can produce byte-identical WebP output while still
+              # upgrading capture_version/settings in metadata. Iterating only
+              # changed .webp files would silently drop those metadata-only
+              # upgrades.
+              find "$PATCH_DIR/screenshots/meta" -maxdepth 1 -type f -name '*.json' -print0 |
+              while IFS= read -r -d '' repaired_meta; do
+                name=$(basename "$repaired_meta")
+                cid="${name%.json}"
                 remote_meta="$HISTORY_DIR/screenshots/meta/$cid.json"
+                repaired_webp="$PATCH_DIR/screenshots/$cid.webp"
 
-                remote_is_current=false
                 if [[ -f "$remote_meta" ]] && jq -e '.capture_version == 6' "$remote_meta" >/dev/null 2>&1; then
-                  remote_is_current=true
-                fi
-
-                if [[ "$remote_is_current" == "true" ]]; then
                   echo "Remote already has capture v6 for $cid; keeping remote copy."
                   continue
                 fi
 
-                cp "$repaired" "$HISTORY_DIR/screenshots/$cid.webp"
-                if [[ -f "$PATCH_DIR/screenshots/meta/$cid.json" ]]; then
-                  mkdir -p "$HISTORY_DIR/screenshots/meta"
-                  cp "$PATCH_DIR/screenshots/meta/$cid.json" "$remote_meta"
+                mkdir -p "$HISTORY_DIR/screenshots/meta"
+                cp "$repaired_meta" "$remote_meta"
+
+                # Copy the WebP only when Git detected changed image bytes.
+                # If it is absent from PATCH_DIR, the newly captured WebP was
+                # byte-identical to the remote image and needs no replacement.
+                if [[ -f "$repaired_webp" ]]; then
+                  cp "$repaired_webp" "$HISTORY_DIR/screenshots/$cid.webp"
                 fi
               done
 
