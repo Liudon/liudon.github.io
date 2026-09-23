@@ -890,12 +890,28 @@ jobs:
           if git -C "$HISTORY_DIR" diff --cached --quiet; then
             echo "Screenshot already exists for CID: $CID"
           else
-            git -C "$HISTORY_DIR" commit -m "capture IPFS history screenshot"
+            PATCH_DIR="${RUNNER_TEMP}/ipfs-history-current-screenshot"
+            rm -rf "$PATCH_DIR"
+            mkdir -p "$PATCH_DIR/screenshots/meta"
+            cp "$HISTORY_DIR/screenshots/$CID.webp" "$PATCH_DIR/screenshots/$CID.webp"
+            cp "$HISTORY_DIR/screenshots/meta/$CID.json" "$PATCH_DIR/screenshots/meta/$CID.json"
 
             for attempt in {1..5}; do
               echo "Screenshot push attempt $attempt/5"
               git -C "$HISTORY_DIR" fetch origin ipfs-history
-              git -C "$HISTORY_DIR" rebase origin/ipfs-history
+              git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
+
+              REMOTE_META="$HISTORY_DIR/screenshots/meta/$CID.json"
+              if [[ -f "$REMOTE_META" ]] && jq -e '.capture_version == 2' "$REMOTE_META" >/dev/null 2>&1; then
+                echo "Remote already has capture v2 for CID: $CID"
+                break
+              fi
+
+              mkdir -p "$HISTORY_DIR/screenshots/meta"
+              cp "$PATCH_DIR/screenshots/$CID.webp" "$HISTORY_DIR/screenshots/$CID.webp"
+              cp "$PATCH_DIR/screenshots/meta/$CID.json" "$REMOTE_META"
+              git -C "$HISTORY_DIR" add "screenshots/$CID.webp" "screenshots/meta/$CID.json"
+              git -C "$HISTORY_DIR" commit -m "capture IPFS history screenshot"
 
               if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
                 echo "Captured screenshot for CID: $CID"
