@@ -800,6 +800,79 @@ jobs:
             echo "Normalized IPFS deployment history recorded on ipfs-history."
           fi
 
+      # Capture the newly published snapshot directly from the local ./public
+      # tree. This avoids depending on the public IPFS gateway immediately
+      # after deployment. Screenshot generation is derivative data: failure
+      # must not turn an otherwise successful site/IPFS deployment red.
+      - name: Capture current IPFS history screenshot
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
+        continue-on-error: true
+        env:
+          CID: ${{ steps.ipfs.outputs.cid }}
+          IPFS_GATEWAY_BASE: https://liudon.xyz/ipfs
+          SCREENSHOT_WIDTH: "1440"
+          SCREENSHOT_HEIGHT: "900"
+          SCREENSHOT_QUALITY: "72"
+          SCREENSHOT_ATTEMPTS: "2"
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          npm install \
+            --no-save \
+            --package-lock=false \
+            --no-audit \
+            --no-fund \
+            playwright-core@latest
+
+          HISTORY_DIR=$(mktemp -d)
+          SERVER_PID=""
+
+          cleanup() {
+            if [[ -n "$SERVER_PID" ]]; then
+              kill "$SERVER_PID" >/dev/null 2>&1 || true
+            fi
+            git worktree remove --force "$HISTORY_DIR" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          git fetch origin ipfs-history
+          git worktree add --detach "$HISTORY_DIR" origin/ipfs-history
+
+          python3 -m http.server 4173 \
+            --bind 127.0.0.1 \
+            --directory ./public \
+            >"${RUNNER_TEMP}/ipfs-history-http.log" 2>&1 &
+          SERVER_PID=$!
+
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              break
+            fi
+            if [[ "$attempt" == "20" ]]; then
+              echo "Local screenshot server failed to start."
+              cat "${RUNNER_TEMP}/ipfs-history-http.log" || true
+              exit 1
+            fi
+            sleep 0.5
+          done
+
+          CAPTURE_CID="$CID" \
+          SCREENSHOT_SOURCE_URL="http://127.0.0.1:4173/" \
+          node .github/scripts/ipfs-history/capture-screenshots.mjs "$HISTORY_DIR"
+
+          git -C "$HISTORY_DIR" config user.name "github-actions[bot]"
+          git -C "$HISTORY_DIR" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$HISTORY_DIR" add "screenshots/$CID.webp"
+
+          if git -C "$HISTORY_DIR" diff --cached --quiet; then
+            echo "Screenshot already exists for CID: $CID"
+          else
+            git -C "$HISTORY_DIR" commit -m "capture IPFS history screenshot"
+            git -C "$HISTORY_DIR" push origin HEAD:ipfs-history
+            echo "Captured screenshot for CID: $CID"
+          fi
+
       - name: IPFS deployment summary
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         env:
@@ -826,160 +899,3 @@ jobs:
               echo "- CID: $LAST_CID"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
-
-  # ------------------------------------------------------
-  # IPFS history screenshots
-  #
-  # The code branch owns the capture logic. The ipfs-history branch remains
-  # data-only: history metadata plus one full-page WebP per immutable CID.
-  #
-  # This job is idempotent. The first run backfills every missing CID; later
-  # runs normally capture only the newly recorded snapshot.
-  # ------------------------------------------------------
-  history-screenshots:
-    name: IPFS history screenshots
-    needs: build
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          token: ${{ secrets.TOKEN }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: "24"
-          package-manager-cache: false
-
-      - name: Checkout IPFS history
-        id: history
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          HISTORY_DIR="${RUNNER_TEMP}/ipfs-history"
-          git fetch origin ipfs-history
-          git worktree add --detach "$HISTORY_DIR" origin/ipfs-history
-
-          echo "dir=$HISTORY_DIR" >> "$GITHUB_OUTPUT"
-
-      - name: Find missing screenshots
-        id: missing
-        env:
-          HISTORY_DIR: ${{ steps.history.outputs.dir }}
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          COUNT=$(python3 - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          root = Path(os.environ["HISTORY_DIR"])
-          history_dir = root / "history"
-          screenshot_dir = root / "screenshots"
-
-          cids = set()
-          for path in sorted(history_dir.glob("*.jsonl")):
-              for line_number, line in enumerate(
-                  path.read_text(encoding="utf-8").splitlines(),
-                  start=1,
-              ):
-                  if not line.strip():
-                      continue
-                  entry = json.loads(line)
-                  cid = entry.get("cid")
-                  if not cid:
-                      raise SystemExit(f"Missing cid in {path.name}:{line_number}")
-                  cids.add(cid)
-
-          missing = sorted(
-              cid
-              for cid in cids
-              if not (screenshot_dir / f"{cid}.webp").exists()
-          )
-
-          print(len(missing))
-          PY
-          )
-
-          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
-          echo "Missing IPFS history screenshots: $COUNT"
-
-      - name: Install Playwright core
-        if: steps.missing.outputs.count != '0'
-        run: |
-          npm install \
-            --no-save \
-            --package-lock=false \
-            --no-audit \
-            --no-fund \
-            playwright-core@latest
-
-      - name: Capture missing screenshots
-        if: steps.missing.outputs.count != '0'
-        env:
-          IPFS_GATEWAY_BASE: https://liudon.xyz/ipfs
-          SCREENSHOT_WIDTH: "1440"
-          SCREENSHOT_HEIGHT: "900"
-          SCREENSHOT_QUALITY: "72"
-        run: |
-          node .github/scripts/ipfs-history/capture-screenshots.mjs \
-            "${{ steps.history.outputs.dir }}"
-
-      # Commit any successful captures even if one historical CID failed.
-      # A failed capture still leaves this job red, and the next run retries
-      # only the screenshots that remain absent.
-      - name: Commit captured screenshots
-        if: always() && steps.missing.outputs.count != '0'
-        env:
-          HISTORY_DIR: ${{ steps.history.outputs.dir }}
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          git -C "$HISTORY_DIR" config user.name "github-actions[bot]"
-          git -C "$HISTORY_DIR" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C "$HISTORY_DIR" add screenshots
-
-          if git -C "$HISTORY_DIR" diff --cached --quiet; then
-            echo "No new screenshots to commit."
-          else
-            git -C "$HISTORY_DIR" commit -m "capture IPFS history screenshots"
-            git -C "$HISTORY_DIR" push origin HEAD:ipfs-history
-            echo "IPFS history screenshots pushed."
-          fi
-
-      - name: Screenshot summary
-        if: always()
-        env:
-          HISTORY_DIR: ${{ steps.history.outputs.dir }}
-          MISSING_BEFORE: ${{ steps.missing.outputs.count }}
-        shell: bash
-        run: |
-          {
-            echo "## IPFS history screenshots"
-            echo
-            echo "- Missing before run: ${MISSING_BEFORE:-unknown}"
-
-            if [[ -d "$HISTORY_DIR/screenshots" ]]; then
-              TOTAL=$(find "$HISTORY_DIR/screenshots" -maxdepth 1 -type f -name '*.webp' | wc -l)
-              echo "- Screenshots present after run: $TOTAL"
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Cleanup history worktree
-        if: always()
-        env:
-          HISTORY_DIR: ${{ steps.history.outputs.dir }}
-        shell: bash
-        run: |
-          if [[ -n "${HISTORY_DIR:-}" ]]; then
-            git worktree remove --force "$HISTORY_DIR" >/dev/null 2>&1 || true
-          fi
-
