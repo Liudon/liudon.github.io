@@ -830,7 +830,7 @@ jobs:
           SCREENSHOT_HEIGHT: "900"
           SCREENSHOT_QUALITY: "72"
           SCREENSHOT_ATTEMPTS: "2"
-          SCREENSHOT_CAPTURE_VERSION: "5"
+          SCREENSHOT_CAPTURE_VERSION: "6"
         shell: bash
         run: |
           set -euo pipefail
@@ -902,8 +902,8 @@ jobs:
               git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
 
               REMOTE_META="$HISTORY_DIR/screenshots/meta/$CID.json"
-              if [[ -f "$REMOTE_META" ]] && jq -e '.capture_version == 5' "$REMOTE_META" >/dev/null 2>&1; then
-                echo "Remote already has capture v5 for CID: $CID"
+              if [[ -f "$REMOTE_META" ]] && jq -e '.capture_version == 6' "$REMOTE_META" >/dev/null 2>&1; then
+                echo "Remote already has capture v6 for CID: $CID"
                 break
               fi
 
