@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
+import { readCapture, normalizeText } from "./capture-data.mjs";
 
 const historyRoot = process.argv[2];
 
@@ -14,7 +15,7 @@ const screenshotDir = path.join(historyRoot, "screenshots");
 const indexPath = path.join(historyRoot, "visual-index.json");
 const diffPath = path.join(historyRoot, "visual-diffs.jsonl");
 
-const algorithmVersion = 2;
+const algorithmVersion = 3;
 const sampleWidth = Number(process.env.VISUAL_SAMPLE_WIDTH || 480);
 const pixelDelta = Number(process.env.VISUAL_PIXEL_DELTA || 18);
 const blurSigma = Number(process.env.VISUAL_BLUR_SIGMA || 0.8);
@@ -64,6 +65,7 @@ function screenshotPath(snapshot) {
 }
 
 async function sampleScreenshot(snapshot) {
+  const capture = readCapture(historyRoot, snapshot.cid);
   const file = screenshotPath(snapshot);
 
   if (!fs.existsSync(file)) {
@@ -94,6 +96,7 @@ async function sampleScreenshot(snapshot) {
 
   return {
     cid: snapshot.cid,
+    capture,
     width: info.width,
     height: info.height,
     data,
@@ -124,6 +127,7 @@ function compareSamples(baseline, candidate) {
   const tileChanged = new Uint32Array(tilesX * tilesY);
   const tilePixels = new Uint32Array(tilesX * tilesY);
 
+  let minX = width, minY = height, maxX = -1, maxY = -1;
   let changedPixels = 0;
   let totalPixels = 0;
   let totalChannelDelta = 0;
@@ -146,6 +150,8 @@ function compareSamples(baseline, candidate) {
       tilePixels[tile] += 1;
 
       if (maxDelta > pixelDelta) {
+        minX = Math.min(minX, x); minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
         changedPixels += 1;
         tileChanged[tile] += 1;
       }
@@ -186,6 +192,7 @@ function compareSamples(baseline, candidate) {
     overall_changed_ratio: Number(overallChangedRatio.toFixed(8)),
     max_tile_changed_ratio: Number(maxTileChangedRatio.toFixed(8)),
     mean_channel_delta: Number(meanChannelDelta.toFixed(6)),
+    changed_bounds_sample: maxX < 0 ? null : { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 },
     changed_tiles: changedTiles,
     significant_tiles: significantTiles,
   };
@@ -224,7 +231,23 @@ frames.push(currentFrame);
 for (let index = 1; index < snapshots.length; index += 1) {
   const candidateSnapshot = snapshots[index];
   const candidateSample = await sampleScreenshot(candidateSnapshot);
+  if (JSON.stringify(baselineSample.capture.profile) !== JSON.stringify(candidateSample.capture.profile)) {
+    throw new Error(`Incompatible capture profiles: ${baselineSnapshot.cid} / ${candidateSnapshot.cid}`);
+  }
   const metrics = compareSamples(baselineSample, candidateSample);
+  const before = normalizeText(baselineSample.capture.visible_text);
+  const after = normalizeText(candidateSample.capture.visible_text);
+  metrics.text_changed = before !== after;
+  if (metrics.text_changed) {
+    metrics.same = false;
+    metrics.reason = "text_change";
+    let offset = 0;
+    while (offset < Math.min(before.length, after.length) && before[offset] === after[offset]) offset++;
+    metrics.text_diff = {
+      offset, before: before.slice(Math.max(0, offset - 60), offset + 180),
+      after: after.slice(Math.max(0, offset - 60), offset + 180),
+    };
+  }
 
   comparisons.push({
     baseline_cid: baselineSnapshot.cid,
@@ -237,7 +260,7 @@ for (let index = 1; index < snapshots.length; index += 1) {
   const ratio = (metrics.overall_changed_ratio * 100).toFixed(4);
   const tile = (metrics.max_tile_changed_ratio * 100).toFixed(3);
   console.log(
-    `${metrics.same ? "SAME   " : "CHANGED"} ${candidateSnapshot.deployed_at} ${candidateSnapshot.cid} overall=${ratio}% tile=${tile}% mean=${metrics.mean_channel_delta}`,
+    `${metrics.same ? "SAME   " : "CHANGED"} ${candidateSnapshot.deployed_at} ${candidateSnapshot.cid} reason=${metrics.reason} overall=${ratio}% tile=${tile}% mean=${metrics.mean_channel_delta}`,
   );
 
   if (metrics.same) {
@@ -258,7 +281,7 @@ const visualIndex = {
   version: 1,
   algorithm: {
     version: algorithmVersion,
-    strategy: "baseline-blurred-pixel-tiles",
+    strategy: "visible-text-and-lossless-pixel-tiles",
     sample_width: sampleWidth,
     blur_sigma: blurSigma,
     pixel_delta: pixelDelta,

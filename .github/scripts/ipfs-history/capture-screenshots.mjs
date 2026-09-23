@@ -1,5 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
+import sharp from "sharp";
+import { captureVersion, captureIsValid, hash, normalizeText } from "./capture-data.mjs";
 
 const historyRoot = process.argv[2];
 
@@ -16,9 +18,9 @@ const sourceUrl = process.env.SCREENSHOT_SOURCE_URL || "";
 const targetCid = process.env.CAPTURE_CID || "";
 const viewportWidth = Number(process.env.SCREENSHOT_WIDTH || 1440);
 const viewportHeight = Number(process.env.SCREENSHOT_HEIGHT || 900);
-const webpQuality = Number(process.env.SCREENSHOT_QUALITY || 72);
+
 const maxAttempts = Number(process.env.SCREENSHOT_ATTEMPTS || 3);
-const captureVersion = Number(process.env.SCREENSHOT_CAPTURE_VERSION || 6);
+
 
 function readSnapshots() {
   const byCid = new Map();
@@ -54,18 +56,6 @@ function readSnapshots() {
   );
 }
 
-function findChrome() {
-  const candidates = [
-    process.env.CHROME_BIN,
-    "/usr/bin/google-chrome-stable",
-    "/usr/bin/google-chrome",
-    "/usr/bin/chromium",
-    "/usr/bin/chromium-browser",
-  ].filter(Boolean);
-
-  return candidates.find((candidate) => fs.existsSync(candidate));
-}
-
 function screenshotPath(snapshot) {
   return path.join(screenshotDir, `${snapshot.cid}.webp`);
 }
@@ -74,77 +64,94 @@ function metadataPath(snapshot) {
   return path.join(metadataDir, `${snapshot.cid}.json`);
 }
 
-function readCaptureMetadata(snapshot) {
-  const file = metadataPath(snapshot);
-  if (!fs.existsSync(file)) return null;
-
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch {
-    return null;
-  }
-}
-
 function screenshotIsValid(snapshot) {
-  const target = screenshotPath(snapshot);
-  if (!fs.existsSync(target) || fs.statSync(target).size < 10_000) {
-    return false;
-  }
-
-  const metadata = readCaptureMetadata(snapshot);
-  return metadata?.capture_version === captureVersion;
+  return captureIsValid(historyRoot, snapshot.cid);
 }
 
-function writeCaptureMetadata(snapshot) {
-  fs.mkdirSync(metadataDir, { recursive: true });
-  const file = metadataPath(snapshot);
-  const tmp = `${file}.tmp`;
-
-  const metadata = {
-    capture_version: captureVersion,
-    captured_at: new Date().toISOString(),
-    viewport_width: viewportWidth,
-    viewport_height: viewportHeight,
-    format: "webp",
-    quality: webpQuality,
-    javascript_enabled: false,
-    service_workers: "block",
-    reduced_motion: "reduce",
-    color_scheme: "light",
-    animations_disabled: true,
-  };
-
-  fs.writeFileSync(tmp, JSON.stringify(metadata, null, 2) + "\n", "utf8");
-  fs.renameSync(tmp, file);
-}
+const stableStyle = `*, *::before, *::after {
+  animation: none !important; transition: none !important;
+  caret-color: transparent !important; scroll-behavior: auto !important;
+}`;
 
 async function stabilizePage(page) {
-  // JavaScript is disabled in the browser context. Keep stabilization limited
-  // to native browser operations so this step cannot depend on page script
-  // execution or DOM injection.
-  await page.waitForTimeout(500);
-
-  // Warm native lazy-loaded resources with a small bounded number of scrolls.
-  // Each action has its own short timeout guard so one old snapshot cannot
-  // stall the whole repair job.
-  for (let step = 0; step < 8; step += 1) {
-    await Promise.race([
-      page.mouse.wheel(0, Math.max(900, viewportHeight)),
-      page.waitForTimeout(1_500).then(() => {
-        throw new Error("scroll warmup timed out");
-      }),
-    ]);
-    await page.waitForTimeout(60);
+  await page.waitForLoadState("domcontentloaded", { timeout: 30_000 });
+  await page.addStyleTag({ content: stableStyle });
+  // Terminal and PaperMod use different theme attributes/storage keys.
+  await page.evaluate(() => {
+    document.documentElement.setAttribute("data-theme", "light");
+    document.documentElement.classList.remove("dark");
+    document.body.classList.remove("dark");
+  });
+  // Trigger native and JS lazy loading, with a bound for broken/infinite pages.
+  for (let step = 0; step < 40; step += 1) {
+    const bottom = await page.evaluate(() => {
+      window.scrollBy(0, window.innerHeight);
+      return window.scrollY + window.innerHeight >= document.documentElement.scrollHeight;
+    });
+    await page.waitForTimeout(100);
+    if (bottom) break;
+    if (step === 39) throw new Error("Page exceeded lazy-loading scroll limit");
   }
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForFunction(() => {
+    const stylesReady = [...document.querySelectorAll('link[rel="stylesheet"]')]
+      .filter(link => !link.disabled && (!link.media || matchMedia(link.media).matches))
+      .every(link => link.sheet);
+    const imagesReady = [...document.images].filter(img => img.getClientRects().length)
+      .every(img => img.complete && img.naturalWidth > 0);
+    return stylesReady && imagesReady && document.fonts.status === "loaded";
+  }, null, { timeout: 20_000 });
+  let previous = "";
+  let stable = 0;
+  for (let step = 0; step < 20; step += 1) {
+    const signature = await page.evaluate(() => JSON.stringify({
+      text: document.body.innerText,
+      boxes: [...document.querySelectorAll("body *")].map(el => {
+        const r = el.getBoundingClientRect();
+        return [r.x, r.y, r.width, r.height];
+      }),
+    }));
+    stable = signature === previous ? stable + 1 : 0;
+    if (stable >= 2) return;
+    previous = signature;
+    await page.waitForTimeout(250);
+  }
+  throw new Error("Page text/layout did not stabilize");
+}
 
-  await Promise.race([
-    page.keyboard.press("Home"),
-    page.waitForTimeout(1_500).then(() => {
-      throw new Error("return-to-top timed out");
-    }),
-  ]);
-
-  await page.waitForTimeout(250);
+async function pageEvidence(page) {
+  return page.evaluate(() => {
+    // Read rendered text nodes: innerText alone can include opacity:0 content.
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const parts = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const el = node.parentElement;
+      if (!el || el.closest("script, style, template, noscript")) continue;
+      let visible = true;
+      for (let ancestor = el; ancestor; ancestor = ancestor.parentElement) {
+        const style = getComputedStyle(ancestor);
+        if (style.display === "none" || style.visibility !== "visible" || Number(style.opacity) === 0 ||
+            /^rect\(0px[, ]+0px[, ]+0px[, ]+0px\)$/.test(style.clip) ||
+            style.clipPath === "inset(50%)") {
+          visible = false; break;
+        }
+      }
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      if (visible && [...range.getClientRects()].some(r => r.width > 0 && r.height > 0)) {
+        parts.push(node.textContent);
+      }
+    }
+    const root = getComputedStyle(document.documentElement).backgroundColor;
+    const body = getComputedStyle(document.body).backgroundColor;
+    const background = body === "rgba(0, 0, 0, 0)" ? root : body;
+    const rgb = background.match(/[\d.]+/g)?.map(Number) || [];
+    const light = rgb.length >= 3 && (rgb.length < 4 || rgb[3] === 1) &&
+      (rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722) >= 180;
+    return { visible_text: parts.join(" "), background, light_verified: light,
+      theme: document.documentElement.getAttribute("data-theme") };
+  });
 }
 
 function snapshotUrl(snapshot) {
@@ -172,12 +179,23 @@ async function withHeartbeat(label, task) {
   }
 }
 
-async function captureOne(context, snapshot) {
+async function captureOne(browser, snapshot) {
   const target = screenshotPath(snapshot);
   const tempTarget = `${target}.tmp.webp`;
   const url = snapshotUrl(snapshot);
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const context = await browser.newContext({
+      viewport: { width: viewportWidth, height: viewportHeight },
+      deviceScaleFactor: 1, javaScriptEnabled: true, serviceWorkers: "block",
+      reducedMotion: "reduce", colorScheme: "light", locale: "zh-CN", timezoneId: "UTC",
+    });
+    await context.addInitScript(() => {
+      try {
+        localStorage.setItem("theme", "light");
+        localStorage.setItem("pref-theme", "light");
+      } catch {}
+    });
     const page = await context.newPage();
 
     try {
@@ -188,9 +206,6 @@ async function captureOne(context, snapshot) {
       console.log("  navigating...");
       const response = await withHeartbeat("still waiting for main HTML response", () =>
         page.goto(url, {
-          // Do not wait for DOMContentLoaded here. Historical pages can contain
-          // slow third-party script tags. JavaScript is disabled, and the
-          // screenshot only needs the static HTML/CSS/image rendering.
           waitUntil: "commit",
           timeout: 30_000,
         }),
@@ -222,29 +237,34 @@ async function captureOne(context, snapshot) {
       await withHeartbeat("still stabilizing", () => stabilizePage(page));
       console.log("  page stabilized");
 
-      console.log("  capturing full-page screenshot...");
-      await withHeartbeat("still capturing screenshot", () =>
-        page.screenshot({
-          path: tempTarget,
-          type: "webp",
-          quality: webpQuality,
-          fullPage: true,
-          animations: "disabled",
-          caret: "hide",
-          timeout: 45_000,
-        }),
-      );
-      console.log("  screenshot captured");
-
-      const size = fs.statSync(tempTarget).size;
-      if (size < 10_000) {
-        throw new Error(`Screenshot looks unexpectedly small: ${size} bytes`);
-      }
-
-      // Only replace the old screenshot after a complete successful capture.
-      // This keeps the previous usable image if a recapture attempt fails.
+      const evidence = await pageEvidence(page);
+      if (!evidence.light_verified) throw new Error(`Light theme verification failed: ${evidence.background}`);
+      if (!normalizeText(evidence.visible_text)) throw new Error("No visible text captured");
+      // One browser screenshot. Store lossless WebP for both comparison and display.
+      const png = await withHeartbeat("still capturing screenshot", () => page.screenshot({
+        type: "png", fullPage: true, animations: "disabled", caret: "hide", timeout: 45_000,
+      }));
+      const after = await pageEvidence(page);
+      if (JSON.stringify(evidence) !== JSON.stringify(after)) throw new Error("Page changed during capture");
+      const webp = await sharp(png).webp({ lossless: true }).toBuffer();
+      await sharp(webp).metadata();
+      fs.writeFileSync(tempTarget, webp);
+      const size = webp.length;
+      const metadata = {
+        capture_version: captureVersion, captured_at: new Date().toISOString(),
+        viewport_width: viewportWidth, viewport_height: viewportHeight,
+        format: "webp", lossless: true, javascript_enabled: true,
+        service_workers: "block", reduced_motion: "reduce", color_scheme: "light",
+        animations_disabled: true, ...evidence,
+        text_hash: hash(normalizeText(evidence.visible_text)), image_hash: hash(webp),
+        profile: { browser: browser.version(), platform: process.platform,
+          viewport: [viewportWidth, viewportHeight], device_scale_factor: 1,
+          locale: "zh-CN", timezone: "UTC", capture_version: captureVersion },
+      };
+      const metaTemp = `${metadataPath(snapshot)}.tmp`;
+      fs.writeFileSync(metaTemp, JSON.stringify(metadata, null, 2) + "\n");
       fs.renameSync(tempTarget, target);
-      writeCaptureMetadata(snapshot);
+      fs.renameSync(metaTemp, metadataPath(snapshot));
 
       console.log(
         `  saved ${path.relative(historyRoot, target)} (${Math.round(size / 1024)} KiB), capture v${captureVersion}`,
@@ -253,6 +273,7 @@ async function captureOne(context, snapshot) {
     } catch (error) {
       console.error(`  failed: ${error.stack || error.message}`);
       fs.rmSync(tempTarget, { force: true });
+      fs.rmSync(`${metadataPath(snapshot)}.tmp`, { force: true });
 
       if (attempt === maxAttempts) {
         throw error;
@@ -260,7 +281,7 @@ async function captureOne(context, snapshot) {
 
       await new Promise((resolve) => setTimeout(resolve, attempt * 2_000));
     } finally {
-      await page.close();
+      await context.close();
     }
   }
 }
@@ -300,42 +321,20 @@ if (missing.length === 0) {
   process.exit(0);
 }
 
-const chrome = findChrome();
-if (!chrome) {
-  throw new Error("Chrome/Chromium executable not found on the runner");
-}
-
-console.log(`Browser: ${chrome}`);
-console.log(`Viewport: ${viewportWidth}x${viewportHeight}, WebP quality: ${webpQuality}`);
-console.log("Capture mode: JavaScript disabled, light color scheme, service workers blocked, native stabilization only.");
-
-const { chromium } = await import("playwright-core");
-
+const { chromium } = await import("playwright");
 const browser = await chromium.launch({
-  executablePath: chrome,
+  ...(process.env.CHROME_BIN ? { executablePath: process.env.CHROME_BIN } : {}),
   headless: true,
   args: ["--disable-dev-shm-usage"],
 });
-
-const context = await browser.newContext({
-  viewport: {
-    width: viewportWidth,
-    height: viewportHeight,
-  },
-  deviceScaleFactor: 1,
-  javaScriptEnabled: false,
-  serviceWorkers: "block",
-  reducedMotion: "reduce",
-  colorScheme: "light",
-});
-
+console.log(`Browser: ${browser.version()}, capture v${captureVersion}, JavaScript enabled, lossless WebP`);
 
 const failures = [];
 
 try {
   for (const snapshot of missing) {
     try {
-      await captureOne(context, snapshot);
+      await captureOne(browser, snapshot);
     } catch (error) {
       failures.push({
         cid: snapshot.cid,
@@ -345,7 +344,6 @@ try {
     }
   }
 } finally {
-  await context.close();
   await browser.close();
 }
 

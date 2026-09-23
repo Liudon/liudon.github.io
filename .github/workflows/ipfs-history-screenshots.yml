@@ -5,6 +5,8 @@ on:
     branches: [code]
     paths:
       - ".github/scripts/ipfs-history/capture-screenshots.mjs"
+      - ".github/scripts/ipfs-history/capture-data.mjs"
+      - ".github/scripts/ipfs-history/check-capture.mjs"
       - ".github/workflows/ipfs-history-screenshots.yml"
   schedule:
     # Run off the top of the hour to reduce GitHub Actions schedule congestion.
@@ -20,7 +22,7 @@ concurrency:
 
 jobs:
   repair:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
 
     steps:
@@ -55,48 +57,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          COUNT=$(python3 - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          root = Path(os.environ["HISTORY_DIR"])
-          history_dir = root / "history"
-          screenshot_dir = root / "screenshots"
-
-          cids = set()
-          for path in sorted(history_dir.glob("*.jsonl")):
-              for line_number, line in enumerate(
-                  path.read_text(encoding="utf-8").splitlines(),
-                  start=1,
-              ):
-                  if not line.strip():
-                      continue
-                  entry = json.loads(line)
-                  cid = entry.get("cid")
-                  if not cid:
-                      raise SystemExit(f"Missing cid in {path.name}:{line_number}")
-                  cids.add(cid)
-
-          missing = []
-          for cid in sorted(cids):
-              screenshot = screenshot_dir / f"{cid}.webp"
-              metadata = screenshot_dir / "meta" / f"{cid}.json"
-              valid = screenshot.exists() and screenshot.stat().st_size >= 10_000
-
-              if valid:
-                  try:
-                      meta = json.loads(metadata.read_text(encoding="utf-8"))
-                      valid = meta.get("capture_version") == 6
-                  except (FileNotFoundError, json.JSONDecodeError):
-                      valid = False
-
-              if not valid:
-                  missing.append(cid)
-
-          print(len(missing))
-          PY
-          )
+          COUNT=$(node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR" | jq -r '.missing')
 
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
           echo "Missing/invalid IPFS history screenshots: $COUNT"
@@ -117,7 +78,9 @@ jobs:
             --package-lock=false \
             --no-audit \
             --no-fund \
-            playwright-core@latest
+            playwright@1.56.1 sharp@0.35.0
+
+          npx playwright install --with-deps chromium
 
       - name: Repair missing screenshots
         if: steps.missing.outputs.count != '0'
@@ -125,9 +88,7 @@ jobs:
           IPFS_GATEWAY_BASE: https://liudon.xyz/ipfs
           SCREENSHOT_WIDTH: "1440"
           SCREENSHOT_HEIGHT: "900"
-          SCREENSHOT_QUALITY: "72"
           SCREENSHOT_ATTEMPTS: "3"
-          SCREENSHOT_CAPTURE_VERSION: "6"
         run: |
           node .github/scripts/ipfs-history/capture-screenshots.mjs \
             "${{ steps.history.outputs.dir }}"
@@ -152,15 +113,17 @@ jobs:
           else
             # Save the repaired files outside Git. Before each push attempt,
             # rebuild the commit on top of the latest remote ipfs-history.
-            # If main CI already published the same CID at capture_version 6,
+            # If main CI already published the same CID at capture_version 7,
             # keep the remote copy instead of creating a binary merge conflict.
             PATCH_DIR="${RUNNER_TEMP}/ipfs-history-repair-patch"
             rm -rf "$PATCH_DIR"
             mkdir -p "$PATCH_DIR/screenshots/meta"
 
-            git -C "$HISTORY_DIR" diff --cached --name-only -z | while IFS= read -r -d '' file; do
-              mkdir -p "$PATCH_DIR/$(dirname "$file")"
+            git -C "$HISTORY_DIR" diff --cached --name-only -- screenshots/meta |
+            while IFS= read -r file; do
+              cid=$(basename "$file" .json)
               cp "$HISTORY_DIR/$file" "$PATCH_DIR/$file"
+              cp "$HISTORY_DIR/screenshots/$cid.webp" "$PATCH_DIR/screenshots/$cid.webp"
             done
 
             for attempt in {1..5}; do
@@ -180,20 +143,15 @@ jobs:
                 remote_meta="$HISTORY_DIR/screenshots/meta/$cid.json"
                 repaired_webp="$PATCH_DIR/screenshots/$cid.webp"
 
-                if [[ -f "$remote_meta" ]] && jq -e '.capture_version == 6' "$remote_meta" >/dev/null 2>&1; then
-                  echo "Remote already has capture v6 for $cid; keeping remote copy."
+                if node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR" "$cid"; then
+                  echo "Remote already has capture v7 for $cid; keeping remote copy."
                   continue
                 fi
 
                 mkdir -p "$HISTORY_DIR/screenshots/meta"
                 cp "$repaired_meta" "$remote_meta"
 
-                # Copy the WebP only when Git detected changed image bytes.
-                # If it is absent from PATCH_DIR, the newly captured WebP was
-                # byte-identical to the remote image and needs no replacement.
-                if [[ -f "$repaired_webp" ]]; then
-                  cp "$repaired_webp" "$HISTORY_DIR/screenshots/$cid.webp"
-                fi
+                cp "$repaired_webp" "$HISTORY_DIR/screenshots/$cid.webp"
               done
 
               git -C "$HISTORY_DIR" add screenshots
@@ -226,48 +184,15 @@ jobs:
           MISSING_BEFORE: ${{ steps.missing.outputs.count }}
         shell: bash
         run: |
-          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
-          import json
-          import os
-          from pathlib import Path
-
-          root = Path(os.environ["HISTORY_DIR"])
-          history_dir = root / "history"
-          screenshot_dir = root / "screenshots"
-
-          cids = set()
-          for path in history_dir.glob("*.jsonl"):
-              for line in path.read_text(encoding="utf-8").splitlines():
-                  if line.strip():
-                      entry = json.loads(line)
-                      if entry.get("cid"):
-                          cids.add(entry["cid"])
-
-          valid = 0
-          missing = 0
-          for cid in cids:
-              screenshot = screenshot_dir / f"{cid}.webp"
-              metadata = screenshot_dir / "meta" / f"{cid}.json"
-              is_valid = screenshot.exists() and screenshot.stat().st_size >= 10_000
-
-              if is_valid:
-                  try:
-                      meta = json.loads(metadata.read_text(encoding="utf-8"))
-                      is_valid = meta.get("capture_version") == 6
-                  except (FileNotFoundError, json.JSONDecodeError):
-                      is_valid = False
-
-              if is_valid:
-                  valid += 1
-              else:
-                  missing += 1
-
-          print("## IPFS history screenshot repair")
-          print()
-          print(f"- Missing/invalid before run: {os.environ.get('MISSING_BEFORE', 'unknown')}")
-          print(f"- Valid screenshots after run: {valid}")
-          print(f"- Still missing/invalid: {missing}")
-          PY
+          if [[ -d "$HISTORY_DIR/history" ]]; then
+            STATUS=$(node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR")
+            {
+              echo "## IPFS history screenshot repair"
+              echo "- Missing/invalid before run: $MISSING_BEFORE"
+              echo "- Valid screenshots: $(jq -r '.valid' <<< "$STATUS")"
+              echo "- Missing/invalid screenshots: $(jq -r '.missing' <<< "$STATUS")"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Cleanup history worktree
         if: always()

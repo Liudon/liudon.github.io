@@ -1,0 +1,84 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { spawnSync } from "node:child_process";
+import sharp from "sharp";
+import { hash, normalizeText, captureIsValid } from "./capture-data.mjs";
+
+async function fixture(t, texts, colors = []) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "visual-v7-"));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(root, "history"));
+  fs.mkdirSync(path.join(root, "screenshots/meta"), { recursive: true });
+  const entries = [];
+  for (const [i, text] of texts.entries()) {
+    const cid = `sample-${i}`;
+    const image = await sharp({ create: { width: 1440, height: 900, channels: 3,
+      background: colors[i] || "white" } }).webp({ lossless: true }).toBuffer();
+    fs.writeFileSync(path.join(root, "screenshots", `${cid}.webp`), image);
+    fs.writeFileSync(path.join(root, "screenshots/meta", `${cid}.json`), JSON.stringify({
+      capture_version: 7, javascript_enabled: true, light_verified: true, lossless: true,
+      visible_text: text, text_hash: hash(normalizeText(text)), image_hash: hash(image),
+      profile: { browser: "fixture" },
+    }));
+    entries.push({ cid, deployed_at: `2026-09-${String(i + 1).padStart(2, "0")}T00:00:00Z` });
+  }
+  fs.writeFileSync(path.join(root, "history/2026-09.jsonl"), entries.map(JSON.stringify).join("\n"));
+  return root;
+}
+function run(root) {
+  return spawnSync(process.execPath, [new URL("./generate-visual-index.mjs", import.meta.url).pathname, root], { encoding: "utf8" });
+}
+function index(root) { return JSON.parse(fs.readFileSync(path.join(root, "visual-index.json"))); }
+
+test("small numeric text change survives identical image; baseline is retained across merges", async t => {
+  const root = await fixture(t, ["57.1K", "57.1K", "58.2K", "58.2K"]);
+  const result = run(root); assert.equal(result.status, 0, result.stderr);
+  assert.equal(index(root).visual_count, 2);
+  assert.equal(index(root).frames[0].unchanged_deployments, 1);
+  const diffs = fs.readFileSync(path.join(root, "visual-diffs.jsonl"), "utf8").trim().split("\n").map(JSON.parse);
+  assert.equal(diffs[1].reason, "text_change");
+  assert.equal(diffs[1].baseline_cid, "sample-0");
+  assert.match(diffs[1].text_diff.after, /58.2K/);
+});
+test("whitespace differences merge", async t => {
+  const root = await fixture(t, ["hello  world", "hello\nworld"]);
+  assert.equal(run(root).status, 0);assert.equal(index(root).visual_count, 1);
+});
+test("same text with color change is retained", async t => {
+  const root = await fixture(t, ["same", "same"], ["white", "#dddddd"]);
+  assert.equal(run(root).status, 0);assert.equal(index(root).visual_count, 2);
+});
+test("old capture version is rejected without replacing existing index", async t => {
+  const root = await fixture(t, ["same"]);
+  const file = path.join(root, "screenshots/meta/sample-0.json");
+  const meta = JSON.parse(fs.readFileSync(file));meta.capture_version = 6;fs.writeFileSync(file, JSON.stringify(meta));
+  fs.writeFileSync(path.join(root, "visual-index.json"), "previous index");
+  assert.notEqual(run(root).status, 0);
+  assert.equal(fs.readFileSync(path.join(root, "visual-index.json"), "utf8"), "previous index");
+});
+test("missing/corrupt image is invalid even when metadata says v7", async t => {
+  const root = await fixture(t, ["same"]);
+  assert.equal(captureIsValid(root, "sample-0"), true);
+  fs.writeFileSync(path.join(root, "screenshots/sample-0.webp"), "broken");
+  assert.equal(captureIsValid(root, "sample-0"), false);
+  assert.notEqual(run(root).status, 0);
+});
+test("mixed browser profiles cannot be merged", async t => {
+  const root = await fixture(t, ["same", "same"]);
+  const file = path.join(root, "screenshots/meta/sample-1.json");
+  const meta = JSON.parse(fs.readFileSync(file));meta.profile.browser = "different";fs.writeFileSync(file, JSON.stringify(meta));
+  const result = run(root);assert.notEqual(result.status, 0);assert.match(result.stderr, /Incompatible capture profiles/);
+});
+test("sparse low-amplitude raster noise merges", async t => {
+  const root = await fixture(t, ["same", "same"]);
+  const image = await sharp({ create: { width: 1440, height: 900, channels: 3, background: "white" } })
+    .composite([{ input: await sharp({ create: { width: 10, height: 10, channels: 3, background: "#fefefe" } }).png().toBuffer(), left: 50, top: 50 }])
+    .webp({ lossless: true }).toBuffer();
+  fs.writeFileSync(path.join(root, "screenshots/sample-1.webp"), image);
+  const file = path.join(root, "screenshots/meta/sample-1.json");
+  const meta = JSON.parse(fs.readFileSync(file));meta.image_hash = hash(image);fs.writeFileSync(file, JSON.stringify(meta));
+  assert.equal(run(root).status, 0);assert.equal(index(root).visual_count, 1);
+});

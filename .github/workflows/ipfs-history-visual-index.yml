@@ -40,6 +40,9 @@ jobs:
             --no-fund \
             sharp@0.35.0
 
+      - name: Test visual index
+        run: node --test .github/scripts/ipfs-history/visual-index.test.mjs
+
       - name: Checkout IPFS history
         id: history
         shell: bash
@@ -76,13 +79,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          PATCH_DIR="${RUNNER_TEMP}/ipfs-history-visual-index"
-          rm -rf "$PATCH_DIR"
-          mkdir -p "$PATCH_DIR"
-
-          cp "$HISTORY_DIR/visual-index.json" "$PATCH_DIR/visual-index.json"
-          cp "$HISTORY_DIR/visual-diffs.jsonl" "$PATCH_DIR/visual-diffs.jsonl"
-
           git -C "$HISTORY_DIR" config user.name "github-actions[bot]"
           git -C "$HISTORY_DIR" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -92,8 +88,8 @@ jobs:
             git -C "$HISTORY_DIR" fetch origin ipfs-history
             git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
 
-            cp "$PATCH_DIR/visual-index.json" "$HISTORY_DIR/visual-index.json"
-            cp "$PATCH_DIR/visual-diffs.jsonl" "$HISTORY_DIR/visual-diffs.jsonl"
+            # Recompute from the exact history/images we are about to publish against.
+            node .github/scripts/ipfs-history/generate-visual-index.mjs "$HISTORY_DIR"
 
             git -C "$HISTORY_DIR" add visual-index.json visual-diffs.jsonl
 

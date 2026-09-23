@@ -40,7 +40,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -828,9 +828,7 @@ jobs:
           IPFS_GATEWAY_BASE: https://liudon.xyz/ipfs
           SCREENSHOT_WIDTH: "1440"
           SCREENSHOT_HEIGHT: "900"
-          SCREENSHOT_QUALITY: "72"
           SCREENSHOT_ATTEMPTS: "2"
-          SCREENSHOT_CAPTURE_VERSION: "6"
         shell: bash
         run: |
           set -euo pipefail
@@ -845,7 +843,9 @@ jobs:
             --package-lock=false \
             --no-audit \
             --no-fund \
-            playwright-core@latest
+            playwright@1.56.1 sharp@0.35.0
+
+          npx playwright install --with-deps chromium
 
           HISTORY_DIR=$(mktemp -d)
           SERVER_PID=""
@@ -902,8 +902,8 @@ jobs:
               git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
 
               REMOTE_META="$HISTORY_DIR/screenshots/meta/$CID.json"
-              if [[ -f "$REMOTE_META" ]] && jq -e '.capture_version == 6' "$REMOTE_META" >/dev/null 2>&1; then
-                echo "Remote already has capture v6 for CID: $CID"
+              if node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR" "$CID"; then
+                echo "Remote already has capture v7 for CID: $CID"
                 break
               fi
 
