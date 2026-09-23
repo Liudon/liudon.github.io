@@ -18,7 +18,7 @@
     "latest_cid": "bafybeid2qnn3ftha4rzjzhozgs5lywmfj44qj4ztjixuuv32eqfipmbpb4",
     "latest_deployed_at": "2026-09-23T06:22:24Z"
   },
-  "visual_count": 17,
+  "visual_count": 15,
   "frames": [
     {
       "cid": "Qmdiv1UNNYZprByDhLBzNQGVwRWMkjxRfjY1JyL5dAEZV2",
@@ -97,23 +97,7 @@
       "deployed_at": "2026-09-09T06:14:25.1193913Z",
       "source_commit": "dd29becbf1ed86ba972aa8a8b34c422d1fde8ed1",
       "screenshot": "screenshots/QmYHSNJDhtn3dyqmt5SRra8yWiiSdi82PBs5CuYJLHFsC6.webp",
-      "unchanged_deployments": 0,
-      "same_until": "2026-09-09T06:14:25.1193913Z"
-    },
-    {
-      "cid": "QmTvL4HCt2mqJ7pPrGT9YCpHAea8kzdEAqqgnpZzj2orui",
-      "deployed_at": "2026-09-09T06:28:17.1385043Z",
-      "source_commit": "54b9d13e4d07f0538e2f0f5ab27708e677c210db",
-      "screenshot": "screenshots/QmTvL4HCt2mqJ7pPrGT9YCpHAea8kzdEAqqgnpZzj2orui.webp",
-      "unchanged_deployments": 0,
-      "same_until": "2026-09-09T06:28:17.1385043Z"
-    },
-    {
-      "cid": "QmerCmTVDZvYrYkGgBqQLW78mKsMeK15UuoC2UHLKZXaaV",
-      "deployed_at": "2026-09-09T06:45:48.0233467Z",
-      "source_commit": "50ef1b467d5196e4cd185f34fb7b42371e163349",
-      "screenshot": "screenshots/QmerCmTVDZvYrYkGgBqQLW78mKsMeK15UuoC2UHLKZXaaV.webp",
-      "unchanged_deployments": 13,
+      "unchanged_deployments": 15,
       "same_until": "2026-09-21T06:51:17Z"
     },
     {
