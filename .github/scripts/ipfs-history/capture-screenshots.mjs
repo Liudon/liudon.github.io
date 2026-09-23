@@ -11,9 +11,12 @@ if (!historyRoot) {
 const historyDir = path.join(historyRoot, "history");
 const screenshotDir = path.join(historyRoot, "screenshots");
 const gatewayBase = process.env.IPFS_GATEWAY_BASE || "https://liudon.xyz/ipfs";
+const sourceUrl = process.env.SCREENSHOT_SOURCE_URL || "";
+const targetCid = process.env.CAPTURE_CID || "";
 const viewportWidth = Number(process.env.SCREENSHOT_WIDTH || 1440);
 const viewportHeight = Number(process.env.SCREENSHOT_HEIGHT || 900);
 const webpQuality = Number(process.env.SCREENSHOT_QUALITY || 72);
+const maxAttempts = Number(process.env.SCREENSHOT_ATTEMPTS || 3);
 
 function readSnapshots() {
   const byCid = new Map();
@@ -105,21 +108,42 @@ async function warmLazyContent(page) {
   });
 }
 
+function snapshotUrl(snapshot) {
+  if (sourceUrl) {
+    if (!targetCid) {
+      throw new Error("SCREENSHOT_SOURCE_URL requires CAPTURE_CID");
+    }
+    return sourceUrl;
+  }
+
+  return `${gatewayBase.replace(/\/$/, "")}/${snapshot.cid}/`;
+}
+
 async function captureOne(context, snapshot) {
   const target = path.join(screenshotDir, `${snapshot.cid}.webp`);
-  const url = `${gatewayBase.replace(/\/$/, "")}/${snapshot.cid}/`;
+  const url = snapshotUrl(snapshot);
 
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const page = await context.newPage();
 
     try {
-      console.log(`[${snapshot.deployed_at}] ${snapshot.cid} (attempt ${attempt}/3)`);
+      console.log(`[${snapshot.deployed_at}] ${snapshot.cid} (attempt ${attempt}/${maxAttempts})`);
       console.log(`  ${url}`);
 
-      await page.goto(url, {
+      const response = await page.goto(url, {
         waitUntil: "domcontentloaded",
         timeout: 60_000,
       });
+
+      if (!response) {
+        throw new Error("Navigation returned no HTTP response");
+      }
+
+      if (!response.ok()) {
+        throw new Error(
+          `HTTP ${response.status()} ${response.statusText()} while loading ${url}`,
+        );
+      }
 
       await page.waitForTimeout(1_000);
       await warmLazyContent(page);
@@ -138,13 +162,15 @@ async function captureOne(context, snapshot) {
         throw new Error(`Screenshot looks unexpectedly small: ${size} bytes`);
       }
 
-      console.log(`  saved ${path.relative(historyRoot, target)} (${Math.round(size / 1024)} KiB)`);
+      console.log(
+        `  saved ${path.relative(historyRoot, target)} (${Math.round(size / 1024)} KiB)`,
+      );
       return;
     } catch (error) {
       console.error(`  failed: ${error.stack || error.message}`);
       fs.rmSync(target, { force: true });
 
-      if (attempt === 3) {
+      if (attempt === maxAttempts) {
         throw error;
       }
 
@@ -158,12 +184,24 @@ async function captureOne(context, snapshot) {
 const snapshots = readSnapshots();
 fs.mkdirSync(screenshotDir, { recursive: true });
 
-const missing = snapshots.filter(
+let candidates = snapshots;
+
+if (targetCid) {
+  candidates = snapshots.filter((snapshot) => snapshot.cid === targetCid);
+  if (candidates.length !== 1) {
+    throw new Error(`CAPTURE_CID was not found in history: ${targetCid}`);
+  }
+}
+
+const missing = candidates.filter(
   (snapshot) => !fs.existsSync(path.join(screenshotDir, `${snapshot.cid}.webp`)),
 );
 
-console.log(`Snapshots: ${snapshots.length}`);
-console.log(`Missing screenshots: ${missing.length}`);
+console.log(`Snapshots in history: ${snapshots.length}`);
+if (targetCid) {
+  console.log(`Target CID: ${targetCid}`);
+}
+console.log(`Missing screenshots to capture: ${missing.length}`);
 
 if (missing.length === 0) {
   process.exit(0);
