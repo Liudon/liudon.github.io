@@ -10,6 +10,7 @@ if (!historyRoot) {
 
 const historyDir = path.join(historyRoot, "history");
 const screenshotDir = path.join(historyRoot, "screenshots");
+const metadataDir = path.join(screenshotDir, "meta");
 const gatewayBase = process.env.IPFS_GATEWAY_BASE || "https://liudon.xyz/ipfs";
 const sourceUrl = process.env.SCREENSHOT_SOURCE_URL || "";
 const targetCid = process.env.CAPTURE_CID || "";
@@ -17,6 +18,7 @@ const viewportWidth = Number(process.env.SCREENSHOT_WIDTH || 1440);
 const viewportHeight = Number(process.env.SCREENSHOT_HEIGHT || 900);
 const webpQuality = Number(process.env.SCREENSHOT_QUALITY || 72);
 const maxAttempts = Number(process.env.SCREENSHOT_ATTEMPTS || 3);
+const captureVersion = Number(process.env.SCREENSHOT_CAPTURE_VERSION || 2);
 
 function readSnapshots() {
   const byCid = new Map();
@@ -62,6 +64,53 @@ function findChrome() {
   ].filter(Boolean);
 
   return candidates.find((candidate) => fs.existsSync(candidate));
+}
+
+function screenshotPath(snapshot) {
+  return path.join(screenshotDir, `${snapshot.cid}.webp`);
+}
+
+function metadataPath(snapshot) {
+  return path.join(metadataDir, `${snapshot.cid}.json`);
+}
+
+function readCaptureMetadata(snapshot) {
+  const file = metadataPath(snapshot);
+  if (!fs.existsSync(file)) return null;
+
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function screenshotIsValid(snapshot) {
+  const target = screenshotPath(snapshot);
+  if (!fs.existsSync(target) || fs.statSync(target).size < 10_000) {
+    return false;
+  }
+
+  const metadata = readCaptureMetadata(snapshot);
+  return metadata?.capture_version === captureVersion;
+}
+
+function writeCaptureMetadata(snapshot) {
+  fs.mkdirSync(metadataDir, { recursive: true });
+  const file = metadataPath(snapshot);
+  const tmp = `${file}.tmp`;
+
+  const metadata = {
+    capture_version: captureVersion,
+    captured_at: new Date().toISOString(),
+    viewport_width: viewportWidth,
+    viewport_height: viewportHeight,
+    format: "webp",
+    quality: webpQuality,
+  };
+
+  fs.writeFileSync(tmp, JSON.stringify(metadata, null, 2) + "\n", "utf8");
+  fs.renameSync(tmp, file);
 }
 
 async function warmLazyContent(page) {
@@ -120,7 +169,7 @@ function snapshotUrl(snapshot) {
 }
 
 async function captureOne(context, snapshot) {
-  const target = path.join(screenshotDir, `${snapshot.cid}.webp`);
+  const target = screenshotPath(snapshot);
   const url = snapshotUrl(snapshot);
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -162,13 +211,16 @@ async function captureOne(context, snapshot) {
         throw new Error(`Screenshot looks unexpectedly small: ${size} bytes`);
       }
 
+      writeCaptureMetadata(snapshot);
+
       console.log(
-        `  saved ${path.relative(historyRoot, target)} (${Math.round(size / 1024)} KiB)`,
+        `  saved ${path.relative(historyRoot, target)} (${Math.round(size / 1024)} KiB), capture v${captureVersion}`,
       );
       return;
     } catch (error) {
       console.error(`  failed: ${error.stack || error.message}`);
       fs.rmSync(target, { force: true });
+      fs.rmSync(metadataPath(snapshot), { force: true });
 
       if (attempt === maxAttempts) {
         throw error;
@@ -183,6 +235,7 @@ async function captureOne(context, snapshot) {
 
 const snapshots = readSnapshots();
 fs.mkdirSync(screenshotDir, { recursive: true });
+fs.mkdirSync(metadataDir, { recursive: true });
 
 let candidates = snapshots;
 
@@ -193,30 +246,25 @@ if (targetCid) {
   }
 }
 
-function screenshotIsValid(snapshot) {
-  const target = path.join(screenshotDir, `${snapshot.cid}.webp`);
-  if (!fs.existsSync(target)) {
-    return false;
-  }
-
-  return fs.statSync(target).size >= 10_000;
-}
-
 const missing = candidates.filter((snapshot) => !screenshotIsValid(snapshot));
 
 for (const snapshot of missing) {
-  const target = path.join(screenshotDir, `${snapshot.cid}.webp`);
+  const target = screenshotPath(snapshot);
   if (fs.existsSync(target)) {
-    console.log(`Removing invalid existing screenshot: ${path.relative(historyRoot, target)}`);
+    console.log(
+      `Recapturing stale/invalid screenshot: ${path.relative(historyRoot, target)}`,
+    );
     fs.rmSync(target, { force: true });
   }
+  fs.rmSync(metadataPath(snapshot), { force: true });
 }
 
 console.log(`Snapshots in history: ${snapshots.length}`);
+console.log(`Capture version: ${captureVersion}`);
 if (targetCid) {
   console.log(`Target CID: ${targetCid}`);
 }
-console.log(`Missing screenshots to capture: ${missing.length}`);
+console.log(`Screenshots to capture: ${missing.length}`);
 
 if (missing.length === 0) {
   process.exit(0);
