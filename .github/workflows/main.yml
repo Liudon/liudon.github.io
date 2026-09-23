@@ -796,8 +796,24 @@ jobs:
             echo "IPFS deployment state is already up to date."
           else
             git -C "$HISTORY_DIR" commit -m "record normalized IPFS deployment history"
-            git -C "$HISTORY_DIR" push origin HEAD:ipfs-history
-            echo "Normalized IPFS deployment history recorded on ipfs-history."
+
+            for attempt in {1..5}; do
+              echo "History push attempt $attempt/5"
+              git -C "$HISTORY_DIR" fetch origin ipfs-history
+              git -C "$HISTORY_DIR" rebase origin/ipfs-history
+
+              if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
+                echo "Normalized IPFS deployment history recorded on ipfs-history."
+                break
+              fi
+
+              if [[ "$attempt" == "5" ]]; then
+                echo "ERROR: unable to push IPFS deployment history after 5 attempts"
+                exit 1
+              fi
+
+              sleep $((attempt * 2))
+            done
           fi
 
       # Capture the newly published snapshot directly from the local ./public
@@ -875,8 +891,24 @@ jobs:
             echo "Screenshot already exists for CID: $CID"
           else
             git -C "$HISTORY_DIR" commit -m "capture IPFS history screenshot"
-            git -C "$HISTORY_DIR" push origin HEAD:ipfs-history
-            echo "Captured screenshot for CID: $CID"
+
+            for attempt in {1..5}; do
+              echo "Screenshot push attempt $attempt/5"
+              git -C "$HISTORY_DIR" fetch origin ipfs-history
+              git -C "$HISTORY_DIR" rebase origin/ipfs-history
+
+              if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
+                echo "Captured screenshot for CID: $CID"
+                break
+              fi
+
+              if [[ "$attempt" == "5" ]]; then
+                echo "ERROR: unable to push IPFS screenshot after 5 attempts"
+                exit 1
+              fi
+
+              sleep $((attempt * 2))
+            done
           fi
 
       - name: IPFS deployment summary
