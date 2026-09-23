@@ -145,12 +145,43 @@ async function pageEvidence(page) {
     }
     const root = getComputedStyle(document.documentElement).backgroundColor;
     const body = getComputedStyle(document.body).backgroundColor;
-    const background = body === "rgba(0, 0, 0, 0)" ? root : body;
-    const rgb = background.match(/[\d.]+/g)?.map(Number) || [];
-    const light = rgb.length >= 3 && (rgb.length < 4 || rgb[3] === 1) &&
-      (rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722) >= 180;
-    return { visible_text: parts.join(" "), background, light_verified: light,
-      theme: document.documentElement.getAttribute("data-theme") };
+
+    const parseColor = (value) => {
+      const nums = value.match(/[\\d.]+/g)?.map(Number) || [];
+      if (nums.length < 3) return [0, 0, 0, 0];
+      return [nums[0], nums[1], nums[2], nums.length >= 4 ? nums[3] : 1];
+    };
+
+    const composite = (fg, bg) => {
+      const a = fg[3] + bg[3] * (1 - fg[3]);
+      if (a <= 0) return [0, 0, 0, 0];
+      return [
+        (fg[0] * fg[3] + bg[0] * bg[3] * (1 - fg[3])) / a,
+        (fg[1] * fg[3] + bg[1] * bg[3] * (1 - fg[3])) / a,
+        (fg[2] * fg[3] + bg[2] * bg[3] * (1 - fg[3])) / a,
+        a,
+      ];
+    };
+
+    // CSS backgrounds are layered body -> html -> browser canvas.
+    // Chromium's page canvas is white for the forced light color scheme.
+    const effective = composite(
+      parseColor(body),
+      composite(parseColor(root), [255, 255, 255, 1]),
+    );
+    const luminance =
+      effective[0] * 0.2126 + effective[1] * 0.7152 + effective[2] * 0.0722;
+    const light = luminance >= 180;
+    const background = body;
+
+    return {
+      visible_text: parts.join(" "),
+      background,
+      effective_background: `rgb(${Math.round(effective[0])}, ${Math.round(effective[1])}, ${Math.round(effective[2])})`,
+      background_luminance: Number(luminance.toFixed(2)),
+      light_verified: light,
+      theme: document.documentElement.getAttribute("data-theme"),
+    };
   });
 }
 
