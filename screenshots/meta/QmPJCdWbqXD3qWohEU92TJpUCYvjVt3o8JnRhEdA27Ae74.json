@@ -1,13 +1,33 @@
 {
-  "capture_version": 6,
-  "captured_at": "2026-09-23T08:36:34.862Z",
+  "capture_version": 7,
+  "captured_at": "2026-09-23T09:18:56.697Z",
   "viewport_width": 1440,
   "viewport_height": 900,
   "format": "webp",
-  "quality": 72,
-  "javascript_enabled": false,
+  "lossless": true,
+  "javascript_enabled": true,
   "service_workers": "block",
   "reduced_motion": "reduce",
   "color_scheme": "light",
-  "animations_disabled": true
+  "animations_disabled": true,
+  "visible_text": "流动 Posts Links liudon@localhost : ~/blog $  ls ██╗      ██╗ ██╗   ██╗ ██████╗   ██████╗  ███╗   ██╗ \n██║      ██║ ██║   ██║ ██╔══██╗ ██╔═══██╗ ████╗  ██║ \n██║      ██║ ██║   ██║ ██║  ██║ ██║   ██║ ██╔██╗ ██║ \n██║      ██║ ██║   ██║ ██║  ██║ ██║   ██║ ██║╚██╗██║ \n███████╗ ██║ ╚██████╔╝ ██████╔╝ ╚██████╔╝ ██║ ╚████║ \n╚══════╝ ╚═╝  ╚═════╝  ╚═════╝   ╚═════╝  ╚═╝  ╚═══╝  序 # 生活就是一个流动的过程. $  cat README.md 80后，已婚，育有一女。 不善言辞，偶在此记些文字。 自2011年起，断断续续，记录至今。 $  ls -la ./posts/ | head -10 total 96 -rw-r--r-- \n 4.2K \n Sep 07 2026 \n 山西之旅/ -rw-r--r-- \n 2.7K \n Sep 04 2026 \n 博客焕新，记录继续/ -rw-r--r-- \n 57.1K \n Sep 01 2026 \n 博客加速实践/ -rw-r--r-- \n 3.8K \n Aug 27 2026 \n 广府古城一日游/ -rw-r--r-- \n 4.0K \n Aug 10 2026 \n 我做了一个口播短视频二创工具：VideoRemaker/ -rw-r--r-- \n 2.2K \n Jul 30 2026 \n Windows 下 Codex Cli 更新报 Move-Item is denied 错误的解决/ -rw-r--r-- \n 11.5K \n Jul 30 2026 \n Caddy 转发 GOST 报 TLS internal error 问题的排查与解决/ -rw-r--r-- \n 9.4K \n Jun 17 2026 \n 2026年对口型视频合成方案对比：Wav2Lip、VideoReTalking、 MuseTalk 部署与实测/ -rw-r--r-- \n 37.8K \n May 18 2026 \n 2026年音色克隆方案对比：IndexTTS-2、CosyVoice、GPT-SoVITS、Fish Speech、VoxCPM 部署与实测/ -rw-r--r-- \n 12.4K \n Apr 14 2026 \n AI Agent折腾记（OpenClaw / Hermes Agent）/ $  echo \"Maintained by Liudon\" Maintained by  Liudon  | Last updated 2026-09-07 NORMAL _index.md words: 43 EOF © 2026 Liudon · Made with Hugo & Terminal · 京ICP备13029522号-2",
+  "background": "rgb(255, 255, 255)",
+  "effective_background": "rgb(255, 255, 255)",
+  "background_luminance": 255,
+  "light_verified": true,
+  "theme": "light",
+  "text_hash": "bdf8077381b8ccc608e11e5a39aefa1653b759f1c794af3aa003df9c0480a069",
+  "image_hash": "08c561e1004a9f50e304b943ac2698ec1a98f62f2053f31bb45c033597f26b81",
+  "profile": {
+    "browser": "153.0.8010.52",
+    "platform": "linux",
+    "viewport": [
+      1440,
+      900
+    ],
+    "device_scale_factor": 1,
+    "locale": "zh-CN",
+    "timezone": "UTC",
+    "capture_version": 7
+  }
 }
