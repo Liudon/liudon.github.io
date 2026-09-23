@@ -18,7 +18,7 @@ const viewportWidth = Number(process.env.SCREENSHOT_WIDTH || 1440);
 const viewportHeight = Number(process.env.SCREENSHOT_HEIGHT || 900);
 const webpQuality = Number(process.env.SCREENSHOT_QUALITY || 72);
 const maxAttempts = Number(process.env.SCREENSHOT_ATTEMPTS || 3);
-const captureVersion = Number(process.env.SCREENSHOT_CAPTURE_VERSION || 4);
+const captureVersion = Number(process.env.SCREENSHOT_CAPTURE_VERSION || 5);
 
 function readSnapshots() {
   const byCid = new Map();
@@ -187,10 +187,13 @@ async function captureOne(context, snapshot) {
       console.log(`  ${url}`);
 
       console.log("  navigating...");
-      const response = await withHeartbeat("still navigating", () =>
+      const response = await withHeartbeat("still waiting for main HTML response", () =>
         page.goto(url, {
-          waitUntil: "domcontentloaded",
-          timeout: 45_000,
+          // Do not wait for DOMContentLoaded here. Historical pages can contain
+          // slow third-party script tags. JavaScript is disabled, and the
+          // screenshot only needs the static HTML/CSS/image rendering.
+          waitUntil: "commit",
+          timeout: 30_000,
         }),
       );
 
@@ -198,13 +201,22 @@ async function captureOne(context, snapshot) {
         throw new Error("Navigation returned no HTTP response");
       }
 
-      console.log(`  loaded HTTP ${response.status()}`);
+      console.log(`  main HTML response: HTTP ${response.status()}`);
 
       if (!response.ok()) {
         throw new Error(
           `HTTP ${response.status()} ${response.statusText()} while loading ${url}`,
         );
       }
+
+      console.log("  waiting for <body>...");
+      await withHeartbeat("still waiting for <body>", () =>
+        page.waitForSelector("body", {
+          state: "attached",
+          timeout: 15_000,
+        }),
+      );
+      console.log("  <body> ready");
 
       console.log("  stabilizing page...");
       await page.waitForTimeout(500);
