@@ -55,7 +55,33 @@ jobs:
 
           echo "dir=$HISTORY_DIR" >> "$GITHUB_OUTPUT"
 
+      - name: Check screenshot readiness
+        id: readiness
+        env:
+          HISTORY_DIR: ${{ steps.history.outputs.dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          STATUS=$(node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR")
+          TOTAL=$(jq -r '.total' <<< "$STATUS")
+          VALID=$(jq -r '.valid' <<< "$STATUS")
+          MISSING=$(jq -r '.missing' <<< "$STATUS")
+
+          echo "total=$TOTAL" >> "$GITHUB_OUTPUT"
+          echo "valid=$VALID" >> "$GITHUB_OUTPUT"
+          echo "missing=$MISSING" >> "$GITHUB_OUTPUT"
+
+          if [[ "$MISSING" == "0" ]]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "All $TOTAL screenshots match the current capture profile."
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Visual index deferred: $MISSING/$TOTAL screenshots still need recapture."
+          fi
+
       - name: Build visual index
+        if: steps.readiness.outputs.ready == 'true'
         env:
           VISUAL_SAMPLE_WIDTH: "480"
           VISUAL_PIXEL_DELTA: "18"
@@ -73,6 +99,7 @@ jobs:
             "${{ steps.history.outputs.dir }}"
 
       - name: Commit visual index
+        if: steps.readiness.outputs.ready == 'true'
         env:
           HISTORY_DIR: ${{ steps.history.outputs.dir }}
         shell: bash
@@ -119,10 +146,19 @@ jobs:
           HISTORY_DIR: ${{ steps.history.outputs.dir }}
         shell: bash
         run: |
-          if [[ -f "$HISTORY_DIR/visual-index.json" ]]; then
+          {
+            echo "## IPFS visual history"
+            echo
+            echo "- Capture readiness: ${{ steps.readiness.outputs.valid || 'unknown' }}/${{ steps.readiness.outputs.total || 'unknown' }} valid"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [[ "${{ steps.readiness.outputs.ready }}" != "true" ]]; then
             {
-              echo "## IPFS visual history"
-              echo
+              echo "- Status: deferred until screenshot repair completes"
+              echo "- Missing/invalid screenshots: ${{ steps.readiness.outputs.missing || 'unknown' }}"
+            } >> "$GITHUB_STEP_SUMMARY"
+          elif [[ -f "$HISTORY_DIR/visual-index.json" ]]; then
+            {
               echo "- Deployments: $(jq -r '.source.snapshot_count' "$HISTORY_DIR/visual-index.json")"
               echo "- Visual frames: $(jq -r '.visual_count' "$HISTORY_DIR/visual-index.json")"
               echo "- Latest CID: $(jq -r '.source.latest_cid' "$HISTORY_DIR/visual-index.json")"
