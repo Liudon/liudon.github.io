@@ -1,0 +1,152 @@
+name: Build IPFS Visual Index
+
+on:
+  push:
+    branches: [code]
+    paths:
+      - ".github/scripts/ipfs-history/generate-visual-index.mjs"
+      - ".github/workflows/ipfs-history-visual-index.yml"
+  workflow_run:
+    workflows:
+      - CI
+      - Repair IPFS History Screenshots
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ipfs-history-visual-index
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: code
+          token: ${{ secrets.TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Install visual index dependency
+        run: |
+          npm install \
+            --no-save \
+            --package-lock=false \
+            --no-audit \
+            --no-fund \
+            sharp@0.35.0
+
+      - name: Checkout IPFS history
+        id: history
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          HISTORY_DIR="${RUNNER_TEMP}/ipfs-history"
+          git fetch origin ipfs-history
+          git worktree add --detach "$HISTORY_DIR" origin/ipfs-history
+
+          echo "dir=$HISTORY_DIR" >> "$GITHUB_OUTPUT"
+
+      - name: Build visual index
+        env:
+          VISUAL_SAMPLE_WIDTH: "480"
+          VISUAL_PIXEL_DELTA: "18"
+          VISUAL_OVERALL_CHANGED_MAX: "0.0015"
+          VISUAL_TILE_CHANGED_MAX: "0.025"
+          VISUAL_MEAN_DELTA_MAX: "1.2"
+          VISUAL_TILE_SIZE: "48"
+          VISUAL_HEIGHT_DELTA_MAX: "2"
+        run: |
+          set -euo pipefail
+
+          node .github/scripts/ipfs-history/generate-visual-index.mjs \
+            "${{ steps.history.outputs.dir }}"
+
+      - name: Commit visual index
+        env:
+          HISTORY_DIR: ${{ steps.history.outputs.dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          PATCH_DIR="${RUNNER_TEMP}/ipfs-history-visual-index"
+          rm -rf "$PATCH_DIR"
+          mkdir -p "$PATCH_DIR"
+
+          cp "$HISTORY_DIR/visual-index.json" "$PATCH_DIR/visual-index.json"
+          cp "$HISTORY_DIR/visual-diffs.jsonl" "$PATCH_DIR/visual-diffs.jsonl"
+
+          git -C "$HISTORY_DIR" config user.name "github-actions[bot]"
+          git -C "$HISTORY_DIR" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          for attempt in {1..5}; do
+            echo "Visual index push attempt $attempt/5"
+
+            git -C "$HISTORY_DIR" fetch origin ipfs-history
+            git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
+
+            cp "$PATCH_DIR/visual-index.json" "$HISTORY_DIR/visual-index.json"
+            cp "$PATCH_DIR/visual-diffs.jsonl" "$HISTORY_DIR/visual-diffs.jsonl"
+
+            git -C "$HISTORY_DIR" add visual-index.json visual-diffs.jsonl
+
+            if git -C "$HISTORY_DIR" diff --cached --quiet; then
+              echo "Visual index is already up to date."
+              break
+            fi
+
+            git -C "$HISTORY_DIR" commit -m "update IPFS visual history index"
+
+            if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
+              echo "Visual index pushed."
+              break
+            fi
+
+            if [[ "$attempt" == "5" ]]; then
+              echo "ERROR: unable to push visual index after 5 attempts"
+              exit 1
+            fi
+
+            sleep $((attempt * 2))
+          done
+
+      - name: Visual index summary
+        if: always()
+        env:
+          HISTORY_DIR: ${{ steps.history.outputs.dir }}
+        shell: bash
+        run: |
+          if [[ -f "$HISTORY_DIR/visual-index.json" ]]; then
+            {
+              echo "## IPFS visual history"
+              echo
+              echo "- Deployments: $(jq -r '.source.snapshot_count' "$HISTORY_DIR/visual-index.json")"
+              echo "- Visual frames: $(jq -r '.visual_count' "$HISTORY_DIR/visual-index.json")"
+              echo "- Latest CID: $(jq -r '.source.latest_cid' "$HISTORY_DIR/visual-index.json")"
+              echo "- Algorithm: $(jq -r '.algorithm.strategy + " v" + (.algorithm.version|tostring)' "$HISTORY_DIR/visual-index.json")"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Cleanup history worktree
+        if: always()
+        env:
+          HISTORY_DIR: ${{ steps.history.outputs.dir }}
+        shell: bash
+        run: |
+          if [[ -n "${HISTORY_DIR:-}" ]]; then
+            git worktree remove --force "$HISTORY_DIR" >/dev/null 2>&1 || true
+          fi
