@@ -18,7 +18,7 @@ const viewportWidth = Number(process.env.SCREENSHOT_WIDTH || 1440);
 const viewportHeight = Number(process.env.SCREENSHOT_HEIGHT || 900);
 const webpQuality = Number(process.env.SCREENSHOT_QUALITY || 72);
 const maxAttempts = Number(process.env.SCREENSHOT_ATTEMPTS || 3);
-const captureVersion = Number(process.env.SCREENSHOT_CAPTURE_VERSION || 3);
+const captureVersion = Number(process.env.SCREENSHOT_CAPTURE_VERSION || 4);
 
 function readSnapshots() {
   const byCid = new Map();
@@ -159,6 +159,20 @@ function snapshotUrl(snapshot) {
   return `${gatewayBase.replace(/\/$/, "")}/${snapshot.cid}/`;
 }
 
+async function withHeartbeat(label, task) {
+  const startedAt = Date.now();
+  const timer = setInterval(() => {
+    const seconds = Math.round((Date.now() - startedAt) / 1000);
+    console.log(`  ... ${label} (${seconds}s)`);
+  }, 10_000);
+
+  try {
+    return await task();
+  } finally {
+    clearInterval(timer);
+  }
+}
+
 async function captureOne(context, snapshot) {
   const target = screenshotPath(snapshot);
   const tempTarget = `${target}.tmp.webp`;
@@ -172,14 +186,19 @@ async function captureOne(context, snapshot) {
       console.log(`[${snapshot.deployed_at}] ${snapshot.cid} (attempt ${attempt}/${maxAttempts})`);
       console.log(`  ${url}`);
 
-      const response = await page.goto(url, {
-        waitUntil: "domcontentloaded",
-        timeout: 60_000,
-      });
+      console.log("  navigating...");
+      const response = await withHeartbeat("still navigating", () =>
+        page.goto(url, {
+          waitUntil: "domcontentloaded",
+          timeout: 45_000,
+        }),
+      );
 
       if (!response) {
         throw new Error("Navigation returned no HTTP response");
       }
+
+      console.log(`  loaded HTTP ${response.status()}`);
 
       if (!response.ok()) {
         throw new Error(
@@ -187,17 +206,24 @@ async function captureOne(context, snapshot) {
         );
       }
 
-      await page.waitForTimeout(700);
-      await stabilizePage(page);
+      console.log("  stabilizing page...");
+      await page.waitForTimeout(500);
+      await withHeartbeat("still stabilizing", () => stabilizePage(page));
+      console.log("  page stabilized");
 
-      await page.screenshot({
-        path: tempTarget,
-        type: "webp",
-        quality: webpQuality,
-        fullPage: true,
-        animations: "disabled",
-        caret: "hide",
-      });
+      console.log("  capturing full-page screenshot...");
+      await withHeartbeat("still capturing screenshot", () =>
+        page.screenshot({
+          path: tempTarget,
+          type: "webp",
+          quality: webpQuality,
+          fullPage: true,
+          animations: "disabled",
+          caret: "hide",
+          timeout: 45_000,
+        }),
+      );
+      console.log("  screenshot captured");
 
       const size = fs.statSync(tempTarget).size;
       if (size < 10_000) {
@@ -290,16 +316,6 @@ const context = await browser.newContext({
   reducedMotion: "reduce",
 });
 
-// Do not even download script resources. This removes third-party ads,
-// analytics and other script-driven noise from historical screenshots.
-await context.route("**/*", async (route) => {
-  if (route.request().resourceType() === "script") {
-    await route.abort();
-    return;
-  }
-
-  await route.continue();
-});
 
 const failures = [];
 
