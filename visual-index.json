@@ -1,0 +1,270 @@
+{
+  "version": 1,
+  "algorithm": {
+    "version": 1,
+    "strategy": "baseline-pixel-tiles",
+    "sample_width": 480,
+    "pixel_delta": 18,
+    "overall_changed_max": 0.0015,
+    "tile_changed_max": 0.025,
+    "mean_delta_max": 1.2,
+    "tile_size": 48,
+    "height_delta_max": 2
+  },
+  "source": {
+    "snapshot_count": 63,
+    "latest_cid": "bafybeid2qnn3ftha4rzjzhozgs5lywmfj44qj4ztjixuuv32eqfipmbpb4",
+    "latest_deployed_at": "2026-09-23T06:22:24Z"
+  },
+  "visual_count": 31,
+  "frames": [
+    {
+      "cid": "Qmdiv1UNNYZprByDhLBzNQGVwRWMkjxRfjY1JyL5dAEZV2",
+      "deployed_at": "2026-07-30T03:10:31.4395175Z",
+      "source_commit": "ebe3d82b991836eb220a80dcf9fc74734ac71e0b",
+      "screenshot": "screenshots/Qmdiv1UNNYZprByDhLBzNQGVwRWMkjxRfjY1JyL5dAEZV2.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-07-30T03:10:31.4395175Z"
+    },
+    {
+      "cid": "QmQ3DNntsuBioWcvkSmFDsZiVuz1BipZALAV5q2KyHV4Q7",
+      "deployed_at": "2026-08-10T04:24:08.7095484Z",
+      "source_commit": "92bf061f49f3f12861e33dcc299e3639207ce92b",
+      "screenshot": "screenshots/QmQ3DNntsuBioWcvkSmFDsZiVuz1BipZALAV5q2KyHV4Q7.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-08-10T04:24:08.7095484Z"
+    },
+    {
+      "cid": "QmVb6UDkUNMPkKaXN9S8GqyvfbLFPFKNNeZpr6cQKj9FRp",
+      "deployed_at": "2026-08-10T04:30:52.7536982Z",
+      "source_commit": "77888799e3adae06b63d10eadeadb45d383a3612",
+      "screenshot": "screenshots/QmVb6UDkUNMPkKaXN9S8GqyvfbLFPFKNNeZpr6cQKj9FRp.webp",
+      "unchanged_deployments": 1,
+      "same_until": "2026-08-10T04:58:05.2464539Z"
+    },
+    {
+      "cid": "QmYwqdWwGoRxMKaegaPTc5sWXe7Vx4trrtMDSf42jmWvpS",
+      "deployed_at": "2026-08-11T04:42:02.2686675Z",
+      "source_commit": "3c1ea125557d4eca1edf68067a3dfba9c460d05e",
+      "screenshot": "screenshots/QmYwqdWwGoRxMKaegaPTc5sWXe7Vx4trrtMDSf42jmWvpS.webp",
+      "unchanged_deployments": 4,
+      "same_until": "2026-08-14T04:45:37.0289135Z"
+    },
+    {
+      "cid": "QmWhv7jvE9xj87ev2jf4obpzVZDTsmZzbRkNqbSqwD9a99",
+      "deployed_at": "2026-08-27T07:29:31.8926069Z",
+      "source_commit": "0eb6659a5bba7c05303baafb22aec0792d146ff7",
+      "screenshot": "screenshots/QmWhv7jvE9xj87ev2jf4obpzVZDTsmZzbRkNqbSqwD9a99.webp",
+      "unchanged_deployments": 4,
+      "same_until": "2026-08-31T03:57:05.0168883Z"
+    },
+    {
+      "cid": "QmdPAQCfDA2fwTTmv1bU2eu7Mu1QMv33ByctVJdhuwiqon",
+      "deployed_at": "2026-08-31T04:21:03.5355931Z",
+      "source_commit": "2d4ec2c4b1f3dd753d59e09a4a45053bcc4b6ff9",
+      "screenshot": "screenshots/QmdPAQCfDA2fwTTmv1bU2eu7Mu1QMv33ByctVJdhuwiqon.webp",
+      "unchanged_deployments": 2,
+      "same_until": "2026-09-01T03:20:32.2255676Z"
+    },
+    {
+      "cid": "QmVq2DacY1SkTNEobNo3hreBcjZQ4WVMg1sskgBTMEtVD7",
+      "deployed_at": "2026-09-01T03:51:26.3870642Z",
+      "source_commit": "75923956b0c1d2b93cbfa5775dd9878668a1de9c",
+      "screenshot": "screenshots/QmVq2DacY1SkTNEobNo3hreBcjZQ4WVMg1sskgBTMEtVD7.webp",
+      "unchanged_deployments": 5,
+      "same_until": "2026-09-01T06:51:55.1537275Z"
+    },
+    {
+      "cid": "QmUcnerwfYP3vW3mg8mjEx7uDDRqrwBHTcu7X25qyFWo2y",
+      "deployed_at": "2026-09-01T10:48:04.6197269Z",
+      "source_commit": "c0cbde0d1c22f4240224e7bbc50c4984bb093c97",
+      "screenshot": "screenshots/QmUcnerwfYP3vW3mg8mjEx7uDDRqrwBHTcu7X25qyFWo2y.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-01T10:48:04.6197269Z"
+    },
+    {
+      "cid": "QmRv1BhgVdbDRtpdM9B2NnznJaqiPKuxEey4WncQxko8QS",
+      "deployed_at": "2026-09-06T14:38:08.2917015Z",
+      "source_commit": "2358d8a51d4cb91020bd2a1cb16a5753837e88e6",
+      "screenshot": "screenshots/QmRv1BhgVdbDRtpdM9B2NnznJaqiPKuxEey4WncQxko8QS.webp",
+      "unchanged_deployments": 1,
+      "same_until": "2026-09-07T00:35:31.9428173Z"
+    },
+    {
+      "cid": "QmT9UmVwywgPoZq42WGSLCgb8n1sQac4vhAFeqWGoKoL9G",
+      "deployed_at": "2026-09-07T08:16:28.9660169Z",
+      "source_commit": "b538afb8b4126ab239ad7bdabf18b3e32e529100",
+      "screenshot": "screenshots/QmT9UmVwywgPoZq42WGSLCgb8n1sQac4vhAFeqWGoKoL9G.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-07T08:16:28.9660169Z"
+    },
+    {
+      "cid": "QmSYNsRKoVrYcWXkRkc6pHSqXTcNkgxBpx68WVnhuvKWjR",
+      "deployed_at": "2026-09-07T11:38:38.0083670Z",
+      "source_commit": "664383c44167e0f6609e12d21f089ba8d2ffde7e",
+      "screenshot": "screenshots/QmSYNsRKoVrYcWXkRkc6pHSqXTcNkgxBpx68WVnhuvKWjR.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-07T11:38:38.0083670Z"
+    },
+    {
+      "cid": "QmSCTxnjVFAj8MLop6GtoxPxT89BjBgMSEpJ8ieWUp8ZUr",
+      "deployed_at": "2026-09-07T11:44:11.7482530Z",
+      "source_commit": "66dbb4e75d7a1ff0c6d3c5817b427c4b361ce205",
+      "screenshot": "screenshots/QmSCTxnjVFAj8MLop6GtoxPxT89BjBgMSEpJ8ieWUp8ZUr.webp",
+      "unchanged_deployments": 4,
+      "same_until": "2026-09-08T12:01:21.9999486Z"
+    },
+    {
+      "cid": "QmYHSNJDhtn3dyqmt5SRra8yWiiSdi82PBs5CuYJLHFsC6",
+      "deployed_at": "2026-09-09T06:14:25.1193913Z",
+      "source_commit": "dd29becbf1ed86ba972aa8a8b34c422d1fde8ed1",
+      "screenshot": "screenshots/QmYHSNJDhtn3dyqmt5SRra8yWiiSdi82PBs5CuYJLHFsC6.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-09T06:14:25.1193913Z"
+    },
+    {
+      "cid": "QmTvL4HCt2mqJ7pPrGT9YCpHAea8kzdEAqqgnpZzj2orui",
+      "deployed_at": "2026-09-09T06:28:17.1385043Z",
+      "source_commit": "54b9d13e4d07f0538e2f0f5ab27708e677c210db",
+      "screenshot": "screenshots/QmTvL4HCt2mqJ7pPrGT9YCpHAea8kzdEAqqgnpZzj2orui.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-09T06:28:17.1385043Z"
+    },
+    {
+      "cid": "QmerCmTVDZvYrYkGgBqQLW78mKsMeK15UuoC2UHLKZXaaV",
+      "deployed_at": "2026-09-09T06:45:48.0233467Z",
+      "source_commit": "50ef1b467d5196e4cd185f34fb7b42371e163349",
+      "screenshot": "screenshots/QmerCmTVDZvYrYkGgBqQLW78mKsMeK15UuoC2UHLKZXaaV.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-09T06:45:48.0233467Z"
+    },
+    {
+      "cid": "QmeBKn7mfsUifYgQHtKLk4PjmXesSHYDqbHLrH5a8MG8FU",
+      "deployed_at": "2026-09-09T06:59:16.4656690Z",
+      "source_commit": "161b5f741c8a27229fb84948e0d25bcb8d17f09d",
+      "screenshot": "screenshots/QmeBKn7mfsUifYgQHtKLk4PjmXesSHYDqbHLrH5a8MG8FU.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-09T06:59:16.4656690Z"
+    },
+    {
+      "cid": "QmUYgSY9Safv5gTT9i2nwWLT9q5tvXzxuRBdXpv3TGAMrU",
+      "deployed_at": "2026-09-20T05:59:41.9880909Z",
+      "source_commit": "3c9130e0d6d11a78858cb2463c9ea37e03fb1db8",
+      "screenshot": "screenshots/QmUYgSY9Safv5gTT9i2nwWLT9q5tvXzxuRBdXpv3TGAMrU.webp",
+      "unchanged_deployments": 1,
+      "same_until": "2026-09-20T06:12:46Z"
+    },
+    {
+      "cid": "bafybeicuhtb5qfld5rluitn3s34jofeqh3ksvk7yh2yx4mrl526u6frzsa",
+      "deployed_at": "2026-09-21T04:13:45Z",
+      "source_commit": "4e1d192354811c126eb8e1596557acdc64cfa34f",
+      "screenshot": "screenshots/bafybeicuhtb5qfld5rluitn3s34jofeqh3ksvk7yh2yx4mrl526u6frzsa.webp",
+      "unchanged_deployments": 3,
+      "same_until": "2026-09-21T05:51:05Z"
+    },
+    {
+      "cid": "bafybeihxtkei243nn3yzqtsb2agk6he7ep67w5brj2c7f277echkjjejem",
+      "deployed_at": "2026-09-21T06:04:14Z",
+      "source_commit": "e9d9c63cbdb4b63a1c330fab9d4f8d4bc161a024",
+      "screenshot": "screenshots/bafybeihxtkei243nn3yzqtsb2agk6he7ep67w5brj2c7f277echkjjejem.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-21T06:04:14Z"
+    },
+    {
+      "cid": "bafybeihmknsbw65dqwqfbym5sofgfk3yp2hldbydnvdfpayrmrnx7zd2ti",
+      "deployed_at": "2026-09-21T06:11:42Z",
+      "source_commit": "2c70b04d5492989629bcc440502ef56c47986714",
+      "screenshot": "screenshots/bafybeihmknsbw65dqwqfbym5sofgfk3yp2hldbydnvdfpayrmrnx7zd2ti.webp",
+      "unchanged_deployments": 1,
+      "same_until": "2026-09-21T06:32:04Z"
+    },
+    {
+      "cid": "bafybeigqap6g7kntsmuatluuc2nyuw3phhuqlxhuehho5zqk7purwgbbyq",
+      "deployed_at": "2026-09-21T06:38:10Z",
+      "source_commit": "5b04d3256637188b7a47f0c89a02d6d150bd5c57",
+      "screenshot": "screenshots/bafybeigqap6g7kntsmuatluuc2nyuw3phhuqlxhuehho5zqk7purwgbbyq.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-21T06:38:10Z"
+    },
+    {
+      "cid": "bafybeiawe6334roln536mbkfdmckq2cdx4vyerxch3dy34g7bkwfjvgfue",
+      "deployed_at": "2026-09-21T06:45:54Z",
+      "source_commit": "1bf3488b0fe0faa7941bf4b8275b25dc92dea4a5",
+      "screenshot": "screenshots/bafybeiawe6334roln536mbkfdmckq2cdx4vyerxch3dy34g7bkwfjvgfue.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-21T06:45:54Z"
+    },
+    {
+      "cid": "bafybeifuaygnopldbd7ng277hsfizrcz6hgwlvxy4miixiucss2zeehlju",
+      "deployed_at": "2026-09-21T06:51:17Z",
+      "source_commit": "887f0f5e104686f91ffbac5bffd6c0f86c6fe4cc",
+      "screenshot": "screenshots/bafybeifuaygnopldbd7ng277hsfizrcz6hgwlvxy4miixiucss2zeehlju.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-21T06:51:17Z"
+    },
+    {
+      "cid": "bafybeigzdwj7okrjdjuhyh4lg2flzxapfdebi3tpv3lwe3uugeh3l32vq4",
+      "deployed_at": "2026-09-21T06:58:11Z",
+      "source_commit": "10c24bad0c3c1175cc18acf1c98b83808d477fea",
+      "screenshot": "screenshots/bafybeigzdwj7okrjdjuhyh4lg2flzxapfdebi3tpv3lwe3uugeh3l32vq4.webp",
+      "unchanged_deployments": 1,
+      "same_until": "2026-09-21T07:11:25Z"
+    },
+    {
+      "cid": "bafybeifshr7rxvgsgvmhusyvcymhf2bputkxhzwo5emv653bcc2mgunpja",
+      "deployed_at": "2026-09-21T15:33:57Z",
+      "source_commit": "66c958320be591ab5fa09cee39c99565eb9a4f62",
+      "screenshot": "screenshots/bafybeifshr7rxvgsgvmhusyvcymhf2bputkxhzwo5emv653bcc2mgunpja.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-21T15:33:57Z"
+    },
+    {
+      "cid": "bafybeicukzgncpwuaygpi5kbjfedkwl5nvf26y7qgo4r3tthj4tcfjouh4",
+      "deployed_at": "2026-09-21T15:54:22Z",
+      "source_commit": "5d01d22184e0454db7bb29c7693a61bad9215bd5",
+      "screenshot": "screenshots/bafybeicukzgncpwuaygpi5kbjfedkwl5nvf26y7qgo4r3tthj4tcfjouh4.webp",
+      "unchanged_deployments": 2,
+      "same_until": "2026-09-21T16:35:51Z"
+    },
+    {
+      "cid": "bafybeihopfc2xh7qjmmxpf7dhpwabrtfegkx4bphmu4mmvc3hyataedipa",
+      "deployed_at": "2026-09-21T17:06:02Z",
+      "source_commit": "f88fd6715e0955909f0ab78585cbb26289a2f13d",
+      "screenshot": "screenshots/bafybeihopfc2xh7qjmmxpf7dhpwabrtfegkx4bphmu4mmvc3hyataedipa.webp",
+      "unchanged_deployments": 1,
+      "same_until": "2026-09-22T00:31:45Z"
+    },
+    {
+      "cid": "bafybeihouimdhfgoqt43kcwbcagd4p27aevsu7mhirfr7zpfuzrp45g7xy",
+      "deployed_at": "2026-09-22T04:00:39Z",
+      "source_commit": "4fa57f04048edebe175c714d0851458410b494a2",
+      "screenshot": "screenshots/bafybeihouimdhfgoqt43kcwbcagd4p27aevsu7mhirfr7zpfuzrp45g7xy.webp",
+      "unchanged_deployments": 1,
+      "same_until": "2026-09-22T04:11:02Z"
+    },
+    {
+      "cid": "bafybeiggtsc3we2zwtk3fcdv3qritvh7xn6tgkdb6fqdcinls6n6bajqau",
+      "deployed_at": "2026-09-23T03:04:08Z",
+      "source_commit": "60bee98aca1ef4096737e89a845c62a73890f5ca",
+      "screenshot": "screenshots/bafybeiggtsc3we2zwtk3fcdv3qritvh7xn6tgkdb6fqdcinls6n6bajqau.webp",
+      "unchanged_deployments": 1,
+      "same_until": "2026-09-23T04:47:20Z"
+    },
+    {
+      "cid": "bafybeide5yki2vircd6timytj7wc7tso4323z722fzeuzweb5angespsb4",
+      "deployed_at": "2026-09-23T04:53:32Z",
+      "source_commit": "6701a47191191afb6b5856841bc0564b2a78060c",
+      "screenshot": "screenshots/bafybeide5yki2vircd6timytj7wc7tso4323z722fzeuzweb5angespsb4.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-23T04:53:32Z"
+    },
+    {
+      "cid": "bafybeid2qnn3ftha4rzjzhozgs5lywmfj44qj4ztjixuuv32eqfipmbpb4",
+      "deployed_at": "2026-09-23T06:22:24Z",
+      "source_commit": "bf160e4791bd2b6d8914e7a4556549d8b2f8679e",
+      "screenshot": "screenshots/bafybeid2qnn3ftha4rzjzhozgs5lywmfj44qj4ztjixuuv32eqfipmbpb4.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-23T06:22:24Z"
+    }
+  ]
+}
