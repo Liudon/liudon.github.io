@@ -16,7 +16,7 @@ permissions:
 
 concurrency:
   group: ipfs-history-screenshot-repair
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   repair:
