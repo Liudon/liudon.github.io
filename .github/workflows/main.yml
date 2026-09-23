@@ -814,9 +814,15 @@ jobs:
           SCREENSHOT_HEIGHT: "900"
           SCREENSHOT_QUALITY: "72"
           SCREENSHOT_ATTEMPTS: "2"
+          SCREENSHOT_CAPTURE_VERSION: "2"
         shell: bash
         run: |
           set -euo pipefail
+
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          fc-cache -f
+          fc-match "Noto Sans CJK SC"
 
           npm install \
             --no-save \
@@ -863,7 +869,7 @@ jobs:
 
           git -C "$HISTORY_DIR" config user.name "github-actions[bot]"
           git -C "$HISTORY_DIR" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C "$HISTORY_DIR" add "screenshots/$CID.webp"
+          git -C "$HISTORY_DIR" add "screenshots/$CID.webp" "screenshots/meta/$CID.json"
 
           if git -C "$HISTORY_DIR" diff --cached --quiet; then
             echo "Screenshot already exists for CID: $CID"
