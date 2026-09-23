@@ -87,7 +87,7 @@ jobs:
               if valid:
                   try:
                       meta = json.loads(metadata.read_text(encoding="utf-8"))
-                      valid = meta.get("capture_version") == 2
+                      valid = meta.get("capture_version") == 3
                   except (FileNotFoundError, json.JSONDecodeError):
                       valid = False
 
@@ -127,7 +127,7 @@ jobs:
           SCREENSHOT_HEIGHT: "900"
           SCREENSHOT_QUALITY: "72"
           SCREENSHOT_ATTEMPTS: "3"
-          SCREENSHOT_CAPTURE_VERSION: "2"
+          SCREENSHOT_CAPTURE_VERSION: "3"
         run: |
           node .github/scripts/ipfs-history/capture-screenshots.mjs \
             "${{ steps.history.outputs.dir }}"
@@ -152,7 +152,7 @@ jobs:
           else
             # Save the repaired files outside Git. Before each push attempt,
             # rebuild the commit on top of the latest remote ipfs-history.
-            # If main CI already published the same CID at capture_version 2,
+            # If main CI already published the same CID at capture_version 3,
             # keep the remote copy instead of creating a binary merge conflict.
             PATCH_DIR="${RUNNER_TEMP}/ipfs-history-repair-patch"
             rm -rf "$PATCH_DIR"
@@ -175,12 +175,12 @@ jobs:
                 remote_meta="$HISTORY_DIR/screenshots/meta/$cid.json"
 
                 remote_is_current=false
-                if [[ -f "$remote_meta" ]] && jq -e '.capture_version == 2' "$remote_meta" >/dev/null 2>&1; then
+                if [[ -f "$remote_meta" ]] && jq -e '.capture_version == 3' "$remote_meta" >/dev/null 2>&1; then
                   remote_is_current=true
                 fi
 
                 if [[ "$remote_is_current" == "true" ]]; then
-                  echo "Remote already has capture v2 for $cid; keeping remote copy."
+                  echo "Remote already has capture v3 for $cid; keeping remote copy."
                   continue
                 fi
 
@@ -248,7 +248,7 @@ jobs:
               if is_valid:
                   try:
                       meta = json.loads(metadata.read_text(encoding="utf-8"))
-                      is_valid = meta.get("capture_version") == 2
+                      is_valid = meta.get("capture_version") == 3
                   except (FileNotFoundError, json.JSONDecodeError):
                       is_valid = False
 
