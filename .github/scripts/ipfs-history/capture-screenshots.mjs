@@ -170,12 +170,14 @@ function snapshotUrl(snapshot) {
 
 async function captureOne(context, snapshot) {
   const target = screenshotPath(snapshot);
+  const tempTarget = `${target}.tmp.webp`;
   const url = snapshotUrl(snapshot);
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const page = await context.newPage();
 
     try {
+      fs.rmSync(tempTarget, { force: true });
       console.log(`[${snapshot.deployed_at}] ${snapshot.cid} (attempt ${attempt}/${maxAttempts})`);
       console.log(`  ${url}`);
 
@@ -198,7 +200,7 @@ async function captureOne(context, snapshot) {
       await warmLazyContent(page);
 
       await page.screenshot({
-        path: target,
+        path: tempTarget,
         type: "webp",
         quality: webpQuality,
         fullPage: true,
@@ -206,11 +208,14 @@ async function captureOne(context, snapshot) {
         caret: "hide",
       });
 
-      const size = fs.statSync(target).size;
+      const size = fs.statSync(tempTarget).size;
       if (size < 10_000) {
         throw new Error(`Screenshot looks unexpectedly small: ${size} bytes`);
       }
 
+      // Only replace the old screenshot after a complete successful capture.
+      // This keeps the previous usable image if a recapture attempt fails.
+      fs.renameSync(tempTarget, target);
       writeCaptureMetadata(snapshot);
 
       console.log(
@@ -219,8 +224,7 @@ async function captureOne(context, snapshot) {
       return;
     } catch (error) {
       console.error(`  failed: ${error.stack || error.message}`);
-      fs.rmSync(target, { force: true });
-      fs.rmSync(metadataPath(snapshot), { force: true });
+      fs.rmSync(tempTarget, { force: true });
 
       if (attempt === maxAttempts) {
         throw error;
@@ -252,11 +256,9 @@ for (const snapshot of missing) {
   const target = screenshotPath(snapshot);
   if (fs.existsSync(target)) {
     console.log(
-      `Recapturing stale/invalid screenshot: ${path.relative(historyRoot, target)}`,
+      `Recapturing stale/invalid screenshot in place: ${path.relative(historyRoot, target)}`,
     );
-    fs.rmSync(target, { force: true });
   }
-  fs.rmSync(metadataPath(snapshot), { force: true });
 }
 
 console.log(`Snapshots in history: ${snapshots.length}`);
