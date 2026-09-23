@@ -1,3 +1,4 @@
+---
 title: "Muse AI 注册教程：借助 Google Gemini Spark 完成注册"
 date: 2026-09-23T12:30:00+08:00
 draft: false
@@ -13,7 +14,7 @@ keywords:
   - Google Gemini Spark
   - Muse AI
 description: "借助 Google Gemini Spark 完成 Muse AI 注册。"
-
+---
 
 Muse 是 Meta 于 2026 年 9 月 8 日推出的全球首款面向普通消费者的个人 AI 智能体（AI Agent）应用。
 
