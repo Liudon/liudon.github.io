@@ -18,7 +18,7 @@ const viewportWidth = Number(process.env.SCREENSHOT_WIDTH || 1440);
 const viewportHeight = Number(process.env.SCREENSHOT_HEIGHT || 900);
 const webpQuality = Number(process.env.SCREENSHOT_QUALITY || 72);
 const maxAttempts = Number(process.env.SCREENSHOT_ATTEMPTS || 3);
-const captureVersion = Number(process.env.SCREENSHOT_CAPTURE_VERSION || 2);
+const captureVersion = Number(process.env.SCREENSHOT_CAPTURE_VERSION || 3);
 
 function readSnapshots() {
   const byCid = new Map();
@@ -107,54 +107,45 @@ function writeCaptureMetadata(snapshot) {
     viewport_height: viewportHeight,
     format: "webp",
     quality: webpQuality,
+    javascript_enabled: false,
+    service_workers: "block",
+    reduced_motion: "reduce",
+    animations_disabled: true,
   };
 
   fs.writeFileSync(tmp, JSON.stringify(metadata, null, 2) + "\n", "utf8");
   fs.renameSync(tmp, file);
 }
 
-async function warmLazyContent(page) {
-  await page.evaluate(async () => {
-    try {
-      if (document.fonts?.ready) {
-        await document.fonts.ready;
+async function stabilizePage(page) {
+  // Disable CSS-driven motion as well. JavaScript is disabled at the browser
+  // context level, but CSS animations/transitions can still create unstable
+  // pixels between otherwise identical deployments.
+  await page.addStyleTag({
+    content: `
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        animation-delay: 0s !important;
+        transition: none !important;
+        caret-color: transparent !important;
+        scroll-behavior: auto !important;
       }
-    } catch {
-      // Font readiness is best-effort; the screenshot should still proceed.
-    }
-
-    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    const root = document.scrollingElement || document.documentElement;
-
-    let lastHeight = 0;
-    let stableRounds = 0;
-
-    while (stableRounds < 3) {
-      const height = Math.max(
-        root.scrollHeight,
-        document.documentElement.scrollHeight,
-        document.body?.scrollHeight || 0,
-      );
-
-      if (height === lastHeight) {
-        stableRounds += 1;
-      } else {
-        stableRounds = 0;
-        lastHeight = height;
-      }
-
-      for (let y = 0; y < height; y += 800) {
-        window.scrollTo(0, y);
-        await sleep(70);
-      }
-
-      window.scrollTo(0, height);
-      await sleep(250);
-    }
-
-    window.scrollTo(0, 0);
-    await sleep(350);
+    `,
   });
+
+  await page.waitForTimeout(600);
+
+  // Warm native lazy-loaded images without relying on site JavaScript.
+  // Fixed wheel steps keep this compatible with javaScriptEnabled: false.
+  for (let step = 0; step < 20; step += 1) {
+    await page.mouse.wheel(0, Math.max(800, viewportHeight - 100));
+    await page.waitForTimeout(45);
+  }
+
+  await page.keyboard.press("Home");
+  await page.waitForTimeout(350);
 }
 
 function snapshotUrl(snapshot) {
@@ -196,8 +187,8 @@ async function captureOne(context, snapshot) {
         );
       }
 
-      await page.waitForTimeout(1_000);
-      await warmLazyContent(page);
+      await page.waitForTimeout(700);
+      await stabilizePage(page);
 
       await page.screenshot({
         path: tempTarget,
@@ -294,6 +285,20 @@ const context = await browser.newContext({
     height: viewportHeight,
   },
   deviceScaleFactor: 1,
+  javaScriptEnabled: false,
+  serviceWorkers: "block",
+  reducedMotion: "reduce",
+});
+
+// Do not even download script resources. This removes third-party ads,
+// analytics and other script-driven noise from historical screenshots.
+await context.route("**/*", async (route) => {
+  if (route.request().resourceType() === "script") {
+    await route.abort();
+    return;
+  }
+
+  await route.continue();
 });
 
 const failures = [];
