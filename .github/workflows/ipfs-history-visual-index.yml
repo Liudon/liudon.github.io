@@ -56,9 +56,11 @@ jobs:
         env:
           VISUAL_SAMPLE_WIDTH: "480"
           VISUAL_PIXEL_DELTA: "18"
-          VISUAL_OVERALL_CHANGED_MAX: "0.0015"
-          VISUAL_TILE_CHANGED_MAX: "0.025"
-          VISUAL_MEAN_DELTA_MAX: "1.2"
+          VISUAL_BLUR_SIGMA: "0.8"
+          VISUAL_OVERALL_CHANGED_MAX: "0.002"
+          VISUAL_TILE_CHANGED_MAX: "0.08"
+          VISUAL_MEAN_DELTA_MAX: "0.35"
+          VISUAL_SIGNIFICANT_TILE_RATIO: "0.01"
           VISUAL_TILE_SIZE: "48"
           VISUAL_HEIGHT_DELTA_MAX: "2"
         run: |
