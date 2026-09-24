@@ -938,13 +938,6 @@
             <div class="menu-item" id="tmMenuBtn">
               <span>TimeMachine</span>
               <div class="mac-dropdown" id="tmDropdown">
-                <div class="dropdown-option" id="menuLivePage" role="button" tabindex="0">
-                  <svg class="retro-icon" viewBox="0 0 16 16">
-                    <path class="retro-icon-fill" d="M3 2h10v12H3V2zm1.5 1.5v9h7v-9h-7zm1 2h5v1.5h-5V5.5zm0 3h5V10h-5V8.5z"/>
-                  </svg>
-                  <span id="menuLivePageLabel">打开当前历史快照</span>
-                </div>
-                <div class="dropdown-divider"></div>
                 <div class="dropdown-option" id="aboutTmBtn">
                   <svg class="retro-icon" viewBox="0 0 16 16">
                     <path class="retro-icon-fill" fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 1.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zM7 5h2v2H7V5zm0 3h2v4H7V8z"/>
@@ -1207,8 +1200,6 @@
   const specialDropdown = $('specialDropdown');
   const tmMenuBtn = $('tmMenuBtn');
   const tmDropdown = $('tmDropdown');
-  const menuLivePage = $('menuLivePage');
-  const menuLivePageLabel = $('menuLivePageLabel');
   const menuShutdown = $('menuShutdown');
   const menuRestart = $('menuRestart');
   const aboutMacBtn = $('aboutMacBtn');
@@ -1330,10 +1321,6 @@
 
     historyToolbar.classList.toggle('is-visible', snapshot);
     historyFrameShell.classList.toggle('is-visible', snapshot);
-
-    menuLivePageLabel.textContent = snapshot
-      ? '返回时间线'
-      : '打开当前历史快照';
 
     hoverStatus.classList.toggle('history-status', snapshot);
   }
@@ -2549,17 +2536,6 @@
 
   teleportBtn.addEventListener('click', openCurrentSnapshot);
   backToTimeline.addEventListener('click', () => returnToTimeline());
-
-  menuLivePage.addEventListener('click', () => {
-    if (state.viewMode === 'snapshot') returnToTimeline();
-    else openCurrentSnapshot();
-  });
-  menuLivePage.addEventListener('keydown', (event) => {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    event.preventDefault();
-    if (state.viewMode === 'snapshot') returnToTimeline();
-    else openCurrentSnapshot();
-  });
 
   togglePlayBtn.addEventListener('click', () => {
     if (state.playMode === 'playing') {
