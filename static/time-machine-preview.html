@@ -1,0 +1,1826 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Macintosh 128K · 博客时光机</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 40%, #3a3f4a 0%, #1e2229 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Geneva, "Charcoal", "Courier New", system-ui, sans-serif;
+      user-select: none;
+    }
+
+    /* Macintosh 128K 物理外壳 */
+    .mac-hardware {
+      width: 92vw;
+      max-width: 880px;
+      height: 94vh;
+      max-height: 820px;
+      background: #ded7c8;
+      border-radius: 28px 28px 14px 14px;
+      box-shadow:
+        inset 0 3px 5px rgba(255, 255, 255, 0.8),
+        inset 0 -6px 12px rgba(0, 0, 0, 0.25),
+        0 18px 45px rgba(0, 0, 0, 0.65),
+        0 4px 12px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      padding: 16px 24px 18px;
+      border: 1px solid #bfb7a4;
+      overflow: hidden;
+      transition: all 0.2s ease-out;
+    }
+
+    @media (min-width: 601px) and (max-width: 1024px) {
+      .mac-hardware {
+        width: 90vw;
+        max-width: 720px;
+        height: auto;
+        max-height: 88vh;
+        aspect-ratio: 1 / 1.15;
+        padding: 12px 16px 14px;
+        border-radius: 24px 24px 12px 12px;
+      }
+      .mac-handle-groove {
+        width: 110px !important;
+        height: 7px !important;
+        margin-bottom: 7px !important;
+      }
+      .floppy-drive {
+        width: 170px !important;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .mac-hardware {
+        width: 95vw;
+        max-width: 440px;
+        height: auto;
+        max-height: 88vh;
+        aspect-ratio: 1 / 1.12;
+        padding: 8px 10px 10px;
+        border-radius: 22px 22px 12px 12px;
+      }
+      .mac-handle-groove {
+        width: 90px !important;
+        height: 5px !important;
+        margin-bottom: 5px !important;
+      }
+      .bezel-outer {
+        padding: 6px !important;
+      }
+      .screen-workspace {
+        padding: 5px !important;
+      }
+      .window-toolbar {
+        padding: 3px 4px !important;
+        gap: 4px !important;
+      }
+      .mac-chassis-lower {
+        height: 34px !important;
+        margin-top: 5px !important;
+        padding: 0 4px !important;
+      }
+      .floppy-drive {
+        width: 130px !important;
+      }
+      .rainbow-apple-svg {
+        width: 12px !important;
+        height: 15px !important;
+      }
+      .mac-logo-text {
+        width: 72px !important;
+        height: 14px !important;
+      }
+    }
+
+    .mac-handle-groove {
+      flex-shrink: 0;
+      width: 140px;
+      height: 8px;
+      background: #b5ad9b;
+      border-radius: 4px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 1px 1px rgba(255,255,255,0.6);
+      margin-bottom: 10px;
+    }
+
+    .bezel-outer {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      background: #cfc6b3;
+      border-radius: 14px;
+      padding: 10px;
+      box-shadow:
+        inset 2px 2px 6px rgba(0, 0, 0, 0.45),
+        inset -2px -2px 4px rgba(255, 255, 255, 0.7);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .crt-screen {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      background: #808080;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.6);
+      background-image: radial-gradient(#aaa 25%, transparent 25%), radial-gradient(#555 25%, transparent 25%);
+      background-size: 4px 4px;
+      background-position: 0 0, 2px 2px;
+    }
+
+    /* 顶部菜单栏 */
+    .screen-menubar {
+      flex-shrink: 0;
+      height: 20px;
+      background: #fff;
+      border-bottom: 1px solid #000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: bold;
+      z-index: 20;
+      position: relative;
+    }
+    .menubar-left {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+    }
+
+    .menu-item {
+      padding: 2px 8px;
+      cursor: pointer;
+      position: relative;
+      border-radius: 1px;
+    }
+    .menu-item.active, .menu-item:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    /* 下拉菜单 */
+    .mac-dropdown {
+      display: none;
+      position: absolute;
+      top: 19px;
+      left: 0;
+      background: #fff;
+      border: 1px solid #000;
+      box-shadow: 2px 2px 0 #000;
+      min-width: 180px;
+      z-index: 100;
+      padding: 3px 0;
+      color: #000;
+      font-size: 11px;
+      font-weight: normal;
+    }
+    .mac-dropdown.show { display: block; }
+
+    .dropdown-option {
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+      color: #000;
+      line-height: 1;
+    }
+    .dropdown-option:hover {
+      background: #000;
+      color: #fff !important;
+    }
+
+    .retro-icon {
+      width: 12px;
+      height: 12px;
+      display: inline-block;
+      flex-shrink: 0;
+      vertical-align: middle;
+      overflow: visible;
+    }
+    .retro-icon-fill { fill: #000; }
+    .dropdown-option:hover .retro-icon-fill { fill: #fff !important; }
+
+    .dropdown-divider {
+      height: 1px;
+      background: repeating-linear-gradient(to right, #000 0, #000 2px, transparent 2px, transparent 4px);
+      margin: 3px 4px;
+    }
+
+    /* 桌面工作区 */
+    .screen-workspace {
+      flex: 1;
+      min-height: 0;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 经典 System 桌面图标（窗口关闭后可见） */
+    .desktop-icons-area {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 5;
+    }
+    .desktop-icon-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 84px;
+      cursor: pointer;
+      padding: 4px;
+      border: 1px dotted transparent;
+    }
+    .desktop-icon-item:hover, .desktop-icon-item.selected {
+      background: rgba(0, 0, 0, 0.15);
+      border-color: #000;
+    }
+    .desktop-icon-item.selected .desktop-icon-label {
+      background: #000;
+      color: #fff;
+    }
+    .desktop-icon-svg {
+      width: 38px;
+      height: 38px;
+      filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.4));
+    }
+    .desktop-icon-label {
+      font-size: 10px;
+      background: #fff;
+      color: #000;
+      padding: 1px 3px;
+      border: 1px solid #000;
+      box-shadow: 1px 1px 0 #000;
+      margin-top: 4px;
+      text-align: center;
+      line-height: 1.1;
+      word-break: break-all;
+    }
+
+    /* 视窗本体与缩放动效 */
+    .mac-window {
+      flex: 1;
+      min-height: 0;
+      background: #fff;
+      border: 1px solid #000;
+      box-shadow: 2px 2px 0 #000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+      transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease;
+      transform-origin: 40px 40px;
+    }
+    .mac-window.window-closing {
+      transform: scale(0.08) translate(-260px, -200px);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .mac-window.window-hidden {
+      display: none;
+    }
+    .mac-window.window-opening {
+      animation: macWindowZoom 0.24s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+    }
+    @keyframes macWindowZoom {
+      0% { transform: scale(0.15) translate(-180px, -140px); opacity: 0; }
+      100% { transform: scale(1) translate(0, 0); opacity: 1; }
+    }
+
+    /* 窗口横纹标题栏与 Go-Away Box */
+    .window-titlebar {
+      flex-shrink: 0;
+      height: 18px;
+      background: repeating-linear-gradient(
+        to bottom,
+        #000 0px, #000 1px,
+        #fff 1px, #fff 3px
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border-bottom: 1px solid #000;
+    }
+    .close-box {
+      position: absolute;
+      left: 6px;
+      width: 10px;
+      height: 10px;
+      background: #fff;
+      border: 1px solid #000;
+      cursor: pointer;
+    }
+    .close-box:active { background: #000; }
+    .window-title {
+      background: #fff;
+      padding: 0 6px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    /* 控制栏 */
+    .window-toolbar {
+      flex-shrink: 0;
+      padding: 4px 8px;
+      background: #f0f0f0;
+      border-bottom: 1px solid #000;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .mac-btn, .mac-select {
+      font-family: inherit;
+      font-size: 10px;
+      padding: 2px 6px;
+      background: #fff;
+      border: 1px solid #000;
+      border-radius: 2px;
+      box-shadow: 1px 1px 0 #000;
+      cursor: pointer;
+      text-decoration: none;
+      color: #000;
+      display: inline-flex;
+      align-items: center;
+    }
+    .mac-btn:active:not(:disabled) {
+      background: #000;
+      color: #fff;
+    }
+    .mac-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .progress-track {
+      flex-shrink: 0;
+      height: 3px;
+      background: #fff;
+      border-bottom: 1px solid #000;
+      width: 100%;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #000;
+      width: 0%;
+    }
+
+    .window-body {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      display: flex;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .viewport {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 16px;
+      bottom: 0;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      cursor: default;
+    }
+    .viewport::-webkit-scrollbar {
+      display: none;
+    }
+
+    .content-box {
+      width: 100%;
+      position: relative;
+    }
+    .content-box img {
+      display: block;
+      width: 100%;
+      height: auto;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    /* 拟物滚动条 */
+    .mac-scrollbar {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 16px;
+      border-left: 1px solid #000;
+      background-image: repeating-linear-gradient(45deg, #fff 0, #fff 1px, #ddd 1px, #ddd 2px);
+      display: flex;
+      flex-direction: column;
+    }
+    .scroll-arrow {
+      flex-shrink: 0;
+      height: 15px;
+      background: #fff;
+      border-bottom: 1px solid #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      cursor: pointer;
+    }
+    .scroll-arrow:active { background: #000; color: #fff; }
+    .scroll-arrow-down {
+      border-bottom: none;
+      border-top: 1px solid #000;
+    }
+    .scroll-track {
+      flex: 1;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .scroll-thumb {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 28px;
+      background: #fff;
+      border: 1px solid #000;
+      box-shadow: 1px 1px 0 #000;
+      cursor: grab;
+    }
+    .scroll-thumb:active { cursor: grabbing; background: #eee; }
+
+    /* 下部硬件面板 */
+    .mac-chassis-lower {
+      flex-shrink: 0;
+      width: 100%;
+      height: 44px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+
+    .rainbow-apple-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .rainbow-apple-svg {
+      width: 15px;
+      height: 18px;
+      display: block;
+      filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.8));
+    }
+    .mac-logo-text {
+      width: 86px;
+      height: 17px;
+      display: block;
+      filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.85));
+      opacity: 0.95;
+    }
+
+    .drive-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .drive-led-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .drive-led {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4d3a08;
+      border: 1px solid #2a2004;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.8);
+      transition: all 0.2s ease;
+    }
+    .drive-led.standby {
+      background: #8fa338;
+      box-shadow: 0 0 3px #a5c43d, inset 0 1px 1px rgba(255,255,255,0.4);
+    }
+    .drive-led.active {
+      background: #ffaa00;
+      box-shadow: 0 0 6px #ffbb00, 0 0 10px rgba(255,170,0,0.8), inset 0 1px 1px #fff;
+      animation: ledFlicker 0.12s infinite alternate;
+    }
+    .drive-led.off {
+      background: #221c0b;
+      box-shadow: none;
+      opacity: 0.35;
+    }
+
+    @keyframes ledFlicker {
+      0% { opacity: 0.35; }
+      100% { opacity: 1; transform: scale(1.08); }
+    }
+
+    .floppy-drive {
+      width: 220px;
+      height: 12px;
+      background: #111;
+      border-radius: 2px;
+      box-shadow:
+        inset 0 2px 3px #000,
+        0 1px 1px rgba(255, 255, 255, 0.7);
+      position: relative;
+    }
+    .floppy-drive::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      top: 4px;
+      width: 4px;
+      height: 4px;
+      background: #000;
+      border-radius: 50%;
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.1);
+    }
+
+    /* 拟物弹窗 */
+    .about-dialog-overlay {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.25);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .about-dialog-overlay.show { display: flex; }
+
+    .about-dialog {
+      width: 290px;
+      background: #fff;
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0 #000;
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+      animation: dialogPop 0.15s ease-out;
+    }
+    @keyframes dialogPop {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* 系统开关机层 */
+    .system-screen-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #808080;
+      background-image: radial-gradient(#aaa 25%, transparent 25%), radial-gradient(#555 25%, transparent 25%);
+      background-size: 4px 4px;
+      transition: opacity 0.3s ease;
+    }
+
+    .happy-mac-icon {
+      width: 58px;
+      height: 72px;
+      background: #fff;
+      border: 2px solid #000;
+      border-radius: 4px;
+      box-shadow: 2px 2px 0 #000;
+      position: relative;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .happy-mac-screen {
+      width: 44px;
+      height: 36px;
+      background: #fff;
+      border: 2px solid #000;
+      margin-top: 6px;
+      border-radius: 2px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .happy-mac-face {
+      width: 32px;
+      height: 24px;
+    }
+    .happy-mac-slot {
+      width: 24px;
+      height: 3px;
+      background: #000;
+      margin-top: 10px;
+      border-radius: 1px;
+    }
+
+    .sys-status-text {
+      font-size: 11px;
+      font-weight: bold;
+      color: #000;
+      background: #fff;
+      padding: 2px 8px;
+      border: 1px solid #000;
+      box-shadow: 1px 1px 0 #000;
+      margin-bottom: 8px;
+    }
+    .sys-progress-box {
+      width: 140px;
+      height: 8px;
+      background: #fff;
+      border: 1px solid #000;
+      box-shadow: 1px 1px 0 #000;
+      padding: 1px;
+    }
+    .sys-progress-bar {
+      width: 5%;
+      height: 100%;
+      background: #000;
+      transition: width 0.25s ease-out;
+    }
+
+    .shutdown-dialog {
+      width: 290px;
+      background: #fff;
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0 #000;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+      animation: dialogPop 0.2s ease-out;
+    }
+
+    #loadingTip {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 1px solid #000;
+      box-shadow: 2px 2px 0 #000;
+      padding: 8px 14px;
+      font-size: 11px;
+      font-weight: bold;
+      z-index: 50;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mac-hardware">
+    <div class="mac-handle-groove"></div>
+
+    <div class="bezel-outer">
+      <div class="crt-screen">
+
+        <!-- 系统开机 / 关机过渡 / 停机动画蒙层 -->
+        <div class="system-screen-overlay" id="systemScreenOverlay">
+          <!-- 1. 开机状态容器 (Happy Mac) -->
+          <div id="bootContainer" style="display:flex; flex-direction:column; align-items:center;">
+            <div class="happy-mac-icon">
+              <div class="happy-mac-screen">
+                <svg class="happy-mac-face" viewBox="0 0 32 24">
+                  <rect x="7" y="6" width="3" height="3" fill="#000"/>
+                  <rect x="22" y="6" width="3" height="3" fill="#000"/>
+                  <path d="M7,15 C10,19 22,19 25,15" stroke="#000" stroke-width="2.2" fill="none" stroke-linecap="square"/>
+                </svg>
+              </div>
+              <div class="happy-mac-slot"></div>
+            </div>
+            <div class="sys-status-text" id="bootStatusText">Starting System 1.0...</div>
+            <div class="sys-progress-box">
+              <div class="sys-progress-bar" id="bootProgressBar"></div>
+            </div>
+          </div>
+
+          <!-- 2. 关机过渡 Loading 容器 -->
+          <div id="shuttingDownContainer" style="display:none; flex-direction:column; align-items:center;">
+            <svg class="retro-icon" style="width:20px; height:20px; margin-bottom:8px;" viewBox="0 0 16 16">
+              <path class="retro-icon-fill" d="M2 1h12v2.5l-4 4 4 4.5V15H2v-3l4-4.5-4-4V1zm2 2.2l3 3.3h2l3-3.3H4zm3 5.3l-3 3.5v1h8v-1l-3-3.5H7z"/>
+            </svg>
+            <div class="sys-status-text" id="shutdownStatusText">Shutting down System...</div>
+            <div class="sys-progress-box">
+              <div class="sys-progress-bar" id="shutdownProgressBar" style="width:10%;"></div>
+            </div>
+          </div>
+
+          <!-- 3. 关机停机对话框 (Safe to Switch Off) -->
+          <div id="shutdownContainer" style="display:none; flex-direction:column; align-items:center;">
+            <div class="shutdown-dialog">
+              <div style="font-size: 20px;"></div>
+              <p style="font-size: 12px; font-weight: bold; line-height: 1.5;">
+                It is now safe to switch off<br>your Macintosh.
+              </p>
+              <div style="font-size: 10px; color: #555;">
+                系统已安全驻留停机 · 显像管高压断开
+              </div>
+              <button class="mac-btn" id="rebootBtn" style="padding: 4px 18px; margin-top: 4px; font-weight: bold;">
+                ⏻ 重新开机
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 屏幕内部菜单栏 -->
+        <div class="screen-menubar">
+          <div class="menubar-left">
+            <!--  苹果菜单 -->
+            <div class="menu-item" id="appleMenuBtn">
+              <span></span>
+              <div class="mac-dropdown" id="appleDropdown">
+                <div class="dropdown-option" id="aboutMacBtn">
+                  <svg class="retro-icon" viewBox="0 0 170 200">
+                    <path class="retro-icon-fill" d="M100.8,17.4 C112.5,3.2 128.2,0 128.2,0 C128.2,0 131.2,15.6 119.5,29.8 C107.8,44 92.1,40.8 92.1,40.8 C92.1,40.8 89.1,31.6 100.8,17.4 Z"/>
+                    <path class="retro-icon-fill" d="M141.2,112.6 C141.4,85.2 163.6,73.6 164.7,73 C151.8,54.4 132.3,51.8 125.6,51.2 C108.9,49.5 93.3,60.8 84.7,60.8 C76.1,60.8 63.3,51.4 49.3,51.7 C31.1,52 14.5,62.3 5.3,78.2 C-13.6,110.8 0.4,159.2 18.6,185.3 C27.5,198.1 38,212.4 51.9,211.8 C65.3,211.2 70.3,203.2 86.4,203.2 C102.5,203.2 107.1,211.8 121,211.5 C135.3,211.2 144.5,198.4 153.3,185.5 C163.6,170.6 167.8,156 168.1,155.1 C167.5,154.8 141,144.7 141.2,112.6 Z"/>
+                  </svg>
+                  <span>关于此 Macintosh...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Special 特别系统菜单 -->
+            <div class="menu-item" id="specialMenuBtn">
+              <span>Special</span>
+              <div class="mac-dropdown" id="specialDropdown">
+                <div class="dropdown-option" id="menuRestart">
+                  <svg class="retro-icon" viewBox="0 0 16 16">
+                    <path class="retro-icon-fill" d="M8 2.2a5.8 5.8 0 1 0 5.4 3.7h-1.8A4 4 0 1 1 8 4v2.2L12 3 8 .8V2.2z"/>
+                  </svg>
+                  <span>重新启动 (Restart)</span>
+                </div>
+                <div class="dropdown-option" id="menuShutdown">
+                  <svg class="retro-icon" viewBox="0 0 16 16">
+                    <path class="retro-icon-fill" d="M7 1h2v6.5H7V1zm4.8 2.8l-1.3 1.3A5.2 5.2 0 1 1 5.5 5.1L4.2 3.8A7 7 0 1 0 11.8 3.8z"/>
+                  </svg>
+                  <span>关机 (Shut Down)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- TimeMachine 菜单 -->
+            <div class="menu-item" id="tmMenuBtn">
+              <span>TimeMachine</span>
+              <div class="mac-dropdown" id="tmDropdown">
+                <a class="dropdown-option" id="menuLivePage" target="_blank" rel="noopener">
+                  <svg class="retro-icon" viewBox="0 0 16 16">
+                    <path class="retro-icon-fill" d="M3 2h5v1.5H4.5v9h9V9H15v5H3V2zm6.5 0H15v5.5h-1.5V4.6L7.6 10.5 6.5 9.4l5.9-5.9H9.5V2z"/>
+                  </svg>
+                  <span>在浏览器中打开 ↗</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-option" id="aboutTmBtn">
+                  <svg class="retro-icon" viewBox="0 0 16 16">
+                    <path class="retro-icon-fill" fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 1.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zM7 5h2v2H7V5zm0 3h2v4H7V8z"/>
+                  </svg>
+                  <span>关于时光机...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <span id="hoverStatus" style="font-weight: normal; margin-right: 8px;">滚轮上下浏览</span>
+            <span id="clock">12:00</span>
+          </div>
+        </div>
+
+        <div class="screen-workspace">
+
+          <!-- 桌面常驻应用图标（当窗口被 Go-Away Box 关闭时可见） -->
+          <div class="desktop-icons-area">
+            <div class="desktop-icon-item" id="desktopAppIcon" title="双击打开应用">
+              <svg class="desktop-icon-svg" viewBox="0 0 38 38">
+                <!-- 1-bit 复古应用文件图标（折角文档内嵌 1984 Mac 小脸） -->
+                <rect x="3" y="1" width="24" height="34" fill="#fff" stroke="#000" stroke-width="2"/>
+                <polygon points="27,1 27,9 35,9" fill="#000"/>
+                <polygon points="27,9 35,9 35,35 3,35" fill="none"/>
+                <!-- 内嵌小微机屏幕 -->
+                <rect x="7" y="6" width="16" height="13" fill="#fff" stroke="#000" stroke-width="1.5"/>
+                <circle cx="11.5" cy="11.5" r="1.2" fill="#000"/>
+                <circle cx="18.5" cy="11.5" r="1.2" fill="#000"/>
+                <path d="M12,15 Q15,18 18,15" stroke="#000" stroke-width="1.2" fill="none"/>
+                <!-- 软驱插槽 -->
+                <line x1="8" y1="23" x2="22" y2="23" stroke="#000" stroke-width="1.8"/>
+              </svg>
+              <span class="desktop-icon-label">TimeMachine</span>
+            </div>
+          </div>
+
+          <!-- 主视窗本体 -->
+          <div class="mac-window" id="mainAppWindow">
+            <div class="window-titlebar">
+              <!-- 真实的 Go-Away Box 关闭按钮 -->
+              <div class="close-box" id="windowCloseBox" title="关闭窗口"></div>
+              <div class="window-title">Blog-TimeMachine.app</div>
+            </div>
+
+            <!-- 控制条 -->
+            <div class="window-toolbar">
+              <div>
+                <span id="time" style="font-weight:bold;">同步中...</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <button class="mac-btn" id="togglePlay">❚❚ 暂停</button>
+                <button class="mac-btn" id="prev">◄</button>
+                <span id="counter" style="font-size:10px;">0/0</span>
+                <button class="mac-btn" id="next">►</button>
+                <select class="mac-select" id="speedSelect">
+                  <option value="7000">慢速 (7秒)</option>
+                  <option value="4500" selected>正常 (4.5秒)</option>
+                  <option value="2500">快速 (2.5秒)</option>
+                </select>
+                <a class="mac-btn" id="teleportBtn" target="_blank" rel="noopener" title="在浏览器新标签页中打开历史快照网页">
+                  打开 ↗
+                </a>
+              </div>
+            </div>
+
+            <div class="progress-track">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- 视窗展示区 -->
+            <div class="window-body">
+              <div id="loadingTip">读取快照清单...</div>
+
+              <div class="viewport" id="viewport">
+                <div class="content-box">
+                  <img id="mainImg" alt="快照截图" style="opacity: 0;">
+                </div>
+              </div>
+
+              <!-- 拟物联动滚动条 -->
+              <div class="mac-scrollbar">
+                <div class="scroll-arrow" id="arrowUp">▲</div>
+                <div class="scroll-track" id="scrollTrack">
+                  <div class="scroll-thumb" id="scrollThumb"></div>
+                </div>
+                <div class="scroll-arrow scroll-arrow-down" id="arrowDown">▼</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 底部铭牌、状态灯与标准 3.5 寸软驱插槽 -->
+    <div class="mac-chassis-lower">
+      <div class="rainbow-apple-badge">
+        <svg class="rainbow-apple-svg" viewBox="0 0 170 200">
+          <defs>
+            <linearGradient id="appleRainbow" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#61bb46" />
+              <stop offset="16.66%" stop-color="#61bb46" />
+              <stop offset="16.67%" stop-color="#fdb827" />
+              <stop offset="33.33%" stop-color="#fdb827" />
+              <stop offset="33.34%" stop-color="#f5821f" />
+              <stop offset="50.00%" stop-color="#f5821f" />
+              <stop offset="50.01%" stop-color="#e03a3e" />
+              <stop offset="66.66%" stop-color="#e03a3e" />
+              <stop offset="66.67%" stop-color="#963d97" />
+              <stop offset="83.33%" stop-color="#963d97" />
+              <stop offset="83.34%" stop-color="#009ddc" />
+              <stop offset="100%" stop-color="#009ddc" />
+            </linearGradient>
+          </defs>
+          <path d="M100.8,17.4 C112.5,3.2 128.2,0 128.2,0 C128.2,0 131.2,15.6 119.5,29.8 C107.8,44 92.1,40.8 92.1,40.8 C92.1,40.8 89.1,31.6 100.8,17.4 Z" fill="#61bb46"/>
+          <path d="M141.2,112.6 C141.4,85.2 163.6,73.6 164.7,73 C151.8,54.4 132.3,51.8 125.6,51.2 C108.9,49.5 93.3,60.8 84.7,60.8 C76.1,60.8 63.3,51.4 49.3,51.7 C31.1,52 14.5,62.3 5.3,78.2 C-13.6,110.8 0.4,159.2 18.6,185.3 C27.5,198.1 38,212.4 51.9,211.8 C65.3,211.2 70.3,203.2 86.4,203.2 C102.5,203.2 107.1,211.8 121,211.5 C135.3,211.2 144.5,198.4 153.3,185.5 C163.6,170.6 167.8,156 168.1,155.1 C167.5,154.8 141,144.7 141.2,112.6 Z" fill="url(#appleRainbow)"/>
+        </svg>
+
+        <svg class="mac-logo-text" viewBox="0 0 110 18" fill="#3a362c">
+          <text x="0" y="14" font-family="'Apple Garamond', 'ITC Garamond', 'EB Garamond', 'Garamond', 'Georgia', serif" font-size="16.5" font-weight="600" letter-spacing="-0.35px" transform="scale(0.88, 1)">Macintosh</text>
+        </svg>
+      </div>
+
+      <div class="drive-section">
+        <div class="drive-led-wrap" title="Disk Activity Indicator">
+          <div class="drive-led standby" id="driveLed"></div>
+        </div>
+        <div class="floppy-drive" title="3.5-inch Floppy Drive Slot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗 1：关于此 Macintosh -->
+  <div class="about-dialog-overlay" id="aboutMacDialog">
+    <div class="about-dialog">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:22px;"></span>
+        <strong style="font-size:14px;">Macintosh 128K</strong>
+      </div>
+      <p style="font-size:11px; line-height:1.5; color:#333;">
+        Motorola 68000 @ 7.83 MHz<br>
+        128KB 统一内存 · 9 英寸单色显像管<br>
+        400KB 3.5 英寸微型软盘驱动器
+      </p>
+      <div style="font-size:10px; color:#666; border-top:1px dashed #aaa; padding-top:6px; width:100%;">
+        Apple Computer, Inc. · 1984
+      </div>
+      <button class="mac-btn" id="closeAboutMacBtn" style="padding:4px 18px; margin-top:4px;">确定</button>
+    </div>
+  </div>
+
+  <!-- 弹窗 2：关于时光机（两句式极简方案，自然留白收束，不加粗） -->
+  <div class="about-dialog-overlay" id="aboutTmDialog">
+    <div class="about-dialog">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <svg class="retro-icon" style="width:16px; height:16px;" viewBox="0 0 16 16">
+          <path class="retro-icon-fill" fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 1.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zm-.7 2v4.3l3.2 1.8.7-1.2-2.5-1.4V4.5h-1.4z"/>
+        </svg>
+        <strong style="font-size:14px;">博客时光机</strong>
+      </div>
+      <p style="font-size:12px; line-height:1.8; color:#333; margin: 4px 0 2px;">
+        写下的每一行，皆有处可循。<br>
+        让过去，再次打开。
+      </p>
+      <div style="font-size:10px; color:#666; border-top:1px dashed #aaa; padding-top:6px; width:100%;">
+        Preserved on IPFS · Forever decentralized
+      </div>
+      <button class="mac-btn" id="closeAboutTmBtn" style="padding:4px 18px; margin-top:4px;">确定</button>
+    </div>
+  </div>
+
+  <script>
+(() => {
+  'use strict';
+
+  const CONFIG = {
+    assetBase: 'https://raw.githubusercontent.com/Liudon/liudon.github.io/ipfs-history/',
+    gatewayBase: 'https://liudon.xyz/ipfs/',
+    indexTimeoutMs: 15000,
+    imageTimeoutMs: 20000,
+    maxActiveLoads: 2,
+    cacheMaxPixels: 24000000,
+    maxPlaybackPixels: 8000000,
+    maxLegacyPixels: 24000000,
+    readReleaseMs: 1800,  };
+  const indexUrl = new URL('visual-index.json', CONFIG.assetBase).href;
+
+  const $ = (id) => document.getElementById(id);
+  const timeEl = $('time');
+  const counterEl = $('counter');
+  const prevBtn = $('prev');
+  const nextBtn = $('next');
+  const togglePlayBtn = $('togglePlay');
+  const speedSelect = $('speedSelect');
+  const teleportBtn = $('teleportBtn');
+  const progressFill = $('progressFill');
+  const hoverStatus = $('hoverStatus');
+  const loadingTip = $('loadingTip');
+  const clockEl = $('clock');
+  const driveLed = $('driveLed');
+  const viewport = $('viewport');
+  const contentBox = viewport.querySelector('.content-box');
+  let mainImg = $('mainImg');
+  const scrollTrack = $('scrollTrack');
+  const scrollThumb = $('scrollThumb');
+  const arrowUp = $('arrowUp');
+  const arrowDown = $('arrowDown');
+
+  const appleMenuBtn = $('appleMenuBtn');
+  const appleDropdown = $('appleDropdown');
+  const specialMenuBtn = $('specialMenuBtn');
+  const specialDropdown = $('specialDropdown');
+  const tmMenuBtn = $('tmMenuBtn');
+  const tmDropdown = $('tmDropdown');
+  const menuLivePage = $('menuLivePage');
+  const menuShutdown = $('menuShutdown');
+  const menuRestart = $('menuRestart');
+  const aboutMacBtn = $('aboutMacBtn');
+  const aboutMacDialog = $('aboutMacDialog');
+  const closeAboutMacBtn = $('closeAboutMacBtn');
+  const aboutTmBtn = $('aboutTmBtn');
+  const aboutTmDialog = $('aboutTmDialog');
+  const closeAboutTmBtn = $('closeAboutTmBtn');
+  const mainAppWindow = $('mainAppWindow');
+  const windowCloseBox = $('windowCloseBox');
+  const desktopAppIcon = $('desktopAppIcon');
+  const systemScreenOverlay = $('systemScreenOverlay');
+  const bootContainer = $('bootContainer');
+  const shuttingDownContainer = $('shuttingDownContainer');
+  const shutdownContainer = $('shutdownContainer');
+  const bootStatusText = $('bootStatusText');
+  const bootProgressBar = $('bootProgressBar');
+  const shutdownStatusText = $('shutdownStatusText');
+  const shutdownProgressBar = $('shutdownProgressBar');
+  const rebootBtn = $('rebootBtn');
+
+  const state = {
+    frames: [],
+    indexLoaded: false,
+    indexPromise: null,
+    power: 'booting',
+    window: 'open',
+    playMode: 'paused',
+    displayedIndex: null,
+    targetIndex: null,
+    sessionId: 0,
+    requestId: 0,
+    playGeneration: 0,
+    windowGeneration: 0,
+    reading: false,
+    pointerHeld: false,
+    documentHidden: document.hidden,
+    frameError: null,
+    frameStartedAt: 0,
+    recentUserIntentAt: 0,
+    programmaticScroll: false,
+  };
+
+  const cache = new Map(); // absolute URL -> resource record
+  const loadQueue = [];
+  let activeLoads = 0;
+  let clockTimer = null;
+  let playRaf = null;
+  let readingTimer = null;
+  let draggedPointerId = null;
+  let dragStartY = 0;
+  let dragStartThumbTop = 0;
+
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  function diagnostics(message, detail) {
+    console.warn(`[TimeMachine] ${message}`, detail ?? '');
+  }
+
+  function setStatus(text) {
+    hoverStatus.textContent = text;
+  }
+
+  function triggerLedFlicker(duration = 750) {
+    if (!driveLed || driveLed.classList.contains('off')) return;
+    const session = state.sessionId;
+    driveLed.classList.remove('standby');
+    driveLed.classList.add('active');
+    setTimeout(() => {
+      if (session !== state.sessionId || driveLed.classList.contains('off')) return;
+      driveLed.classList.remove('active');
+      driveLed.classList.add('standby');
+    }, duration);
+  }
+
+  function startClock() {
+    if (clockTimer) return;
+    const render = () => {
+      const d = new Date();
+      clockEl.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+    render();
+    clockTimer = setInterval(render, 1000);
+  }
+
+  function formatTime(isoStr) {
+    try {
+      return new Intl.DateTimeFormat('zh-CN', {
+        timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+      }).format(new Date(isoStr));
+    } catch {
+      return isoStr;
+    }
+  }
+
+  function historyUrl(cid) {
+    return `${CONFIG.gatewayBase.replace(/\/$/, '')}/${cid}/`;
+  }
+
+  function validateScreenshotPath(value) {
+    if (typeof value !== 'string' || !value) return null;
+    if (!value.startsWith('screenshots/')) return null;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(value) || value.startsWith('/') || value.includes('\\')) return null;
+    if (/[?#]/.test(value)) return null;
+    let decoded;
+    try { decoded = decodeURIComponent(value); } catch { return null; }
+    if (decoded.split('/').some(part => part === '..' || part === '.')) return null;
+    if (!/\.(?:webp|png|jpe?g)$/i.test(decoded)) return null;
+    const url = new URL(value, CONFIG.assetBase);
+    const base = new URL(CONFIG.assetBase);
+    if (url.origin !== base.origin || !url.pathname.startsWith(new URL('screenshots/', base).pathname)) return null;
+    return url.href;
+  }
+
+  function normalizeFrames(data) {
+    if (!data || data.version !== 1 || !Array.isArray(data.frames)) {
+      throw new Error(data?.version && data.version !== 1 ? '档案格式暂不支持' : '档案清单格式错误');
+    }
+    const seenCid = new Set();
+    const valid = [];
+    data.frames.forEach((raw, sourceIndex) => {
+      const reasons = [];
+      const cid = typeof raw?.cid === 'string' ? raw.cid.trim() : '';
+      if (!cid || cid.includes('/') || cid.includes('\\')) reasons.push('invalid cid');
+      const deployedAt = typeof raw?.deployed_at === 'string' ? raw.deployed_at.trim() : '';
+      const time = Date.parse(deployedAt);
+      if (!deployedAt || !Number.isFinite(time) || !/(?:Z|[+-]\d\d:\d\d)$/.test(deployedAt)) reasons.push('invalid deployed_at');
+      const screenshotUrl = validateScreenshotPath(raw?.screenshot);
+      if (!screenshotUrl) reasons.push('invalid screenshot');
+      const hasWidth = raw?.width !== undefined && raw?.width !== null;
+      const hasHeight = raw?.height !== undefined && raw?.height !== null;
+      if (hasWidth !== hasHeight) reasons.push('partial dimensions');
+      if (hasWidth && (!Number.isSafeInteger(raw.width) || raw.width <= 0 || !Number.isSafeInteger(raw.height) || raw.height <= 0)) reasons.push('invalid dimensions');
+      if (hasWidth && raw.width * raw.height > Number.MAX_SAFE_INTEGER) reasons.push('invalid pixels');
+      if (raw?.bytes != null && (!Number.isSafeInteger(raw.bytes) || raw.bytes <= 0)) reasons.push('invalid bytes');
+      if (reasons.length) {
+        diagnostics('filtered invalid frame', { sourceIndex, cid, reasons });
+        return;
+      }
+      if (seenCid.has(cid)) {
+        diagnostics('filtered duplicate cid', { sourceIndex, cid });
+        return;
+      }
+      seenCid.add(cid);
+      valid.push({ ...raw, cid, deployed_at: deployedAt, _time: time, _url: screenshotUrl });
+    });
+    valid.sort((a, b) => a._time - b._time || a.cid.localeCompare(b.cid));
+    if (data.visual_count !== undefined && data.visual_count !== valid.length) {
+      diagnostics('visual_count differs from valid frame count', { visual_count: data.visual_count, valid: valid.length });
+    }
+    return valid;
+  }
+
+  async function fetchWithTimeout(url, options, timeoutMs) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(new DOMException('Timeout', 'AbortError')), timeoutMs);
+    try {
+      return await fetch(url, { ...options, signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function loadIndex(force = false) {
+    if (state.indexLoaded && !force) return state.frames;
+    if (state.indexPromise && !force) return state.indexPromise;
+    const session = state.sessionId;
+    const promise = (async () => {
+      const response = await fetchWithTimeout(indexUrl, { cache: 'no-cache' }, CONFIG.indexTimeoutMs);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      const frames = normalizeFrames(data);
+      if (!frames.length) throw new Error('暂无可用快照');
+      if (session !== state.sessionId) throw new DOMException('Stale session', 'AbortError');
+      state.frames = frames;
+      state.indexLoaded = true;
+      return frames;
+    })();
+    state.indexPromise = promise;
+    try {
+      return await promise;
+    } finally {
+      if (state.indexPromise === promise) state.indexPromise = null;
+    }
+  }
+
+  function framePixels(frame) {
+    if (Number.isSafeInteger(frame.width) && Number.isSafeInteger(frame.height)) return frame.width * frame.height;
+    return null;
+  }
+
+  function pumpQueue() {
+    while (activeLoads < CONFIG.maxActiveLoads && loadQueue.length) {
+      loadQueue.sort((a, b) => a.priority - b.priority || a.queuedAt - b.queuedAt);
+      const task = loadQueue.shift();
+      if (task.cancelled) continue;
+      activeLoads += 1;
+      task.run().finally(() => {
+        activeLoads -= 1;
+        pumpQueue();
+      });
+    }
+  }
+
+  function enqueue(run, priority) {
+    return new Promise((resolve, reject) => {
+      const task = {
+        priority: priority === 'foreground' ? 0 : 1,
+        queuedAt: performance.now(), cancelled: false,
+        run: async () => {
+          try { resolve(await run()); } catch (error) { reject(error); }
+        },
+      };
+      loadQueue.push(task);
+      pumpQueue();
+    });
+  }
+
+  async function prepareImage(frame, attempts) {
+    let lastError;
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      try {
+        const response = await fetchWithTimeout(frame._url, { cache: 'default', mode: 'cors' }, CONFIG.imageTimeoutMs);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const img = new Image();
+        img.id = 'mainImg';
+        img.alt = '快照截图';
+        img.style.opacity = '0';
+        img.src = objectUrl;
+        try {
+          await img.decode();
+        } catch (error) {
+          URL.revokeObjectURL(objectUrl);
+          throw error;
+        }
+        const width = img.naturalWidth;
+        const height = img.naturalHeight;
+        const pixels = width * height;
+        if (frame.width && (frame.width !== width || frame.height !== height)) {
+          URL.revokeObjectURL(objectUrl);
+          throw new Error(`尺寸不匹配：索引 ${frame.width}x${frame.height}，实际 ${width}x${height}`);
+        }
+        const limit = frame.width ? CONFIG.maxPlaybackPixels : CONFIG.maxLegacyPixels;
+        if (pixels > limit) {
+          URL.revokeObjectURL(objectUrl);
+          throw new Error(`图片像素超出限制：${width}x${height}`);
+        }
+        return { img, objectUrl, width, height, pixels, bytes: blob.size };
+      } catch (error) {
+        lastError = error;
+        if (attempt < attempts) await sleep(attempt === 1 ? 500 : 1000);
+      }
+    }
+    throw lastError || new Error('图片读取失败');
+  }
+
+  function ensureImage(index, priority = 'background') {
+    if (index < 0 || index >= state.frames.length) return Promise.reject(new Error('frame out of range'));
+    const frame = state.frames[index];
+    const url = frame._url;
+    const existing = cache.get(url);
+    if (existing?.state === 'ready') {
+      existing.lastUsed = performance.now();
+      return Promise.resolve(existing);
+    }
+    if (existing?.state === 'loading') return existing.promise;
+    if (existing?.state === 'failed' && priority !== 'foreground') return Promise.reject(existing.error);
+
+    const taskId = Symbol(url);
+    const record = { url, state: 'loading', taskId, index, frame, lastUsed: performance.now(), promise: null };
+    const attempts = priority === 'foreground' ? 3 : 1;
+    record.promise = enqueue(async () => {
+      try {
+        const prepared = await prepareImage(frame, attempts);
+        if (cache.get(url)?.taskId !== taskId) {
+          URL.revokeObjectURL(prepared.objectUrl);
+          throw new DOMException('Stale resource', 'AbortError');
+        }
+        Object.assign(record, prepared, { state: 'ready', lastUsed: performance.now() });
+        return record;
+      } catch (error) {
+        if (cache.get(url)?.taskId === taskId) Object.assign(record, { state: 'failed', error });
+        throw error;
+      }
+    }, priority);
+    cache.set(url, record);
+    return record.promise;
+  }
+
+  function desiredIndices(center) {
+    const total = state.frames.length;
+    if (!total) return [];
+    const raw = [center - 1, center, center + 1, center + 2, center + 3];
+    const values = [];
+    for (const n of raw) {
+      const wrapped = ((n % total) + total) % total;
+      if (!values.includes(wrapped)) values.push(wrapped);
+    }
+    return values;
+  }
+
+  function trimCache(center = state.displayedIndex ?? 0) {
+    const protectedUrls = new Set(desiredIndices(center).map(i => state.frames[i]?._url).filter(Boolean));
+    if (state.targetIndex != null) protectedUrls.add(state.frames[state.targetIndex]?._url);
+    if (state.displayedIndex != null) protectedUrls.add(state.frames[state.displayedIndex]?._url);
+    let readyPixels = [...cache.values()].filter(r => r.state === 'ready').reduce((sum, r) => sum + (r.pixels || 0), 0);
+    const evict = [...cache.values()]
+      .filter(r => r.state !== 'loading' && !protectedUrls.has(r.url))
+      .sort((a, b) => a.lastUsed - b.lastUsed);
+    for (const record of evict) {
+      if (cache.size <= 5 && readyPixels <= CONFIG.cacheMaxPixels) break;
+      cache.delete(record.url);
+      if (record.objectUrl) URL.revokeObjectURL(record.objectUrl);
+      readyPixels -= record.pixels || 0;
+    }
+    // If the protected five exceed the budget, keep nearest ready items only.
+    if (readyPixels > CONFIG.cacheMaxPixels) {
+      const order = desiredIndices(center).map((i, distance) => ({ url: state.frames[i]._url, distance }));
+      const candidates = [...cache.values()]
+        .filter(r => r.state === 'ready' && r.index !== state.displayedIndex && r.index !== state.targetIndex)
+        .sort((a, b) => (order.find(x => x.url === b.url)?.distance ?? 99) - (order.find(x => x.url === a.url)?.distance ?? 99));
+      for (const record of candidates) {
+        if (readyPixels <= CONFIG.cacheMaxPixels) break;
+        cache.delete(record.url);
+        if (record.objectUrl) URL.revokeObjectURL(record.objectUrl);
+        readyPixels -= record.pixels || 0;
+      }
+    }
+  }
+
+  function warmBuffer(center) {
+    if (state.frames.length <= 1 || state.power !== 'on' || state.window === 'closed') return;
+    const targets = desiredIndices(center).filter(i => i !== center).slice(1); // next frames before previous via explicit order below
+    const ordered = [];
+    for (const delta of [1, 2, 3, -1]) {
+      const i = ((center + delta) % state.frames.length + state.frames.length) % state.frames.length;
+      if (!ordered.includes(i)) ordered.push(i);
+    }
+    for (const index of ordered) {
+      const pixels = framePixels(state.frames[index]);
+      if (pixels && pixels > CONFIG.maxPlaybackPixels) continue;
+      ensureImage(index, 'background').catch(error => diagnostics('background preload failed', { index, error: error.message }));
+    }
+    trimCache(center);
+  }
+
+  function syncScrollbar() {
+    const maxScroll = viewport.scrollHeight - viewport.clientHeight;
+    const maxThumbTravel = scrollTrack.clientHeight - scrollThumb.clientHeight;
+    if (maxScroll <= 0 || maxThumbTravel <= 0) {
+      scrollThumb.style.top = '0px';
+      return;
+    }
+    const ratio = Math.min(Math.max(viewport.scrollTop / maxScroll, 0), 1);
+    scrollThumb.style.top = `${ratio * maxThumbTravel}px`;
+  }
+
+  function markUserIntent() {
+    state.recentUserIntentAt = performance.now();
+    state.reading = true;
+    setStatus('[阅读中 暂停切页]');
+    clearTimeout(readingTimer);
+    readingTimer = setTimeout(() => {
+      if (state.pointerHeld) return;
+      state.reading = false;
+      if (state.playMode === 'playing') state.frameStartedAt = performance.now();
+      renderStatus();
+    }, CONFIG.readReleaseMs);
+  }
+
+  function resetScroll() {
+    state.programmaticScroll = true;
+    viewport.scrollTop = 0;
+    syncScrollbar();
+    requestAnimationFrame(() => { state.programmaticScroll = false; });
+  }
+
+  viewport.addEventListener('wheel', markUserIntent, { passive: true });
+  viewport.addEventListener('pointerdown', () => { state.pointerHeld = true; markUserIntent(); }, { passive: true });
+  viewport.addEventListener('pointerup', () => { state.pointerHeld = false; markUserIntent(); }, { passive: true });
+  viewport.addEventListener('pointercancel', () => { state.pointerHeld = false; markUserIntent(); }, { passive: true });
+  viewport.addEventListener('scroll', () => {
+    syncScrollbar();
+    if (!state.programmaticScroll && performance.now() - state.recentUserIntentAt < 500) markUserIntent();
+  }, { passive: true });
+
+  function scrollByUser(delta) {
+    markUserIntent();
+    viewport.scrollBy({ top: delta, behavior: 'smooth' });
+  }
+  arrowUp.addEventListener('click', () => scrollByUser(-140));
+  arrowDown.addEventListener('click', () => scrollByUser(140));
+
+  scrollThumb.addEventListener('pointerdown', (event) => {
+    draggedPointerId = event.pointerId;
+    state.pointerHeld = true;
+    markUserIntent();
+    dragStartY = event.clientY;
+    dragStartThumbTop = parseFloat(scrollThumb.style.top || 0);
+    scrollThumb.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+  scrollThumb.addEventListener('pointermove', (event) => {
+    if (draggedPointerId !== event.pointerId) return;
+    const maxThumbTravel = scrollTrack.clientHeight - scrollThumb.clientHeight;
+    const maxScroll = viewport.scrollHeight - viewport.clientHeight;
+    const top = Math.max(0, Math.min(dragStartThumbTop + event.clientY - dragStartY, maxThumbTravel));
+    scrollThumb.style.top = `${top}px`;
+    if (maxThumbTravel > 0) viewport.scrollTop = (top / maxThumbTravel) * maxScroll;
+  });
+  const finishThumbDrag = (event) => {
+    if (draggedPointerId !== event.pointerId) return;
+    draggedPointerId = null;
+    state.pointerHeld = false;
+    try { scrollThumb.releasePointerCapture(event.pointerId); } catch {}
+    markUserIntent();
+  };
+  scrollThumb.addEventListener('pointerup', finishThumbDrag);
+  scrollThumb.addEventListener('pointercancel', finishThumbDrag);
+  scrollThumb.addEventListener('lostpointercapture', () => {
+    draggedPointerId = null;
+    state.pointerHeld = false;
+  });
+  scrollTrack.addEventListener('click', (event) => {
+    if (event.target === scrollThumb) return;
+    markUserIntent();
+    const rect = scrollTrack.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min((event.clientY - rect.top) / rect.height, 1));
+    viewport.scrollTo({ top: ratio * (viewport.scrollHeight - viewport.clientHeight), behavior: 'smooth' });
+  });
+
+  function renderStatus() {
+    if (state.power !== 'on') return;
+    if (state.frameError) { setStatus('[这份档案读取失败]'); return; }
+    if (state.window === 'closed') { setStatus('[双击桌面图标重新打开]'); return; }
+    if (state.reading || state.pointerHeld) { setStatus('[阅读中 暂停切页]'); return; }
+    if (state.targetIndex != null && state.targetIndex !== state.displayedIndex) { setStatus('[正在读取下一份档案…]'); return; }
+    setStatus(state.playMode === 'playing' ? '滚轮上下浏览' : '[已暂停]');
+  }
+
+  function updateControls() {
+    const count = state.frames.length;
+    const displayed = state.displayedIndex;
+    counterEl.textContent = displayed == null ? `0/${count}` : `${displayed + 1}/${count}`;
+    const target = state.targetIndex ?? displayed ?? 0;
+    prevBtn.disabled = count <= 1 || target <= 0;
+    nextBtn.disabled = count <= 1 || target >= count - 1;
+    togglePlayBtn.disabled = count <= 1;
+    togglePlayBtn.textContent = state.playMode === 'playing' ? '❚❚ 暂停' : '▶ 播放';
+  }
+
+  function commitFrame(index, resource, context) {
+    if (context.sessionId !== state.sessionId || context.requestId !== state.requestId) return false;
+    if (state.power !== 'on' && state.power !== 'booting') return false;
+    if (context.origin === 'auto' && (state.playMode !== 'playing' || context.playGeneration !== state.playGeneration || state.reading || state.pointerHeld || state.documentHidden)) return false;
+    const frame = state.frames[index];
+    const img = resource.img;
+    img.id = 'mainImg';
+    img.alt = '快照截图';
+    img.style.opacity = '0';
+    contentBox.replaceChildren(img);
+    mainImg = img;
+    state.displayedIndex = index;
+    state.targetIndex = index;
+    state.frameError = null;
+    timeEl.textContent = formatTime(frame.deployed_at);
+    const liveUrl = historyUrl(frame.cid);
+    teleportBtn.href = liveUrl;
+    menuLivePage.href = liveUrl;
+    resetScroll();
+    updateControls();
+    state.frameStartedAt = performance.now();
+    progressFill.style.width = '0%';
+    requestAnimationFrame(() => {
+      img.style.opacity = '1';
+      syncScrollbar();
+    });
+    warmBuffer(index);
+    renderStatus();
+    return true;
+  }
+
+  async function showFrame(index, origin = 'manual', playGeneration = state.playGeneration) {
+    if (index < 0 || index >= state.frames.length) return false;
+    const context = {
+      sessionId: state.sessionId,
+      requestId: ++state.requestId,
+      origin,
+      playGeneration,
+    };
+    state.targetIndex = index;
+    state.frameError = null;
+    updateControls();
+    renderStatus();
+    triggerLedFlicker(650);
+    try {
+      const resource = await ensureImage(index, 'foreground');
+      return commitFrame(index, resource, context);
+    } catch (error) {
+      if (context.sessionId !== state.sessionId || context.requestId !== state.requestId || error?.name === 'AbortError') return false;
+      state.targetIndex = state.displayedIndex;
+      state.frameError = { index, error };
+      if (origin === 'auto') stopAutoPlay(false);
+      loadingTip.style.display = 'block';
+      loadingTip.textContent = '这份档案读取失败 · 点击重试';
+      loadingTip.onclick = async () => {
+        loadingTip.style.display = 'none';
+        cache.delete(state.frames[index]._url);
+        await showFrame(index, 'manual');
+      };
+      diagnostics('foreground frame failed', { index, error: error.message });
+      updateControls();
+      renderStatus();
+      return false;
+    }
+  }
+
+  function stopAutoPlay(resetProgress = true) {
+    state.playMode = 'paused';
+    state.playGeneration += 1;
+    cancelAnimationFrame(playRaf);
+    playRaf = null;
+    state.requestId += 1; // invalidate pending automatic commit
+    if (resetProgress) progressFill.style.width = '0%';
+    updateControls();
+    renderStatus();
+  }
+
+  function startAutoPlay() {
+    if (state.frames.length <= 1 || state.displayedIndex == null || state.power !== 'on' || state.window !== 'open') return;
+    state.playMode = 'playing';
+    const generation = ++state.playGeneration;
+    state.frameStartedAt = performance.now();
+    updateControls();
+    renderStatus();
+    cancelAnimationFrame(playRaf);
+    const tick = async (now) => {
+      if (generation !== state.playGeneration || state.playMode !== 'playing') return;
+      if (state.reading || state.pointerHeld || state.documentHidden || state.window !== 'open') {
+        state.frameStartedAt = now;
+        playRaf = requestAnimationFrame(tick);
+        return;
+      }
+      const duration = Number(speedSelect.value) || 4500;
+      const progress = Math.min((now - state.frameStartedAt) / duration, 1);
+      progressFill.style.width = `${progress * 100}%`;
+      if (progress < 1) {
+        playRaf = requestAnimationFrame(tick);
+        return;
+      }
+      progressFill.style.width = '100%';
+      const nextIndex = (state.displayedIndex + 1) % state.frames.length;
+      const ok = await showFrame(nextIndex, 'auto', generation);
+      if (!ok || generation !== state.playGeneration || state.playMode !== 'playing') return;
+      playRaf = requestAnimationFrame(tick);
+    };
+    playRaf = requestAnimationFrame(tick);
+  }
+
+  togglePlayBtn.addEventListener('click', () => {
+    if (state.playMode === 'playing') stopAutoPlay(); else startAutoPlay();
+  });
+  prevBtn.addEventListener('click', async () => {
+    stopAutoPlay();
+    const base = state.targetIndex ?? state.displayedIndex ?? 0;
+    await showFrame(Math.max(0, base - 1), 'manual');
+  });
+  nextBtn.addEventListener('click', async () => {
+    stopAutoPlay();
+    const base = state.targetIndex ?? state.displayedIndex ?? 0;
+    await showFrame(Math.min(state.frames.length - 1, base + 1), 'manual');
+  });
+  speedSelect.addEventListener('change', () => {
+    if (state.playMode === 'playing') { stopAutoPlay(); startAutoPlay(); }
+  });
+
+  function closeAppWindow() {
+    stopAutoPlay();
+    state.window = 'closing';
+    const generation = ++state.windowGeneration;
+    mainAppWindow.classList.remove('window-opening');
+    mainAppWindow.classList.add('window-closing');
+    renderStatus();
+    setTimeout(() => {
+      if (generation !== state.windowGeneration || state.window !== 'closing') return;
+      mainAppWindow.classList.add('window-hidden');
+      mainAppWindow.classList.remove('window-closing');
+      state.window = 'closed';
+      renderStatus();
+    }, 220);
+  }
+
+  function openAppWindow() {
+    if (state.window === 'open' || state.window === 'opening') return;
+    const generation = ++state.windowGeneration;
+    state.window = 'opening';
+    mainAppWindow.classList.remove('window-hidden', 'window-closing');
+    mainAppWindow.classList.add('window-opening');
+    desktopAppIcon.classList.remove('selected');
+    setTimeout(() => {
+      if (generation !== state.windowGeneration || state.window !== 'opening') return;
+      mainAppWindow.classList.remove('window-opening');
+      state.window = 'open';
+      syncScrollbar();
+      if (state.frames.length > 1) startAutoPlay();
+      renderStatus();
+    }, 240);
+  }
+
+  windowCloseBox.addEventListener('click', event => { event.stopPropagation(); closeAppWindow(); });
+  let lastDesktopClick = 0;
+  desktopAppIcon.tabIndex = 0;
+  desktopAppIcon.setAttribute('role', 'button');
+  desktopAppIcon.setAttribute('aria-label', '打开博客时光机');
+  desktopAppIcon.addEventListener('click', event => {
+    const now = Date.now();
+    desktopAppIcon.classList.add('selected');
+    const coarse = matchMedia('(pointer: coarse)').matches;
+    if (coarse || now - lastDesktopClick < 350) openAppWindow();
+    lastDesktopClick = now;
+  });
+  desktopAppIcon.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openAppWindow(); }
+  });
+  document.querySelector('.screen-workspace').addEventListener('click', event => {
+    if (!desktopAppIcon.contains(event.target)) desktopAppIcon.classList.remove('selected');
+  });
+
+  function closeAllDropdowns() {
+    for (const [button, dropdown] of [[appleMenuBtn, appleDropdown], [specialMenuBtn, specialDropdown], [tmMenuBtn, tmDropdown]]) {
+      dropdown.classList.remove('show');
+      button.classList.remove('active');
+    }
+  }
+  function toggleDropdown(button, dropdown, event) {
+    event.stopPropagation();
+    const open = dropdown.classList.contains('show');
+    closeAllDropdowns();
+    if (!open) { dropdown.classList.add('show'); button.classList.add('active'); }
+  }
+  appleMenuBtn.addEventListener('click', event => toggleDropdown(appleMenuBtn, appleDropdown, event));
+  specialMenuBtn.addEventListener('click', event => toggleDropdown(specialMenuBtn, specialDropdown, event));
+  tmMenuBtn.addEventListener('click', event => toggleDropdown(tmMenuBtn, tmDropdown, event));
+  document.addEventListener('click', closeAllDropdowns);
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') closeAllDropdowns(); });
+  aboutMacBtn.addEventListener('click', () => { closeAllDropdowns(); aboutMacDialog.classList.add('show'); });
+  closeAboutMacBtn.addEventListener('click', () => aboutMacDialog.classList.remove('show'));
+  aboutTmBtn.addEventListener('click', () => { closeAllDropdowns(); aboutTmDialog.classList.add('show'); });
+  closeAboutTmBtn.addEventListener('click', () => aboutTmDialog.classList.remove('show'));
+
+  function clearImageResources() {
+    for (const record of cache.values()) if (record.objectUrl) URL.revokeObjectURL(record.objectUrl);
+    cache.clear();
+    loadQueue.splice(0).forEach(task => { task.cancelled = true; });
+  }
+
+  function invalidateSession({ releaseImages = false } = {}) {
+    state.sessionId += 1;
+    state.requestId += 1;
+    state.playGeneration += 1;
+    state.windowGeneration += 1;
+    cancelAnimationFrame(playRaf);
+    playRaf = null;
+    clearTimeout(readingTimer);
+    state.reading = false;
+    state.pointerHeld = false;
+    if (releaseImages) clearImageResources();
+  }
+
+  async function performBootSequence({ forceIndex = false } = {}) {
+    invalidateSession({ releaseImages: false });
+    const session = state.sessionId;
+    state.power = 'booting';
+    state.window = 'open';
+    state.frameError = null;
+    state.displayedIndex = null;
+    state.targetIndex = null;
+    state.playMode = 'paused';
+    closeAllDropdowns();
+    loadingTip.style.display = 'none';
+    systemScreenOverlay.style.display = 'flex';
+    systemScreenOverlay.style.opacity = '1';
+    bootContainer.style.display = 'flex';
+    shuttingDownContainer.style.display = 'none';
+    shutdownContainer.style.display = 'none';
+    mainAppWindow.classList.remove('window-hidden', 'window-closing', 'window-opening');
+    driveLed.className = 'drive-led standby';
+    triggerLedFlicker(1000);
+    bootStatusText.textContent = 'Starting System 1.0...';
+    bootProgressBar.style.width = '20%';
+    try {
+      await sleep(350);
+      if (session !== state.sessionId) return;
+      bootStatusText.textContent = 'Loading IPFS Index...';
+      bootProgressBar.style.width = '50%';
+      await loadIndex(forceIndex);
+      if (session !== state.sessionId) return;
+      bootStatusText.textContent = 'Loading First Snapshot...';
+      bootProgressBar.style.width = '75%';
+      state.targetIndex = 0;
+      const resource = await ensureImage(0, 'foreground');
+      if (session !== state.sessionId) return;
+      state.requestId += 1;
+      const context = { sessionId: session, requestId: state.requestId, origin: 'boot', playGeneration: state.playGeneration };
+      if (!commitFrame(0, resource, context)) throw new Error('首份档案提交失败');
+      bootStatusText.textContent = 'Welcome to Macintosh.';
+      bootProgressBar.style.width = '100%';
+      state.power = 'on';
+      warmBuffer(0);
+      await sleep(300);
+      if (session !== state.sessionId) return;
+      systemScreenOverlay.style.opacity = '0';
+      setTimeout(() => {
+        if (session !== state.sessionId || state.power !== 'on') return;
+        systemScreenOverlay.style.display = 'none';
+        state.frameStartedAt = performance.now();
+        if (state.frames.length > 1) startAutoPlay(); else updateControls();
+      }, 300);
+    } catch (error) {
+      if (session !== state.sessionId || error?.name === 'AbortError') return;
+      state.power = 'bootError';
+      bootProgressBar.style.width = '75%';
+      bootStatusText.textContent = state.indexLoaded ? '首份档案读取失败' : '档案清单读取失败';
+      let retry = $('bootRetryButton');
+      if (!retry) {
+        retry = document.createElement('button');
+        retry.id = 'bootRetryButton';
+        retry.className = 'mac-btn';
+        retry.style.marginTop = '10px';
+        retry.textContent = '重试';
+        bootContainer.appendChild(retry);
+      }
+      retry.onclick = () => performBootSequence({ forceIndex: !state.indexLoaded });
+      retry.style.display = 'inline-flex';
+      diagnostics('boot failed', error.message);
+    }
+  }
+
+  async function performShutDown() {
+    if (state.power === 'shuttingDown' || state.power === 'off') return;
+    invalidateSession({ releaseImages: true });
+    state.power = 'shuttingDown';
+    closeAllDropdowns();
+    aboutMacDialog.classList.remove('show');
+    aboutTmDialog.classList.remove('show');
+    systemScreenOverlay.style.display = 'flex';
+    systemScreenOverlay.style.opacity = '1';
+    bootContainer.style.display = 'none';
+    shuttingDownContainer.style.display = 'flex';
+    shutdownContainer.style.display = 'none';
+    shutdownStatusText.textContent = 'Flushing Memory Buffers...';
+    shutdownProgressBar.style.width = '30%';
+    driveLed.className = 'drive-led standby';
+    triggerLedFlicker(400);
+    await sleep(550);
+    if (state.power !== 'shuttingDown') return;
+    shutdownStatusText.textContent = 'Disconnecting IPFS Gateways...';
+    shutdownProgressBar.style.width = '75%';
+    await sleep(650);
+    if (state.power !== 'shuttingDown') return;
+    shutdownStatusText.textContent = 'Unmounting Virtual Disk...';
+    shutdownProgressBar.style.width = '100%';
+    await sleep(400);
+    if (state.power !== 'shuttingDown') return;
+    driveLed.className = 'drive-led off';
+    shuttingDownContainer.style.display = 'none';
+    shutdownContainer.style.display = 'flex';
+    state.power = 'off';
+  }
+
+  function performRestart() {
+    performBootSequence({ forceIndex: false });
+  }
+
+  menuShutdown.addEventListener('click', performShutDown);
+  menuRestart.addEventListener('click', performRestart);
+  rebootBtn.addEventListener('click', () => performBootSequence({ forceIndex: false }));
+
+  document.addEventListener('visibilitychange', () => {
+    state.documentHidden = document.hidden;
+    if (!document.hidden && state.playMode === 'playing') state.frameStartedAt = performance.now();
+  });
+  window.addEventListener('resize', syncScrollbar);
+  if ('ResizeObserver' in window) new ResizeObserver(syncScrollbar).observe(viewport);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    startClock();
+    performBootSequence();
+  });
+})();
+  </script>
+</body>
+</html>
