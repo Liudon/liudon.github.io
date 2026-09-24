@@ -25,10 +25,25 @@ export function captureProfileConfig(env = process.env) {
     throw new Error(`Invalid capture viewport: ${width}x${height}`);
   }
 
+  const requireEvidence = env.CAPTURE_REQUIRE_RUNTIME_EVIDENCE === "true";
+  const runtime = {
+    browser: env.CAPTURE_BROWSER_EVIDENCE || null,
+    font: env.CAPTURE_FONT_EVIDENCE || null,
+    image_toolchain: env.CAPTURE_IMAGE_TOOLCHAIN_EVIDENCE || null,
+  };
+
+  if (
+    requireEvidence &&
+    (!runtime.browser || !runtime.font || !runtime.image_toolchain)
+  ) {
+    throw new Error("Missing required capture runtime evidence");
+  }
+
   return {
     profile_version: captureProfileVersion,
     capture_version: captureVersion,
     environment_id: env.CAPTURE_ENVIRONMENT_ID || "local-unpinned",
+    runtime,
     viewport: [width, height],
     device_scale_factor: 1,
     locale: "zh-CN",
