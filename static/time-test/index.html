@@ -496,8 +496,20 @@
       display: flex;
     }
 
-    .history-frame {
+    .history-frame-shell {
       display: none;
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .history-frame-shell.is-visible {
+      display: block;
+    }
+
+    .history-frame {
+      display: block;
       width: 100%;
       height: 100%;
       border: 0;
@@ -505,25 +517,21 @@
       transform-origin: top left;
     }
 
-    .history-frame.is-visible {
-      display: block;
-    }
-
     /* The IPFS page is cross-origin, so its inner font-size cannot be
-       changed here. Give the iframe a wider layout viewport and scale
-       the whole historical page back down for denser reading instead. */
+       changed here. Keep a fixed clipping shell at 100%, then give the
+       iframe a wider viewport and scale only the iframe inside it. */
     @media (min-width: 601px) and (max-width: 1024px) {
       .history-frame {
-        width: 108.696%;
-        height: 108.696%;
+        width: calc(100% / 0.92);
+        height: calc(100% / 0.92);
         transform: scale(0.92);
       }
     }
 
     @media (max-width: 600px) {
       .history-frame {
-        width: 117.647%;
-        height: 117.647%;
+        width: calc(100% / 0.85);
+        height: calc(100% / 0.85);
         transform: scale(0.85);
       }
     }
@@ -1030,12 +1038,14 @@
                 <div class="scroll-arrow scroll-arrow-down" id="arrowDown">▼</div>
               </div>
 
-              <iframe
-                id="historyFrame"
-                class="history-frame"
-                title="博客历史快照"
-                referrerpolicy="strict-origin-when-cross-origin"
-              ></iframe>
+              <div id="historyFrameShell" class="history-frame-shell">
+                <iframe
+                  id="historyFrame"
+                  class="history-frame"
+                  title="博客历史快照"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                ></iframe>
+              </div>
             </div>
 
           </div>
@@ -1188,6 +1198,7 @@
   const arrowUp = $('arrowUp');
   const arrowDown = $('arrowDown');
   const timelineScrollbar = $('timelineScrollbar');
+  const historyFrameShell = $('historyFrameShell');
   const historyFrame = $('historyFrame');
 
   const appleMenuBtn = $('appleMenuBtn');
@@ -1318,7 +1329,7 @@
     timelineScrollbar.classList.toggle('timeline-hidden', snapshot);
 
     historyToolbar.classList.toggle('is-visible', snapshot);
-    historyFrame.classList.toggle('is-visible', snapshot);
+    historyFrameShell.classList.toggle('is-visible', snapshot);
 
     menuLivePageLabel.textContent = snapshot
       ? '返回时间线'
