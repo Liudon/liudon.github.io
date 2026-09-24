@@ -1,0 +1,161 @@
+name: Validate Blog Time Machine V1 Integration
+
+on:
+  push:
+    branches:
+      - feature/blog-time-machine-v1-integration
+    paths:
+      - ".github/scripts/ipfs-history/**"
+      - ".github/workflows/time-machine-v1-integration-validation.yml"
+      - ".github/workflows/ipfs-history-screenshots.yml"
+      - ".github/workflows/ipfs-history-visual-index.yml"
+      - ".github/workflows/main.yml"
+      - "static/time-machine-preview.html"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blog-time-machine-v1-integration-validation
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SCREENSHOT_WIDTH: "1440"
+      SCREENSHOT_HEIGHT: "900"
+      SCREENSHOT_ATTEMPTS: "2"
+      CAPTURE_MAX_PIXELS: "40000000"
+      CAPTURE_ENVIRONMENT_ID: ubuntu-24.04-playwright-1.56.1-sharp-0.35.0-noto-cjk-v1
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Install capture dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          fc-cache -f
+          npm install --no-save --package-lock=false --no-audit --no-fund playwright@1.56.1 sharp@0.35.0
+          npx playwright install --with-deps chromium
+
+      - name: Collect runtime evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          FONT_VERSION=$(dpkg-query -W -f='${Version}' fonts-noto-cjk)
+          BROWSER_EVIDENCE=$(node --input-type=module <<'NODE'
+          import { chromium } from "playwright";
+          const browser = await chromium.launch({ headless: true });
+          console.log(browser.version());
+          await browser.close();
+          NODE
+          )
+          IMAGE_TOOLCHAIN_EVIDENCE=$(node --input-type=module <<'NODE'
+          import sharp from "sharp";
+          console.log(`sharp=${sharp.versions.sharp};vips=${sharp.versions.vips};webp=${sharp.versions.webp}`);
+          NODE
+          )
+          {
+            echo "CAPTURE_BROWSER_EVIDENCE=$BROWSER_EVIDENCE"
+            echo "CAPTURE_FONT_EVIDENCE=fonts-noto-cjk=$FONT_VERSION"
+            echo "CAPTURE_IMAGE_TOOLCHAIN_EVIDENCE=$IMAGE_TOOLCHAIN_EVIDENCE"
+            echo "CAPTURE_REQUIRE_RUNTIME_EVIDENCE=true"
+          } >> "$GITHUB_ENV"
+
+      - name: Run unit tests
+        run: |
+          set -euo pipefail
+          node --test \
+            .github/scripts/ipfs-history/capture-data.test.mjs \
+            .github/scripts/ipfs-history/capture-evidence.test.mjs \
+            .github/scripts/ipfs-history/capture-ads.test.mjs \
+            .github/scripts/ipfs-history/visual-index.test.mjs
+
+      - name: Checkout IPFS history
+        id: history
+        shell: bash
+        run: |
+          set -euo pipefail
+          HISTORY_DIR="${RUNNER_TEMP}/ipfs-history"
+          git fetch origin ipfs-history
+          git worktree add --detach "$HISTORY_DIR" origin/ipfs-history
+          echo "dir=$HISTORY_DIR" >> "$GITHUB_OUTPUT"
+
+      - name: Capture and verify one real CID
+        id: smoke
+        env:
+          HISTORY_DIR: ${{ steps.history.outputs.dir }}
+          IPFS_GATEWAY_BASE: https://liudon.xyz/ipfs
+        shell: bash
+        run: |
+          set -euo pipefail
+          CID=$(jq -er '.cid' "$HISTORY_DIR/latest.json")
+          echo "cid=$CID" >> "$GITHUB_OUTPUT"
+          CAPTURE_CID="$CID" node .github/scripts/ipfs-history/capture-screenshots.mjs "$HISTORY_DIR"
+          CAPTURE_REQUIRE_CURRENT_PROFILE=true node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR" "$CID"
+
+      - name: Build isolated playback and visual index
+        env:
+          HISTORY_DIR: ${{ steps.history.outputs.dir }}
+          CID: ${{ steps.smoke.outputs.cid }}
+          PLAYBACK_WIDTH: "960"
+          PLAYBACK_QUALITY: "75"
+          PLAYBACK_MAX_PIXELS: "8000000"
+          PLAYBACK_MAX_EDGE: "16383"
+        shell: bash
+        run: |
+          set -euo pipefail
+          SMOKE_DIR="${RUNNER_TEMP}/time-machine-smoke"
+          PROFILE_ID=$(jq -er '.profile_id' "$HISTORY_DIR/captures/current-profile.json")
+          mkdir -p "$SMOKE_DIR/history" "$SMOKE_DIR/captures/$PROFILE_ID"
+          cp "$HISTORY_DIR/captures/current-profile.json" "$SMOKE_DIR/captures/current-profile.json"
+          cp -R "$HISTORY_DIR/captures/$PROFILE_ID/$CID" "$SMOKE_DIR/captures/$PROFILE_ID/$CID"
+
+          python3 - "$HISTORY_DIR" "$CID" "$SMOKE_DIR/history/smoke.jsonl" <<'PY'
+          import json, pathlib, sys
+          root = pathlib.Path(sys.argv[1]); cid = sys.argv[2]; output = pathlib.Path(sys.argv[3])
+          matches = []
+          for file in sorted((root / "history").glob("*.jsonl")):
+              for raw in file.read_text(encoding="utf-8").splitlines():
+                  if raw.strip():
+                      item = json.loads(raw)
+                      if item.get("cid") == cid:
+                          matches.append(item)
+          if not matches:
+              raise SystemExit(f"CID not found: {cid}")
+          matches.sort(key=lambda item: item["deployed_at"])
+          output.write_text(json.dumps(matches[0], ensure_ascii=False) + "\n", encoding="utf-8")
+          PY
+
+          node .github/scripts/ipfs-history/generate-visual-index.mjs "$SMOKE_DIR"
+          jq -e '
+            .version == 1 and
+            .visual_count == 1 and
+            .frames[0].cid == env.CID and
+            .frames[0].width > 0 and .frames[0].width <= 960 and
+            .frames[0].height > 0 and .frames[0].bytes > 0 and
+            (.frames[0].screenshot | test("^screenshots/playback/[0-9a-f]{64}\\.webp$"))
+          ' "$SMOKE_DIR/visual-index.json" >/dev/null
+          PLAYBACK=$(jq -er '.frames[0].screenshot' "$SMOKE_DIR/visual-index.json")
+          test -s "$SMOKE_DIR/$PLAYBACK"
+          test "$(basename "$PLAYBACK" .webp)" = "$(sha256sum "$SMOKE_DIR/$PLAYBACK" | awk '{print $1}')"
+
+      - name: Cleanup
+        if: always()
+        env:
+          HISTORY_DIR: ${{ steps.history.outputs.dir }}
+        shell: bash
+        run: |
+          if [[ -n "${HISTORY_DIR:-}" ]]; then
+            git worktree remove --force "$HISTORY_DIR" >/dev/null 2>&1 || true
+          fi
