@@ -841,7 +841,7 @@ jobs:
           fc-cache -f
           fc-match "Noto Sans CJK SC"
 
-          FONT_VERSION=$(dpkg-query -W -f='\${Version}' fonts-noto-cjk)
+          FONT_VERSION=$(dpkg-query -W -f='${Version}' fonts-noto-cjk)
           FONT_EVIDENCE="fonts-noto-cjk=${FONT_VERSION}"
           echo "Capture font evidence: ${FONT_EVIDENCE}"
 
