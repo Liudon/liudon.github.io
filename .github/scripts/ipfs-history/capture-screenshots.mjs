@@ -610,11 +610,11 @@ async function captureOne(
       }
 
       const profileEvidence = {
-        browser: browser.version(),
+        browser: actualBrowserEvidence,
         platform: process.platform,
-        font_evidence:
-          process.env.CAPTURE_FONT_EVIDENCE ||
-          null,
+        font_evidence: profileConfig.runtime.font,
+        image_toolchain_evidence:
+          actualImageToolchainEvidence,
         sharp: sharp.versions.sharp,
         vips: sharp.versions.vips,
         webp: sharp.versions.webp,
@@ -795,10 +795,50 @@ const browser =
     ],
   });
 
+const actualBrowserEvidence = browser.version();
+const actualImageToolchainEvidence =
+  `sharp=${sharp.versions.sharp};` +
+  `vips=${sharp.versions.vips};` +
+  `webp=${sharp.versions.webp}`;
+
+if (
+  profileConfig.runtime.browser !== actualBrowserEvidence
+) {
+  await browser.close();
+  throw new Error(
+    `Capture browser evidence mismatch: expected ` +
+    `${profileConfig.runtime.browser}, actual ` +
+    `${actualBrowserEvidence}`,
+  );
+}
+
+if (
+  profileConfig.runtime.image_toolchain !==
+  actualImageToolchainEvidence
+) {
+  await browser.close();
+  throw new Error(
+    `Capture image toolchain evidence mismatch: expected ` +
+    `${profileConfig.runtime.image_toolchain}, actual ` +
+    `${actualImageToolchainEvidence}`,
+  );
+}
+
+if (!profileConfig.runtime.font) {
+  await browser.close();
+  throw new Error("Capture font evidence is missing");
+}
+
 console.log(
-  `Browser: ${browser.version()}, ` +
+  `Browser: ${actualBrowserEvidence}, ` +
   `capture v${captureVersion}, ` +
   `profile ${profileId}`,
+);
+console.log(
+  `Font evidence: ${profileConfig.runtime.font}`,
+);
+console.log(
+  `Image toolchain evidence: ${actualImageToolchainEvidence}`,
 );
 
 const failures = [];
