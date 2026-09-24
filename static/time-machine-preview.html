@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Macintosh 128K · 博客时光机</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -102,6 +102,25 @@
       .mac-logo-text {
         width: 72px !important;
         height: 14px !important;
+      }
+
+      html,
+      body,
+      .mac-hardware,
+      .crt-screen,
+      .screen-workspace,
+      .window-toolbar,
+      .mac-btn,
+      .mac-select,
+      .menu-item,
+      .desktop-app-icon,
+      .scroll-arrow,
+      .scroll-thumb {
+        touch-action: manipulation;
+      }
+
+      .viewport {
+        touch-action: pan-y pinch-zoom;
       }
     }
 
@@ -867,9 +886,9 @@
                 <span id="counter" style="font-size:10px;">0/0</span>
                 <button class="mac-btn" id="next">►</button>
                 <select class="mac-select" id="speedSelect">
-                  <option value="7000">慢速 (7秒)</option>
-                  <option value="4500" selected>正常 (4.5秒)</option>
-                  <option value="2500">快速 (2.5秒)</option>
+                  <option value="7000" data-desktop-label="慢速 (7秒)" data-mobile-label="慢速">慢速 (7秒)</option>
+                  <option value="4500" selected data-desktop-label="正常 (4.5秒)" data-mobile-label="正常">正常 (4.5秒)</option>
+                  <option value="2500" data-desktop-label="快速 (2.5秒)" data-mobile-label="快速">快速 (2.5秒)</option>
                 </select>
                 <a class="mac-btn" id="teleportBtn" target="_blank" rel="noopener" title="在浏览器新标签页中打开历史快照网页">
                   打开 ↗
@@ -2147,6 +2166,24 @@
     const base = state.targetIndex ?? state.displayedIndex ?? 0;
     await showFrame(Math.min(state.frames.length - 1, base + 1), 'manual');
   });
+  function syncSpeedLabels() {
+    const mobile = matchMedia('(max-width: 600px)').matches;
+    for (const option of speedSelect.options) {
+      const label = mobile
+        ? option.dataset.mobileLabel
+        : option.dataset.desktopLabel;
+      if (label) option.textContent = label;
+    }
+  }
+
+  const speedLabelMedia = matchMedia('(max-width: 600px)');
+  syncSpeedLabels();
+  if (speedLabelMedia.addEventListener) {
+    speedLabelMedia.addEventListener('change', syncSpeedLabels);
+  } else if (speedLabelMedia.addListener) {
+    speedLabelMedia.addListener(syncSpeedLabels);
+  }
+
   speedSelect.addEventListener('change', () => {
     if (state.playMode === 'playing') { stopAutoPlay(); startAutoPlay(); }
   });
