@@ -296,7 +296,9 @@ jobs:
 
             jq -r --slurpfile old "$CURRENT_INDEX" '
               (($old[0].frames // []) | map(.screenshot) | unique) as $before
-              | [.frames[].screenshot | select(($before | index(.)) == null)]
+              | [.frames[].screenshot as $candidate
+                 | select(($before | index($candidate)) == null)
+                 | $candidate]
               | unique[]
             ' "$HISTORY_DIR/visual-index.json" > "$NEW_REFS"
 

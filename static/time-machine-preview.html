@@ -1114,6 +1114,7 @@
     frameElapsedMs: 0,
     frameTickAt: 0,
     loopPhase: 'normal',
+    pendingTargetOrigin: null,
     recentUserIntentAt: 0,
     programmaticScroll: false,
   };
@@ -1247,8 +1248,21 @@
     return valid;
   }
 
-  async function fetchWithTimeout(url, options = {}, timeoutMs, externalSignal = null) {
+  function createTimeoutError(label = '请求超时') {
+    const error = new Error(label);
+    error.name = 'TimeoutError';
+    return error;
+  }
+
+  async function fetchWithTimeout(
+    url,
+    options = {},
+    timeoutMs,
+    externalSignal = null,
+    consume = response => response,
+  ) {
     const controller = new AbortController();
+    let timedOut = false;
     const abortFromExternal = () => {
       if (!controller.signal.aborted) {
         controller.abort(externalSignal?.reason || new DOMException('Cancelled', 'AbortError'));
@@ -1257,17 +1271,61 @@
     if (externalSignal?.aborted) abortFromExternal();
     else externalSignal?.addEventListener('abort', abortFromExternal, { once: true });
 
+    let rejectTimeout;
+    const deadline = new Promise((_, reject) => {
+      rejectTimeout = reject;
+    });
     const timer = setTimeout(() => {
       if (!controller.signal.aborted) {
-        controller.abort(new DOMException('Timeout', 'AbortError'));
+        timedOut = true;
+        const error = createTimeoutError();
+        controller.abort(error);
+        rejectTimeout(error);
       }
     }, timeoutMs);
 
     try {
-      return await fetch(url, { ...options, signal: controller.signal });
+      return await Promise.race([
+        (async () => {
+          const response = await fetch(url, {
+            ...options,
+            signal: controller.signal,
+          });
+          return consume(response);
+        })(),
+        deadline,
+      ]);
+    } catch (error) {
+      if (timedOut) throw createTimeoutError();
+      throw error;
     } finally {
       clearTimeout(timer);
       externalSignal?.removeEventListener('abort', abortFromExternal);
+    }
+  }
+
+  async function decodeWithTimeout(img, timeoutMs, externalSignal) {
+    let timer;
+    let abortListener;
+    const cancelled = new Promise((_, reject) => {
+      abortListener = () => reject(
+        externalSignal.reason || new DOMException('Cancelled', 'AbortError'),
+      );
+      if (externalSignal.aborted) abortListener();
+      else externalSignal.addEventListener('abort', abortListener, { once: true });
+    });
+    const timedOut = new Promise((_, reject) => {
+      timer = setTimeout(
+        () => reject(createTimeoutError('图片解码超时')),
+        timeoutMs,
+      );
+    });
+
+    try {
+      await Promise.race([img.decode(), cancelled, timedOut]);
+    } finally {
+      clearTimeout(timer);
+      externalSignal.removeEventListener('abort', abortListener);
     }
   }
 
@@ -1281,16 +1339,18 @@
 
       for (const [sourceIndex, url] of indexUrls.entries()) {
         try {
-          const response = await fetchWithTimeout(
+          const data = await fetchWithTimeout(
             url,
             { cache: force ? 'reload' : 'default' },
             sourceIndex === 0
               ? CONFIG.primaryAssetTimeoutMs
               : CONFIG.indexTimeoutMs,
+            null,
+            async response => {
+              if (!response.ok) throw new Error(`HTTP ${response.status}`);
+              return response.json();
+            },
           );
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-          const data = await response.json();
           preferredAssetSourceIndex = sourceIndex;
           const frames = normalizeFrames(data);
           if (!frames.length) throw new Error('暂无可用快照');
@@ -1428,21 +1488,32 @@
       if (record.cancelled || record.controller.signal.aborted) {
         throw new DOMException('Cancelled', 'AbortError');
       }
+      const attemptStartedAt = performance.now();
 
       for (const sourceUrl of orderedAssetUrls(frame._urls)) {
         try {
           const originalSourceIndex = frame._urls.indexOf(sourceUrl);
-          const response = await fetchWithTimeout(
-            sourceUrl,
-            { cache: 'default', mode: 'cors' },
+          const attemptRemainingMs = Math.max(
+            1,
+            CONFIG.imageTimeoutMs - (performance.now() - attemptStartedAt),
+          );
+          const timeoutMs = Math.min(
             originalSourceIndex === 0
               ? CONFIG.primaryAssetTimeoutMs
               : CONFIG.imageTimeoutMs,
-            record.controller.signal,
+            attemptRemainingMs,
           );
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-          const blob = await response.blob();
+          const sourceStartedAt = performance.now();
+          const blob = await fetchWithTimeout(
+            sourceUrl,
+            { cache: 'default', mode: 'cors' },
+            timeoutMs,
+            record.controller.signal,
+            async response => {
+              if (!response.ok) throw new Error(`HTTP ${response.status}`);
+              return response.blob();
+            },
+          );
 
           if (
             Number.isSafeInteger(frame.bytes) &&
@@ -1462,7 +1533,15 @@
           img.src = objectUrl;
 
           try {
-            await img.decode();
+            const remainingMs = Math.max(
+              1,
+              timeoutMs - (performance.now() - sourceStartedAt),
+            );
+            await decodeWithTimeout(
+              img,
+              remainingMs,
+              record.controller.signal,
+            );
           } catch (error) {
             URL.revokeObjectURL(objectUrl);
             throw error;
@@ -1530,13 +1609,20 @@
           };
         } catch (error) {
           lastError = error;
-          if (error?.name === 'AbortError') throw error;
+          if (
+            error?.name === 'AbortError' &&
+            record.controller.signal.aborted
+          ) throw error;
           diagnostics('image source failed; trying fallback', {
             index: record.index,
             sourceUrl,
             attempt,
             error: error.message,
           });
+          if (
+            performance.now() - attemptStartedAt >=
+            CONFIG.imageTimeoutMs
+          ) break;
         }
       }
 
@@ -1605,6 +1691,7 @@
           state: 'ready',
           lastUsed: performance.now(),
         });
+        trimCache(state.displayedIndex ?? record.index);
         return record;
       } catch (error) {
         if (cache.get(url)?.taskId === taskId) {
@@ -1710,6 +1797,46 @@
     }
   }
 
+  function makeRoomForForeground(index) {
+    const targetUrl = state.frames[index]?._url;
+    for (const record of [...cache.values()]) {
+      if (record.state === 'loading' && record.url !== targetUrl) {
+        releaseRecord(record);
+      }
+    }
+
+    const displayedUrl = state.displayedIndex == null
+      ? null
+      : state.frames[state.displayedIndex]?._url;
+    const existingTarget = cache.get(targetUrl);
+    const targetReservation = existingTarget
+      ? 0
+      : (framePixels(state.frames[index]) ?? CONFIG.maxLegacyPixels);
+    let projectedPixels = [...cache.values()].reduce(
+      (sum, record) => sum + (
+        record.state === 'ready'
+          ? (record.pixels || 0)
+          : record.state === 'loading'
+            ? (framePixels(record.frame) ?? CONFIG.maxLegacyPixels)
+            : 0
+      ),
+      targetReservation,
+    );
+    const candidates = [...cache.values()]
+      .filter(record =>
+        record.state === 'ready' &&
+        record.url !== displayedUrl &&
+        record.url !== targetUrl
+      )
+      .sort((a, b) => a.lastUsed - b.lastUsed);
+
+    for (const record of candidates) {
+      if (projectedPixels <= CONFIG.cacheMaxPixels) break;
+      projectedPixels -= record.pixels || 0;
+      releaseRecord(record);
+    }
+  }
+
   function warmBuffer(center) {
     if (
       state.frames.length <= 1 ||
@@ -1726,13 +1853,26 @@
       if (!ordered.includes(index)) ordered.push(index);
     }
 
-    for (const index of ordered) {
+    let reservedPixels = [...cache.values()].reduce((sum, record) => {
+      if (record.state === 'ready') return sum + (record.pixels || 0);
+      if (record.state === 'loading') {
+        return sum + (framePixels(record.frame) ?? CONFIG.maxLegacyPixels);
+      }
+      return sum;
+    }, 0);
+
+    for (const [position, index] of ordered.entries()) {
+      const url = state.frames[index]._url;
+      if (cache.has(url)) continue;
       const pixels = framePixels(state.frames[index]);
+      if (pixels == null && position !== 0) continue;
+      const reservation = pixels ?? CONFIG.maxLegacyPixels;
       if (
-        pixels &&
-        pixels > CONFIG.maxPlaybackPixels
+        (pixels && pixels > CONFIG.maxPlaybackPixels) ||
+        reservedPixels + reservation > CONFIG.cacheMaxPixels
       ) continue;
 
+      reservedPixels += reservation;
       ensureImage(index, 'background').catch((error) => {
         if (error?.name !== 'AbortError') {
           diagnostics('background preload failed', {
@@ -1758,6 +1898,12 @@
   }
 
   function markUserIntent() {
+    if (state.pendingTargetOrigin === 'auto') {
+      state.requestId += 1;
+      state.targetIndex = state.displayedIndex;
+      state.pendingTargetOrigin = null;
+      updateControls();
+    }
     state.recentUserIntentAt = performance.now();
     state.reading = true;
     setStatus('[阅读中 暂停切页]');
@@ -1765,7 +1911,7 @@
     readingTimer = setTimeout(() => {
       if (state.pointerHeld) return;
       state.reading = false;
-      if (state.playMode === 'playing') state.frameTickAt = performance.now();
+      if (state.playMode === 'playing') resetPlaybackProgress();
       renderStatus();
     }, CONFIG.readReleaseMs);
   }
@@ -1868,12 +2014,15 @@
     const img = resource.img;
     img.id = 'mainImg';
     img.alt = '快照截图';
-    img.style.opacity = '0';
+    img.style.opacity = '1';
     contentBox.replaceChildren(img);
     mainImg = img;
     state.displayedIndex = index;
     state.targetIndex = index;
+    state.pendingTargetOrigin = null;
     state.frameError = null;
+    loadingTip.style.display = 'none';
+    loadingTip.onclick = null;
     timeEl.textContent = formatTime(frame.deployed_at);
     const liveUrl = historyUrl(frame.cid);
     teleportBtn.href = liveUrl;
@@ -1884,10 +2033,7 @@
     state.frameTickAt = performance.now();
     state.loopPhase = 'normal';
     progressFill.style.width = '0%';
-    requestAnimationFrame(() => {
-      img.style.opacity = '1';
-      syncScrollbar();
-    });
+    requestAnimationFrame(syncScrollbar);
     warmBuffer(index);
     renderStatus();
     return true;
@@ -1907,16 +2053,19 @@
       playGeneration,
     };
     state.targetIndex = index;
+    state.pendingTargetOrigin = origin;
     state.frameError = null;
     updateControls();
     renderStatus();
     if (flicker) triggerLedFlicker(650);
     try {
+      makeRoomForForeground(index);
       const resource = await ensureImage(index, 'foreground');
       return commitFrame(index, resource, context);
     } catch (error) {
       if (context.sessionId !== state.sessionId || context.requestId !== state.requestId || error?.name === 'AbortError') return false;
       state.targetIndex = state.displayedIndex;
+      state.pendingTargetOrigin = null;
       state.frameError = { index, error };
       if (origin === 'auto') stopAutoPlay(false);
       loadingTip.style.display = 'block';
@@ -1947,6 +2096,7 @@
     cancelAnimationFrame(playRaf);
     playRaf = null;
     state.requestId += 1; // invalidate pending automatic commit
+    state.pendingTargetOrigin = null;
     if (resetProgress) resetPlaybackProgress();
     updateControls();
     renderStatus();
@@ -2012,6 +2162,8 @@
   async function rewindToBeginning(generation) {
     if (!playbackContextValid(generation)) return false;
 
+    const requestMarker = state.requestId;
+    state.pendingTargetOrigin = 'auto';
     state.loopPhase = 'rewind';
     renderStatus();
 
@@ -2028,9 +2180,14 @@
       return false;
     }
 
-    if (!playbackContextValid(generation)) return false;
+    if (
+      !playbackContextValid(generation) ||
+      requestMarker !== state.requestId
+    ) return false;
     if (!(await flashDriveSeek(generation, 3))) return false;
+    if (requestMarker !== state.requestId) return false;
     if (!(await rewindProgressToZero(generation))) return false;
+    if (requestMarker !== state.requestId) return false;
 
     return showFrame(
       0,
@@ -2125,7 +2282,15 @@
         if (
           !ok ||
           !playbackContextValid(generation)
-        ) return;
+        ) {
+          if (
+            playbackContextValid(generation) &&
+            !state.frameError
+          ) {
+            playRaf = requestAnimationFrame(tick);
+          }
+          return;
+        }
 
         playRaf = requestAnimationFrame(tick);
         return;
@@ -2141,7 +2306,15 @@
       if (
         !ok ||
         !playbackContextValid(generation)
-      ) return;
+      ) {
+        if (
+          playbackContextValid(generation) &&
+          !state.frameError
+        ) {
+          playRaf = requestAnimationFrame(tick);
+        }
+        return;
+      }
 
       playRaf = requestAnimationFrame(tick);
     };
@@ -2286,6 +2459,7 @@
     state.reading = false;
     state.pointerHeld = false;
     state.loopPhase = 'normal';
+    state.pendingTargetOrigin = null;
     if (releaseImages) clearImageResources();
   }
 
@@ -2326,13 +2500,6 @@
       const resource = await ensureImage(0, 'foreground');
       if (session !== state.sessionId) return;
 
-      if (state.frames.length > 1) {
-        bootStatusText.textContent = 'Priming Next Snapshot...';
-        bootProgressBar.style.width = '88%';
-        await ensureImage(1, 'foreground');
-        if (session !== state.sessionId) return;
-      }
-
       state.requestId += 1;
       const context = {
         sessionId: session,
@@ -2345,6 +2512,7 @@
       }
 
       state.power = 'on';
+      bootProgressBar.style.width = '88%';
       warmBuffer(0);
       bootStatusText.textContent = 'Welcome to Macintosh.';
       bootProgressBar.style.width = '100%';
@@ -2423,8 +2591,14 @@
 
   document.addEventListener('visibilitychange', () => {
     state.documentHidden = document.hidden;
+    if (document.hidden && state.pendingTargetOrigin === 'auto') {
+      state.requestId += 1;
+      state.targetIndex = state.displayedIndex;
+      state.pendingTargetOrigin = null;
+      updateControls();
+    }
     if (!document.hidden && state.playMode === 'playing') {
-      state.frameTickAt = performance.now();
+      resetPlaybackProgress();
     }
   });
   window.addEventListener('resize', syncScrollbar);
