@@ -857,13 +857,6 @@
             <div class="menu-item" id="tmMenuBtn">
               <span>TimeMachine</span>
               <div class="mac-dropdown" id="tmDropdown">
-                <a class="dropdown-option" id="menuLivePage" target="_blank" rel="noopener">
-                  <svg class="retro-icon" viewBox="0 0 16 16">
-                    <path class="retro-icon-fill" d="M3 2h5v1.5H4.5v9h9V9H15v5H3V2zm6.5 0H15v5.5h-1.5V4.6L7.6 10.5 6.5 9.4l5.9-5.9H9.5V2z"/>
-                  </svg>
-                  <span>在浏览器中打开 ↗</span>
-                </a>
-                <div class="dropdown-divider"></div>
                 <div class="dropdown-option" id="aboutTmBtn">
                   <svg class="retro-icon" viewBox="0 0 16 16">
                     <path class="retro-icon-fill" fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 1.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zM7 5h2v2H7V5zm0 3h2v4H7V8z"/>
@@ -1107,7 +1100,6 @@
   const specialDropdown = $('specialDropdown');
   const tmMenuBtn = $('tmMenuBtn');
   const tmDropdown = $('tmDropdown');
-  const menuLivePage = $('menuLivePage');
   const menuShutdown = $('menuShutdown');
   const menuRestart = $('menuRestart');
   const aboutMacBtn = $('aboutMacBtn');
@@ -2067,7 +2059,6 @@
     timeEl.textContent = formatTime(frame.deployed_at);
     const liveUrl = historyUrl(frame.cid);
     teleportBtn.href = liveUrl;
-    menuLivePage.href = liveUrl;
     resetScroll();
     updateControls();
     state.frameElapsedMs = 0;
