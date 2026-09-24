@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import sharp from "sharp";
-import { hash, normalizeText, captureIsValid, captureVersion } from "./capture-data.mjs";
+import { hash, normalizeText, captureIsValid, legacyCaptureVersion } from "./capture-data.mjs";
 
 async function fixture(t, texts, colors = [], dimensions = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "visual-v8-"));
@@ -21,7 +21,7 @@ async function fixture(t, texts, colors = [], dimensions = {}) {
       background: colors[i] || "white" } }).webp({ lossless: true }).toBuffer();
     fs.writeFileSync(path.join(root, "screenshots", `${cid}.webp`), image);
     fs.writeFileSync(path.join(root, "screenshots/meta", `${cid}.json`), JSON.stringify({
-      capture_version: captureVersion, ads_blocked: true, ad_containers_removed: true,
+      capture_version: legacyCaptureVersion, ads_blocked: true, ad_containers_removed: true,
       javascript_enabled: true, light_verified: true, lossless: true,
       visible_text: text, text_hash: hash(normalizeText(text)), image_hash: hash(image),
       profile: { browser: "fixture" },
