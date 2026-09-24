@@ -1066,7 +1066,8 @@
     pointerHeld: false,
     documentHidden: document.hidden,
     frameError: null,
-    frameStartedAt: 0,
+    frameElapsedMs: 0,
+    frameTickAt: 0,
     recentUserIntentAt: 0,
     programmaticScroll: false,
   };
@@ -1588,7 +1589,7 @@
     readingTimer = setTimeout(() => {
       if (state.pointerHeld) return;
       state.reading = false;
-      if (state.playMode === 'playing') state.frameStartedAt = performance.now();
+      if (state.playMode === 'playing') state.frameTickAt = performance.now();
       renderStatus();
     }, CONFIG.readReleaseMs);
   }
@@ -1694,7 +1695,8 @@
     menuLivePage.href = liveUrl;
     resetScroll();
     updateControls();
-    state.frameStartedAt = performance.now();
+    state.frameElapsedMs = 0;
+    state.frameTickAt = performance.now();
     progressFill.style.width = '0%';
     requestAnimationFrame(() => {
       img.style.opacity = '1';
@@ -1740,50 +1742,106 @@
     }
   }
 
+  function resetPlaybackProgress() {
+    state.frameElapsedMs = 0;
+    state.frameTickAt = performance.now();
+    progressFill.style.width = '0%';
+  }
+
   function stopAutoPlay(resetProgress = true) {
     state.playMode = 'paused';
     state.playGeneration += 1;
     cancelAnimationFrame(playRaf);
     playRaf = null;
     state.requestId += 1; // invalidate pending automatic commit
-    if (resetProgress) progressFill.style.width = '0%';
+    if (resetProgress) resetPlaybackProgress();
     updateControls();
     renderStatus();
   }
 
   function startAutoPlay() {
-    if (state.frames.length <= 1 || state.displayedIndex == null || state.power !== 'on' || state.window !== 'open') return;
+    if (
+      state.frames.length <= 1 ||
+      state.displayedIndex == null ||
+      state.power !== 'on' ||
+      state.window !== 'open'
+    ) return;
+
     state.playMode = 'playing';
     const generation = ++state.playGeneration;
-    state.frameStartedAt = performance.now();
+    state.frameTickAt = performance.now();
     updateControls();
     renderStatus();
     cancelAnimationFrame(playRaf);
+
     const tick = async (now) => {
-      if (generation !== state.playGeneration || state.playMode !== 'playing') return;
-      if (state.reading || state.pointerHeld || state.documentHidden || state.window !== 'open') {
-        state.frameStartedAt = now;
+      if (
+        generation !== state.playGeneration ||
+        state.playMode !== 'playing'
+      ) return;
+
+      if (
+        state.reading ||
+        state.pointerHeld ||
+        state.documentHidden ||
+        state.window !== 'open'
+      ) {
+        // Freeze elapsed time while the user is reading, dragging,
+        // the tab is hidden, or the app window is not available.
+        state.frameTickAt = now;
         playRaf = requestAnimationFrame(tick);
         return;
       }
+
       const duration = Number(speedSelect.value) || 4500;
-      const progress = Math.min((now - state.frameStartedAt) / duration, 1);
+      const delta = Math.max(0, now - state.frameTickAt);
+      state.frameTickAt = now;
+      state.frameElapsedMs = Math.min(
+        state.frameElapsedMs + delta,
+        duration,
+      );
+
+      const progress = Math.min(
+        state.frameElapsedMs / duration,
+        1,
+      );
       progressFill.style.width = `${progress * 100}%`;
+
       if (progress < 1) {
         playRaf = requestAnimationFrame(tick);
         return;
       }
+
+      // Stay at 100% and keep the current decoded image visible until
+      // the next frame is fully downloaded and decoded.
       progressFill.style.width = '100%';
-      const nextIndex = (state.displayedIndex + 1) % state.frames.length;
-      const ok = await showFrame(nextIndex, 'auto', generation);
-      if (!ok || generation !== state.playGeneration || state.playMode !== 'playing') return;
+      const nextIndex =
+        (state.displayedIndex + 1) %
+        state.frames.length;
+      const ok = await showFrame(
+        nextIndex,
+        'auto',
+        generation,
+      );
+
+      if (
+        !ok ||
+        generation !== state.playGeneration ||
+        state.playMode !== 'playing'
+      ) return;
+
       playRaf = requestAnimationFrame(tick);
     };
+
     playRaf = requestAnimationFrame(tick);
   }
 
   togglePlayBtn.addEventListener('click', () => {
-    if (state.playMode === 'playing') stopAutoPlay(); else startAutoPlay();
+    if (state.playMode === 'playing') {
+      stopAutoPlay(false);
+    } else {
+      startAutoPlay();
+    }
   });
   prevBtn.addEventListener('click', async () => {
     stopAutoPlay();
@@ -1800,7 +1858,7 @@
   });
 
   function closeAppWindow() {
-    stopAutoPlay();
+    stopAutoPlay(false);
     state.window = 'closing';
     const generation = ++state.windowGeneration;
     mainAppWindow.classList.remove('window-opening');
@@ -1941,7 +1999,7 @@
       setTimeout(() => {
         if (session !== state.sessionId || state.power !== 'on') return;
         systemScreenOverlay.style.display = 'none';
-        state.frameStartedAt = performance.now();
+        state.frameTickAt = performance.now();
         if (state.frames.length > 1) startAutoPlay(); else updateControls();
       }, 300);
     } catch (error) {
@@ -2006,7 +2064,9 @@
 
   document.addEventListener('visibilitychange', () => {
     state.documentHidden = document.hidden;
-    if (!document.hidden && state.playMode === 'playing') state.frameStartedAt = performance.now();
+    if (!document.hidden && state.playMode === 'playing') {
+      state.frameTickAt = performance.now();
+    }
   });
   window.addEventListener('resize', syncScrollbar);
   if ('ResizeObserver' in window) new ResizeObserver(syncScrollbar).observe(viewport);
