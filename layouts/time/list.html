@@ -1,7 +1,28 @@
 <!DOCTYPE html>
 <html lang="{{ site.Language.Locale | default site.Language.Lang | default "zh-CN" }}">
 <head>
-  {{ partial "head.html" . }}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>{{ .Title }} | {{ site.Title }}</title>
+  <meta name="description" content="{{ .Description | default site.Params.description | plainify | truncate 160 }}">
+  <meta name="robots" content="{{ .Params.robots | default "index, follow" }}">
+  <link rel="canonical" href="{{ .Permalink }}">
+
+  <meta property="og:title" content="{{ .Title }} | {{ site.Title }}">
+  <meta property="og:description" content="{{ .Description | default site.Params.description | plainify | truncate 200 }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ .Permalink }}">
+  <meta property="og:site_name" content="{{ site.Title }}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ .Title }} | {{ site.Title }}">
+  <meta name="twitter:description" content="{{ .Description | default site.Params.description | plainify | truncate 200 }}">
+
+  <link rel="icon" type="image/svg+xml" href="{{ site.Params.assets.favicon_svg | default "favicon.svg" | relURL }}">
+  <link rel="icon" href="{{ site.Params.assets.favicon | default "favicon.ico" | relURL }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ site.Params.assets.favicon16x16 | default "favicon-16x16.png" | relURL }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ site.Params.assets.favicon32x32 | default "favicon-32x32.png" | relURL }}">
+  <link rel="apple-touch-icon" href="{{ site.Params.assets.apple_touch_icon | default "apple-touch-icon.png" | relURL }}">
+
   {{- $timeCSS := resources.Get "css/time.css" | minify | fingerprint "sha256" }}
   <link rel="stylesheet" href="{{ $timeCSS.RelPermalink }}" integrity="{{ $timeCSS.Data.Integrity }}" crossorigin="anonymous">
 </head>
