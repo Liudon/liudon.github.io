@@ -6,12 +6,14 @@ on:
     paths:
       - ".github/scripts/ipfs-history/capture-screenshots.mjs"
       - ".github/scripts/ipfs-history/capture-data.mjs"
+      - ".github/scripts/ipfs-history/capture-data.test.mjs"
+      - ".github/scripts/ipfs-history/capture-evidence.mjs"
+      - ".github/scripts/ipfs-history/capture-evidence.test.mjs"
       - ".github/scripts/ipfs-history/capture-ads.mjs"
       - ".github/scripts/ipfs-history/capture-ads.test.mjs"
       - ".github/scripts/ipfs-history/check-capture.mjs"
       - ".github/workflows/ipfs-history-screenshots.yml"
   schedule:
-    # Run off the top of the hour to reduce GitHub Actions schedule congestion.
     - cron: "37 3 * * *"
   workflow_dispatch:
 
@@ -25,12 +27,20 @@ concurrency:
 jobs:
   repair:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 60
+
+    env:
+      SCREENSHOT_WIDTH: "1440"
+      SCREENSHOT_HEIGHT: "900"
+      SCREENSHOT_ATTEMPTS: "3"
+      CAPTURE_MAX_PIXELS: "40000000"
+      CAPTURE_ENVIRONMENT_ID: ubuntu-24.04-playwright-1.56.1-sharp-0.35.0-noto-cjk-v1
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || 'code' }}
           token: ${{ secrets.TOKEN }}
 
       - name: Setup Node.js
@@ -38,6 +48,12 @@ jobs:
         with:
           node-version: "24"
           package-manager-cache: false
+
+      - name: Test capture profile and evidence
+        run: |
+          node --test \
+            .github/scripts/ipfs-history/capture-data.test.mjs \
+            .github/scripts/ipfs-history/capture-evidence.test.mjs
 
       - name: Checkout IPFS history
         id: history
@@ -51,21 +67,7 @@ jobs:
 
           echo "dir=$HISTORY_DIR" >> "$GITHUB_OUTPUT"
 
-      - name: Find missing screenshots
-        id: missing
-        env:
-          HISTORY_DIR: ${{ steps.history.outputs.dir }}
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          COUNT=$(node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR" | jq -r '.missing')
-
-          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
-          echo "Missing/invalid IPFS history screenshots: $COUNT"
-
       - name: Install screenshot dependencies
-        if: steps.missing.outputs.count != '0'
         shell: bash
         run: |
           set -euo pipefail
@@ -84,6 +86,58 @@ jobs:
 
           npx playwright install --with-deps chromium
 
+      - name: Collect capture runtime evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          FONT_VERSION=$(dpkg-query -W -f='${Version}' fonts-noto-cjk)
+          BROWSER_EVIDENCE=$(node --input-type=module <<'NODE'
+          import { chromium } from "playwright";
+          const browser = await chromium.launch({ headless: true });
+          console.log(browser.version());
+          await browser.close();
+          NODE
+          )
+          IMAGE_TOOLCHAIN_EVIDENCE=$(node --input-type=module <<'NODE'
+          import sharp from "sharp";
+          console.log(
+            `sharp=${sharp.versions.sharp};` +
+            `vips=${sharp.versions.vips};` +
+            `webp=${sharp.versions.webp}`
+          );
+          NODE
+          )
+
+          {
+            echo "CAPTURE_BROWSER_EVIDENCE=$BROWSER_EVIDENCE"
+            echo "CAPTURE_FONT_EVIDENCE=fonts-noto-cjk=$FONT_VERSION"
+            echo "CAPTURE_IMAGE_TOOLCHAIN_EVIDENCE=$IMAGE_TOOLCHAIN_EVIDENCE"
+            echo "CAPTURE_REQUIRE_RUNTIME_EVIDENCE=true"
+          } >> "$GITHUB_ENV"
+
+          echo "Capture browser evidence: $BROWSER_EVIDENCE"
+          echo "Capture font evidence: fonts-noto-cjk=$FONT_VERSION"
+          echo "Capture image toolchain evidence: $IMAGE_TOOLCHAIN_EVIDENCE"
+
+      - name: Find missing current-profile screenshots
+        id: missing
+        env:
+          HISTORY_DIR: ${{ steps.history.outputs.dir }}
+          CAPTURE_REQUIRE_CURRENT_PROFILE: "true"
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          STATUS=$(node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR")
+          COUNT=$(jq -r '.missing' <<< "$STATUS")
+          PROFILE_ID=$(jq -r '.profile_id // empty' <<< "$STATUS")
+
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "profile_id=$PROFILE_ID" >> "$GITHUB_OUTPUT"
+          echo "Missing/invalid current-profile screenshots: $COUNT"
+          echo "Target capture profile: $PROFILE_ID"
+
       - name: Test ad exclusion
         if: steps.missing.outputs.count != '0'
         run: node --test .github/scripts/ipfs-history/capture-ads.test.mjs
@@ -91,112 +145,125 @@ jobs:
       - name: Repair missing screenshots
         if: steps.missing.outputs.count != '0'
         env:
-          IPFS_GATEWAY_BASE: https://liudon.xyz/ipfs
-          SCREENSHOT_WIDTH: "1440"
-          SCREENSHOT_HEIGHT: "900"
-          SCREENSHOT_ATTEMPTS: "3"
-        run: |
-          node .github/scripts/ipfs-history/capture-screenshots.mjs \
-            "${{ steps.history.outputs.dir }}"
-
-      # Preserve every successful repair even if another CID still failed.
-      # The failed job remains visible in Actions, and the next scheduled run
-      # retries only the screenshots that are still absent.
-      - name: Commit repaired screenshots
-        if: always() && steps.missing.outputs.count != '0'
-        env:
           HISTORY_DIR: ${{ steps.history.outputs.dir }}
+          IPFS_GATEWAY_BASE: https://liudon.xyz/ipfs
         shell: bash
         run: |
           set -euo pipefail
 
+          node .github/scripts/ipfs-history/capture-screenshots.mjs "$HISTORY_DIR"
+
+      # Preserve every successful current-profile capture even when another
+      # CID fails. The completed workflow still triggers visual-index readiness,
+      # which will defer publication until the profile is complete.
+      - name: Commit repaired captures
+        if: always() && steps.missing.outputs.count != '0'
+        env:
+          HISTORY_DIR: ${{ steps.history.outputs.dir }}
+          CAPTURE_REQUIRE_CURRENT_PROFILE: "true"
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ ! -f "$HISTORY_DIR/captures/current-profile.json" ]]; then
+            echo "No current-profile marker was produced."
+            exit 0
+          fi
+
+          PROFILE_ID=$(jq -er '.profile_id' "$HISTORY_DIR/captures/current-profile.json")
+
           git -C "$HISTORY_DIR" config user.name "github-actions[bot]"
           git -C "$HISTORY_DIR" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C "$HISTORY_DIR" add screenshots
+          git -C "$HISTORY_DIR" add captures
 
           if git -C "$HISTORY_DIR" diff --cached --quiet; then
-            echo "No repaired screenshots to commit."
-          else
-            # Save the repaired files outside Git. Before each push attempt,
-            # rebuild the commit on top of the latest remote ipfs-history.
-            # If main CI already published the same CID at the current capture version,
-            # keep the remote copy instead of creating a binary merge conflict.
-            PATCH_DIR="${RUNNER_TEMP}/ipfs-history-repair-patch"
-            rm -rf "$PATCH_DIR"
-            mkdir -p "$PATCH_DIR/screenshots/meta"
-
-            git -C "$HISTORY_DIR" diff --cached --name-only -- screenshots/meta |
-            while IFS= read -r file; do
-              cid=$(basename "$file" .json)
-              cp "$HISTORY_DIR/$file" "$PATCH_DIR/$file"
-              cp "$HISTORY_DIR/screenshots/$cid.webp" "$PATCH_DIR/screenshots/$cid.webp"
-            done
-
-            for attempt in {1..5}; do
-              echo "Push attempt $attempt/5"
-              git -C "$HISTORY_DIR" fetch origin ipfs-history
-              git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
-
-              # Metadata is the authoritative list of recaptured CIDs.
-              # A recapture can produce byte-identical WebP output while still
-              # upgrading capture_version/settings in metadata. Iterating only
-              # changed .webp files would silently drop those metadata-only
-              # upgrades.
-              find "$PATCH_DIR/screenshots/meta" -maxdepth 1 -type f -name '*.json' -print0 |
-              while IFS= read -r -d '' repaired_meta; do
-                name=$(basename "$repaired_meta")
-                cid="${name%.json}"
-                remote_meta="$HISTORY_DIR/screenshots/meta/$cid.json"
-                repaired_webp="$PATCH_DIR/screenshots/$cid.webp"
-
-                if node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR" "$cid"; then
-                  echo "Remote already has a valid current capture for $cid; keeping remote copy."
-                  continue
-                fi
-
-                mkdir -p "$HISTORY_DIR/screenshots/meta"
-                cp "$repaired_meta" "$remote_meta"
-
-                cp "$repaired_webp" "$HISTORY_DIR/screenshots/$cid.webp"
-              done
-
-              git -C "$HISTORY_DIR" add screenshots
-
-              if git -C "$HISTORY_DIR" diff --cached --quiet; then
-                echo "Remote already contains all repaired screenshots."
-                break
-              fi
-
-              git -C "$HISTORY_DIR" commit -m "repair IPFS history screenshots"
-
-              if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
-                echo "Repaired IPFS history screenshots pushed."
-                break
-              fi
-
-              if [[ "$attempt" == "5" ]]; then
-                echo "ERROR: unable to push repaired screenshots after 5 attempts"
-                exit 1
-              fi
-
-              sleep $((attempt * 2))
-            done
+            echo "No repaired captures to commit."
+            exit 0
           fi
+
+          PATCH_DIR="${RUNNER_TEMP}/ipfs-history-repair-patch"
+          CID_LIST="${RUNNER_TEMP}/ipfs-history-repaired-cids.txt"
+          rm -rf "$PATCH_DIR"
+          mkdir -p "$PATCH_DIR/captures/$PROFILE_ID"
+
+          cp "$HISTORY_DIR/captures/current-profile.json" \
+            "$PATCH_DIR/captures/current-profile.json"
+
+          git -C "$HISTORY_DIR" diff --cached --name-only -- "captures/$PROFILE_ID" |
+          awk -F/ '$NF == "meta.json" { print $(NF-1) }' |
+          sort -u > "$CID_LIST"
+
+          if [[ ! -s "$CID_LIST" ]]; then
+            echo "No successful current-profile captures were produced; not publishing the profile marker."
+            exit 0
+          fi
+
+          while IFS= read -r cid; do
+            [[ -n "$cid" ]] || continue
+            cp -R "$HISTORY_DIR/captures/$PROFILE_ID/$cid" \
+              "$PATCH_DIR/captures/$PROFILE_ID/$cid"
+          done < "$CID_LIST"
+
+          for attempt in {1..5}; do
+            echo "Repair push attempt $attempt/5"
+            git -C "$HISTORY_DIR" fetch origin ipfs-history
+            git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
+
+            mkdir -p "$HISTORY_DIR/captures/$PROFILE_ID"
+            cp "$PATCH_DIR/captures/current-profile.json" \
+              "$HISTORY_DIR/captures/current-profile.json"
+            git -C "$HISTORY_DIR" add "captures/current-profile.json"
+
+            while IFS= read -r cid; do
+              [[ -n "$cid" ]] || continue
+
+              if node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR" "$cid"; then
+                echo "Remote already has a valid target-profile capture for $cid."
+                continue
+              fi
+
+              rm -rf "$HISTORY_DIR/captures/$PROFILE_ID/$cid"
+              cp -R "$PATCH_DIR/captures/$PROFILE_ID/$cid" \
+                "$HISTORY_DIR/captures/$PROFILE_ID/$cid"
+              git -C "$HISTORY_DIR" add "captures/$PROFILE_ID/$cid"
+            done < "$CID_LIST"
+
+            if git -C "$HISTORY_DIR" diff --cached --quiet; then
+              echo "Remote already contains all repaired captures."
+              break
+            fi
+
+            git -C "$HISTORY_DIR" commit -m "repair IPFS history captures"
+
+            if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
+              echo "Repaired IPFS history captures pushed."
+              break
+            fi
+
+            if [[ "$attempt" == "5" ]]; then
+              echo "ERROR: unable to push repaired captures after 5 attempts"
+              exit 1
+            fi
+
+            sleep $((attempt * 2))
+          done
 
       - name: Repair summary
         if: always()
         env:
           HISTORY_DIR: ${{ steps.history.outputs.dir }}
           MISSING_BEFORE: ${{ steps.missing.outputs.count }}
+          CAPTURE_REQUIRE_CURRENT_PROFILE: "true"
         shell: bash
         run: |
           if [[ -d "$HISTORY_DIR/history" ]]; then
             STATUS=$(node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR")
             {
               echo "## IPFS history screenshot repair"
-              echo "- Missing/invalid before run: $MISSING_BEFORE"
-              echo "- Valid screenshots: $(jq -r '.valid' <<< "$STATUS")"
-              echo "- Missing/invalid screenshots: $(jq -r '.missing' <<< "$STATUS")"
+              echo "- Target profile: $(jq -r '.profile_id // "unknown"' <<< "$STATUS")"
+              echo "- Missing/invalid before run: ${MISSING_BEFORE:-unknown}"
+              echo "- Valid current-profile captures: $(jq -r '.valid' <<< "$STATUS")"
+              echo "- Missing/invalid current-profile captures: $(jq -r '.missing' <<< "$STATUS")"
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
@@ -209,4 +276,3 @@ jobs:
           if [[ -n "${HISTORY_DIR:-}" ]]; then
             git worktree remove --force "$HISTORY_DIR" >/dev/null 2>&1 || true
           fi
-
