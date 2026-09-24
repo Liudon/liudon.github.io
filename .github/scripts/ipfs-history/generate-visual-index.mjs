@@ -105,13 +105,13 @@ function readSnapshots() {
     .map(({ __deployed_millis, ...entry }) => entry);
 }
 
-function screenshotPath(snapshot) {
-  return path.join(screenshotDir, `${snapshot.cid}.webp`);
+function captureImagePath(capture) {
+  return path.join(historyRoot, ...capture.image_path.split("/"));
 }
 
 async function sampleScreenshot(snapshot) {
   const capture = readCapture(historyRoot, snapshot.cid);
-  const file = screenshotPath(snapshot);
+  const file = captureImagePath(capture);
 
   if (!fs.existsSync(file)) {
     throw new Error(`Missing screenshot for ${snapshot.deployed_at} ${snapshot.cid}`);
@@ -250,7 +250,8 @@ function frameFromSnapshot(snapshot) {
 }
 
 async function generatePlayback(frame) {
-  const source = path.join(screenshotDir, `${frame.cid}.webp`);
+  const capture = readCapture(historyRoot, frame.cid);
+  const source = captureImagePath(capture);
   const image = sharp(source, { failOn: "error" });
   const metadata = await image.metadata();
 
@@ -336,7 +337,7 @@ frames.push(currentFrame);
 for (let index = 1; index < snapshots.length; index += 1) {
   const candidateSnapshot = snapshots[index];
   const candidateSample = await sampleScreenshot(candidateSnapshot);
-  if (JSON.stringify(baselineSample.capture.profile) !== JSON.stringify(candidateSample.capture.profile)) {
+  if (baselineSample.capture.profile_id !== candidateSample.capture.profile_id) {
     throw new Error(`Incompatible capture profiles: ${baselineSnapshot.cid} / ${candidateSnapshot.cid}`);
   }
   const metrics = compareSamples(baselineSample, candidateSample);
@@ -401,7 +402,10 @@ const visualIndex = {
     tile_size: tileSize,
     height_delta_max: heightDeltaMax,
   },
-  capture_profile: baselineSample.capture.profile,
+  capture_profile: {
+    id: baselineSample.capture.profile_id,
+    ...baselineSample.capture.profile_config,
+  },
   source: {
     snapshot_count: snapshots.length,
     latest_cid: latest.cid,
