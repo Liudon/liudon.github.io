@@ -2173,6 +2173,12 @@
     }
   });
 
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted) return;
+    startClock();
+    performBootSequence({ forceIndex: false });
+  });
+
   document.addEventListener('DOMContentLoaded', () => {
     startClock();
     performBootSequence();
