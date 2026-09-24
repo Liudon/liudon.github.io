@@ -993,6 +993,7 @@
     fallbackAssetBase: 'https://raw.githubusercontent.com/Liudon/liudon.github.io/ipfs-history/',
     gatewayBase: 'https://liudon.xyz/ipfs/',
     indexTimeoutMs: 15000,
+    primaryAssetTimeoutMs: 8000,
     imageTimeoutMs: 20000,
     maxActiveLoads: 2,
     cacheMaxPixels: 24000000,
@@ -1011,6 +1012,19 @@
   }
 
   const indexUrls = assetUrls('visual-index.json');
+  let preferredAssetSourceIndex = 0;
+
+  function orderedAssetUrls(urls) {
+    if (
+      preferredAssetSourceIndex <= 0 ||
+      preferredAssetSourceIndex >= urls.length
+    ) return urls;
+
+    return [
+      urls[preferredAssetSourceIndex],
+      ...urls.filter((_, index) => index !== preferredAssetSourceIndex),
+    ];
+  }
 
   const $ = (id) => document.getElementById(id);
   const timeEl = $('time');
@@ -1246,16 +1260,19 @@
     const promise = (async () => {
       let lastError;
 
-      for (const url of indexUrls) {
+      for (const [sourceIndex, url] of indexUrls.entries()) {
         try {
           const response = await fetchWithTimeout(
             url,
             { cache: force ? 'reload' : 'default' },
-            CONFIG.indexTimeoutMs,
+            sourceIndex === 0
+              ? CONFIG.primaryAssetTimeoutMs
+              : CONFIG.indexTimeoutMs,
           );
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
           const data = await response.json();
+          preferredAssetSourceIndex = sourceIndex;
           const frames = normalizeFrames(data);
           if (!frames.length) throw new Error('暂无可用快照');
 
@@ -1393,12 +1410,15 @@
         throw new DOMException('Cancelled', 'AbortError');
       }
 
-      for (const sourceUrl of frame._urls) {
+      for (const sourceUrl of orderedAssetUrls(frame._urls)) {
         try {
+          const originalSourceIndex = frame._urls.indexOf(sourceUrl);
           const response = await fetchWithTimeout(
             sourceUrl,
             { cache: 'default', mode: 'cors' },
-            CONFIG.imageTimeoutMs,
+            originalSourceIndex === 0
+              ? CONFIG.primaryAssetTimeoutMs
+              : CONFIG.imageTimeoutMs,
             record.controller.signal,
           );
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -1470,9 +1490,14 @@
             );
           }
 
+          if (originalSourceIndex >= 0) {
+            preferredAssetSourceIndex = originalSourceIndex;
+          }
+
           diagnostics('image source ready', {
             index: record.index,
             sourceUrl,
+            preferredAssetSourceIndex,
           });
 
           return {
