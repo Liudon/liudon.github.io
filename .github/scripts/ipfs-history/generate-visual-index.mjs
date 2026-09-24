@@ -14,6 +14,7 @@ const historyDir = path.join(historyRoot, "history");
 const screenshotDir = path.join(historyRoot, "screenshots");
 const indexPath = path.join(historyRoot, "visual-index.json");
 const diffPath = path.join(historyRoot, "visual-diffs.jsonl");
+const playbackDir = path.join(historyRoot, "screenshots", "playback");
 
 const algorithmVersion = 3;
 const sampleWidth = Number(process.env.VISUAL_SAMPLE_WIDTH || 480);
@@ -31,12 +32,48 @@ const playbackWidth = Number(process.env.PLAYBACK_WIDTH || 960);
 const playbackQuality = Number(process.env.PLAYBACK_QUALITY || 75);
 const playbackMaxPixels = Number(process.env.PLAYBACK_MAX_PIXELS || 8_000_000);
 const playbackMaxEdge = Number(process.env.PLAYBACK_MAX_EDGE || 16_383);
-const playbackDir = path.join(historyRoot, "screenshots", "playback");
+
+for (const [name, value] of Object.entries({
+  sampleWidth,
+  pixelDelta,
+  blurSigma,
+  overallChangedMax,
+  tileChangedMax,
+  meanDeltaMax,
+  significantTileRatio,
+  tileSize,
+  heightDeltaMax,
+  playbackWidth,
+  playbackQuality,
+  playbackMaxPixels,
+  playbackMaxEdge,
+})) {
+  if (!Number.isFinite(value) || value <= 0) {
+    throw new Error(`Invalid ${name}: ${value}`);
+  }
+}
+if (playbackQuality > 100) {
+  throw new Error(`Invalid playbackQuality: ${playbackQuality}`);
+}
+
+function parseDeploymentTime(value, label) {
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error(`Invalid deployed_at in ${label}`);
+  }
+  if (!/(?:Z|[+-]\d{2}:\d{2})$/u.test(value)) {
+    throw new Error(`deployed_at must include timezone in ${label}: ${value}`);
+  }
+  const millis = Date.parse(value);
+  if (!Number.isFinite(millis)) {
+    throw new Error(`Invalid deployed_at in ${label}: ${value}`);
+  }
+  return millis;
+}
 
 function readSnapshots() {
   const byCid = new Map();
 
-  for (const name of fs.readdirSync(historyDir).filter((name) => name.endsWith(".jsonl")).sort()) {
+  for (const name of fs.readdirSync(historyDir).filter((item) => item.endsWith(".jsonl")).sort()) {
     const file = path.join(historyDir, name);
     const lines = fs.readFileSync(file, "utf8").split(/\r?\n/);
 
@@ -55,16 +92,17 @@ function readSnapshots() {
         throw new Error(`Missing cid/deployed_at in ${name}:${index + 1}`);
       }
 
+      const deployedMillis = parseDeploymentTime(entry.deployed_at, `${name}:${index + 1}`);
       const previous = byCid.get(entry.cid);
-      if (!previous || entry.deployed_at < previous.deployed_at) {
-        byCid.set(entry.cid, entry);
+      if (!previous || deployedMillis < previous.__deployed_millis) {
+        byCid.set(entry.cid, { ...entry, __deployed_millis: deployedMillis });
       }
     }
   }
 
-  return [...byCid.values()].sort(
-    (a, b) => a.deployed_at.localeCompare(b.deployed_at) || a.cid.localeCompare(b.cid),
-  );
+  return [...byCid.values()]
+    .sort((a, b) => a.__deployed_millis - b.__deployed_millis || a.cid.localeCompare(b.cid))
+    .map(({ __deployed_millis, ...entry }) => entry);
 }
 
 function screenshotPath(snapshot) {
@@ -178,13 +216,8 @@ function compareSamples(baseline, candidate) {
     const ratio = tileChanged[i] / tilePixels[i];
     maxTileChangedRatio = Math.max(maxTileChangedRatio, ratio);
 
-    if (tileChanged[i] > 0) {
-      changedTiles += 1;
-    }
-
-    if (ratio >= significantTileRatio) {
-      significantTiles += 1;
-    }
+    if (tileChanged[i] > 0) changedTiles += 1;
+    if (ratio >= significantTileRatio) significantTiles += 1;
   }
 
   const same =
@@ -229,8 +262,7 @@ async function generatePlayback(frame) {
     1,
     playbackWidth / metadata.width,
     Math.sqrt(playbackMaxPixels / (metadata.width * metadata.height)),
-    playbackMaxEdge / metadata.width,
-    playbackMaxEdge / metadata.height,
+    playbackMaxEdge / Math.max(metadata.width, metadata.height),
   );
 
   const width = Math.max(1, Math.floor(metadata.width * scale));
@@ -257,13 +289,17 @@ async function generatePlayback(frame) {
 
   if (fs.existsSync(target)) {
     const existing = fs.readFileSync(target);
-    if (hash(existing) !== digest) {
-      throw new Error(`Playback hash collision for ${frame.cid}`);
+    if (hash(existing) !== digest || !existing.equals(buffer)) {
+      throw new Error(`Playback content mismatch for ${frame.cid}`);
     }
   } else {
     const temp = `${target}.tmp-${process.pid}`;
     fs.writeFileSync(temp, buffer);
-    await sharp(temp, { failOn: "error" }).metadata();
+    const verified = await sharp(temp, { failOn: "error" }).metadata();
+    if (verified.width !== width || verified.height !== height) {
+      fs.rmSync(temp, { force: true });
+      throw new Error(`Playback temporary file verification failed for ${frame.cid}`);
+    }
     fs.renameSync(temp, target);
   }
 
@@ -284,6 +320,9 @@ if (snapshots.length === 0) {
 console.log(`History snapshots: ${snapshots.length}`);
 console.log(
   `Visual algorithm v${algorithmVersion}: width=${sampleWidth}, blur=${blurSigma}, pixelDelta=${pixelDelta}, overall<=${overallChangedMax}, tile<=${tileChangedMax}, mean<=${meanDeltaMax}`,
+);
+console.log(
+  `Playback profile v${playbackVersion}: width=${playbackWidth}, quality=${playbackQuality}, maxPixels=${playbackMaxPixels}, maxEdge=${playbackMaxEdge}`,
 );
 
 const frames = [];
@@ -308,9 +347,10 @@ for (let index = 1; index < snapshots.length; index += 1) {
     metrics.same = false;
     metrics.reason = "text_change";
     let offset = 0;
-    while (offset < Math.min(before.length, after.length) && before[offset] === after[offset]) offset++;
+    while (offset < Math.min(before.length, after.length) && before[offset] === after[offset]) offset += 1;
     metrics.text_diff = {
-      offset, before: before.slice(Math.max(0, offset - 60), offset + 180),
+      offset,
+      before: before.slice(Math.max(0, offset - 60), offset + 180),
       after: after.slice(Math.max(0, offset - 60), offset + 180),
     };
   }
@@ -346,7 +386,6 @@ for (const frame of frames) {
 }
 
 const latest = snapshots.at(-1);
-
 const visualIndex = {
   version: 1,
   algorithm: {
@@ -362,6 +401,7 @@ const visualIndex = {
     tile_size: tileSize,
     height_delta_max: heightDeltaMax,
   },
+  capture_profile: baselineSample.capture.profile,
   source: {
     snapshot_count: snapshots.length,
     latest_cid: latest.cid,
@@ -374,20 +414,25 @@ const visualIndex = {
     quality: playbackQuality,
     max_pixels: playbackMaxPixels,
     max_edge: playbackMaxEdge,
-    encoder: "sharp",
+    encoder: {
+      sharp: sharp.versions.sharp,
+      vips: sharp.versions.vips,
+      webp: sharp.versions.webp,
+    },
   },
   visual_count: frames.length,
   frames,
 };
 
-fs.writeFileSync(indexPath, JSON.stringify(visualIndex, null, 2) + "\n", "utf8");
-fs.writeFileSync(
-  diffPath,
-  comparisons.map((item) => JSON.stringify(item)).join("\n") + "\n",
-  "utf8",
-);
+const indexTemp = `${indexPath}.tmp-${process.pid}`;
+const diffTemp = `${diffPath}.tmp-${process.pid}`;
+fs.writeFileSync(indexTemp, JSON.stringify(visualIndex, null, 2) + "\n", "utf8");
+fs.writeFileSync(diffTemp, comparisons.map((item) => JSON.stringify(item)).join("\n") + "\n", "utf8");
+fs.renameSync(indexTemp, indexPath);
+fs.renameSync(diffTemp, diffPath);
 
 console.log();
 console.log(`Visual frames: ${frames.length}/${snapshots.length}`);
+console.log(`Playback files: ${new Set(frames.map((frame) => frame.screenshot)).size}`);
 console.log(`Wrote ${path.relative(historyRoot, indexPath)}`);
 console.log(`Wrote ${path.relative(historyRoot, diffPath)}`);
