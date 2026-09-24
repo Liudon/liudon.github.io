@@ -85,7 +85,36 @@
       }
       .window-toolbar {
         padding: 3px 4px !important;
-        gap: 4px !important;
+        gap: 2px !important;
+        flex-wrap: nowrap !important;
+        justify-content: flex-start !important;
+      }
+      .toolbar-time {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        font-size: 10px;
+      }
+      .toolbar-controls {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 2px !important;
+        white-space: nowrap;
+      }
+      .toolbar-controls .mac-btn,
+      .toolbar-controls .mac-select {
+        flex: 0 0 auto;
+        font-size: 9px !important;
+        padding: 1px 4px !important;
+      }
+      #togglePlay {
+        min-width: 22px;
+        justify-content: center;
+      }
+      #counter {
+        font-size: 9px !important;
       }
       .mac-chassis-lower {
         height: 34px !important;
@@ -380,6 +409,12 @@
       justify-content: space-between;
       gap: 6px;
       font-size: 11px;
+    }
+
+    .toolbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .mac-btn, .mac-select {
@@ -877,10 +912,10 @@
 
             <!-- 控制条 -->
             <div class="window-toolbar">
-              <div>
+              <div class="toolbar-time">
                 <span id="time" style="font-weight:bold;">同步中...</span>
               </div>
-              <div style="display:flex; align-items:center; gap:4px;">
+              <div class="toolbar-controls">
                 <button class="mac-btn" id="togglePlay">❚❚ 暂停</button>
                 <button class="mac-btn" id="prev">◄</button>
                 <span id="counter" style="font-size:10px;">0/0</span>
@@ -2003,7 +2038,13 @@
     prevBtn.disabled = count <= 1 || target <= 0;
     nextBtn.disabled = count <= 1 || target >= count - 1;
     togglePlayBtn.disabled = count <= 1;
-    togglePlayBtn.textContent = state.playMode === 'playing' ? '❚❚ 暂停' : '▶ 播放';
+    const mobile = matchMedia('(max-width: 600px)').matches;
+    const paused = state.playMode !== 'playing';
+    togglePlayBtn.textContent = mobile
+      ? (paused ? '▶' : '❚❚')
+      : (paused ? '▶ 播放' : '❚❚ 暂停');
+    togglePlayBtn.title = paused ? '播放' : '暂停';
+    togglePlayBtn.setAttribute('aria-label', paused ? '播放' : '暂停');
   }
 
   function commitFrame(index, resource, context) {
@@ -2350,11 +2391,17 @@
   }
 
   const speedLabelMedia = matchMedia('(max-width: 600px)');
-  syncSpeedLabels();
+
+  function syncMobileControlLabels() {
+    syncSpeedLabels();
+    updateControls();
+  }
+
+  syncMobileControlLabels();
   if (speedLabelMedia.addEventListener) {
-    speedLabelMedia.addEventListener('change', syncSpeedLabels);
+    speedLabelMedia.addEventListener('change', syncMobileControlLabels);
   } else if (speedLabelMedia.addListener) {
-    speedLabelMedia.addListener(syncSpeedLabels);
+    speedLabelMedia.addListener(syncMobileControlLabels);
   }
 
   speedSelect.addEventListener('change', () => {
