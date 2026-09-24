@@ -67,26 +67,7 @@ jobs:
 
           echo "dir=$HISTORY_DIR" >> "$GITHUB_OUTPUT"
 
-      - name: Find missing current-profile screenshots
-        id: missing
-        env:
-          HISTORY_DIR: ${{ steps.history.outputs.dir }}
-          CAPTURE_REQUIRE_CURRENT_PROFILE: "true"
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          STATUS=$(node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR")
-          COUNT=$(jq -r '.missing' <<< "$STATUS")
-          PROFILE_ID=$(jq -r '.profile_id // empty' <<< "$STATUS")
-
-          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
-          echo "profile_id=$PROFILE_ID" >> "$GITHUB_OUTPUT"
-          echo "Missing/invalid current-profile screenshots: $COUNT"
-          echo "Target capture profile: $PROFILE_ID"
-
       - name: Install screenshot dependencies
-        if: steps.missing.outputs.count != '0'
         shell: bash
         run: |
           set -euo pipefail
@@ -105,6 +86,58 @@ jobs:
 
           npx playwright install --with-deps chromium
 
+      - name: Collect capture runtime evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          FONT_VERSION=$(dpkg-query -W -f='${Version}' fonts-noto-cjk)
+          BROWSER_EVIDENCE=$(node --input-type=module <<'NODE'
+          import { chromium } from "playwright";
+          const browser = await chromium.launch({ headless: true });
+          console.log(browser.version());
+          await browser.close();
+          NODE
+          )
+          IMAGE_TOOLCHAIN_EVIDENCE=$(node --input-type=module <<'NODE'
+          import sharp from "sharp";
+          console.log(
+            `sharp=${sharp.versions.sharp};` +
+            `vips=${sharp.versions.vips};` +
+            `webp=${sharp.versions.webp}`
+          );
+          NODE
+          )
+
+          {
+            echo "CAPTURE_BROWSER_EVIDENCE=$BROWSER_EVIDENCE"
+            echo "CAPTURE_FONT_EVIDENCE=fonts-noto-cjk=$FONT_VERSION"
+            echo "CAPTURE_IMAGE_TOOLCHAIN_EVIDENCE=$IMAGE_TOOLCHAIN_EVIDENCE"
+            echo "CAPTURE_REQUIRE_RUNTIME_EVIDENCE=true"
+          } >> "$GITHUB_ENV"
+
+          echo "Capture browser evidence: $BROWSER_EVIDENCE"
+          echo "Capture font evidence: fonts-noto-cjk=$FONT_VERSION"
+          echo "Capture image toolchain evidence: $IMAGE_TOOLCHAIN_EVIDENCE"
+
+      - name: Find missing current-profile screenshots
+        id: missing
+        env:
+          HISTORY_DIR: ${{ steps.history.outputs.dir }}
+          CAPTURE_REQUIRE_CURRENT_PROFILE: "true"
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          STATUS=$(node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR")
+          COUNT=$(jq -r '.missing' <<< "$STATUS")
+          PROFILE_ID=$(jq -r '.profile_id // empty' <<< "$STATUS")
+
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "profile_id=$PROFILE_ID" >> "$GITHUB_OUTPUT"
+          echo "Missing/invalid current-profile screenshots: $COUNT"
+          echo "Target capture profile: $PROFILE_ID"
+
       - name: Test ad exclusion
         if: steps.missing.outputs.count != '0'
         run: node --test .github/scripts/ipfs-history/capture-ads.test.mjs
@@ -118,8 +151,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          FONT_VERSION=$(dpkg-query -W -f='${Version}' fonts-noto-cjk)
-          CAPTURE_FONT_EVIDENCE="fonts-noto-cjk=${FONT_VERSION}" \
           node .github/scripts/ipfs-history/capture-screenshots.mjs "$HISTORY_DIR"
 
       # Preserve every successful current-profile capture even when another
