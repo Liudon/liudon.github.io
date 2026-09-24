@@ -989,7 +989,8 @@
   'use strict';
 
   const CONFIG = {
-    assetBase: 'https://raw.githubusercontent.com/Liudon/liudon.github.io/ipfs-history/',
+    assetBase: 'https://gh-proxy.org/https://raw.githubusercontent.com/Liudon/liudon.github.io/ipfs-history/',
+    fallbackAssetBase: 'https://raw.githubusercontent.com/Liudon/liudon.github.io/ipfs-history/',
     gatewayBase: 'https://liudon.xyz/ipfs/',
     indexTimeoutMs: 15000,
     imageTimeoutMs: 20000,
@@ -997,8 +998,19 @@
     cacheMaxPixels: 24000000,
     maxPlaybackPixels: 8000000,
     maxLegacyPixels: 24000000,
-    readReleaseMs: 1800,  };
-  const indexUrl = new URL('visual-index.json', CONFIG.assetBase).href;
+    readReleaseMs: 1800,
+  };
+
+  const assetBases = [
+    CONFIG.assetBase,
+    CONFIG.fallbackAssetBase,
+  ].filter((value, index, values) => value && values.indexOf(value) === index);
+
+  function assetUrls(relativePath) {
+    return assetBases.map((base) => new URL(relativePath, base).href);
+  }
+
+  const indexUrls = assetUrls('visual-index.json');
 
   const $ = (id) => document.getElementById(id);
   const timeEl = $('time');
@@ -1134,14 +1146,24 @@
     if (!value.startsWith('screenshots/')) return null;
     if (/^[a-z][a-z0-9+.-]*:/i.test(value) || value.startsWith('/') || value.includes('\\')) return null;
     if (/[?#]/.test(value)) return null;
+
     let decoded;
-    try { decoded = decodeURIComponent(value); } catch { return null; }
-    if (decoded.split('/').some(part => part === '..' || part === '.')) return null;
+    try {
+      decoded = decodeURIComponent(value);
+    } catch {
+      return null;
+    }
+
+    if (decoded.split('/').some((part) => part === '..' || part === '.')) return null;
     if (!/\.(?:webp|png|jpe?g)$/i.test(decoded)) return null;
-    const url = new URL(value, CONFIG.assetBase);
-    const base = new URL(CONFIG.assetBase);
-    if (url.origin !== base.origin || !url.pathname.startsWith(new URL('screenshots/', base).pathname)) return null;
-    return url.href;
+
+    const urls = assetUrls(value);
+    if (!urls.length) return null;
+
+    return {
+      path: value,
+      urls,
+    };
   }
 
   function normalizeFrames(data) {
@@ -1157,8 +1179,8 @@
       const deployedAt = typeof raw?.deployed_at === 'string' ? raw.deployed_at.trim() : '';
       const time = Date.parse(deployedAt);
       if (!deployedAt || !Number.isFinite(time) || !/(?:Z|[+-]\d\d:\d\d)$/.test(deployedAt)) reasons.push('invalid deployed_at');
-      const screenshotUrl = validateScreenshotPath(raw?.screenshot);
-      if (!screenshotUrl) reasons.push('invalid screenshot');
+      const screenshot = validateScreenshotPath(raw?.screenshot);
+      if (!screenshot) reasons.push('invalid screenshot');
       const hasWidth = raw?.width !== undefined && raw?.width !== null;
       const hasHeight = raw?.height !== undefined && raw?.height !== null;
       if (hasWidth !== hasHeight) reasons.push('partial dimensions');
@@ -1174,7 +1196,15 @@
         return;
       }
       seenCid.add(cid);
-      valid.push({ ...raw, cid, deployed_at: deployedAt, _time: time, _url: screenshotUrl });
+      valid.push({
+        ...raw,
+        cid,
+        deployed_at: deployedAt,
+        _time: time,
+        _path: screenshot.path,
+        _urls: screenshot.urls,
+        _url: screenshot.urls[0],
+      });
     });
     valid.sort((a, b) => a._time - b._time || a.cid.localeCompare(b.cid));
     if (data.visual_count !== undefined && data.visual_count !== valid.length) {
@@ -1210,24 +1240,45 @@
   async function loadIndex(force = false) {
     if (state.indexLoaded && !force) return state.frames;
     if (state.indexPromise && !force) return state.indexPromise;
+
     const session = state.sessionId;
     const promise = (async () => {
-      const response = await fetchWithTimeout(
-        indexUrl,
-        { cache: 'no-cache' },
-        CONFIG.indexTimeoutMs,
-      );
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
-      const frames = normalizeFrames(data);
-      if (!frames.length) throw new Error('暂无可用快照');
-      if (session !== state.sessionId) {
-        throw new DOMException('Stale session', 'AbortError');
+      let lastError;
+
+      for (const url of indexUrls) {
+        try {
+          const response = await fetchWithTimeout(
+            url,
+            { cache: force ? 'reload' : 'default' },
+            CONFIG.indexTimeoutMs,
+          );
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          const data = await response.json();
+          const frames = normalizeFrames(data);
+          if (!frames.length) throw new Error('暂无可用快照');
+
+          if (session !== state.sessionId) {
+            throw new DOMException('Stale session', 'AbortError');
+          }
+
+          state.frames = frames;
+          state.indexLoaded = true;
+          diagnostics('index source ready', { url });
+          return frames;
+        } catch (error) {
+          if (error?.name === 'AbortError' && session !== state.sessionId) throw error;
+          lastError = error;
+          diagnostics('index source failed; trying fallback', {
+            url,
+            error: error.message,
+          });
+        }
       }
-      state.frames = frames;
-      state.indexLoaded = true;
-      return frames;
+
+      throw lastError || new Error('档案清单读取失败');
     })();
+
     state.indexPromise = promise;
     try {
       return await promise;
@@ -1341,98 +1392,112 @@
         throw new DOMException('Cancelled', 'AbortError');
       }
 
-      try {
-        const response = await fetchWithTimeout(
-          frame._url,
-          { cache: 'default', mode: 'cors' },
-          CONFIG.imageTimeoutMs,
-          record.controller.signal,
-        );
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const blob = await response.blob();
-
-        if (
-          Number.isSafeInteger(frame.bytes) &&
-          frame.bytes > 0 &&
-          blob.size !== frame.bytes
-        ) {
-          throw new Error(
-            `文件大小不匹配：索引 ${frame.bytes} bytes，实际 ${blob.size} bytes`,
-          );
-        }
-
-        const objectUrl = URL.createObjectURL(blob);
-        const img = new Image();
-        img.id = 'mainImg';
-        img.alt = '快照截图';
-        img.style.opacity = '0';
-        img.src = objectUrl;
-
+      for (const sourceUrl of frame._urls) {
         try {
-          await img.decode();
+          const response = await fetchWithTimeout(
+            sourceUrl,
+            { cache: 'default', mode: 'cors' },
+            CONFIG.imageTimeoutMs,
+            record.controller.signal,
+          );
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          const blob = await response.blob();
+
+          if (
+            Number.isSafeInteger(frame.bytes) &&
+            frame.bytes > 0 &&
+            blob.size !== frame.bytes
+          ) {
+            throw new Error(
+              `文件大小不匹配：索引 ${frame.bytes} bytes，实际 ${blob.size} bytes`,
+            );
+          }
+
+          const objectUrl = URL.createObjectURL(blob);
+          const img = new Image();
+          img.id = 'mainImg';
+          img.alt = '快照截图';
+          img.style.opacity = '0';
+          img.src = objectUrl;
+
+          try {
+            await img.decode();
+          } catch (error) {
+            URL.revokeObjectURL(objectUrl);
+            throw error;
+          }
+
+          if (record.cancelled || record.controller.signal.aborted) {
+            URL.revokeObjectURL(objectUrl);
+            throw new DOMException('Cancelled', 'AbortError');
+          }
+
+          const width = img.naturalWidth;
+          const height = img.naturalHeight;
+          const pixels = width * height;
+
+          if (
+            !Number.isSafeInteger(width) ||
+            !Number.isSafeInteger(height) ||
+            width <= 0 ||
+            height <= 0 ||
+            !Number.isSafeInteger(pixels)
+          ) {
+            URL.revokeObjectURL(objectUrl);
+            throw new Error('图片尺寸无效');
+          }
+
+          if (
+            frame.width &&
+            (frame.width !== width || frame.height !== height)
+          ) {
+            URL.revokeObjectURL(objectUrl);
+            throw new Error(
+              `尺寸不匹配：索引 ${frame.width}x${frame.height}，实际 ${width}x${height}`,
+            );
+          }
+
+          const limit = frame.width
+            ? CONFIG.maxPlaybackPixels
+            : CONFIG.maxLegacyPixels;
+
+          if (pixels > limit) {
+            URL.revokeObjectURL(objectUrl);
+            throw new Error(
+              `图片像素超出限制：${width}x${height}`,
+            );
+          }
+
+          diagnostics('image source ready', {
+            index: record.index,
+            sourceUrl,
+          });
+
+          return {
+            img,
+            objectUrl,
+            width,
+            height,
+            pixels,
+            bytes: blob.size,
+            sourceUrl,
+          };
         } catch (error) {
-          URL.revokeObjectURL(objectUrl);
-          throw error;
+          lastError = error;
+          if (error?.name === 'AbortError') throw error;
+          diagnostics('image source failed; trying fallback', {
+            index: record.index,
+            sourceUrl,
+            attempt,
+            error: error.message,
+          });
         }
-
-        if (record.cancelled || record.controller.signal.aborted) {
-          URL.revokeObjectURL(objectUrl);
-          throw new DOMException('Cancelled', 'AbortError');
-        }
-
-        const width = img.naturalWidth;
-        const height = img.naturalHeight;
-        const pixels = width * height;
-
-        if (
-          !Number.isSafeInteger(width) ||
-          !Number.isSafeInteger(height) ||
-          width <= 0 ||
-          height <= 0 ||
-          !Number.isSafeInteger(pixels)
-        ) {
-          URL.revokeObjectURL(objectUrl);
-          throw new Error('图片尺寸无效');
-        }
-
-        if (
-          frame.width &&
-          (frame.width !== width || frame.height !== height)
-        ) {
-          URL.revokeObjectURL(objectUrl);
-          throw new Error(
-            `尺寸不匹配：索引 ${frame.width}x${frame.height}，实际 ${width}x${height}`,
-          );
-        }
-
-        const limit = frame.width
-          ? CONFIG.maxPlaybackPixels
-          : CONFIG.maxLegacyPixels;
-
-        if (pixels > limit) {
-          URL.revokeObjectURL(objectUrl);
-          throw new Error(
-            `图片像素超出限制：${width}x${height}`,
-          );
-        }
-
-        return {
-          img,
-          objectUrl,
-          width,
-          height,
-          pixels,
-          bytes: blob.size,
-        };
-      } catch (error) {
-        lastError = error;
-        if (error?.name === 'AbortError') throw error;
-
-        const foreground = record.priority === 'foreground';
-        if (!foreground || attempt >= 3) break;
-        await sleep(attempt === 1 ? 500 : 1000);
       }
+
+      const foreground = record.priority === 'foreground';
+      if (!foreground || attempt >= 3) break;
+      await sleep(attempt === 1 ? 500 : 1000);
     }
 
     throw lastError || new Error('图片读取失败');
