@@ -12,10 +12,13 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ipfs-history-visual-index
+  cancel-in-progress: false
+
 jobs:
   build:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     steps:
@@ -92,6 +95,10 @@ jobs:
           VISUAL_SIGNIFICANT_TILE_RATIO: "0.01"
           VISUAL_TILE_SIZE: "48"
           VISUAL_HEIGHT_DELTA_MAX: "2"
+          PLAYBACK_WIDTH: "960"
+          PLAYBACK_QUALITY: "75"
+          PLAYBACK_MAX_PIXELS: "8000000"
+          PLAYBACK_MAX_EDGE: "16383"
         run: |
           set -euo pipefail
 
@@ -118,7 +125,7 @@ jobs:
             # Recompute from the exact history/images we are about to publish against.
             node .github/scripts/ipfs-history/generate-visual-index.mjs "$HISTORY_DIR"
 
-            git -C "$HISTORY_DIR" add visual-index.json visual-diffs.jsonl
+            git -C "$HISTORY_DIR" add visual-index.json visual-diffs.jsonl screenshots/playback
 
             if git -C "$HISTORY_DIR" diff --cached --quiet; then
               echo "Visual index is already up to date."
@@ -163,6 +170,7 @@ jobs:
               echo "- Visual frames: $(jq -r '.visual_count' "$HISTORY_DIR/visual-index.json")"
               echo "- Latest CID: $(jq -r '.source.latest_cid' "$HISTORY_DIR/visual-index.json")"
               echo "- Algorithm: $(jq -r '.algorithm.strategy + " v" + (.algorithm.version|tostring)' "$HISTORY_DIR/visual-index.json")"
+              echo "- Playback: $(jq -r '(.playback_profile.target_width|tostring) + "px WebP q" + (.playback_profile.quality|tostring)' "$HISTORY_DIR/visual-index.json")"
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
