@@ -162,6 +162,11 @@ jobs:
           awk -F/ '$NF == "meta.json" { print $(NF-1) }' |
           sort -u > "$CID_LIST"
 
+          if [[ ! -s "$CID_LIST" ]]; then
+            echo "No successful current-profile captures were produced; not publishing the profile marker."
+            exit 0
+          fi
+
           while IFS= read -r cid; do
             [[ -n "$cid" ]] || continue
             cp -R "$HISTORY_DIR/captures/$PROFILE_ID/$cid" \
