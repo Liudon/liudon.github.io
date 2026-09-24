@@ -1182,13 +1182,27 @@
     return valid;
   }
 
-  async function fetchWithTimeout(url, options, timeoutMs) {
+  async function fetchWithTimeout(url, options = {}, timeoutMs, externalSignal = null) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(new DOMException('Timeout', 'AbortError')), timeoutMs);
+    const abortFromExternal = () => {
+      if (!controller.signal.aborted) {
+        controller.abort(externalSignal?.reason || new DOMException('Cancelled', 'AbortError'));
+      }
+    };
+    if (externalSignal?.aborted) abortFromExternal();
+    else externalSignal?.addEventListener('abort', abortFromExternal, { once: true });
+
+    const timer = setTimeout(() => {
+      if (!controller.signal.aborted) {
+        controller.abort(new DOMException('Timeout', 'AbortError'));
+      }
+    }, timeoutMs);
+
     try {
       return await fetch(url, { ...options, signal: controller.signal });
     } finally {
       clearTimeout(timer);
+      externalSignal?.removeEventListener('abort', abortFromExternal);
     }
   }
 
@@ -1197,12 +1211,18 @@
     if (state.indexPromise && !force) return state.indexPromise;
     const session = state.sessionId;
     const promise = (async () => {
-      const response = await fetchWithTimeout(indexUrl, { cache: 'no-cache' }, CONFIG.indexTimeoutMs);
+      const response = await fetchWithTimeout(
+        indexUrl,
+        { cache: 'no-cache' },
+        CONFIG.indexTimeoutMs,
+      );
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       const frames = normalizeFrames(data);
       if (!frames.length) throw new Error('暂无可用快照');
-      if (session !== state.sessionId) throw new DOMException('Stale session', 'AbortError');
+      if (session !== state.sessionId) {
+        throw new DOMException('Stale session', 'AbortError');
+      }
       state.frames = frames;
       state.indexLoaded = true;
       return frames;
@@ -1216,15 +1236,40 @@
   }
 
   function framePixels(frame) {
-    if (Number.isSafeInteger(frame.width) && Number.isSafeInteger(frame.height)) return frame.width * frame.height;
+    if (
+      Number.isSafeInteger(frame.width) &&
+      Number.isSafeInteger(frame.height)
+    ) {
+      return frame.width * frame.height;
+    }
     return null;
+  }
+
+  function releaseRecord(record, { remove = true } = {}) {
+    if (!record) return;
+    record.cancelled = true;
+    if (record.controller && !record.controller.signal.aborted) {
+      record.controller.abort(new DOMException('Resource released', 'AbortError'));
+    }
+    if (record.objectUrl) {
+      URL.revokeObjectURL(record.objectUrl);
+      record.objectUrl = null;
+    }
+    if (record.task) record.task.cancelled = true;
+    if (remove && cache.get(record.url) === record) {
+      cache.delete(record.url);
+    }
   }
 
   function pumpQueue() {
     while (activeLoads < CONFIG.maxActiveLoads && loadQueue.length) {
-      loadQueue.sort((a, b) => a.priority - b.priority || a.queuedAt - b.queuedAt);
+      loadQueue.sort((a, b) =>
+        a.priority - b.priority ||
+        a.queuedAt - b.queuedAt
+      );
       const task = loadQueue.shift();
       if (task.cancelled) continue;
+      task.started = true;
       activeLoads += 1;
       task.run().finally(() => {
         activeLoads -= 1;
@@ -1234,88 +1279,221 @@
   }
 
   function enqueue(run, priority) {
-    return new Promise((resolve, reject) => {
-      const task = {
-        priority: priority === 'foreground' ? 0 : 1,
-        queuedAt: performance.now(), cancelled: false,
-        run: async () => {
-          try { resolve(await run()); } catch (error) { reject(error); }
-        },
-      };
-      loadQueue.push(task);
-      pumpQueue();
+    let resolvePromise;
+    let rejectPromise;
+    const task = {
+      priority: priority === 'foreground' ? 0 : 1,
+      queuedAt: performance.now(),
+      cancelled: false,
+      started: false,
+      run: async () => {
+        if (task.cancelled) {
+          rejectPromise(new DOMException('Cancelled', 'AbortError'));
+          return;
+        }
+        try {
+          resolvePromise(await run());
+        } catch (error) {
+          rejectPromise(error);
+        }
+      },
+    };
+    const promise = new Promise((resolve, reject) => {
+      resolvePromise = resolve;
+      rejectPromise = reject;
     });
+    loadQueue.push(task);
+    pumpQueue();
+    return { task, promise };
   }
 
-  async function prepareImage(frame, attempts) {
+  function promoteRecord(record) {
+    if (!record || record.state !== 'loading') return;
+    record.priority = 'foreground';
+    if (record.task && !record.task.started) {
+      record.task.priority = 0;
+      record.task.queuedAt = -1;
+      pumpQueue();
+    }
+  }
+
+  async function prepareImage(record) {
+    const frame = record.frame;
     let lastError;
-    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      if (record.cancelled || record.controller.signal.aborted) {
+        throw new DOMException('Cancelled', 'AbortError');
+      }
+
       try {
-        const response = await fetchWithTimeout(frame._url, { cache: 'default', mode: 'cors' }, CONFIG.imageTimeoutMs);
+        const response = await fetchWithTimeout(
+          frame._url,
+          { cache: 'default', mode: 'cors' },
+          CONFIG.imageTimeoutMs,
+          record.controller.signal,
+        );
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
         const blob = await response.blob();
+
+        if (
+          Number.isSafeInteger(frame.bytes) &&
+          frame.bytes > 0 &&
+          blob.size !== frame.bytes
+        ) {
+          throw new Error(
+            `文件大小不匹配：索引 ${frame.bytes} bytes，实际 ${blob.size} bytes`,
+          );
+        }
+
         const objectUrl = URL.createObjectURL(blob);
         const img = new Image();
         img.id = 'mainImg';
         img.alt = '快照截图';
         img.style.opacity = '0';
         img.src = objectUrl;
+
         try {
           await img.decode();
         } catch (error) {
           URL.revokeObjectURL(objectUrl);
           throw error;
         }
+
+        if (record.cancelled || record.controller.signal.aborted) {
+          URL.revokeObjectURL(objectUrl);
+          throw new DOMException('Cancelled', 'AbortError');
+        }
+
         const width = img.naturalWidth;
         const height = img.naturalHeight;
         const pixels = width * height;
-        if (frame.width && (frame.width !== width || frame.height !== height)) {
+
+        if (
+          !Number.isSafeInteger(width) ||
+          !Number.isSafeInteger(height) ||
+          width <= 0 ||
+          height <= 0 ||
+          !Number.isSafeInteger(pixels)
+        ) {
           URL.revokeObjectURL(objectUrl);
-          throw new Error(`尺寸不匹配：索引 ${frame.width}x${frame.height}，实际 ${width}x${height}`);
+          throw new Error('图片尺寸无效');
         }
-        const limit = frame.width ? CONFIG.maxPlaybackPixels : CONFIG.maxLegacyPixels;
+
+        if (
+          frame.width &&
+          (frame.width !== width || frame.height !== height)
+        ) {
+          URL.revokeObjectURL(objectUrl);
+          throw new Error(
+            `尺寸不匹配：索引 ${frame.width}x${frame.height}，实际 ${width}x${height}`,
+          );
+        }
+
+        const limit = frame.width
+          ? CONFIG.maxPlaybackPixels
+          : CONFIG.maxLegacyPixels;
+
         if (pixels > limit) {
           URL.revokeObjectURL(objectUrl);
-          throw new Error(`图片像素超出限制：${width}x${height}`);
+          throw new Error(
+            `图片像素超出限制：${width}x${height}`,
+          );
         }
-        return { img, objectUrl, width, height, pixels, bytes: blob.size };
+
+        return {
+          img,
+          objectUrl,
+          width,
+          height,
+          pixels,
+          bytes: blob.size,
+        };
       } catch (error) {
         lastError = error;
-        if (attempt < attempts) await sleep(attempt === 1 ? 500 : 1000);
+        if (error?.name === 'AbortError') throw error;
+
+        const foreground = record.priority === 'foreground';
+        if (!foreground || attempt >= 3) break;
+        await sleep(attempt === 1 ? 500 : 1000);
       }
     }
+
     throw lastError || new Error('图片读取失败');
   }
 
   function ensureImage(index, priority = 'background') {
-    if (index < 0 || index >= state.frames.length) return Promise.reject(new Error('frame out of range'));
+    if (index < 0 || index >= state.frames.length) {
+      return Promise.reject(new Error('frame out of range'));
+    }
+
     const frame = state.frames[index];
     const url = frame._url;
     const existing = cache.get(url);
+
     if (existing?.state === 'ready') {
       existing.lastUsed = performance.now();
       return Promise.resolve(existing);
     }
-    if (existing?.state === 'loading') return existing.promise;
-    if (existing?.state === 'failed' && priority !== 'foreground') return Promise.reject(existing.error);
+
+    if (existing?.state === 'loading') {
+      if (priority === 'foreground') promoteRecord(existing);
+      return existing.promise;
+    }
+
+    if (existing) {
+      releaseRecord(existing);
+      if (priority !== 'foreground') {
+        return Promise.reject(existing.error || new Error('background preload failed'));
+      }
+    }
 
     const taskId = Symbol(url);
-    const record = { url, state: 'loading', taskId, index, frame, lastUsed: performance.now(), promise: null };
-    const attempts = priority === 'foreground' ? 3 : 1;
-    record.promise = enqueue(async () => {
+    const record = {
+      url,
+      state: 'loading',
+      taskId,
+      index,
+      frame,
+      priority,
+      controller: new AbortController(),
+      cancelled: false,
+      lastUsed: performance.now(),
+      promise: null,
+      task: null,
+      objectUrl: null,
+    };
+
+    const queued = enqueue(async () => {
       try {
-        const prepared = await prepareImage(frame, attempts);
-        if (cache.get(url)?.taskId !== taskId) {
+        const prepared = await prepareImage(record);
+        if (
+          record.cancelled ||
+          cache.get(url)?.taskId !== taskId
+        ) {
           URL.revokeObjectURL(prepared.objectUrl);
           throw new DOMException('Stale resource', 'AbortError');
         }
-        Object.assign(record, prepared, { state: 'ready', lastUsed: performance.now() });
+
+        Object.assign(record, prepared, {
+          state: 'ready',
+          lastUsed: performance.now(),
+        });
         return record;
       } catch (error) {
-        if (cache.get(url)?.taskId === taskId) Object.assign(record, { state: 'failed', error });
+        if (cache.get(url)?.taskId === taskId) {
+          Object.assign(record, {
+            state: 'failed',
+            error,
+          });
+        }
         throw error;
       }
     }, priority);
+
+    record.task = queued.task;
+    record.promise = queued.promise;
     cache.set(url, record);
     return record.promise;
   }
