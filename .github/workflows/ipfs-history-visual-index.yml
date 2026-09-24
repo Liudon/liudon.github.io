@@ -12,11 +12,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ipfs-history-visual-index
+  cancel-in-progress: false
+
 jobs:
   build:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
@@ -77,12 +80,15 @@ jobs:
             echo "All $TOTAL screenshots match the current capture profile."
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "Visual index deferred: $MISSING/$TOTAL screenshots still need recapture."
+            echo "Visual index deferred: $MISSING/$TOTAL screenshots still need repair."
           fi
 
-      - name: Build visual index
+      - name: Publish playback assets then visual index
+        id: publish
         if: steps.readiness.outputs.ready == 'true'
         env:
+          HISTORY_DIR: ${{ steps.history.outputs.dir }}
+          ASSET_BASE: https://raw.githubusercontent.com/Liudon/liudon.github.io/ipfs-history/
           VISUAL_SAMPLE_WIDTH: "480"
           VISUAL_PIXEL_DELTA: "18"
           VISUAL_BLUR_SIGMA: "0.8"
@@ -92,16 +98,10 @@ jobs:
           VISUAL_SIGNIFICANT_TILE_RATIO: "0.01"
           VISUAL_TILE_SIZE: "48"
           VISUAL_HEIGHT_DELTA_MAX: "2"
-        run: |
-          set -euo pipefail
-
-          node .github/scripts/ipfs-history/generate-visual-index.mjs \
-            "${{ steps.history.outputs.dir }}"
-
-      - name: Commit visual index
-        if: steps.readiness.outputs.ready == 'true'
-        env:
-          HISTORY_DIR: ${{ steps.history.outputs.dir }}
+          PLAYBACK_WIDTH: "960"
+          PLAYBACK_QUALITY: "75"
+          PLAYBACK_MAX_PIXELS: "8000000"
+          PLAYBACK_MAX_EDGE: "16383"
         shell: bash
         run: |
           set -euo pipefail
@@ -109,36 +109,118 @@ jobs:
           git -C "$HISTORY_DIR" config user.name "github-actions[bot]"
           git -C "$HISTORY_DIR" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          for attempt in {1..5}; do
-            echo "Visual index push attempt $attempt/5"
+          verify_asset() {
+            local relative="$1"
+            local expected
+            expected=$(basename "$relative" .webp)
+            local tmp
+            tmp=$(mktemp)
+            if ! curl -fsSL --retry 5 --retry-delay 2 --retry-all-errors \
+              "${ASSET_BASE}${relative}" -o "$tmp"; then
+              rm -f "$tmp"
+              return 1
+            fi
+            local actual
+            actual=$(sha256sum "$tmp" | awk '{print $1}')
+            rm -f "$tmp"
+            [[ "$actual" == "$expected" ]]
+          }
 
+          OLD_INDEX="${RUNNER_TEMP}/visual-index-before.json"
+          NEW_REFS="${RUNNER_TEMP}/visual-index-new-refs.txt"
+          PUBLISHED=false
+
+          for attempt in {1..5}; do
+            echo "Visual publication attempt $attempt/5"
             git -C "$HISTORY_DIR" fetch origin ipfs-history
             git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
+            git -C "$HISTORY_DIR" clean -fd -- screenshots/playback visual-index.json visual-diffs.jsonl
 
-            # Recompute from the exact history/images we are about to publish against.
+            if [[ -f "$HISTORY_DIR/visual-index.json" ]]; then
+              cp "$HISTORY_DIR/visual-index.json" "$OLD_INDEX"
+            else
+              printf '{"frames":[]}\n' > "$OLD_INDEX"
+            fi
+
+            STATUS=$(node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR")
+            MISSING=$(jq -r '.missing' <<< "$STATUS")
+            if [[ "$MISSING" != "0" ]]; then
+              echo "Visual index deferred after refresh: $MISSING screenshot(s) missing/invalid."
+              echo "deferred=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
             node .github/scripts/ipfs-history/generate-visual-index.mjs "$HISTORY_DIR"
 
-            git -C "$HISTORY_DIR" add visual-index.json visual-diffs.jsonl
+            jq -r --slurpfile old "$OLD_INDEX" '
+              (($old[0].frames // []) | map(.screenshot) | unique) as $before
+              | [.frames[].screenshot | select(($before | index(.)) == null)]
+              | unique[]
+            ' "$HISTORY_DIR/visual-index.json" > "$NEW_REFS"
 
+            if [[ -n "$(git -C "$HISTORY_DIR" status --porcelain -- screenshots/playback)" ]]; then
+              git -C "$HISTORY_DIR" add screenshots/playback
+              git -C "$HISTORY_DIR" commit -m "publish IPFS visual playback assets"
+
+              if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
+                echo "Playback assets pushed; verifying newly referenced immutable files."
+                while IFS= read -r relative; do
+                  [[ -n "$relative" ]] || continue
+                  if ! verify_asset "$relative"; then
+                    echo "ERROR: playback asset verification failed: $relative"
+                    exit 1
+                  fi
+                done < "$NEW_REFS"
+                # Re-read the latest branch and recompute before publishing the index.
+                continue
+              fi
+
+              echo "Playback asset push raced with another writer; retrying from latest history."
+              sleep $((attempt * 2))
+              continue
+            fi
+
+            git -C "$HISTORY_DIR" add visual-index.json visual-diffs.jsonl
             if git -C "$HISTORY_DIR" diff --cached --quiet; then
-              echo "Visual index is already up to date."
+              echo "Visual index and playback assets are already up to date."
+              PUBLISHED=true
               break
             fi
 
             git -C "$HISTORY_DIR" commit -m "update IPFS visual history index"
-
             if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
               echo "Visual index pushed."
+
+              PUBLIC_INDEX=$(mktemp)
+              curl -fsSL --retry 5 --retry-delay 2 --retry-all-errors \
+                "${ASSET_BASE}visual-index.json" -o "$PUBLIC_INDEX"
+              jq -e '.version == 1 and (.frames | type == "array") and (.visual_count == (.frames | length))' \
+                "$PUBLIC_INDEX" >/dev/null
+
+              while IFS= read -r relative; do
+                [[ -n "$relative" ]] || continue
+                if ! verify_asset "$relative"; then
+                  echo "ERROR: published index references unavailable playback asset: $relative"
+                  rm -f "$PUBLIC_INDEX"
+                  exit 1
+                fi
+              done < "$NEW_REFS"
+              rm -f "$PUBLIC_INDEX"
+
+              PUBLISHED=true
               break
             fi
 
-            if [[ "$attempt" == "5" ]]; then
-              echo "ERROR: unable to push visual index after 5 attempts"
-              exit 1
-            fi
-
+            echo "Visual index push raced with another writer; retrying from latest history."
             sleep $((attempt * 2))
           done
+
+          if [[ "$PUBLISHED" != "true" ]]; then
+            echo "ERROR: unable to publish visual history safely after 5 attempts"
+            exit 1
+          fi
+
+          echo "deferred=false" >> "$GITHUB_OUTPUT"
 
       - name: Visual index summary
         if: always()
@@ -152,7 +234,7 @@ jobs:
             echo "- Capture readiness: ${{ steps.readiness.outputs.valid || 'unknown' }}/${{ steps.readiness.outputs.total || 'unknown' }} valid"
           } >> "$GITHUB_STEP_SUMMARY"
 
-          if [[ "${{ steps.readiness.outputs.ready }}" != "true" ]]; then
+          if [[ "${{ steps.readiness.outputs.ready }}" != "true" || "${{ steps.publish.outputs.deferred }}" == "true" ]]; then
             {
               echo "- Status: deferred until screenshot repair completes"
               echo "- Missing/invalid screenshots: ${{ steps.readiness.outputs.missing || 'unknown' }}"
@@ -163,6 +245,7 @@ jobs:
               echo "- Visual frames: $(jq -r '.visual_count' "$HISTORY_DIR/visual-index.json")"
               echo "- Latest CID: $(jq -r '.source.latest_cid' "$HISTORY_DIR/visual-index.json")"
               echo "- Algorithm: $(jq -r '.algorithm.strategy + " v" + (.algorithm.version|tostring)' "$HISTORY_DIR/visual-index.json")"
+              echo "- Playback: $(jq -r '(.playback_profile.target_width|tostring) + "px / WebP q" + (.playback_profile.quality|tostring)' "$HISTORY_DIR/visual-index.json")"
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
