@@ -77,6 +77,35 @@ test("capture profile id is stable and changes with rendering configuration", ()
   assert.notEqual(captureProfileId(a), captureProfileId(c));
 });
 
+test("runtime evidence participates in capture profile identity", () => {
+  const baseEnv = {
+    SCREENSHOT_WIDTH: "1440",
+    SCREENSHOT_HEIGHT: "900",
+    CAPTURE_ENVIRONMENT_ID: "fixed",
+    CAPTURE_BROWSER_EVIDENCE: "Chromium 153.0.8010.52",
+    CAPTURE_FONT_EVIDENCE: "fonts-noto-cjk=1:20240730+repack1-1",
+    CAPTURE_IMAGE_TOOLCHAIN_EVIDENCE: "sharp=0.35.0;vips=8.18.3;webp=1.6.0",
+  };
+
+  const a = captureProfileConfig(baseEnv);
+  const b = captureProfileConfig({
+    ...baseEnv,
+    CAPTURE_BROWSER_EVIDENCE: "Chromium 154.0.0.0",
+  });
+
+  assert.notEqual(captureProfileId(a), captureProfileId(b));
+});
+
+test("strict capture profile requires runtime evidence", () => {
+  assert.throws(
+    () => captureProfileConfig({
+      CAPTURE_REQUIRE_RUNTIME_EVIDENCE: "true",
+      CAPTURE_ENVIRONMENT_ID: "fixed",
+    }),
+    /Missing required capture runtime evidence/,
+  );
+});
+
 test("current profile marker selects only the matching new archive", (t) => {
   const root = tempRoot(t);
   const config = captureProfileConfig({
