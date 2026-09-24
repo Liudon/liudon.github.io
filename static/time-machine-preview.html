@@ -1080,6 +1080,7 @@
     frameError: null,
     frameElapsedMs: 0,
     frameTickAt: 0,
+    loopPhase: 'normal',
     recentUserIntentAt: 0,
     programmaticScroll: false,
   };
@@ -1792,7 +1793,16 @@
     if (state.window === 'closed') { setStatus('[双击桌面图标重新打开]'); return; }
     if (state.reading || state.pointerHeld) { setStatus('[阅读中 暂停切页]'); return; }
     if (state.targetIndex != null && state.targetIndex !== state.displayedIndex) { setStatus('[正在读取下一份档案…]'); return; }
-    setStatus(state.playMode === 'playing' ? '滚轮上下浏览' : '[已暂停]');
+    if (state.playMode !== 'playing') { setStatus('[已暂停]'); return; }
+    if (state.loopPhase === 'hold') {
+      setStatus('[ 已抵达最新纪元 · 即将开启新一轮时光穿梭 ]');
+      return;
+    }
+    if (state.loopPhase === 'rewind') {
+      setStatus('[ 磁头归位 · 返回最初纪元… ]');
+      return;
+    }
+    setStatus('滚轮上下浏览');
   }
 
   function updateControls() {
@@ -1828,6 +1838,7 @@
     updateControls();
     state.frameElapsedMs = 0;
     state.frameTickAt = performance.now();
+    state.loopPhase = 'normal';
     progressFill.style.width = '0%';
     requestAnimationFrame(() => {
       img.style.opacity = '1';
@@ -1838,7 +1849,12 @@
     return true;
   }
 
-  async function showFrame(index, origin = 'manual', playGeneration = state.playGeneration) {
+  async function showFrame(
+    index,
+    origin = 'manual',
+    playGeneration = state.playGeneration,
+    { flicker = true } = {},
+  ) {
     if (index < 0 || index >= state.frames.length) return false;
     const context = {
       sessionId: state.sessionId,
@@ -1850,7 +1866,7 @@
     state.frameError = null;
     updateControls();
     renderStatus();
-    triggerLedFlicker(650);
+    if (flicker) triggerLedFlicker(650);
     try {
       const resource = await ensureImage(index, 'foreground');
       return commitFrame(index, resource, context);
@@ -1876,6 +1892,8 @@
   function resetPlaybackProgress() {
     state.frameElapsedMs = 0;
     state.frameTickAt = performance.now();
+    state.loopPhase = 'normal';
+    progressFill.style.transition = '';
     progressFill.style.width = '0%';
   }
 
@@ -1890,6 +1908,94 @@
     renderStatus();
   }
 
+  function playbackContextValid(generation) {
+    return (
+      generation === state.playGeneration &&
+      state.playMode === 'playing' &&
+      state.power === 'on' &&
+      state.window === 'open'
+    );
+  }
+
+  async function flashDriveSeek(generation, times = 3) {
+    const session = state.sessionId;
+
+    for (let index = 0; index < times; index += 1) {
+      if (
+        !playbackContextValid(generation) ||
+        session !== state.sessionId ||
+        driveLed.classList.contains('off')
+      ) return false;
+
+      driveLed.classList.remove('standby');
+      driveLed.classList.add('active');
+      await sleep(120);
+
+      if (
+        !playbackContextValid(generation) ||
+        session !== state.sessionId
+      ) return false;
+
+      driveLed.classList.remove('active');
+      driveLed.classList.add('standby');
+      await sleep(index === times - 1 ? 160 : 105);
+    }
+
+    return true;
+  }
+
+  async function rewindProgressToZero(generation) {
+    if (!playbackContextValid(generation)) return false;
+
+    progressFill.style.transition = 'width 350ms ease-in-out';
+
+    await new Promise((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(resolve));
+    });
+
+    if (!playbackContextValid(generation)) {
+      progressFill.style.transition = '';
+      return false;
+    }
+
+    progressFill.style.width = '0%';
+    await sleep(380);
+    progressFill.style.transition = '';
+
+    return playbackContextValid(generation);
+  }
+
+  async function rewindToBeginning(generation) {
+    if (!playbackContextValid(generation)) return false;
+
+    state.loopPhase = 'rewind';
+    renderStatus();
+
+    // Frame 0 should normally already be warm from the sliding buffer.
+    // Promote it now so the ritual never ends on an unloaded frame.
+    try {
+      await ensureImage(0, 'foreground');
+    } catch (error) {
+      if (error?.name === 'AbortError') return false;
+      state.frameError = { index: 0, error };
+      stopAutoPlay(false);
+      diagnostics('rewind target failed', { error: error.message });
+      renderStatus();
+      return false;
+    }
+
+    if (!playbackContextValid(generation)) return false;
+    if (!(await flashDriveSeek(generation, 3))) return false;
+    if (!(await rewindProgressToZero(generation))) return false;
+
+    return showFrame(
+      0,
+      'auto',
+      generation,
+      { flicker: false },
+    );
+  }
+
   function startAutoPlay() {
     if (
       state.frames.length <= 1 ||
@@ -1901,54 +2007,87 @@
     state.playMode = 'playing';
     const generation = ++state.playGeneration;
     state.frameTickAt = performance.now();
+
+    const initialDuration = Number(speedSelect.value) || 4500;
+    const initialIsLast =
+      state.displayedIndex === state.frames.length - 1;
+    state.loopPhase =
+      initialIsLast &&
+      state.frameElapsedMs >= initialDuration
+        ? 'hold'
+        : 'normal';
+
     updateControls();
     renderStatus();
     cancelAnimationFrame(playRaf);
 
     const tick = async (now) => {
-      if (
-        generation !== state.playGeneration ||
-        state.playMode !== 'playing'
-      ) return;
+      if (!playbackContextValid(generation)) return;
 
       if (
         state.reading ||
         state.pointerHeld ||
-        state.documentHidden ||
-        state.window !== 'open'
+        state.documentHidden
       ) {
         // Freeze elapsed time while the user is reading, dragging,
-        // the tab is hidden, or the app window is not available.
+        // or the tab is hidden.
         state.frameTickAt = now;
         playRaf = requestAnimationFrame(tick);
         return;
       }
 
       const duration = Number(speedSelect.value) || 4500;
+      const isLast =
+        state.displayedIndex === state.frames.length - 1;
+      const totalDuration = isLast
+        ? duration * 2
+        : duration;
+
       const delta = Math.max(0, now - state.frameTickAt);
       state.frameTickAt = now;
       state.frameElapsedMs = Math.min(
         state.frameElapsedMs + delta,
-        duration,
+        totalDuration,
       );
 
+      // The last frame fills normally, then stays at 100% for one
+      // additional frame duration as a deliberate Hold phase.
       const progress = Math.min(
         state.frameElapsedMs / duration,
         1,
       );
       progressFill.style.width = `${progress * 100}%`;
 
-      if (progress < 1) {
+      if (
+        isLast &&
+        state.frameElapsedMs >= duration &&
+        state.loopPhase !== 'hold' &&
+        state.loopPhase !== 'rewind'
+      ) {
+        state.loopPhase = 'hold';
+        renderStatus();
+      }
+
+      if (state.frameElapsedMs < totalDuration) {
         playRaf = requestAnimationFrame(tick);
         return;
       }
 
-      // Stay at 100% and keep the current decoded image visible until
-      // the next frame is fully downloaded and decoded.
       progressFill.style.width = '100%';
-      const nextIndex =
-        (state.displayedIndex + 1) %
-        state.frames.length;
+
+      if (isLast) {
+        const ok = await rewindToBeginning(generation);
+
+        if (
+          !ok ||
+          !playbackContextValid(generation)
+        ) return;
+
+        playRaf = requestAnimationFrame(tick);
+        return;
+      }
+
+      const nextIndex = state.displayedIndex + 1;
       const ok = await showFrame(
         nextIndex,
         'auto',
@@ -1957,8 +2096,7 @@
 
       if (
         !ok ||
-        generation !== state.playGeneration ||
-        state.playMode !== 'playing'
+        !playbackContextValid(generation)
       ) return;
 
       playRaf = requestAnimationFrame(tick);
@@ -2085,6 +2223,7 @@
     clearTimeout(readingTimer);
     state.reading = false;
     state.pointerHeld = false;
+    state.loopPhase = 'normal';
     if (releaseImages) clearImageResources();
   }
 
@@ -2097,6 +2236,7 @@
     state.displayedIndex = null;
     state.targetIndex = null;
     state.playMode = 'paused';
+    state.loopPhase = 'normal';
     closeAllDropdowns();
     const retryButton = $('bootRetryButton');
     if (retryButton) retryButton.style.display = 'none';
