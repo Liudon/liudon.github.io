@@ -284,13 +284,9 @@ jobs:
           chmod +x ./easyindex-cli
           ./easyindex-cli google -d -c ./url.csv
 
-      # GitHub Pages has already been published above. Only the IPFS copy gets
-      # this robots.txt, so liudon.com remains indexable.
-      - name: Generate IPFS robots.txt
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        run: |
-          echo "User-agent: *" > ./public/robots.txt
-          echo "Disallow: /" >> ./public/robots.txt
+      # Keep Hugo's normal robots.txt in the IPFS copy. The public gateway
+      # controls snapshot indexing with X-Robots-Tag: noindex, nofollow, noarchive,
+      # so crawlers must be allowed to fetch the response and see that header.
 
       # Hash exactly the tree that will be merkleized for IPFS. The digest is
       # independent of mtimes/ownership, but includes paths, directories,
