@@ -36,9 +36,9 @@
     "reduced_motion": "reduce"
   },
   "source": {
-    "snapshot_count": 74,
-    "latest_cid": "bafybeialqv77ytcwdp4ujqhyxkr4264vrzxqnspvz6q6nkovh2gyz7xi54",
-    "latest_deployed_at": "2026-09-24T09:14:06Z"
+    "snapshot_count": 75,
+    "latest_cid": "bafybeiadogds67qbwegipnpgclylakf7htlz6bttw26q537zgidumm43gy",
+    "latest_deployed_at": "2026-09-24T14:55:55Z"
   },
   "playback_profile": {
     "version": 1,
@@ -291,8 +291,8 @@
       "deployed_at": "2026-09-23T04:53:32Z",
       "source_commit": "6701a47191191afb6b5856841bc0564b2a78060c",
       "screenshot": "screenshots/playback/5cc50d122649949a8b85882bc326721b9f513271982dbdf9be592e4dae6d0eea.webp",
-      "unchanged_deployments": 12,
-      "same_until": "2026-09-24T09:14:06Z",
+      "unchanged_deployments": 13,
+      "same_until": "2026-09-24T14:55:55Z",
       "width": 960,
       "height": 967,
       "bytes": 27276
