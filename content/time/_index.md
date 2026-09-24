@@ -1,16 +1,7 @@
 ---
 title: "Time Machine"
-description: "随机穿越到博客过去的一个不可变快照。"
+description: "让博客过去的版本沿时间线重新出现，并可通过 IPFS 打开真实历史快照。"
 robots: "noindex, follow"
 outputs:
   - HTML
-
-travel_lines:
-  - "溯流寻迹…"
-  - "定格如昨…"
-  - "循光而返…"
-
-travel_waiting: "急急如律令…"
-travel_line_delay_ms: 650
 ---
-

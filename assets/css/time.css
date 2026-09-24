@@ -1,329 +1,938 @@
-html,
-body.time-machine-page {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-body.time-machine-page {
-  background: var(--term-bg);
-  color: var(--term-text);
-}
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 40%, #3a3f4a 0%, #1e2229 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Geneva, "Charcoal", "Courier New", system-ui, sans-serif;
+      user-select: none;
+    }
 
-.time-machine-page button,
-.time-machine-page a {
-  font: inherit;
-}
+    /* Macintosh 128K 物理外壳 */
+    .mac-hardware {
+      width: 92vw;
+      max-width: 880px;
+      height: 94vh;
+      max-height: 820px;
+      background: #ded7c8;
+      border-radius: 28px 28px 14px 14px;
+      box-shadow:
+        inset 0 3px 5px rgba(255, 255, 255, 0.8),
+        inset 0 -6px 12px rgba(0, 0, 0, 0.25),
+        0 18px 45px rgba(0, 0, 0, 0.65),
+        0 4px 12px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      padding: 16px 24px 18px;
+      border: 1px solid #bfb7a4;
+      overflow: hidden;
+      transition: all 0.2s ease-out;
+    }
 
-.snapshot {
-  position: fixed;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100vh;
-  height: 100dvh;
-  border: 0;
-  background: var(--term-bg);
-  opacity: 0;
-  filter: blur(16px);
-  transform: scale(1.025);
-  transform-origin: center;
-  transition:
-    opacity 650ms ease,
-    filter 1200ms ease-out,
-    transform 1200ms ease-out;
-  will-change: opacity, filter, transform;
-}
+    @media (min-width: 601px) and (max-width: 1024px) {
+      .mac-hardware {
+        width: 90vw;
+        max-width: 720px;
+        height: auto;
+        max-height: 88vh;
+        aspect-ratio: 1 / 1.15;
+        padding: 12px 16px 14px;
+        border-radius: 24px 24px 12px 12px;
+      }
+      .mac-handle-groove {
+        width: 110px !important;
+        height: 7px !important;
+        margin-bottom: 7px !important;
+      }
+      .floppy-drive {
+        width: 170px !important;
+      }
+    }
 
-.snapshot.is-loading {
-  opacity: 0.32;
-  filter: blur(16px);
-  transform: scale(1.025);
-}
+    @media (max-width: 600px) {
+      .mac-hardware {
+        width: 95vw;
+        max-width: 440px;
+        height: auto;
+        max-height: 88vh;
+        aspect-ratio: 1 / 1.12;
+        padding: 8px 10px 10px;
+        border-radius: 22px 22px 12px 12px;
+      }
+      .mac-handle-groove {
+        width: 90px !important;
+        height: 5px !important;
+        margin-bottom: 5px !important;
+      }
+      .bezel-outer {
+        padding: 6px !important;
+      }
+      .screen-workspace {
+        padding: 5px !important;
+      }
+      .screen-menubar {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      .menu-item {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      .menubar-left {
+        gap: 2px;
+      }
+      .window-toolbar {
+        padding: 3px 4px !important;
+        gap: 2px !important;
+        flex-wrap: nowrap !important;
+        justify-content: flex-start !important;
+      }
+      .toolbar-time {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        font-size: 10px;
+      }
+      .toolbar-controls {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 2px !important;
+        white-space: nowrap;
+      }
+      .toolbar-controls .mac-btn,
+      .toolbar-controls .mac-select {
+        flex: 0 0 auto;
+        font-size: 9px !important;
+        padding: 1px 4px !important;
+      }
+      #togglePlay {
+        min-width: 22px;
+        justify-content: center;
+      }
+      #counter {
+        font-size: 9px !important;
+      }
+      #hoverStatus.history-status {
+        font-size: 9px;
+        margin-right: 4px !important;
+        white-space: nowrap;
+      }
+      .history-toolbar {
+        padding: 3px 4px !important;
+      }
+      .mac-chassis-lower {
+        height: 34px !important;
+        margin-top: 5px !important;
+        padding: 0 4px !important;
+      }
+      .floppy-drive {
+        width: 130px !important;
+      }
+      .rainbow-apple-svg {
+        width: 12px !important;
+        height: 15px !important;
+      }
+      .mac-logo-text {
+        width: 72px !important;
+        height: 14px !important;
+      }
 
-.snapshot.is-loading.is-emerging {
-  opacity: 0.92;
-  filter: blur(2px);
-  transform: scale(1.004);
-}
+      html,
+      body,
+      .mac-hardware,
+      .crt-screen,
+      .screen-workspace,
+      .window-toolbar,
+      .mac-btn,
+      .mac-select,
+      .menu-item,
+      .desktop-app-icon,
+      .scroll-arrow,
+      .scroll-thumb {
+        touch-action: manipulation;
+      }
 
-.snapshot.is-visible {
-  opacity: 1;
-  filter: blur(0);
-  transform: scale(1);
-  transition:
-    opacity 420ms ease,
-    filter 650ms ease,
-    transform 650ms ease;
-}
+      .viewport {
+        touch-action: pan-y pinch-zoom;
+      }
+    }
 
-.travel {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background-image:
-    radial-gradient(circle at center, var(--term-accent-10), transparent 48%);
-  background-color: var(--term-bg);
-  transition:
-    opacity 180ms ease,
-    visibility 180ms ease,
-    background-color 1200ms ease;
-}
+    .mac-handle-groove {
+      flex-shrink: 0;
+      width: 140px;
+      height: 8px;
+      background: #b5ad9b;
+      border-radius: 4px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 1px 1px rgba(255,255,255,0.6);
+      margin-bottom: 10px;
+    }
 
-.travel.is-revealing {
-  background-color: rgba(10, 10, 10, 0.38);
-}
+    .bezel-outer {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      background: #cfc6b3;
+      border-radius: 14px;
+      padding: 10px;
+      box-shadow:
+        inset 2px 2px 6px rgba(0, 0, 0, 0.45),
+        inset -2px -2px 4px rgba(255, 255, 255, 0.7);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-.travel.is-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
+    .crt-screen {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      background: #808080;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.6);
+      background-image: radial-gradient(#aaa 25%, transparent 25%), radial-gradient(#555 25%, transparent 25%);
+      background-size: 4px 4px;
+      background-position: 0 0, 2px 2px;
+    }
 
-.time-terminal {
-  width: min(680px, 100%);
-  min-height: 190px;
-  padding: 22px 24px;
-  border: 1px solid var(--term-border);
-  border-radius: 10px;
-  background: var(--term-bg-input);
-  box-shadow: var(--term-shadow-window);
-}
+    /* 顶部菜单栏 */
+    .screen-menubar {
+      flex-shrink: 0;
+      height: 20px;
+      background: #fff;
+      border-bottom: 1px solid #000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: bold;
+      z-index: 20;
+      position: relative;
+    }
+    .menubar-left {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+    }
 
-.time-prompt {
-  margin: 0 0 16px;
-  color: var(--term-phosphor);
-  font-size: 16px;
-  line-height: 1.7;
-  text-shadow: var(--term-text-glow);
-}
+    .menubar-status {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
 
-.time-lines {
-  min-height: 1px;
-}
+    .menu-item {
+      padding: 2px 8px;
+      cursor: pointer;
+      position: relative;
+      border-radius: 1px;
+    }
+    .menu-item.active, .menu-item:hover {
+      background: #000;
+      color: #fff;
+    }
 
-.time-line {
-  display: none;
-  margin: 6px 0;
-  color: var(--term-text);
-  font-size: 14px;
-  line-height: 1.65;
-}
+    /* 下拉菜单 */
+    .mac-dropdown {
+      display: none;
+      position: absolute;
+      top: 19px;
+      left: 0;
+      background: #fff;
+      border: 1px solid #000;
+      box-shadow: 2px 2px 0 #000;
+      min-width: 180px;
+      z-index: 100;
+      padding: 3px 0;
+      color: #000;
+      font-size: 11px;
+      font-weight: normal;
+    }
+    .mac-dropdown.show { display: block; }
 
-.time-line.is-visible {
-  display: block;
-}
+    .dropdown-option {
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+      color: #000;
+      line-height: 1;
+    }
+    .dropdown-option:hover {
+      background: #000;
+      color: #fff !important;
+    }
 
-.time-waiting {
-  color: var(--term-phosphor-bright);
-}
+    .retro-icon {
+      width: 12px;
+      height: 12px;
+      display: inline-block;
+      flex-shrink: 0;
+      vertical-align: middle;
+      overflow: visible;
+    }
+    .retro-icon-fill { fill: #000; }
+    .dropdown-option:hover .retro-icon-fill { fill: #fff !important; }
 
-.time-line::before {
-  content: "> ";
-  color: var(--term-text-dim);
-}
+    .dropdown-divider {
+      height: 1px;
+      background: repeating-linear-gradient(to right, #000 0, #000 2px, transparent 2px, transparent 4px);
+      margin: 3px 4px;
+    }
 
-.time-cursor {
-  display: inline-block;
-  width: 0.7ch;
-  height: 1.15em;
-  margin-left: 4px;
-  vertical-align: -0.16em;
-  background: var(--term-phosphor);
-  animation: time-blink 1s steps(1, end) infinite;
-}
+    /* 桌面工作区 */
+    .screen-workspace {
+      flex: 1;
+      min-height: 0;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
 
-@keyframes time-blink {
-  50% {
-    opacity: 0;
-  }
-}
+    /* 经典 System 桌面图标（窗口关闭后可见） */
+    .desktop-icons-area {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 5;
+    }
+    .desktop-icon-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 84px;
+      cursor: pointer;
+      padding: 4px;
+      border: 1px dotted transparent;
+    }
+    .desktop-icon-item:hover, .desktop-icon-item.selected {
+      background: rgba(0, 0, 0, 0.15);
+      border-color: #000;
+    }
+    .desktop-icon-item.selected .desktop-icon-label {
+      background: #000;
+      color: #fff;
+    }
+    .desktop-icon-svg {
+      width: 38px;
+      height: 38px;
+      filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.4));
+    }
+    .desktop-icon-label {
+      font-size: 10px;
+      background: #fff;
+      color: #000;
+      padding: 1px 3px;
+      border: 1px solid #000;
+      box-shadow: 1px 1px 0 #000;
+      margin-top: 4px;
+      text-align: center;
+      line-height: 1.1;
+      word-break: break-all;
+    }
 
-.time-error {
-  display: none;
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--term-accent-20);
-}
+    /* 视窗本体与缩放动效 */
+    .mac-window {
+      flex: 1;
+      min-height: 0;
+      background: #fff;
+      border: 1px solid #000;
+      box-shadow: 2px 2px 0 #000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+      transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease;
+      transform-origin: 40px 40px;
+    }
+    .mac-window.window-closing {
+      transform: scale(0.08) translate(-260px, -200px);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .mac-window.window-hidden {
+      display: none;
+    }
+    .mac-window.window-opening {
+      animation: macWindowZoom 0.24s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+    }
+    @keyframes macWindowZoom {
+      0% { transform: scale(0.15) translate(-180px, -140px); opacity: 0; }
+      100% { transform: scale(1) translate(0, 0); opacity: 1; }
+    }
 
-.time-error.is-visible {
-  display: block;
-}
+    /* 窗口横纹标题栏与 Go-Away Box */
+    .window-titlebar {
+      flex-shrink: 0;
+      height: 18px;
+      background: repeating-linear-gradient(
+        to bottom,
+        #000 0px, #000 1px,
+        #fff 1px, #fff 3px
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border-bottom: 1px solid #000;
+    }
+    .close-box {
+      position: absolute;
+      left: 6px;
+      width: 10px;
+      height: 10px;
+      background: #fff;
+      border: 1px solid #000;
+      cursor: pointer;
+    }
+    .close-box:active { background: #000; }
+    .window-title {
+      background: #fff;
+      padding: 0 6px;
+      font-size: 11px;
+      font-weight: bold;
+    }
 
-.time-error__title {
-  margin: 0 0 7px;
-  color: var(--term-red);
-  font-size: 14px;
-}
+    /* 控制栏 */
+    .window-toolbar {
+      flex-shrink: 0;
+      padding: 4px 8px;
+      background: #f0f0f0;
+      border-bottom: 1px solid #000;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 11px;
+    }
 
-.time-error__message {
-  margin: 0 0 16px;
-  color: var(--term-text-dim);
-  font-size: 13px;
-  line-height: 1.6;
-}
+    .toolbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
 
-.time-actions {
+    .mac-btn, .mac-select {
+      font-family: inherit;
+      font-size: 10px;
+      padding: 2px 6px;
+      background: #fff;
+      border: 1px solid #000;
+      border-radius: 2px;
+      box-shadow: 1px 1px 0 #000;
+      cursor: pointer;
+      text-decoration: none;
+      color: #000;
+      display: inline-flex;
+      align-items: center;
+    }
+    .mac-btn:active:not(:disabled) {
+      background: #000;
+      color: #fff;
+    }
+    .mac-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .progress-track {
+      flex-shrink: 0;
+      height: 3px;
+      background: #fff;
+      border-bottom: 1px solid #000;
+      width: 100%;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #000;
+      width: 0%;
+    }
+
+    .window-body {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      display: flex;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .history-toolbar {
+      display: none;
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+    }
+
+    .history-toolbar.is-visible {
+      display: flex;
+    }
+
+    .history-frame-shell {
+      display: none;
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .history-frame-shell.is-visible {
+      display: block;
+    }
+
+    .history-frame {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #fff;
+      transform-origin: top left;
+    }
+
+    /* The IPFS page is cross-origin, so its inner font-size cannot be
+       changed here. Keep a fixed clipping shell at 100%, then give the
+       iframe a wider viewport and scale only the iframe inside it. */
+    @media (min-width: 601px) and (max-width: 1024px) {
+      .history-frame {
+        width: calc(100% / 0.92);
+        height: calc(100% / 0.92);
+        transform: scale(0.92);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .history-frame {
+        width: calc(100% / 0.85);
+        height: calc(100% / 0.85);
+        transform: scale(0.85);
+      }
+    }
+
+    .timeline-hidden {
+      display: none !important;
+    }
+
+    .viewport {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 16px;
+      bottom: 0;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      cursor: default;
+    }
+    .viewport::-webkit-scrollbar {
+      display: none;
+    }
+
+    .content-box {
+      width: 100%;
+      position: relative;
+    }
+    .content-box img {
+      display: block;
+      width: 100%;
+      height: auto;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    /* 拟物滚动条 */
+    .mac-scrollbar {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 16px;
+      border-left: 1px solid #000;
+      background-image: repeating-linear-gradient(45deg, #fff 0, #fff 1px, #ddd 1px, #ddd 2px);
+      display: flex;
+      flex-direction: column;
+    }
+    .scroll-arrow {
+      flex-shrink: 0;
+      height: 15px;
+      background: #fff;
+      border-bottom: 1px solid #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      cursor: pointer;
+    }
+    .scroll-arrow:active { background: #000; color: #fff; }
+    .scroll-arrow-down {
+      border-bottom: none;
+      border-top: 1px solid #000;
+    }
+    .scroll-track {
+      flex: 1;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .scroll-thumb {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 28px;
+      background: #fff;
+      border: 1px solid #000;
+      box-shadow: 1px 1px 0 #000;
+      cursor: grab;
+    }
+    .scroll-thumb:active { cursor: grabbing; background: #eee; }
+
+    /* 下部硬件面板 */
+    .mac-chassis-lower {
+      flex-shrink: 0;
+      width: 100%;
+      height: 44px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+
+    .rainbow-apple-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .rainbow-apple-svg {
+      width: 15px;
+      height: 18px;
+      display: block;
+      filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.8));
+    }
+    .mac-logo-text {
+      width: 86px;
+      height: 17px;
+      display: block;
+      filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.85));
+      opacity: 0.95;
+    }
+
+    .drive-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .drive-led-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .drive-led {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4d3a08;
+      border: 1px solid #2a2004;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.8);
+      transition: all 0.2s ease;
+    }
+    .drive-led.standby {
+      background: #8fa338;
+      box-shadow: 0 0 3px #a5c43d, inset 0 1px 1px rgba(255,255,255,0.4);
+    }
+    .drive-led.active {
+      background: #ffaa00;
+      box-shadow: 0 0 6px #ffbb00, 0 0 10px rgba(255,170,0,0.8), inset 0 1px 1px #fff;
+      animation: ledFlicker 0.12s infinite alternate;
+    }
+    .drive-led.off {
+      background: #221c0b;
+      box-shadow: none;
+      opacity: 0.35;
+    }
+
+    @keyframes ledFlicker {
+      0% { opacity: 0.35; }
+      100% { opacity: 1; transform: scale(1.08); }
+    }
+
+    .floppy-drive {
+      width: 220px;
+      height: 12px;
+      background: #111;
+      border-radius: 2px;
+      box-shadow:
+        inset 0 2px 3px #000,
+        0 1px 1px rgba(255, 255, 255, 0.7);
+      position: relative;
+    }
+    .floppy-drive::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      top: 4px;
+      width: 4px;
+      height: 4px;
+      background: #000;
+      border-radius: 50%;
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.1);
+    }
+
+    /* 拟物弹窗 */
+    .about-dialog-overlay {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.25);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .about-dialog-overlay.show { display: flex; }
+
+    .about-dialog {
+      width: 290px;
+      background: #fff;
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0 #000;
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+      animation: dialogPop 0.15s ease-out;
+    }
+    @keyframes dialogPop {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* 系统开关机层 */
+    .system-screen-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #808080;
+      background-image: radial-gradient(#aaa 25%, transparent 25%), radial-gradient(#555 25%, transparent 25%);
+      background-size: 4px 4px;
+      transition: opacity 0.3s ease;
+    }
+
+    .happy-mac-icon {
+      width: 58px;
+      height: 72px;
+      background: #fff;
+      border: 2px solid #000;
+      border-radius: 4px;
+      box-shadow: 2px 2px 0 #000;
+      position: relative;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .happy-mac-screen {
+      width: 44px;
+      height: 36px;
+      background: #fff;
+      border: 2px solid #000;
+      margin-top: 6px;
+      border-radius: 2px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .happy-mac-face {
+      width: 32px;
+      height: 24px;
+    }
+    .happy-mac-slot {
+      width: 24px;
+      height: 3px;
+      background: #000;
+      margin-top: 10px;
+      border-radius: 1px;
+    }
+
+    .sys-status-text {
+      font-size: 11px;
+      font-weight: bold;
+      color: #000;
+      background: #fff;
+      padding: 2px 8px;
+      border: 1px solid #000;
+      box-shadow: 1px 1px 0 #000;
+      margin-bottom: 8px;
+    }
+    .sys-progress-box {
+      width: 140px;
+      height: 8px;
+      background: #fff;
+      border: 1px solid #000;
+      box-shadow: 1px 1px 0 #000;
+      padding: 1px;
+    }
+    .sys-progress-bar {
+      width: 5%;
+      height: 100%;
+      background: #000;
+      transition: width 0.25s ease-out;
+    }
+
+    .shutdown-dialog {
+      width: 290px;
+      background: #fff;
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0 #000;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+      animation: dialogPop 0.2s ease-out;
+    }
+
+    #loadingTip {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 1px solid #000;
+      box-shadow: 2px 2px 0 #000;
+      padding: 8px 14px;
+      font-size: 11px;
+      font-weight: bold;
+      z-index: 50;
+    }
+
+/* Hugo integration: styles moved out of the former /time-test inline markup. */
+.system-state-stack {
   display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
+  flex-direction: column;
+  align-items: center;
 }
 
-.time-btn {
-  appearance: none;
-  border: 1px solid var(--term-border);
-  border-radius: 6px;
-  padding: 8px 11px;
-  background: var(--term-accent-10);
-  color: var(--term-phosphor-bright);
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease;
-}
-
-.time-btn:hover,
-.time-btn:focus-visible {
-  border-color: var(--term-phosphor);
-  background: var(--term-accent-20);
-  outline: none;
-}
-
-.past {
-  position: fixed;
-  right: max(18px, env(safe-area-inset-right));
-  bottom: max(18px, env(safe-area-inset-bottom));
-  z-index: 20;
-  width: min(330px, calc(100vw - 36px));
-  border: 1px solid var(--term-border);
-  border-radius: 8px;
-  background: var(--header-bg);
-  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  opacity: 0;
-  transform: translateY(8px);
-  pointer-events: none;
-  transition: opacity 160ms ease, transform 160ms ease;
-}
-
-.past.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.past.is-collapsed {
-  width: auto;
-  max-width: calc(100vw - 36px);
-}
-
-.past__collapsed {
-  display: none;
-  width: 100%;
-  appearance: none;
-  border: 0;
-  padding: 10px 12px;
-  background: transparent;
-  color: var(--term-phosphor);
-  text-align: left;
-  cursor: pointer;
-}
-
-.past.is-collapsed .past__collapsed {
-  display: block;
-}
-
-.past.is-collapsed .past__expanded {
+.system-state-stack--hidden {
   display: none;
 }
 
-.past__expanded {
-  padding: 14px;
+.shutdown-hourglass {
+  width: 20px;
+  height: 20px;
+  margin-bottom: 8px;
 }
 
-.past__eyebrow {
-  margin: 0 0 9px;
-  color: var(--term-phosphor);
-  font-size: 11px;
-  letter-spacing: 0.11em;
+#shutdownProgressBar {
+  width: 10%;
 }
 
-.past__label {
-  margin: 0;
-  color: var(--term-phosphor-bright);
-  font-size: 18px;
-  font-weight: 700;
+.shutdown-apple {
+  font-size: 20px;
 }
 
-.past__date {
-  margin: 4px 0 11px;
-  color: var(--term-text);
-  font-size: 13px;
-}
-
-.past__copy {
-  margin: 0 0 14px;
-  color: var(--term-text-dim);
+.shutdown-message {
   font-size: 12px;
-  line-height: 1.6;
+  font-weight: bold;
+  line-height: 1.5;
 }
 
-.past__close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 30px;
-  height: 30px;
-  appearance: none;
-  border: 0;
-  background: transparent;
-  color: var(--term-text-dim);
-  cursor: pointer;
+.shutdown-note {
+  color: #555;
+  font-size: 10px;
 }
 
-.past__close:hover,
-.past__close:focus-visible {
-  color: var(--term-phosphor);
-  outline: none;
+.reboot-button {
+  margin-top: 4px;
+  padding: 4px 18px;
+  font-weight: bold;
 }
 
-@media (max-width: 640px) {
-  .time-terminal {
-    min-height: 170px;
-    padding: 18px;
-  }
-
-  .past {
-    right: max(12px, env(safe-area-inset-right));
-    bottom: max(12px, env(safe-area-inset-bottom));
-    width: min(330px, calc(100vw - 24px));
-  }
+.hover-status {
+  margin-right: 8px;
+  font-weight: normal;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .snapshot,
-  .travel,
-  .past {
-    transition: none;
-  }
+.snapshot-time {
+  font-weight: bold;
+}
 
-  .snapshot.is-loading,
-  .snapshot.is-loading.is-emerging {
-    opacity: 0.72;
-    filter: blur(4px);
-    transform: none;
-  }
+.snapshot-counter {
+  font-size: 10px;
+}
 
-  .snapshot.is-visible {
-    filter: none;
-    transform: none;
-  }
+.snapshot-image {
+  opacity: 0;
+}
 
-  .time-cursor {
-    animation: none;
-  }
+.about-dialog__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.about-dialog__apple {
+  font-size: 22px;
+}
+
+.about-dialog__heading {
+  font-size: 14px;
+}
+
+.about-dialog__mac-copy {
+  color: #333;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.about-dialog__meta {
+  width: 100%;
+  padding-top: 6px;
+  border-top: 1px dashed #aaa;
+  color: #666;
+  font-size: 10px;
+}
+
+.about-dialog__button {
+  margin-top: 4px;
+  padding: 4px 18px;
+}
+
+.about-dialog__tm-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.about-dialog__tm-copy {
+  margin: 4px 0 2px;
+  color: #333;
+  font-size: 12px;
+  line-height: 1.8;
 }

@@ -2,56 +2,295 @@
 <html lang="{{ site.Language.Locale | default site.Language.Lang | default "zh-CN" }}">
 <head>
   {{ partial "head.html" . }}
-  {{- $timeCSS := resources.Get "css/time.css" | minify | fingerprint }}
+  {{- $timeCSS := resources.Get "css/time.css" | minify | fingerprint "sha256" }}
   <link rel="stylesheet" href="{{ $timeCSS.RelPermalink }}" integrity="{{ $timeCSS.Data.Integrity }}" crossorigin="anonymous">
 </head>
 <body class="time-machine-page">
-  <iframe id="snapshot" class="snapshot" title="博客历史快照" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+<div class="mac-hardware">
+    <div class="mac-handle-groove"></div>
 
-  <div id="travel" class="travel" aria-live="polite">
-    <div class="time-terminal">
-      <p class="time-prompt">$ time<span class="time-cursor" aria-hidden="true"></span></p>
-      <div id="travel-lines" class="time-lines" data-line-delay="{{ .Params.travel_line_delay_ms | default 320 }}">
-        {{- range .Params.travel_lines }}
-        <p class="time-line">{{ . }}</p>
-        {{- end }}
-        <p id="travel-waiting" class="time-line time-waiting" data-text="{{ .Params.travel_waiting | default "loading snapshot..." }}"></p>
+    <div class="bezel-outer">
+      <div class="crt-screen">
+
+        <!-- 系统开机 / 关机过渡 / 停机动画蒙层 -->
+        <div class="system-screen-overlay" id="systemScreenOverlay">
+          <!-- 1. 开机状态容器 (Happy Mac) -->
+          <div id="bootContainer" class="system-state-stack">
+            <div class="happy-mac-icon">
+              <div class="happy-mac-screen">
+                <svg class="happy-mac-face" viewBox="0 0 32 24">
+                  <rect x="7" y="6" width="3" height="3" fill="#000"/>
+                  <rect x="22" y="6" width="3" height="3" fill="#000"/>
+                  <path d="M7,15 C10,19 22,19 25,15" stroke="#000" stroke-width="2.2" fill="none" stroke-linecap="square"/>
+                </svg>
+              </div>
+              <div class="happy-mac-slot"></div>
+            </div>
+            <div class="sys-status-text" id="bootStatusText">Starting System 1.0...</div>
+            <div class="sys-progress-box">
+              <div class="sys-progress-bar" id="bootProgressBar"></div>
+            </div>
+          </div>
+
+          <!-- 2. 关机过渡 Loading 容器 -->
+          <div id="shuttingDownContainer" class="system-state-stack system-state-stack--hidden">
+            <svg class="retro-icon shutdown-hourglass" viewBox="0 0 16 16">
+              <path class="retro-icon-fill" d="M2 1h12v2.5l-4 4 4 4.5V15H2v-3l4-4.5-4-4V1zm2 2.2l3 3.3h2l3-3.3H4zm3 5.3l-3 3.5v1h8v-1l-3-3.5H7z"/>
+            </svg>
+            <div class="sys-status-text" id="shutdownStatusText">Shutting down System...</div>
+            <div class="sys-progress-box">
+              <div class="sys-progress-bar" id="shutdownProgressBar"></div>
+            </div>
+          </div>
+
+          <!-- 3. 关机停机对话框 (Safe to Switch Off) -->
+          <div id="shutdownContainer" class="system-state-stack system-state-stack--hidden">
+            <div class="shutdown-dialog">
+              <div class="shutdown-apple"></div>
+              <p class="shutdown-message">
+                It is now safe to switch off<br>your Macintosh.
+              </p>
+              <div class="shutdown-note">
+                系统已安全驻留停机 · 显像管高压断开
+              </div>
+              <button class="mac-btn reboot-button" id="rebootBtn">
+                ⏻ 重新开机
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 屏幕内部菜单栏 -->
+        <div class="screen-menubar">
+          <div class="menubar-left">
+            <!--  苹果菜单 -->
+            <div class="menu-item" id="appleMenuBtn">
+              <span></span>
+              <div class="mac-dropdown" id="appleDropdown">
+                <div class="dropdown-option" id="aboutMacBtn">
+                  <svg class="retro-icon" viewBox="0 0 170 200">
+                    <path class="retro-icon-fill" d="M100.8,17.4 C112.5,3.2 128.2,0 128.2,0 C128.2,0 131.2,15.6 119.5,29.8 C107.8,44 92.1,40.8 92.1,40.8 C92.1,40.8 89.1,31.6 100.8,17.4 Z"/>
+                    <path class="retro-icon-fill" d="M141.2,112.6 C141.4,85.2 163.6,73.6 164.7,73 C151.8,54.4 132.3,51.8 125.6,51.2 C108.9,49.5 93.3,60.8 84.7,60.8 C76.1,60.8 63.3,51.4 49.3,51.7 C31.1,52 14.5,62.3 5.3,78.2 C-13.6,110.8 0.4,159.2 18.6,185.3 C27.5,198.1 38,212.4 51.9,211.8 C65.3,211.2 70.3,203.2 86.4,203.2 C102.5,203.2 107.1,211.8 121,211.5 C135.3,211.2 144.5,198.4 153.3,185.5 C163.6,170.6 167.8,156 168.1,155.1 C167.5,154.8 141,144.7 141.2,112.6 Z"/>
+                  </svg>
+                  <span>关于此 Macintosh...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Special 特别系统菜单 -->
+            <div class="menu-item" id="specialMenuBtn">
+              <span>Special</span>
+              <div class="mac-dropdown" id="specialDropdown">
+                <div class="dropdown-option" id="menuRestart">
+                  <svg class="retro-icon" viewBox="0 0 16 16">
+                    <path class="retro-icon-fill" d="M8 2.2a5.8 5.8 0 1 0 5.4 3.7h-1.8A4 4 0 1 1 8 4v2.2L12 3 8 .8V2.2z"/>
+                  </svg>
+                  <span>重新启动 (Restart)</span>
+                </div>
+                <div class="dropdown-option" id="menuShutdown">
+                  <svg class="retro-icon" viewBox="0 0 16 16">
+                    <path class="retro-icon-fill" d="M7 1h2v6.5H7V1zm4.8 2.8l-1.3 1.3A5.2 5.2 0 1 1 5.5 5.1L4.2 3.8A7 7 0 1 0 11.8 3.8z"/>
+                  </svg>
+                  <span>关机 (Shut Down)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- TimeMachine 菜单 -->
+            <div class="menu-item" id="tmMenuBtn">
+              <span>TimeMachine</span>
+              <div class="mac-dropdown" id="tmDropdown">
+                <div class="dropdown-option" id="aboutTmBtn">
+                  <svg class="retro-icon" viewBox="0 0 16 16">
+                    <path class="retro-icon-fill" fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 1.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zM7 5h2v2H7V5zm0 3h2v4H7V8z"/>
+                  </svg>
+                  <span>关于时光机...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="menubar-status">
+            <span id="hoverStatus" class="hover-status">滚轮上下浏览</span>
+            <span id="clock">12:00</span>
+          </div>
+        </div>
+
+        <div class="screen-workspace">
+
+          <!-- 桌面常驻应用图标（当窗口被 Go-Away Box 关闭时可见） -->
+          <div class="desktop-icons-area">
+            <div class="desktop-icon-item" id="desktopAppIcon" title="双击打开应用">
+              <svg class="desktop-icon-svg" viewBox="0 0 38 38">
+                <!-- 1-bit 复古应用文件图标（折角文档内嵌 1984 Mac 小脸） -->
+                <rect x="3" y="1" width="24" height="34" fill="#fff" stroke="#000" stroke-width="2"/>
+                <polygon points="27,1 27,9 35,9" fill="#000"/>
+                <polygon points="27,9 35,9 35,35 3,35" fill="none"/>
+                <!-- 内嵌小微机屏幕 -->
+                <rect x="7" y="6" width="16" height="13" fill="#fff" stroke="#000" stroke-width="1.5"/>
+                <circle cx="11.5" cy="11.5" r="1.2" fill="#000"/>
+                <circle cx="18.5" cy="11.5" r="1.2" fill="#000"/>
+                <path d="M12,15 Q15,18 18,15" stroke="#000" stroke-width="1.2" fill="none"/>
+                <!-- 软驱插槽 -->
+                <line x1="8" y1="23" x2="22" y2="23" stroke="#000" stroke-width="1.8"/>
+              </svg>
+              <span class="desktop-icon-label">TimeMachine</span>
+            </div>
+          </div>
+
+          <!-- 主视窗本体 -->
+          <div class="mac-window" id="mainAppWindow">
+            <div class="window-titlebar">
+              <!-- 真实的 Go-Away Box 关闭按钮 -->
+              <div class="close-box" id="windowCloseBox" title="关闭窗口"></div>
+              <div class="window-title">Blog-TimeMachine.app</div>
+            </div>
+
+            <!-- 时间线控制条 -->
+            <div class="window-toolbar" id="timelineToolbar">
+              <div class="toolbar-time">
+                <span id="time" class="snapshot-time">同步中...</span>
+              </div>
+              <div class="toolbar-controls">
+                <button class="mac-btn" id="togglePlay">❚❚ 暂停</button>
+                <button class="mac-btn" id="prev">◄</button>
+                <span id="counter" class="snapshot-counter">0/0</span>
+                <button class="mac-btn" id="next">►</button>
+                <select class="mac-select" id="speedSelect">
+                  <option value="7000" data-desktop-label="慢速 (7秒)" data-mobile-label="慢速">慢速 (7秒)</option>
+                  <option value="4500" selected data-desktop-label="正常 (4.5秒)" data-mobile-label="正常">正常 (4.5秒)</option>
+                  <option value="2500" data-desktop-label="快速 (2.5秒)" data-mobile-label="快速">快速 (2.5秒)</option>
+                </select>
+                <button class="mac-btn" id="teleportBtn" type="button" title="在时光机中打开历史快照">打开</button>
+              </div>
+            </div>
+
+            <!-- 历史浏览控制条 -->
+            <div class="window-toolbar history-toolbar" id="historyToolbar">
+              <button class="mac-btn" id="backToTimeline" type="button">← 返回时间线</button>
+            </div>
+
+            <div class="progress-track" id="progressTrack">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- 视窗展示区 -->
+            <div class="window-body">
+              <div id="loadingTip">读取快照清单...</div>
+
+              <div class="viewport" id="viewport">
+                <div class="content-box">
+                  <img id="mainImg" class="snapshot-image" alt="快照截图">
+                </div>
+              </div>
+
+              <!-- 拟物联动滚动条 -->
+              <div class="mac-scrollbar" id="timelineScrollbar">
+                <div class="scroll-arrow" id="arrowUp">▲</div>
+                <div class="scroll-track" id="scrollTrack">
+                  <div class="scroll-thumb" id="scrollThumb"></div>
+                </div>
+                <div class="scroll-arrow scroll-arrow-down" id="arrowDown">▼</div>
+              </div>
+
+              <div id="historyFrameShell" class="history-frame-shell">
+                <iframe
+                  id="historyFrame"
+                  class="history-frame"
+                  title="博客历史快照"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                ></iframe>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 底部铭牌、状态灯与标准 3.5 寸软驱插槽 -->
+    <div class="mac-chassis-lower">
+      <div class="rainbow-apple-badge">
+        <svg class="rainbow-apple-svg" viewBox="0 0 170 200">
+          <defs>
+            <linearGradient id="appleRainbow" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#61bb46" />
+              <stop offset="16.66%" stop-color="#61bb46" />
+              <stop offset="16.67%" stop-color="#fdb827" />
+              <stop offset="33.33%" stop-color="#fdb827" />
+              <stop offset="33.34%" stop-color="#f5821f" />
+              <stop offset="50.00%" stop-color="#f5821f" />
+              <stop offset="50.01%" stop-color="#e03a3e" />
+              <stop offset="66.66%" stop-color="#e03a3e" />
+              <stop offset="66.67%" stop-color="#963d97" />
+              <stop offset="83.33%" stop-color="#963d97" />
+              <stop offset="83.34%" stop-color="#009ddc" />
+              <stop offset="100%" stop-color="#009ddc" />
+            </linearGradient>
+          </defs>
+          <path d="M100.8,17.4 C112.5,3.2 128.2,0 128.2,0 C128.2,0 131.2,15.6 119.5,29.8 C107.8,44 92.1,40.8 92.1,40.8 C92.1,40.8 89.1,31.6 100.8,17.4 Z" fill="#61bb46"/>
+          <path d="M141.2,112.6 C141.4,85.2 163.6,73.6 164.7,73 C151.8,54.4 132.3,51.8 125.6,51.2 C108.9,49.5 93.3,60.8 84.7,60.8 C76.1,60.8 63.3,51.4 49.3,51.7 C31.1,52 14.5,62.3 5.3,78.2 C-13.6,110.8 0.4,159.2 18.6,185.3 C27.5,198.1 38,212.4 51.9,211.8 C65.3,211.2 70.3,203.2 86.4,203.2 C102.5,203.2 107.1,211.8 121,211.5 C135.3,211.2 144.5,198.4 153.3,185.5 C163.6,170.6 167.8,156 168.1,155.1 C167.5,154.8 141,144.7 141.2,112.6 Z" fill="url(#appleRainbow)"/>
+        </svg>
+
+        <svg class="mac-logo-text" viewBox="0 0 110 18" fill="#3a362c">
+          <text x="0" y="14" font-family="'Apple Garamond', 'ITC Garamond', 'EB Garamond', 'Garamond', 'Georgia', serif" font-size="16.5" font-weight="600" letter-spacing="-0.35px" transform="scale(0.88, 1)">Macintosh</text>
+        </svg>
       </div>
 
-      <div id="error" class="time-error" role="alert">
-        <p id="error-title" class="time-error__title">connection to the past was lost.</p>
-        <p id="error-message" class="time-error__message">无法加载这个历史快照。</p>
-        <div class="time-actions">
-          <button id="retry" class="time-btn" type="button">🎲 再次随机</button>
-          <a class="time-btn" href="{{ site.Home.RelPermalink }}">↩ 回到现在</a>
+      <div class="drive-section">
+        <div class="drive-led-wrap" title="Disk Activity Indicator">
+          <div class="drive-led standby" id="driveLed"></div>
         </div>
+        <div class="floppy-drive" title="3.5-inch Floppy Drive Slot"></div>
       </div>
     </div>
   </div>
 
-  <aside id="past" class="past" aria-label="Time Machine 控制面板">
-    <button id="past-collapsed" class="past__collapsed" type="button">
-      PAST · <span id="past-date-short">----</span>
-    </button>
-
-    <div class="past__expanded">
-      <button id="past-close" class="past__close" type="button" aria-label="收起 Time Machine">×</button>
-      <p class="past__eyebrow">BLOG TIME MACHINE</p>
-      <p class="past__label">PAST</p>
-      <p id="past-date" class="past__date">----</p>
-      <p class="past__copy">你正在浏览博客过去的一个不可变快照。</p>
-      <div class="time-actions">
-        <button id="random-again" class="time-btn" type="button">🎲 再次随机</button>
-        <a class="time-btn" href="{{ site.Home.RelPermalink }}">↩ 回到现在</a>
+  <!-- 弹窗 1：关于此 Macintosh -->
+  <div class="about-dialog-overlay" id="aboutMacDialog">
+    <div class="about-dialog">
+      <div class="about-dialog__title">
+        <span class="about-dialog__apple"></span>
+        <strong class="about-dialog__heading">Macintosh 128K</strong>
       </div>
+      <p class="about-dialog__mac-copy">
+        Motorola 68000 @ 7.83 MHz<br>
+        128KB 统一内存 · 9 英寸单色显像管<br>
+        400KB 3.5 英寸微型软盘驱动器
+      </p>
+      <div class="about-dialog__meta">
+        Apple Computer, Inc. · 1984
+      </div>
+      <button class="mac-btn about-dialog__button" id="closeAboutMacBtn">确定</button>
     </div>
-  </aside>
+  </div>
+
+  <!-- 弹窗 2：关于时光机（两句式极简方案，自然留白收束，不加粗） -->
+  <div class="about-dialog-overlay" id="aboutTmDialog">
+    <div class="about-dialog">
+      <div class="about-dialog__title">
+        <svg class="retro-icon about-dialog__tm-icon" viewBox="0 0 16 16">
+          <path class="retro-icon-fill" fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 1.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zm-.7 2v4.3l3.2 1.8.7-1.2-2.5-1.4V4.5h-1.4z"/>
+        </svg>
+        <strong class="about-dialog__heading">博客时光机</strong>
+      </div>
+      <p class="about-dialog__tm-copy">
+        写下的每一行，皆有处可循。<br>
+        让过去，再次打开。
+      </p>
+      <div class="about-dialog__meta">
+        Preserved on IPFS · Forever decentralized
+      </div>
+      <button class="mac-btn about-dialog__button" id="closeAboutTmBtn">确定</button>
+    </div>
+  </div>
 
   {{- $timeParts := slice
       (resources.Get "js/custom/google-analytics.js")
       (resources.Get "js/time.js")
   -}}
-  {{- $timeJS := $timeParts | resources.Concat "js/time-machine.js" | minify | fingerprint }}
+  {{- $timeJS := $timeParts | resources.Concat "js/time-machine.js" | minify | fingerprint "sha256" }}
   <script src="{{ $timeJS.RelPermalink }}" integrity="{{ $timeJS.Data.Integrity }}" crossorigin="anonymous" defer></script>
   {{ partial "extend_footer.html" . }}
 </body>
