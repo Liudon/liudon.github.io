@@ -38,6 +38,12 @@ test("small numeric text change survives identical image; baseline is retained a
   const result = run(root); assert.equal(result.status, 0, result.stderr);
   assert.equal(index(root).visual_count, 2);
   assert.equal(index(root).frames[0].unchanged_deployments, 1);
+  assert.match(index(root).frames[0].screenshot, /^screenshots\\/playback\\/[0-9a-f]{64}\\.webp$/);
+  assert.equal(index(root).frames[0].width, 960);
+  assert.equal(index(root).frames[0].height, 600);
+  assert.ok(index(root).frames[0].bytes > 0);
+  assert.equal(index(root).playback_profile.target_width, 960);
+  assert.ok(fs.existsSync(path.join(root, index(root).frames[0].screenshot)));
   const diffs = fs.readFileSync(path.join(root, "visual-diffs.jsonl"), "utf8").trim().split("\n").map(JSON.parse);
   assert.equal(diffs[1].reason, "text_change");
   assert.equal(diffs[1].baseline_cid, "sample-0");
@@ -93,4 +99,23 @@ test("capture without ad exclusion evidence is invalid", async t => {
     fs.writeFileSync(file, JSON.stringify(meta));
     assert.equal(captureIsValid(root, "sample-0"), false);
   }
+});
+
+
+test("playback image respects pixel and edge budgets without cropping", async t => {
+  const root = await fixture(t, ["long"]);
+  const source = await sharp({ create: { width: 1440, height: 12000, channels: 3, background: "white" } })
+    .webp({ lossless: true }).toBuffer();
+  fs.writeFileSync(path.join(root, "screenshots/sample-0.webp"), source);
+  const metaFile = path.join(root, "screenshots/meta/sample-0.json");
+  const meta = JSON.parse(fs.readFileSync(metaFile));
+  meta.image_hash = hash(source);
+  fs.writeFileSync(metaFile, JSON.stringify(meta));
+  const result = run(root); assert.equal(result.status, 0, result.stderr);
+  const frame = index(root).frames[0];
+  assert.ok(frame.width * frame.height <= 8_000_000);
+  assert.ok(frame.width <= 16_383 && frame.height <= 16_383);
+  const playbackMeta = await sharp(path.join(root, frame.screenshot)).metadata();
+  assert.equal(playbackMeta.width, frame.width);
+  assert.equal(playbackMeta.height, frame.height);
 });
