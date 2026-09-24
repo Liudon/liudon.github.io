@@ -84,6 +84,17 @@
       .screen-workspace {
         padding: 5px !important;
       }
+      .screen-menubar {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      .menu-item {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      .menubar-left {
+        gap: 2px;
+      }
       .window-toolbar {
         padding: 3px 4px !important;
         gap: 2px !important;
@@ -223,6 +234,13 @@
       align-items: center;
       gap: 4px;
       position: relative;
+    }
+
+    .menubar-status {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .menu-item {
@@ -929,7 +947,7 @@
             </div>
           </div>
 
-          <div>
+          <div class="menubar-status">
             <span id="hoverStatus" style="font-weight: normal; margin-right: 8px;">滚轮上下浏览</span>
             <span id="clock">12:00</span>
           </div>
