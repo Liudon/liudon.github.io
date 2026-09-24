@@ -1526,47 +1526,113 @@
   }
 
   function trimCache(center = state.displayedIndex ?? 0) {
-    const protectedUrls = new Set(desiredIndices(center).map(i => state.frames[i]?._url).filter(Boolean));
-    if (state.targetIndex != null) protectedUrls.add(state.frames[state.targetIndex]?._url);
-    if (state.displayedIndex != null) protectedUrls.add(state.frames[state.displayedIndex]?._url);
-    let readyPixels = [...cache.values()].filter(r => r.state === 'ready').reduce((sum, r) => sum + (r.pixels || 0), 0);
-    const evict = [...cache.values()]
-      .filter(r => r.state !== 'loading' && !protectedUrls.has(r.url))
-      .sort((a, b) => a.lastUsed - b.lastUsed);
-    for (const record of evict) {
-      if (cache.size <= 5 && readyPixels <= CONFIG.cacheMaxPixels) break;
-      cache.delete(record.url);
-      if (record.objectUrl) URL.revokeObjectURL(record.objectUrl);
-      readyPixels -= record.pixels || 0;
+    const protectedUrls = new Set(
+      desiredIndices(center)
+        .map((index) => state.frames[index]?._url)
+        .filter(Boolean),
+    );
+    if (state.targetIndex != null) {
+      protectedUrls.add(state.frames[state.targetIndex]?._url);
     }
-    // If the protected five exceed the budget, keep nearest ready items only.
+    if (state.displayedIndex != null) {
+      protectedUrls.add(state.frames[state.displayedIndex]?._url);
+    }
+
+    let readyPixels = [...cache.values()]
+      .filter((record) => record.state === 'ready')
+      .reduce((sum, record) => sum + (record.pixels || 0), 0);
+
+    const evict = [...cache.values()]
+      .filter(
+        (record) =>
+          record.state !== 'loading' &&
+          !protectedUrls.has(record.url),
+      )
+      .sort((a, b) => a.lastUsed - b.lastUsed);
+
+    for (const record of evict) {
+      if (
+        cache.size <= 5 &&
+        readyPixels <= CONFIG.cacheMaxPixels
+      ) break;
+
+      readyPixels -= record.pixels || 0;
+      releaseRecord(record);
+    }
+
     if (readyPixels > CONFIG.cacheMaxPixels) {
-      const order = desiredIndices(center).map((i, distance) => ({ url: state.frames[i]._url, distance }));
+      const order = desiredIndices(center).map(
+        (index, distance) => ({
+          url: state.frames[index]._url,
+          distance,
+        }),
+      );
+
       const candidates = [...cache.values()]
-        .filter(r => r.state === 'ready' && r.index !== state.displayedIndex && r.index !== state.targetIndex)
-        .sort((a, b) => (order.find(x => x.url === b.url)?.distance ?? 99) - (order.find(x => x.url === a.url)?.distance ?? 99));
+        .filter(
+          (record) =>
+            record.state === 'ready' &&
+            record.index !== state.displayedIndex &&
+            record.index !== state.targetIndex,
+        )
+        .sort(
+          (a, b) =>
+            (order.find((item) => item.url === b.url)?.distance ?? 99) -
+            (order.find((item) => item.url === a.url)?.distance ?? 99),
+        );
+
       for (const record of candidates) {
         if (readyPixels <= CONFIG.cacheMaxPixels) break;
-        cache.delete(record.url);
-        if (record.objectUrl) URL.revokeObjectURL(record.objectUrl);
         readyPixels -= record.pixels || 0;
+        releaseRecord(record);
+      }
+    }
+  }
+
+  function cancelBackgroundLoads() {
+    for (const record of [...cache.values()]) {
+      if (
+        record.state === 'loading' &&
+        record.priority === 'background'
+      ) {
+        releaseRecord(record);
       }
     }
   }
 
   function warmBuffer(center) {
-    if (state.frames.length <= 1 || state.power !== 'on' || state.window === 'closed') return;
-    const targets = desiredIndices(center).filter(i => i !== center).slice(1); // next frames before previous via explicit order below
+    if (
+      state.frames.length <= 1 ||
+      state.power !== 'on' ||
+      state.window !== 'open'
+    ) return;
+
     const ordered = [];
     for (const delta of [1, 2, 3, -1]) {
-      const i = ((center + delta) % state.frames.length + state.frames.length) % state.frames.length;
-      if (!ordered.includes(i)) ordered.push(i);
+      const index =
+        ((center + delta) % state.frames.length +
+          state.frames.length) %
+        state.frames.length;
+      if (!ordered.includes(index)) ordered.push(index);
     }
+
     for (const index of ordered) {
       const pixels = framePixels(state.frames[index]);
-      if (pixels && pixels > CONFIG.maxPlaybackPixels) continue;
-      ensureImage(index, 'background').catch(error => diagnostics('background preload failed', { index, error: error.message }));
+      if (
+        pixels &&
+        pixels > CONFIG.maxPlaybackPixels
+      ) continue;
+
+      ensureImage(index, 'background').catch((error) => {
+        if (error?.name !== 'AbortError') {
+          diagnostics('background preload failed', {
+            index,
+            error: error.message,
+          });
+        }
+      });
     }
+
     trimCache(center);
   }
 
@@ -1859,6 +1925,7 @@
 
   function closeAppWindow() {
     stopAutoPlay(false);
+    cancelBackgroundLoads();
     state.window = 'closing';
     const generation = ++state.windowGeneration;
     mainAppWindow.classList.remove('window-opening');
@@ -1885,6 +1952,9 @@
       mainAppWindow.classList.remove('window-opening');
       state.window = 'open';
       syncScrollbar();
+      if (state.displayedIndex != null) {
+        warmBuffer(state.displayedIndex);
+      }
       if (state.frames.length > 1) startAutoPlay();
       renderStatus();
     }, 240);
@@ -1963,6 +2033,8 @@
     state.targetIndex = null;
     state.playMode = 'paused';
     closeAllDropdowns();
+    const retryButton = $('bootRetryButton');
+    if (retryButton) retryButton.style.display = 'none';
     loadingTip.style.display = 'none';
     systemScreenOverlay.style.display = 'flex';
     systemScreenOverlay.style.opacity = '1';
@@ -1982,17 +2054,33 @@
       await loadIndex(forceIndex);
       if (session !== state.sessionId) return;
       bootStatusText.textContent = 'Loading First Snapshot...';
-      bootProgressBar.style.width = '75%';
+      bootProgressBar.style.width = '72%';
       state.targetIndex = 0;
       const resource = await ensureImage(0, 'foreground');
       if (session !== state.sessionId) return;
+
+      if (state.frames.length > 1) {
+        bootStatusText.textContent = 'Priming Next Snapshot...';
+        bootProgressBar.style.width = '88%';
+        await ensureImage(1, 'foreground');
+        if (session !== state.sessionId) return;
+      }
+
       state.requestId += 1;
-      const context = { sessionId: session, requestId: state.requestId, origin: 'boot', playGeneration: state.playGeneration };
-      if (!commitFrame(0, resource, context)) throw new Error('首份档案提交失败');
-      bootStatusText.textContent = 'Welcome to Macintosh.';
-      bootProgressBar.style.width = '100%';
+      const context = {
+        sessionId: session,
+        requestId: state.requestId,
+        origin: 'boot',
+        playGeneration: state.playGeneration,
+      };
+      if (!commitFrame(0, resource, context)) {
+        throw new Error('首份档案提交失败');
+      }
+
       state.power = 'on';
       warmBuffer(0);
+      bootStatusText.textContent = 'Welcome to Macintosh.';
+      bootProgressBar.style.width = '100%';
       await sleep(300);
       if (session !== state.sessionId) return;
       systemScreenOverlay.style.opacity = '0';
@@ -2024,13 +2112,17 @@
 
   async function performShutDown() {
     if (state.power === 'shuttingDown' || state.power === 'off') return;
-    invalidateSession({ releaseImages: true });
+
     state.power = 'shuttingDown';
     closeAllDropdowns();
     aboutMacDialog.classList.remove('show');
     aboutTmDialog.classList.remove('show');
     systemScreenOverlay.style.display = 'flex';
     systemScreenOverlay.style.opacity = '1';
+
+    // Cover the CRT before revoking the object URL used by the visible frame.
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    invalidateSession({ releaseImages: true });
     bootContainer.style.display = 'none';
     shuttingDownContainer.style.display = 'flex';
     shutdownContainer.style.display = 'none';
@@ -2069,7 +2161,17 @@
     }
   });
   window.addEventListener('resize', syncScrollbar);
-  if ('ResizeObserver' in window) new ResizeObserver(syncScrollbar).observe(viewport);
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(syncScrollbar).observe(viewport);
+  }
+
+  window.addEventListener('pagehide', () => {
+    invalidateSession({ releaseImages: true });
+    if (clockTimer) {
+      clearInterval(clockTimer);
+      clockTimer = null;
+    }
+  });
 
   document.addEventListener('DOMContentLoaded', () => {
     startClock();
