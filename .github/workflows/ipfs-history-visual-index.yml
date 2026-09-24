@@ -25,7 +25,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          ref: code
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || 'code' }}
           token: ${{ secrets.TOKEN }}
 
       - name: Setup Node.js
@@ -109,69 +109,211 @@ jobs:
           git -C "$HISTORY_DIR" config user.name "github-actions[bot]"
           git -C "$HISTORY_DIR" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          verify_asset() {
+          ROLLBACK_INDEX="${RUNNER_TEMP}/visual-index.rollback.json"
+          ROLLBACK_DIFF="${RUNNER_TEMP}/visual-diffs.rollback.jsonl"
+          ROLLBACK_STATE="${RUNNER_TEMP}/visual-index.rollback.state"
+          CURRENT_INDEX="${RUNNER_TEMP}/visual-index.current.json"
+          NEW_REFS="${RUNNER_TEMP}/visual-index.new-refs.txt"
+
+          verify_playback_asset() {
             local relative="$1"
+            if [[ ! "$relative" =~ ^screenshots/playback/[0-9a-f]{64}\.webp$ ]]; then
+              echo "ERROR: invalid playback path: $relative"
+              return 1
+            fi
+
             local expected
             expected=$(basename "$relative" .webp)
             local tmp
             tmp=$(mktemp)
-            if ! curl -fsSL --retry 5 --retry-delay 2 --retry-all-errors \
-              "${ASSET_BASE}${relative}" -o "$tmp"; then
+
+            if ! curl -fsSL \
+              --retry 5 \
+              --retry-delay 2 \
+              --retry-all-errors \
+              -H "Cache-Control: no-cache" \
+              "${ASSET_BASE}${relative}" \
+              -o "$tmp"; then
               rm -f "$tmp"
               return 1
             fi
+
             local actual
             actual=$(sha256sum "$tmp" | awk '{print $1}')
             rm -f "$tmp"
-            [[ "$actual" == "$expected" ]]
+
+            if [[ "$actual" != "$expected" ]]; then
+              echo "ERROR: playback hash mismatch: $relative"
+              echo "Expected: $expected"
+              echo "Actual:   $actual"
+              return 1
+            fi
           }
 
-          OLD_INDEX="${RUNNER_TEMP}/visual-index-before.json"
-          NEW_REFS="${RUNNER_TEMP}/visual-index-new-refs.txt"
+          verify_public_index() {
+            local expected_file="$1"
+            local expected_hash
+            expected_hash=$(sha256sum "$expected_file" | awk '{print $1}')
+
+            for check in {1..8}; do
+              local tmp
+              tmp=$(mktemp)
+
+              if curl -fsSL \
+                --retry 3 \
+                --retry-delay 2 \
+                --retry-all-errors \
+                -H "Cache-Control: no-cache" \
+                "${ASSET_BASE}visual-index.json" \
+                -o "$tmp"; then
+                local actual_hash
+                actual_hash=$(sha256sum "$tmp" | awk '{print $1}')
+
+                if [[ "$actual_hash" == "$expected_hash" ]] &&
+                   jq -e '
+                     .version == 1 and
+                     (.frames | type == "array") and
+                     (.visual_count == (.frames | length)) and
+                     all(.frames[];
+                       (.screenshot | type == "string") and
+                       (.screenshot | test("^screenshots/playback/[0-9a-f]{64}\\.webp$"))
+                     )
+                   ' "$tmp" >/dev/null; then
+                  rm -f "$tmp"
+                  return 0
+                fi
+              fi
+
+              rm -f "$tmp"
+              echo "Public visual index not current yet (check $check/8)."
+              sleep $((check * 2))
+            done
+
+            return 1
+          }
+
+          save_rollback_state() {
+            if [[ -f "$ROLLBACK_STATE" ]]; then
+              return
+            fi
+
+            if [[ -f "$HISTORY_DIR/visual-index.json" ]]; then
+              cp "$HISTORY_DIR/visual-index.json" "$ROLLBACK_INDEX"
+              echo "index=present" > "$ROLLBACK_STATE"
+            else
+              echo "index=absent" > "$ROLLBACK_STATE"
+            fi
+
+            if [[ -f "$HISTORY_DIR/visual-diffs.jsonl" ]]; then
+              cp "$HISTORY_DIR/visual-diffs.jsonl" "$ROLLBACK_DIFF"
+              echo "diff=present" >> "$ROLLBACK_STATE"
+            else
+              echo "diff=absent" >> "$ROLLBACK_STATE"
+            fi
+          }
+
+          rollback_index() {
+            echo "Attempting visual index rollback."
+
+            for rollback_attempt in {1..5}; do
+              git -C "$HISTORY_DIR" fetch origin ipfs-history
+              git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
+
+              if grep -q '^index=present$' "$ROLLBACK_STATE"; then
+                cp "$ROLLBACK_INDEX" "$HISTORY_DIR/visual-index.json"
+              else
+                rm -f "$HISTORY_DIR/visual-index.json"
+              fi
+
+              if grep -q '^diff=present$' "$ROLLBACK_STATE"; then
+                cp "$ROLLBACK_DIFF" "$HISTORY_DIR/visual-diffs.jsonl"
+              else
+                rm -f "$HISTORY_DIR/visual-diffs.jsonl"
+              fi
+
+              git -C "$HISTORY_DIR" add -A visual-index.json visual-diffs.jsonl
+
+              if git -C "$HISTORY_DIR" diff --cached --quiet; then
+                echo "Visual index already matches rollback state."
+                return 0
+              fi
+
+              git -C "$HISTORY_DIR" commit -m "rollback IPFS visual history index"
+
+              if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
+                echo "Visual index rollback pushed."
+                return 0
+              fi
+
+              echo "Rollback push raced with another writer; retrying."
+              sleep $((rollback_attempt * 2))
+            done
+
+            echo "ERROR: unable to rollback visual index after 5 attempts"
+            return 1
+          }
+
           PUBLISHED=false
 
           for attempt in {1..5}; do
             echo "Visual publication attempt $attempt/5"
+
             git -C "$HISTORY_DIR" fetch origin ipfs-history
             git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
-            git -C "$HISTORY_DIR" clean -fd -- screenshots/playback visual-index.json visual-diffs.jsonl
-
-            if [[ -f "$HISTORY_DIR/visual-index.json" ]]; then
-              cp "$HISTORY_DIR/visual-index.json" "$OLD_INDEX"
-            else
-              printf '{"frames":[]}\n' > "$OLD_INDEX"
-            fi
+            git -C "$HISTORY_DIR" clean -fd -- screenshots/playback
+            save_rollback_state
 
             STATUS=$(node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR")
             MISSING=$(jq -r '.missing' <<< "$STATUS")
+
             if [[ "$MISSING" != "0" ]]; then
               echo "Visual index deferred after refresh: $MISSING screenshot(s) missing/invalid."
               echo "deferred=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
 
+            if [[ -f "$HISTORY_DIR/visual-index.json" ]]; then
+              cp "$HISTORY_DIR/visual-index.json" "$CURRENT_INDEX"
+            else
+              printf '{"frames":[]}\n' > "$CURRENT_INDEX"
+            fi
+
             node .github/scripts/ipfs-history/generate-visual-index.mjs "$HISTORY_DIR"
 
-            jq -r --slurpfile old "$OLD_INDEX" '
+            jq -e '
+              .version == 1 and
+              (.frames | type == "array") and
+              (.visual_count == (.frames | length)) and
+              (.playback_profile.version == 1) and
+              all(.frames[];
+                (.screenshot | type == "string") and
+                (.screenshot | test("^screenshots/playback/[0-9a-f]{64}\\.webp$")) and
+                (.width | type == "number") and (.width > 0) and
+                (.height | type == "number") and (.height > 0) and
+                (.bytes | type == "number") and (.bytes > 0)
+              )
+            ' "$HISTORY_DIR/visual-index.json" >/dev/null
+
+            jq -r --slurpfile old "$CURRENT_INDEX" '
               (($old[0].frames // []) | map(.screenshot) | unique) as $before
               | [.frames[].screenshot | select(($before | index(.)) == null)]
               | unique[]
             ' "$HISTORY_DIR/visual-index.json" > "$NEW_REFS"
 
-            if [[ -n "$(git -C "$HISTORY_DIR" status --porcelain -- screenshots/playback)" ]]; then
+            if [[ -n "$(git -C "$HISTORY_DIR" status --porcelain --untracked-files=all -- screenshots/playback)" ]]; then
               git -C "$HISTORY_DIR" add screenshots/playback
               git -C "$HISTORY_DIR" commit -m "publish IPFS visual playback assets"
 
               if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
-                echo "Playback assets pushed; verifying newly referenced immutable files."
+                echo "Playback assets pushed."
+
                 while IFS= read -r relative; do
                   [[ -n "$relative" ]] || continue
-                  if ! verify_asset "$relative"; then
-                    echo "ERROR: playback asset verification failed: $relative"
-                    exit 1
-                  fi
+                  verify_playback_asset "$relative"
                 done < "$NEW_REFS"
-                # Re-read the latest branch and recompute before publishing the index.
+
+                # The index is deliberately not published in the same commit.
+                # Re-read latest history and recompute before the next phase.
                 continue
               fi
 
@@ -180,32 +322,49 @@ jobs:
               continue
             fi
 
+            while IFS= read -r relative; do
+              [[ -n "$relative" ]] || continue
+              verify_playback_asset "$relative"
+            done < "$NEW_REFS"
+
+            EXPECTED_INDEX="${RUNNER_TEMP}/visual-index.expected.json"
+            cp "$HISTORY_DIR/visual-index.json" "$EXPECTED_INDEX"
+
             git -C "$HISTORY_DIR" add visual-index.json visual-diffs.jsonl
+
             if git -C "$HISTORY_DIR" diff --cached --quiet; then
               echo "Visual index and playback assets are already up to date."
+              if ! verify_public_index "$EXPECTED_INDEX"; then
+                echo "ERROR: public visual index does not match the verified branch state."
+                exit 1
+              fi
               PUBLISHED=true
               break
             fi
 
             git -C "$HISTORY_DIR" commit -m "update IPFS visual history index"
-            if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
-              echo "Visual index pushed."
 
-              PUBLIC_INDEX=$(mktemp)
-              curl -fsSL --retry 5 --retry-delay 2 --retry-all-errors \
-                "${ASSET_BASE}visual-index.json" -o "$PUBLIC_INDEX"
-              jq -e '.version == 1 and (.frames | type == "array") and (.visual_count == (.frames | length))' \
-                "$PUBLIC_INDEX" >/dev/null
+            if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
+              echo "Visual index pushed; verifying public index."
+
+              if ! verify_public_index "$EXPECTED_INDEX"; then
+                echo "ERROR: public visual index verification failed after publication."
+                if ! rollback_index; then
+                  echo "CRITICAL: visual index rollback also failed."
+                fi
+                exit 1
+              fi
 
               while IFS= read -r relative; do
                 [[ -n "$relative" ]] || continue
-                if ! verify_asset "$relative"; then
-                  echo "ERROR: published index references unavailable playback asset: $relative"
-                  rm -f "$PUBLIC_INDEX"
+                if ! verify_playback_asset "$relative"; then
+                  echo "ERROR: public index references unavailable playback asset: $relative"
+                  if ! rollback_index; then
+                    echo "CRITICAL: visual index rollback also failed."
+                  fi
                   exit 1
                 fi
               done < "$NEW_REFS"
-              rm -f "$PUBLIC_INDEX"
 
               PUBLISHED=true
               break
@@ -239,13 +398,16 @@ jobs:
               echo "- Status: deferred until screenshot repair completes"
               echo "- Missing/invalid screenshots: ${{ steps.readiness.outputs.missing || 'unknown' }}"
             } >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "${{ steps.publish.outcome }}" != "success" ]]; then
+            echo "- Status: publication failed; see workflow logs" >> "$GITHUB_STEP_SUMMARY"
           elif [[ -f "$HISTORY_DIR/visual-index.json" ]]; then
             {
+              echo "- Status: published/verified"
               echo "- Deployments: $(jq -r '.source.snapshot_count' "$HISTORY_DIR/visual-index.json")"
               echo "- Visual frames: $(jq -r '.visual_count' "$HISTORY_DIR/visual-index.json")"
               echo "- Latest CID: $(jq -r '.source.latest_cid' "$HISTORY_DIR/visual-index.json")"
               echo "- Algorithm: $(jq -r '.algorithm.strategy + " v" + (.algorithm.version|tostring)' "$HISTORY_DIR/visual-index.json")"
-              echo "- Playback: $(jq -r '(.playback_profile.target_width|tostring) + "px / WebP q" + (.playback_profile.quality|tostring)' "$HISTORY_DIR/visual-index.json")"
+              echo "- Playback: $(jq -r '(.playback_profile.target_width|tostring) + "px WebP q" + (.playback_profile.quality|tostring)' "$HISTORY_DIR/visual-index.json")"
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
