@@ -120,6 +120,7 @@
       #hoverStatus.history-status {
         font-size: 9px;
         margin-right: 4px !important;
+        white-space: nowrap;
       }
       .history-toolbar {
         padding: 3px 4px !important;
@@ -483,10 +484,30 @@
       height: 100%;
       border: 0;
       background: #fff;
+      transform-origin: top left;
     }
 
     .history-frame.is-visible {
       display: block;
+    }
+
+    /* The IPFS page is cross-origin, so its inner font-size cannot be
+       changed here. Give the iframe a wider layout viewport and scale
+       the whole historical page back down for denser reading instead. */
+    @media (min-width: 601px) and (max-width: 1024px) {
+      .history-frame {
+        width: 108.696%;
+        height: 108.696%;
+        transform: scale(0.92);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .history-frame {
+        width: 117.647%;
+        height: 117.647%;
+        transform: scale(0.85);
+      }
     }
 
     .timeline-hidden {
@@ -1263,25 +1284,6 @@
 
   function historyUrl(cid) {
     return `${CONFIG.gatewayBase.replace(/\/$/, '')}/${cid}/`;
-  }
-
-  function formatHistoryStatus(isoStr) {
-    try {
-      const mobile = matchMedia('(max-width: 600px)').matches;
-      return new Intl.DateTimeFormat('zh-CN', {
-        timeZone: 'Asia/Shanghai',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        ...(mobile ? {} : {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        }),
-      }).format(new Date(isoStr));
-    } catch {
-      return isoStr;
-    }
   }
 
   function currentSnapshotFrame() {
@@ -2169,10 +2171,7 @@
     if (state.frameError) { setStatus('[这份档案读取失败]'); return; }
     if (state.window === 'closed') { setStatus('[双击桌面图标重新打开]'); return; }
     if (state.viewMode === 'snapshot') {
-      const frame = currentSnapshotFrame();
-      setStatus(frame
-        ? `● 正在浏览历史 · ${formatHistoryStatus(frame.deployed_at)}`
-        : '● 正在浏览历史');
+      setStatus('● 正在浏览历史');
       return;
     }
     if (state.reading || state.pointerHeld) { setStatus('[阅读中 暂停切页]'); return; }
