@@ -781,14 +781,15 @@ if (missing.length === 0) {
 const { chromium } =
   await import("playwright");
 
+if (process.env.CHROME_BIN) {
+  console.log(
+    `Ignoring CHROME_BIN for deterministic capture: ` +
+    process.env.CHROME_BIN,
+  );
+}
+
 const browser =
   await chromium.launch({
-    ...(process.env.CHROME_BIN
-      ? {
-          executablePath:
-            process.env.CHROME_BIN,
-        }
-      : {}),
     headless: true,
     args: [
       "--disable-dev-shm-usage",
