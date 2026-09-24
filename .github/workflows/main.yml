@@ -817,18 +817,21 @@ jobs:
           fi
 
       # Capture the newly published snapshot directly from the local ./public
-      # tree. This avoids depending on the public IPFS gateway immediately
-      # after deployment. Screenshot generation is derivative data: failure
-      # must not turn an otherwise successful site/IPFS deployment red.
+      # tree. The legacy screenshots/<cid>.webp path is frozen; new captures
+      # are written under captures/<profile-id>/<cid>/.
       - name: Capture current IPFS history screenshot
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         continue-on-error: true
         env:
           CID: ${{ steps.ipfs.outputs.cid }}
+          CONTENT_DIGEST: ${{ steps.ipfs-content.outputs.digest }}
+          SOURCE_COMMIT: ${{ github.sha }}
           IPFS_GATEWAY_BASE: https://liudon.xyz/ipfs
           SCREENSHOT_WIDTH: "1440"
           SCREENSHOT_HEIGHT: "900"
           SCREENSHOT_ATTEMPTS: "2"
+          CAPTURE_MAX_PIXELS: "40000000"
+          CAPTURE_ENVIRONMENT_ID: ubuntu-24.04-playwright-1.56.1-sharp-0.35.0-noto-cjk-v1
         shell: bash
         run: |
           set -euo pipefail
@@ -838,6 +841,10 @@ jobs:
           fc-cache -f
           fc-match "Noto Sans CJK SC"
 
+          FONT_VERSION=$(dpkg-query -W -f='\${Version}' fonts-noto-cjk)
+          FONT_EVIDENCE="fonts-noto-cjk=${FONT_VERSION}"
+          echo "Capture font evidence: ${FONT_EVIDENCE}"
+
           npm install \
             --no-save \
             --package-lock=false \
@@ -846,6 +853,51 @@ jobs:
             playwright@1.56.1 sharp@0.35.0
 
           npx playwright install --with-deps chromium
+
+          # Re-hash the exact public tree immediately before capture. Nothing
+          # may rewrite public between CAR creation and the local screenshot.
+          CURRENT_DIGEST=$(python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+
+          root = Path("public")
+          h = hashlib.sha256()
+
+          def add_field(tag: bytes, value: bytes) -> None:
+              h.update(tag)
+              h.update(len(value).to_bytes(8, "big"))
+              h.update(value)
+
+          entries = sorted(
+              root.rglob("*"),
+              key=lambda p: p.relative_to(root).as_posix(),
+          )
+
+          for path in entries:
+              rel = path.relative_to(root).as_posix().encode("utf-8")
+              if path.is_symlink():
+                  add_field(b"L", rel)
+                  add_field(b"T", path.readlink().as_posix().encode("utf-8"))
+              elif path.is_dir():
+                  add_field(b"D", rel)
+              elif path.is_file():
+                  add_field(b"F", rel)
+                  with path.open("rb") as f:
+                      while chunk := f.read(1024 * 1024):
+                          h.update(chunk)
+              else:
+                  raise SystemExit(f"Unsupported filesystem entry: {path}")
+
+          print("sha256:" + h.hexdigest())
+          PY
+          )
+
+          if [[ "$CURRENT_DIGEST" != "$CONTENT_DIGEST" ]]; then
+            echo "ERROR: public changed between CAR creation and screenshot capture"
+            echo "CAR digest:     $CONTENT_DIGEST"
+            echo "Capture digest: $CURRENT_DIGEST"
+            exit 1
+          fi
 
           HISTORY_DIR=$(mktemp -d)
           SERVER_PID=""
@@ -880,46 +932,57 @@ jobs:
           done
 
           CAPTURE_CID="$CID" \
+          CAPTURE_CONTENT_DIGEST="$CONTENT_DIGEST" \
+          CAPTURE_SOURCE_COMMIT="$SOURCE_COMMIT" \
+          CAPTURE_FONT_EVIDENCE="$FONT_EVIDENCE" \
           SCREENSHOT_SOURCE_URL="http://127.0.0.1:4173/" \
           node .github/scripts/ipfs-history/capture-screenshots.mjs "$HISTORY_DIR"
 
+          PROFILE_ID=$(jq -er '.profile_id' "$HISTORY_DIR/captures/current-profile.json")
+          CAPTURE_DIR="captures/$PROFILE_ID/$CID"
+
           git -C "$HISTORY_DIR" config user.name "github-actions[bot]"
           git -C "$HISTORY_DIR" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C "$HISTORY_DIR" add "screenshots/$CID.webp" "screenshots/meta/$CID.json"
+          git -C "$HISTORY_DIR" add "captures/current-profile.json" "$CAPTURE_DIR"
 
           if git -C "$HISTORY_DIR" diff --cached --quiet; then
-            echo "Screenshot already exists for CID: $CID"
+            echo "Current-profile capture already exists for CID: $CID"
           else
-            PATCH_DIR="${RUNNER_TEMP}/ipfs-history-current-screenshot"
+            PATCH_DIR="${RUNNER_TEMP}/ipfs-history-current-capture"
             rm -rf "$PATCH_DIR"
-            mkdir -p "$PATCH_DIR/screenshots/meta"
-            cp "$HISTORY_DIR/screenshots/$CID.webp" "$PATCH_DIR/screenshots/$CID.webp"
-            cp "$HISTORY_DIR/screenshots/meta/$CID.json" "$PATCH_DIR/screenshots/meta/$CID.json"
+            mkdir -p "$PATCH_DIR/captures/$PROFILE_ID"
+            cp "$HISTORY_DIR/captures/current-profile.json" "$PATCH_DIR/captures/current-profile.json"
+            cp -R "$HISTORY_DIR/$CAPTURE_DIR" "$PATCH_DIR/captures/$PROFILE_ID/$CID"
 
             for attempt in {1..5}; do
-              echo "Screenshot push attempt $attempt/5"
+              echo "Capture push attempt $attempt/5"
               git -C "$HISTORY_DIR" fetch origin ipfs-history
               git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
 
-              REMOTE_META="$HISTORY_DIR/screenshots/meta/$CID.json"
-              if node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR" "$CID"; then
-                echo "Remote already has capture v7 for CID: $CID"
+              if CAPTURE_REQUIRE_CURRENT_PROFILE=true \
+                 CAPTURE_ENVIRONMENT_ID="$CAPTURE_ENVIRONMENT_ID" \
+                 SCREENSHOT_WIDTH="$SCREENSHOT_WIDTH" \
+                 SCREENSHOT_HEIGHT="$SCREENSHOT_HEIGHT" \
+                 node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR" "$CID"; then
+                echo "Remote already has a valid current-profile capture for CID: $CID"
                 break
               fi
 
-              mkdir -p "$HISTORY_DIR/screenshots/meta"
-              cp "$PATCH_DIR/screenshots/$CID.webp" "$HISTORY_DIR/screenshots/$CID.webp"
-              cp "$PATCH_DIR/screenshots/meta/$CID.json" "$REMOTE_META"
-              git -C "$HISTORY_DIR" add "screenshots/$CID.webp" "screenshots/meta/$CID.json"
+              mkdir -p "$HISTORY_DIR/captures/$PROFILE_ID"
+              cp "$PATCH_DIR/captures/current-profile.json" "$HISTORY_DIR/captures/current-profile.json"
+              rm -rf "$HISTORY_DIR/$CAPTURE_DIR"
+              cp -R "$PATCH_DIR/captures/$PROFILE_ID/$CID" "$HISTORY_DIR/captures/$PROFILE_ID/$CID"
+
+              git -C "$HISTORY_DIR" add "captures/current-profile.json" "$CAPTURE_DIR"
               git -C "$HISTORY_DIR" commit -m "capture IPFS history screenshot"
 
               if git -C "$HISTORY_DIR" push origin HEAD:ipfs-history; then
-                echo "Captured screenshot for CID: $CID"
+                echo "Captured current-profile screenshot for CID: $CID"
                 break
               fi
 
               if [[ "$attempt" == "5" ]]; then
-                echo "ERROR: unable to push IPFS screenshot after 5 attempts"
+                echo "ERROR: unable to push IPFS capture after 5 attempts"
                 exit 1
               fi
 
