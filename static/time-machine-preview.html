@@ -1255,7 +1255,9 @@
       URL.revokeObjectURL(record.objectUrl);
       record.objectUrl = null;
     }
-    if (record.task) record.task.cancelled = true;
+    if (record.task) {
+      record.task.cancel(new DOMException('Resource released', 'AbortError'));
+    }
     if (remove && cache.get(record.url) === record) {
       cache.delete(record.url);
     }
@@ -1281,27 +1283,39 @@
   function enqueue(run, priority) {
     let resolvePromise;
     let rejectPromise;
+    let settled = false;
+
+    const settle = (kind, value) => {
+      if (settled) return;
+      settled = true;
+      if (kind === 'resolve') resolvePromise(value);
+      else rejectPromise(value);
+    };
+
     const task = {
       priority: priority === 'foreground' ? 0 : 1,
       queuedAt: performance.now(),
       cancelled: false,
       started: false,
+      cancel: (reason = new DOMException('Cancelled', 'AbortError')) => {
+        task.cancelled = true;
+        if (!task.started) settle('reject', reason);
+      },
       run: async () => {
-        if (task.cancelled) {
-          rejectPromise(new DOMException('Cancelled', 'AbortError'));
-          return;
-        }
+        if (task.cancelled) return;
         try {
-          resolvePromise(await run());
+          settle('resolve', await run());
         } catch (error) {
-          rejectPromise(error);
+          settle('reject', error);
         }
       },
     };
+
     const promise = new Promise((resolve, reject) => {
       resolvePromise = resolve;
       rejectPromise = reject;
     });
+
     loadQueue.push(task);
     pumpQueue();
     return { task, promise };
@@ -1860,9 +1874,12 @@
   closeAboutTmBtn.addEventListener('click', () => aboutTmDialog.classList.remove('show'));
 
   function clearImageResources() {
-    for (const record of cache.values()) if (record.objectUrl) URL.revokeObjectURL(record.objectUrl);
-    cache.clear();
-    loadQueue.splice(0).forEach(task => { task.cancelled = true; });
+    for (const record of [...cache.values()]) {
+      releaseRecord(record);
+    }
+    for (const task of loadQueue.splice(0)) {
+      task.cancel(new DOMException('Resource cache cleared', 'AbortError'));
+    }
   }
 
   function invalidateSession({ releaseImages = false } = {}) {
