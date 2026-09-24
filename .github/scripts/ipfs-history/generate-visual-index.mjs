@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
-import { readCapture, normalizeText } from "./capture-data.mjs";
+import { readCapture, normalizeText, hash } from "./capture-data.mjs";
 
 const historyRoot = process.argv[2];
 
@@ -25,6 +25,13 @@ const meanDeltaMax = Number(process.env.VISUAL_MEAN_DELTA_MAX || 0.35);
 const significantTileRatio = Number(process.env.VISUAL_SIGNIFICANT_TILE_RATIO || 0.01);
 const tileSize = Number(process.env.VISUAL_TILE_SIZE || 48);
 const heightDeltaMax = Number(process.env.VISUAL_HEIGHT_DELTA_MAX || 2);
+
+const playbackVersion = 1;
+const playbackWidth = Number(process.env.PLAYBACK_WIDTH || 960);
+const playbackQuality = Number(process.env.PLAYBACK_QUALITY || 75);
+const playbackMaxPixels = Number(process.env.PLAYBACK_MAX_PIXELS || 8_000_000);
+const playbackMaxEdge = Number(process.env.PLAYBACK_MAX_EDGE || 16_383);
+const playbackDir = path.join(historyRoot, "screenshots", "playback");
 
 function readSnapshots() {
   const byCid = new Map();
@@ -203,9 +210,68 @@ function frameFromSnapshot(snapshot) {
     cid: snapshot.cid,
     deployed_at: snapshot.deployed_at,
     source_commit: snapshot.source_commit || null,
-    screenshot: `screenshots/${snapshot.cid}.webp`,
+    screenshot: null,
     unchanged_deployments: 0,
     same_until: snapshot.deployed_at,
+  };
+}
+
+async function generatePlayback(frame) {
+  const source = path.join(screenshotDir, `${frame.cid}.webp`);
+  const image = sharp(source, { failOn: "error" });
+  const metadata = await image.metadata();
+
+  if (!metadata.width || !metadata.height) {
+    throw new Error(`Unable to read playback source dimensions: ${frame.cid}`);
+  }
+
+  const scale = Math.min(
+    1,
+    playbackWidth / metadata.width,
+    Math.sqrt(playbackMaxPixels / (metadata.width * metadata.height)),
+    playbackMaxEdge / metadata.width,
+    playbackMaxEdge / metadata.height,
+  );
+
+  const width = Math.max(1, Math.floor(metadata.width * scale));
+  const height = Math.max(1, Math.floor(metadata.height * scale));
+
+  if (width * height > playbackMaxPixels || width > playbackMaxEdge || height > playbackMaxEdge) {
+    throw new Error(`Playback dimensions exceed limits for ${frame.cid}: ${width}x${height}`);
+  }
+
+  const buffer = await image
+    .resize({ width, height, fit: "fill", kernel: sharp.kernel.lanczos3, withoutEnlargement: true })
+    .webp({ quality: playbackQuality })
+    .toBuffer();
+
+  const decoded = await sharp(buffer, { failOn: "error" }).metadata();
+  if (decoded.width !== width || decoded.height !== height) {
+    throw new Error(`Playback decode dimension mismatch for ${frame.cid}`);
+  }
+
+  const digest = hash(buffer);
+  const filename = `${digest}.webp`;
+  const target = path.join(playbackDir, filename);
+  fs.mkdirSync(playbackDir, { recursive: true });
+
+  if (fs.existsSync(target)) {
+    const existing = fs.readFileSync(target);
+    if (hash(existing) !== digest) {
+      throw new Error(`Playback hash collision for ${frame.cid}`);
+    }
+  } else {
+    const temp = `${target}.tmp-${process.pid}`;
+    fs.writeFileSync(temp, buffer);
+    await sharp(temp, { failOn: "error" }).metadata();
+    fs.renameSync(temp, target);
+  }
+
+  return {
+    screenshot: `screenshots/playback/${filename}`,
+    width,
+    height,
+    bytes: buffer.length,
   };
 }
 
@@ -275,6 +341,10 @@ for (let index = 1; index < snapshots.length; index += 1) {
   frames.push(currentFrame);
 }
 
+for (const frame of frames) {
+  Object.assign(frame, await generatePlayback(frame));
+}
+
 const latest = snapshots.at(-1);
 
 const visualIndex = {
@@ -296,6 +366,15 @@ const visualIndex = {
     snapshot_count: snapshots.length,
     latest_cid: latest.cid,
     latest_deployed_at: latest.deployed_at,
+  },
+  playback_profile: {
+    version: playbackVersion,
+    format: "webp",
+    target_width: playbackWidth,
+    quality: playbackQuality,
+    max_pixels: playbackMaxPixels,
+    max_edge: playbackMaxEdge,
+    encoder: "sharp",
   },
   visual_count: frames.length,
   frames,
