@@ -989,16 +989,42 @@
   'use strict';
 
   const CONFIG = {
-    assetBase: 'https://raw.githubusercontent.com/Liudon/liudon.github.io/ipfs-history/',
+    assetBase: 'https://gh-proxy.org/https://raw.githubusercontent.com/Liudon/liudon.github.io/ipfs-history/',
+    fallbackAssetBase: 'https://raw.githubusercontent.com/Liudon/liudon.github.io/ipfs-history/',
     gatewayBase: 'https://liudon.xyz/ipfs/',
     indexTimeoutMs: 15000,
+    primaryAssetTimeoutMs: 8000,
     imageTimeoutMs: 20000,
     maxActiveLoads: 2,
     cacheMaxPixels: 24000000,
     maxPlaybackPixels: 8000000,
     maxLegacyPixels: 24000000,
-    readReleaseMs: 1800,  };
-  const indexUrl = new URL('visual-index.json', CONFIG.assetBase).href;
+    readReleaseMs: 1800,
+  };
+
+  const assetBases = [
+    CONFIG.assetBase,
+    CONFIG.fallbackAssetBase,
+  ].filter((value, index, values) => value && values.indexOf(value) === index);
+
+  function assetUrls(relativePath) {
+    return assetBases.map((base) => new URL(relativePath, base).href);
+  }
+
+  const indexUrls = assetUrls('visual-index.json');
+  let preferredAssetSourceIndex = 0;
+
+  function orderedAssetUrls(urls) {
+    if (
+      preferredAssetSourceIndex <= 0 ||
+      preferredAssetSourceIndex >= urls.length
+    ) return urls;
+
+    return [
+      urls[preferredAssetSourceIndex],
+      ...urls.filter((_, index) => index !== preferredAssetSourceIndex),
+    ];
+  }
 
   const $ = (id) => document.getElementById(id);
   const timeEl = $('time');
@@ -1068,6 +1094,7 @@
     frameError: null,
     frameElapsedMs: 0,
     frameTickAt: 0,
+    loopPhase: 'normal',
     recentUserIntentAt: 0,
     programmaticScroll: false,
   };
@@ -1134,14 +1161,24 @@
     if (!value.startsWith('screenshots/')) return null;
     if (/^[a-z][a-z0-9+.-]*:/i.test(value) || value.startsWith('/') || value.includes('\\')) return null;
     if (/[?#]/.test(value)) return null;
+
     let decoded;
-    try { decoded = decodeURIComponent(value); } catch { return null; }
-    if (decoded.split('/').some(part => part === '..' || part === '.')) return null;
+    try {
+      decoded = decodeURIComponent(value);
+    } catch {
+      return null;
+    }
+
+    if (decoded.split('/').some((part) => part === '..' || part === '.')) return null;
     if (!/\.(?:webp|png|jpe?g)$/i.test(decoded)) return null;
-    const url = new URL(value, CONFIG.assetBase);
-    const base = new URL(CONFIG.assetBase);
-    if (url.origin !== base.origin || !url.pathname.startsWith(new URL('screenshots/', base).pathname)) return null;
-    return url.href;
+
+    const urls = assetUrls(value);
+    if (!urls.length) return null;
+
+    return {
+      path: value,
+      urls,
+    };
   }
 
   function normalizeFrames(data) {
@@ -1157,8 +1194,8 @@
       const deployedAt = typeof raw?.deployed_at === 'string' ? raw.deployed_at.trim() : '';
       const time = Date.parse(deployedAt);
       if (!deployedAt || !Number.isFinite(time) || !/(?:Z|[+-]\d\d:\d\d)$/.test(deployedAt)) reasons.push('invalid deployed_at');
-      const screenshotUrl = validateScreenshotPath(raw?.screenshot);
-      if (!screenshotUrl) reasons.push('invalid screenshot');
+      const screenshot = validateScreenshotPath(raw?.screenshot);
+      if (!screenshot) reasons.push('invalid screenshot');
       const hasWidth = raw?.width !== undefined && raw?.width !== null;
       const hasHeight = raw?.height !== undefined && raw?.height !== null;
       if (hasWidth !== hasHeight) reasons.push('partial dimensions');
@@ -1174,7 +1211,15 @@
         return;
       }
       seenCid.add(cid);
-      valid.push({ ...raw, cid, deployed_at: deployedAt, _time: time, _url: screenshotUrl });
+      valid.push({
+        ...raw,
+        cid,
+        deployed_at: deployedAt,
+        _time: time,
+        _path: screenshot.path,
+        _urls: screenshot.urls,
+        _url: screenshot.urls[0],
+      });
     });
     valid.sort((a, b) => a._time - b._time || a.cid.localeCompare(b.cid));
     if (data.visual_count !== undefined && data.visual_count !== valid.length) {
@@ -1210,24 +1255,48 @@
   async function loadIndex(force = false) {
     if (state.indexLoaded && !force) return state.frames;
     if (state.indexPromise && !force) return state.indexPromise;
+
     const session = state.sessionId;
     const promise = (async () => {
-      const response = await fetchWithTimeout(
-        indexUrl,
-        { cache: 'no-cache' },
-        CONFIG.indexTimeoutMs,
-      );
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
-      const frames = normalizeFrames(data);
-      if (!frames.length) throw new Error('暂无可用快照');
-      if (session !== state.sessionId) {
-        throw new DOMException('Stale session', 'AbortError');
+      let lastError;
+
+      for (const [sourceIndex, url] of indexUrls.entries()) {
+        try {
+          const response = await fetchWithTimeout(
+            url,
+            { cache: force ? 'reload' : 'default' },
+            sourceIndex === 0
+              ? CONFIG.primaryAssetTimeoutMs
+              : CONFIG.indexTimeoutMs,
+          );
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          const data = await response.json();
+          preferredAssetSourceIndex = sourceIndex;
+          const frames = normalizeFrames(data);
+          if (!frames.length) throw new Error('暂无可用快照');
+
+          if (session !== state.sessionId) {
+            throw new DOMException('Stale session', 'AbortError');
+          }
+
+          state.frames = frames;
+          state.indexLoaded = true;
+          diagnostics('index source ready', { url });
+          return frames;
+        } catch (error) {
+          if (error?.name === 'AbortError' && session !== state.sessionId) throw error;
+          lastError = error;
+          diagnostics('index source failed; trying fallback', {
+            url,
+            error: error.message,
+          });
+        }
       }
-      state.frames = frames;
-      state.indexLoaded = true;
-      return frames;
+
+      throw lastError || new Error('档案清单读取失败');
     })();
+
     state.indexPromise = promise;
     try {
       return await promise;
@@ -1341,98 +1410,120 @@
         throw new DOMException('Cancelled', 'AbortError');
       }
 
-      try {
-        const response = await fetchWithTimeout(
-          frame._url,
-          { cache: 'default', mode: 'cors' },
-          CONFIG.imageTimeoutMs,
-          record.controller.signal,
-        );
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const blob = await response.blob();
-
-        if (
-          Number.isSafeInteger(frame.bytes) &&
-          frame.bytes > 0 &&
-          blob.size !== frame.bytes
-        ) {
-          throw new Error(
-            `文件大小不匹配：索引 ${frame.bytes} bytes，实际 ${blob.size} bytes`,
-          );
-        }
-
-        const objectUrl = URL.createObjectURL(blob);
-        const img = new Image();
-        img.id = 'mainImg';
-        img.alt = '快照截图';
-        img.style.opacity = '0';
-        img.src = objectUrl;
-
+      for (const sourceUrl of orderedAssetUrls(frame._urls)) {
         try {
-          await img.decode();
+          const originalSourceIndex = frame._urls.indexOf(sourceUrl);
+          const response = await fetchWithTimeout(
+            sourceUrl,
+            { cache: 'default', mode: 'cors' },
+            originalSourceIndex === 0
+              ? CONFIG.primaryAssetTimeoutMs
+              : CONFIG.imageTimeoutMs,
+            record.controller.signal,
+          );
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          const blob = await response.blob();
+
+          if (
+            Number.isSafeInteger(frame.bytes) &&
+            frame.bytes > 0 &&
+            blob.size !== frame.bytes
+          ) {
+            throw new Error(
+              `文件大小不匹配：索引 ${frame.bytes} bytes，实际 ${blob.size} bytes`,
+            );
+          }
+
+          const objectUrl = URL.createObjectURL(blob);
+          const img = new Image();
+          img.id = 'mainImg';
+          img.alt = '快照截图';
+          img.style.opacity = '0';
+          img.src = objectUrl;
+
+          try {
+            await img.decode();
+          } catch (error) {
+            URL.revokeObjectURL(objectUrl);
+            throw error;
+          }
+
+          if (record.cancelled || record.controller.signal.aborted) {
+            URL.revokeObjectURL(objectUrl);
+            throw new DOMException('Cancelled', 'AbortError');
+          }
+
+          const width = img.naturalWidth;
+          const height = img.naturalHeight;
+          const pixels = width * height;
+
+          if (
+            !Number.isSafeInteger(width) ||
+            !Number.isSafeInteger(height) ||
+            width <= 0 ||
+            height <= 0 ||
+            !Number.isSafeInteger(pixels)
+          ) {
+            URL.revokeObjectURL(objectUrl);
+            throw new Error('图片尺寸无效');
+          }
+
+          if (
+            frame.width &&
+            (frame.width !== width || frame.height !== height)
+          ) {
+            URL.revokeObjectURL(objectUrl);
+            throw new Error(
+              `尺寸不匹配：索引 ${frame.width}x${frame.height}，实际 ${width}x${height}`,
+            );
+          }
+
+          const limit = frame.width
+            ? CONFIG.maxPlaybackPixels
+            : CONFIG.maxLegacyPixels;
+
+          if (pixels > limit) {
+            URL.revokeObjectURL(objectUrl);
+            throw new Error(
+              `图片像素超出限制：${width}x${height}`,
+            );
+          }
+
+          if (originalSourceIndex >= 0) {
+            preferredAssetSourceIndex = originalSourceIndex;
+          }
+
+          diagnostics('image source ready', {
+            index: record.index,
+            sourceUrl,
+            preferredAssetSourceIndex,
+          });
+
+          return {
+            img,
+            objectUrl,
+            width,
+            height,
+            pixels,
+            bytes: blob.size,
+            sourceUrl,
+          };
         } catch (error) {
-          URL.revokeObjectURL(objectUrl);
-          throw error;
+          lastError = error;
+          if (error?.name === 'AbortError') throw error;
+          diagnostics('image source failed; trying fallback', {
+            index: record.index,
+            sourceUrl,
+            attempt,
+            error: error.message,
+          });
         }
-
-        if (record.cancelled || record.controller.signal.aborted) {
-          URL.revokeObjectURL(objectUrl);
-          throw new DOMException('Cancelled', 'AbortError');
-        }
-
-        const width = img.naturalWidth;
-        const height = img.naturalHeight;
-        const pixels = width * height;
-
-        if (
-          !Number.isSafeInteger(width) ||
-          !Number.isSafeInteger(height) ||
-          width <= 0 ||
-          height <= 0 ||
-          !Number.isSafeInteger(pixels)
-        ) {
-          URL.revokeObjectURL(objectUrl);
-          throw new Error('图片尺寸无效');
-        }
-
-        if (
-          frame.width &&
-          (frame.width !== width || frame.height !== height)
-        ) {
-          URL.revokeObjectURL(objectUrl);
-          throw new Error(
-            `尺寸不匹配：索引 ${frame.width}x${frame.height}，实际 ${width}x${height}`,
-          );
-        }
-
-        const limit = frame.width
-          ? CONFIG.maxPlaybackPixels
-          : CONFIG.maxLegacyPixels;
-
-        if (pixels > limit) {
-          URL.revokeObjectURL(objectUrl);
-          throw new Error(
-            `图片像素超出限制：${width}x${height}`,
-          );
-        }
-
-        return {
-          img,
-          objectUrl,
-          width,
-          height,
-          pixels,
-          bytes: blob.size,
-        };
-      } catch (error) {
-        lastError = error;
-        if (error?.name === 'AbortError') throw error;
-
-        const foreground = record.priority === 'foreground';
-        if (!foreground || attempt >= 3) break;
-        await sleep(attempt === 1 ? 500 : 1000);
       }
+
+      const foreground = record.priority === 'foreground';
+      if (!foreground || attempt >= 3) break;
+      await sleep(attempt === 1 ? 500 : 1000);
     }
 
     throw lastError || new Error('图片读取失败');
@@ -1727,7 +1818,16 @@
     if (state.window === 'closed') { setStatus('[双击桌面图标重新打开]'); return; }
     if (state.reading || state.pointerHeld) { setStatus('[阅读中 暂停切页]'); return; }
     if (state.targetIndex != null && state.targetIndex !== state.displayedIndex) { setStatus('[正在读取下一份档案…]'); return; }
-    setStatus(state.playMode === 'playing' ? '滚轮上下浏览' : '[已暂停]');
+    if (state.playMode !== 'playing') { setStatus('[已暂停]'); return; }
+    if (state.loopPhase === 'hold') {
+      setStatus('[ 已抵达最新纪元 · 即将开启新一轮时光穿梭 ]');
+      return;
+    }
+    if (state.loopPhase === 'rewind') {
+      setStatus('[ 磁头归位 · 返回最初纪元… ]');
+      return;
+    }
+    setStatus('滚轮上下浏览');
   }
 
   function updateControls() {
@@ -1763,6 +1863,7 @@
     updateControls();
     state.frameElapsedMs = 0;
     state.frameTickAt = performance.now();
+    state.loopPhase = 'normal';
     progressFill.style.width = '0%';
     requestAnimationFrame(() => {
       img.style.opacity = '1';
@@ -1773,7 +1874,12 @@
     return true;
   }
 
-  async function showFrame(index, origin = 'manual', playGeneration = state.playGeneration) {
+  async function showFrame(
+    index,
+    origin = 'manual',
+    playGeneration = state.playGeneration,
+    { flicker = true } = {},
+  ) {
     if (index < 0 || index >= state.frames.length) return false;
     const context = {
       sessionId: state.sessionId,
@@ -1785,7 +1891,7 @@
     state.frameError = null;
     updateControls();
     renderStatus();
-    triggerLedFlicker(650);
+    if (flicker) triggerLedFlicker(650);
     try {
       const resource = await ensureImage(index, 'foreground');
       return commitFrame(index, resource, context);
@@ -1811,6 +1917,8 @@
   function resetPlaybackProgress() {
     state.frameElapsedMs = 0;
     state.frameTickAt = performance.now();
+    state.loopPhase = 'normal';
+    progressFill.style.transition = '';
     progressFill.style.width = '0%';
   }
 
@@ -1825,6 +1933,94 @@
     renderStatus();
   }
 
+  function playbackContextValid(generation) {
+    return (
+      generation === state.playGeneration &&
+      state.playMode === 'playing' &&
+      state.power === 'on' &&
+      state.window === 'open'
+    );
+  }
+
+  async function flashDriveSeek(generation, times = 3) {
+    const session = state.sessionId;
+
+    for (let index = 0; index < times; index += 1) {
+      if (
+        !playbackContextValid(generation) ||
+        session !== state.sessionId ||
+        driveLed.classList.contains('off')
+      ) return false;
+
+      driveLed.classList.remove('standby');
+      driveLed.classList.add('active');
+      await sleep(120);
+
+      if (
+        !playbackContextValid(generation) ||
+        session !== state.sessionId
+      ) return false;
+
+      driveLed.classList.remove('active');
+      driveLed.classList.add('standby');
+      await sleep(index === times - 1 ? 160 : 105);
+    }
+
+    return true;
+  }
+
+  async function rewindProgressToZero(generation) {
+    if (!playbackContextValid(generation)) return false;
+
+    progressFill.style.transition = 'width 350ms ease-in-out';
+
+    await new Promise((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(resolve));
+    });
+
+    if (!playbackContextValid(generation)) {
+      progressFill.style.transition = '';
+      return false;
+    }
+
+    progressFill.style.width = '0%';
+    await sleep(380);
+    progressFill.style.transition = '';
+
+    return playbackContextValid(generation);
+  }
+
+  async function rewindToBeginning(generation) {
+    if (!playbackContextValid(generation)) return false;
+
+    state.loopPhase = 'rewind';
+    renderStatus();
+
+    // Frame 0 should normally already be warm from the sliding buffer.
+    // Promote it now so the ritual never ends on an unloaded frame.
+    try {
+      await ensureImage(0, 'foreground');
+    } catch (error) {
+      if (error?.name === 'AbortError') return false;
+      state.frameError = { index: 0, error };
+      stopAutoPlay(false);
+      diagnostics('rewind target failed', { error: error.message });
+      renderStatus();
+      return false;
+    }
+
+    if (!playbackContextValid(generation)) return false;
+    if (!(await flashDriveSeek(generation, 3))) return false;
+    if (!(await rewindProgressToZero(generation))) return false;
+
+    return showFrame(
+      0,
+      'auto',
+      generation,
+      { flicker: false },
+    );
+  }
+
   function startAutoPlay() {
     if (
       state.frames.length <= 1 ||
@@ -1836,54 +2032,87 @@
     state.playMode = 'playing';
     const generation = ++state.playGeneration;
     state.frameTickAt = performance.now();
+
+    const initialDuration = Number(speedSelect.value) || 4500;
+    const initialIsLast =
+      state.displayedIndex === state.frames.length - 1;
+    state.loopPhase =
+      initialIsLast &&
+      state.frameElapsedMs >= initialDuration
+        ? 'hold'
+        : 'normal';
+
     updateControls();
     renderStatus();
     cancelAnimationFrame(playRaf);
 
     const tick = async (now) => {
-      if (
-        generation !== state.playGeneration ||
-        state.playMode !== 'playing'
-      ) return;
+      if (!playbackContextValid(generation)) return;
 
       if (
         state.reading ||
         state.pointerHeld ||
-        state.documentHidden ||
-        state.window !== 'open'
+        state.documentHidden
       ) {
         // Freeze elapsed time while the user is reading, dragging,
-        // the tab is hidden, or the app window is not available.
+        // or the tab is hidden.
         state.frameTickAt = now;
         playRaf = requestAnimationFrame(tick);
         return;
       }
 
       const duration = Number(speedSelect.value) || 4500;
+      const isLast =
+        state.displayedIndex === state.frames.length - 1;
+      const totalDuration = isLast
+        ? duration * 2
+        : duration;
+
       const delta = Math.max(0, now - state.frameTickAt);
       state.frameTickAt = now;
       state.frameElapsedMs = Math.min(
         state.frameElapsedMs + delta,
-        duration,
+        totalDuration,
       );
 
+      // The last frame fills normally, then stays at 100% for one
+      // additional frame duration as a deliberate Hold phase.
       const progress = Math.min(
         state.frameElapsedMs / duration,
         1,
       );
       progressFill.style.width = `${progress * 100}%`;
 
-      if (progress < 1) {
+      if (
+        isLast &&
+        state.frameElapsedMs >= duration &&
+        state.loopPhase !== 'hold' &&
+        state.loopPhase !== 'rewind'
+      ) {
+        state.loopPhase = 'hold';
+        renderStatus();
+      }
+
+      if (state.frameElapsedMs < totalDuration) {
         playRaf = requestAnimationFrame(tick);
         return;
       }
 
-      // Stay at 100% and keep the current decoded image visible until
-      // the next frame is fully downloaded and decoded.
       progressFill.style.width = '100%';
-      const nextIndex =
-        (state.displayedIndex + 1) %
-        state.frames.length;
+
+      if (isLast) {
+        const ok = await rewindToBeginning(generation);
+
+        if (
+          !ok ||
+          !playbackContextValid(generation)
+        ) return;
+
+        playRaf = requestAnimationFrame(tick);
+        return;
+      }
+
+      const nextIndex = state.displayedIndex + 1;
       const ok = await showFrame(
         nextIndex,
         'auto',
@@ -1892,8 +2121,7 @@
 
       if (
         !ok ||
-        generation !== state.playGeneration ||
-        state.playMode !== 'playing'
+        !playbackContextValid(generation)
       ) return;
 
       playRaf = requestAnimationFrame(tick);
@@ -2020,6 +2248,7 @@
     clearTimeout(readingTimer);
     state.reading = false;
     state.pointerHeld = false;
+    state.loopPhase = 'normal';
     if (releaseImages) clearImageResources();
   }
 
@@ -2032,6 +2261,7 @@
     state.displayedIndex = null;
     state.targetIndex = null;
     state.playMode = 'paused';
+    state.loopPhase = 'normal';
     closeAllDropdowns();
     const retryButton = $('bootRetryButton');
     if (retryButton) retryButton.style.display = 'none';
