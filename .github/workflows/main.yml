@@ -854,6 +854,32 @@ jobs:
 
           npx playwright install --with-deps chromium
 
+          BROWSER_EVIDENCE=$(node --input-type=module <<'NODE'
+          import { chromium } from "playwright";
+          const browser = await chromium.launch({ headless: true });
+          console.log(browser.version());
+          await browser.close();
+          NODE
+          )
+
+          IMAGE_TOOLCHAIN_EVIDENCE=$(node --input-type=module <<'NODE'
+          import sharp from "sharp";
+          console.log(
+            `sharp=${sharp.versions.sharp};` +
+            `vips=${sharp.versions.vips};` +
+            `webp=${sharp.versions.webp}`
+          );
+          NODE
+          )
+
+          export CAPTURE_BROWSER_EVIDENCE="$BROWSER_EVIDENCE"
+          export CAPTURE_FONT_EVIDENCE="$FONT_EVIDENCE"
+          export CAPTURE_IMAGE_TOOLCHAIN_EVIDENCE="$IMAGE_TOOLCHAIN_EVIDENCE"
+          export CAPTURE_REQUIRE_RUNTIME_EVIDENCE="true"
+
+          echo "Capture browser evidence: $CAPTURE_BROWSER_EVIDENCE"
+          echo "Capture image toolchain evidence: $CAPTURE_IMAGE_TOOLCHAIN_EVIDENCE"
+
           # Re-hash the exact public tree immediately before capture. Nothing
           # may rewrite public between CAR creation and the local screenshot.
           CURRENT_DIGEST=$(python3 - <<'PY'
@@ -934,7 +960,6 @@ jobs:
           CAPTURE_CID="$CID" \
           CAPTURE_CONTENT_DIGEST="$CONTENT_DIGEST" \
           CAPTURE_SOURCE_COMMIT="$SOURCE_COMMIT" \
-          CAPTURE_FONT_EVIDENCE="$FONT_EVIDENCE" \
           SCREENSHOT_SOURCE_URL="http://127.0.0.1:4173/" \
           node .github/scripts/ipfs-history/capture-screenshots.mjs "$HISTORY_DIR"
 
@@ -960,9 +985,6 @@ jobs:
               git -C "$HISTORY_DIR" reset --hard origin/ipfs-history
 
               if CAPTURE_REQUIRE_CURRENT_PROFILE=true \
-                 CAPTURE_ENVIRONMENT_ID="$CAPTURE_ENVIRONMENT_ID" \
-                 SCREENSHOT_WIDTH="$SCREENSHOT_WIDTH" \
-                 SCREENSHOT_HEIGHT="$SCREENSHOT_HEIGHT" \
                  node .github/scripts/ipfs-history/check-capture.mjs "$HISTORY_DIR" "$CID"; then
                 echo "Remote already has a valid current-profile capture for CID: $CID"
                 break
