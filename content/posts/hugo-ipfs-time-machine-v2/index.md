@@ -1,5 +1,5 @@
 ---
-title: "博客时光机 2.0：从随机穿越到看见时间"
+title: "博客时光机 2.0：在一台 Macintosh 里看见时间"
 date: 2026-09-24T23:10:42+08:00
 draft: false
 tags:
