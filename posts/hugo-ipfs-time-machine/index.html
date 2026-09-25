@@ -1,0 +1,454 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>我给博客做了一个时光机 | 流动</title><meta name=description content="利用 IPFS 保存的历史快照，给 Hugo 博客做了一个随机穿越过去版本的时光机。"><meta name=author content="Liudon"><meta name=keywords content="hugo,ipfs,博客优化"><meta name=robots content="index, follow"><link rel=canonical href=https://liudon.com/posts/hugo-ipfs-time-machine/><meta property="og:title" content="我给博客做了一个时光机 | 流动"><meta property="og:description" content="利用 IPFS 保存的历史快照，给 Hugo 博客做了一个随机穿越过去版本的时光机。"><meta property="og:type" content="article"><meta property="og:url" content="https://liudon.com/posts/hugo-ipfs-time-machine/"><meta property="og:site_name" content="流动"><meta property="article:published_time" content="2026-09-21T21:23:15+08:00"><meta property="article:modified_time" content="2026-09-21T21:23:15+08:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="我给博客做了一个时光机 | 流动"><meta name=twitter:description content="利用 IPFS 保存的历史快照，给 Hugo 博客做了一个随机穿越过去版本的时光机。"><meta name=theme-color content="#ffffff" media="(prefers-color-scheme: light)"><meta name=theme-color content="#0a0a0a" media="(prefers-color-scheme: dark)"><meta name=msapplication-TileColor content="#ff9500"><link rel=icon type=image/svg+xml href=../../favicon.svg><link rel=icon href=../../favicon.ico><link rel=icon type=image/png sizes=16x16 href=../../favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=../../favicon-32x32.png><link rel=apple-touch-icon href=../../apple-touch-icon.png><link rel=mask-icon href=../../safari-pinned-tab.svg color=#c2410c><script>(function(){try{var t=location.search.match(/[?&]theme=(dark|light)/),e=t?t[1]:localStorage.getItem("theme");e||(e=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"),e==="light"&&document.documentElement.setAttribute("data-theme","light")}catch{}})()</script><link rel="preload stylesheet" href=../../css/site.min.995626dc413a7a4678bb4ce005d893254d4a1024bed3612dc25445863bd925a5.css as=style integrity="sha256-mVYm3EE6ekZ4u0zgBdiTJU1KECS+02EtwlRFhjvZJaU=" crossorigin=anonymous><script>window.__termBase="/",window.__termSearchIndex="search.json"</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","author":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"dateModified":"2026-09-21T21:23:15+08:00","datePublished":"2026-09-21T21:23:15+08:00","description":"利用 IPFS 保存的历史快照，给 Hugo 博客做了一个随机穿越过去版本的时光机。","headline":"我给博客做了一个时光机","inLanguage":"zh-CN","keywords":["hugo ipfs","ipfs 博客","博客时光机","hugo 历史快照"],"mainEntityOfPage":{"@id":"https://liudon.com/posts/hugo-ipfs-time-machine/","@type":"WebPage"},"name":"我给博客做了一个时光机","publisher":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"wordCount":5276}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://liudon.com/","name":"流动","position":1},{"@type":"ListItem","item":"https://liudon.com/posts/","name":"文章","position":2},{"@type":"ListItem","item":"https://liudon.com/posts/hugo-ipfs-time-machine/","name":"我给博客做了一个时光机","position":3}]}</script><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous fetchpriority=low></script></head><body><a class=sr-only href=#main>Skip to content</a><header class=site-header><div class=site-header__inner><a class=site-logo href=../../ aria-label="流动 - Home">流动</a><nav class=site-nav aria-label="Main navigation"><a href=../../posts/>Posts</a>
+<a href=../../links/>Links</a>
+<a href=https://liudon.com/time/ target=_top>Time</a></nav><div class=header-actions><button type=button class="icon-btn search-trigger" data-search-open aria-label=Search title="Search (/)">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+</button>
+<button type=button class="icon-btn theme-toggle" aria-label="Toggle light and dark mode" title="Toggle light/dark" onclick='(function(){var e=document.documentElement;if(e.getAttribute("data-theme")==="light"){e.removeAttribute("data-theme");try{localStorage.setItem("theme","dark")}catch{}}else{e.setAttribute("data-theme","light");try{localStorage.setItem("theme","light")}catch{}}})()'>
+<svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+<svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</button>
+<button type=button class="icon-btn menu-toggle" id=menu-toggle aria-label="Toggle navigation" aria-expanded=false>
+<span></span><span></span><span></span></button></div></div><div class=mobile-menu-panel id=mobile-menu><nav class=site-nav aria-label="Mobile navigation"><a href=../../posts/>Posts</a>
+<a href=../../links/>Links</a>
+<a href=https://liudon.com/time/ target=_top>Time</a></nav></div></header><main id=main><article class=terminal-guide><div class=terminal-scanlines aria-hidden=true></div><div class=terminal-progress aria-hidden=true><div class=terminal-progress__bar id=reading-progress></div></div><div class=terminal-window><header class=terminal-titlebar><div class=terminal-buttons aria-hidden=true><span class="terminal-btn terminal-btn--close"></span>
+<span class="terminal-btn terminal-btn--minimize"></span>
+<span class="terminal-btn terminal-btn--maximize"></span></div><div class=terminal-title><span class=terminal-prompt>liudon@localhost</span>:<span class=terminal-path>~/blog</span>$ <span class=terminal-cmd>cd /posts/hugo-ipfs-time-machine</span><span class=terminal-cursor aria-hidden=true></span></div></header><div class=terminal-body><div class=terminal-output-header><h1 class=terminal-main-title>我给博客做了一个时光机</h1><p class=terminal-description># 利用 IPFS 保存的历史快照，给 Hugo 博客做了一个随机穿越过去版本的时光机。</p><div class=terminal-meta><span class=terminal-meta-item><span class=terminal-meta-label>author:</span> Liudon</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>date:</span> 2026-09-21</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>words:</span> 5276</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>read_time:</span> 11m</span></div><div class=terminal-tags><a class=terminal-tag href=../../tags/hugo/>#hugo</a><a class=terminal-tag href=../../tags/ipfs/>#ipfs</a><a class=terminal-tag href=../../tags/%E5%8D%9A%E5%AE%A2%E4%BC%98%E5%8C%96/>#博客优化</a></div></div><nav class=terminal-toc aria-label="Table of contents" id=inline-toc><div class=terminal-toc-header><span class=terminal-prompt>$</span> ls -la ./sections/</div><div class=terminal-dir-listing><div class=terminal-dir-header>drwxr-xr-x 10 sections</div><a class=terminal-dir-row href=#%e5%89%8d%e8%a8%80 data-index=0><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>01</span>
+<span class=terminal-dir-name>前言.md</span>
+</a><a class=terminal-dir-row href=#%e6%80%9d%e8%80%83 data-index=1><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>02</span>
+<span class=terminal-dir-name>思考.md</span>
+</a><a class=terminal-dir-row href=#%e5%ae%9e%e7%8e%b0 data-index=2><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>03</span>
+<span class=terminal-dir-name>实现.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e6%95%b4%e4%bd%93%e6%9e%b6%e6%9e%84 data-index=3><span class=terminal-dir-name>└── 整体架构.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e5%8f%91%e5%b8%83%e6%97%b6%e7%94%9f%e6%88%90%e5%b9%b6%e8%ae%b0%e5%bd%95%e5%8e%86%e5%8f%b2%e5%bf%ab%e7%85%a7 data-index=4><span class=terminal-dir-name>└── 发布时生成并记录历史快照.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#ipfs-%e5%bf%ab%e7%85%a7%e7%b4%a2%e5%bc%95%e6%80%8e%e4%b9%88%e7%bb%84%e7%bb%87 data-index=5><span class=terminal-dir-name>└── ipfs-快照索引怎么组织.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e5%8e%86%e5%8f%b2%e7%89%88%e6%9c%ac%e9%87%8d%e5%bb%ba data-index=6><span class=terminal-dir-name>└── 历史版本重建.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e7%a9%bf%e8%b6%8a%e6%97%b6hugo-%e9%a1%b5%e9%9d%a2%e6%80%8e%e4%b9%88%e5%b7%a5%e4%bd%9c data-index=7><span class=terminal-dir-name>└── 穿越时hugo-页面怎么工作.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e6%9c%80%e5%90%8e%e6%8a%8a%e4%b8%a4%e6%9d%a1%e6%b5%81%e7%a8%8b%e4%b8%b2%e8%b5%b7%e6%9d%a5 data-index=8><span class=terminal-dir-name>└── 最后把两条流程串起来.md</span>
+</a><a class=terminal-dir-row href=#%e6%80%bb%e7%bb%93 data-index=9><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>10</span>
+<span class=terminal-dir-name>总结.md</span></a></div></nav><div class=terminal-content><div class=terminal-content-header><span class=terminal-prompt>$</span> less index.md</div><div class=terminal-prose id=prose-content><h2 id=前言>前言</h2><p>博客早在23年的时候就接入了 IPFS 服务，通过 GitHub Actions 实现了 Cloudflare Pages 和 IPFS 两套服务托管。</p><p>整个流程大概是下面这样的，具体实现可以参考<a href=https://liudon.com/posts/deploy-blog-to-ipfs/>Hugo 接入 IPFS 服务</a>这篇内容。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Hugo Build
+</span></span><span class=line><span class=cl>    │
+</span></span><span class=line><span class=cl>    ├── 正常部署 → Cloudflare Pages ← liudon.com
+</span></span><span class=line><span class=cl>    │
+</span></span><span class=line><span class=cl>    └── IPFS → CID ← liudon.xyz
+</span></span></code></pre></div><p>博客主要还是通过 <code>liudon.com</code> 来对外提供访问，<code>liudon.xyz</code> 更像是一块试验田，用来验证 Hugo 博客跑在 IPFS 服务上。</p><p>虽然 IPFS 部署的流程跑通了，但是博客始终并没有真正用到 IPFS 服务，总感觉差点意思。</p><p>既然折腾通了，那就要用起来，于是就有了这个功能：</p><p><strong>博客时光机。</strong></p><h2 id=思考>思考</h2><p>最开始把博客放到 IPFS，并没有特别明确的使用场景。</p><p>怎么能把博客和 IPFS 结合起来，用上 IPFS 的能力呢？</p><p>IPFS 是基于内容寻址的。</p><p>简单理解就是：</p><p><strong>内容决定地址。</strong></p><p>当 Hugo 生成的博客内容发生变化以后，对应的 CID 也会变化。</p><p>比如今天发布一次：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>博客版本 A
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>CID A
+</span></span></code></pre></div><p>过几天修改了文章或者主题，再发布：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>博客版本 B
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>CID B
+</span></span></code></pre></div><p>正常的网站部署一般是覆盖式的。</p><p>新版本上线以后，线上看到的自然就是新版本。</p><p>而之前的网站长什么样，通常也就看不到了。</p><p>IPFS 不太一样。</p><p>CID A 对应的是版本 A 的内容。</p><p>CID B 对应的是版本 B 的内容。</p><p>只要对应内容还存在：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>CID A → 当时的博客
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>CID B → 后来的博客
+</span></span></code></pre></div><p>新版本并不会把旧版本覆盖掉。</p><p>想到这里以后，突然发现：</p><blockquote><p>我其实早就已经有了一堆博客历史快照。</p></blockquote><p>只是以前这些 CID 都是孤立存在的，没有真正拿来做什么。</p><p>那不如把它们串起来。</p><p>以前每次部署得到的 CID，大概就是这种状态：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>CID A
+</span></span><span class=line><span class=cl>CID B
+</span></span><span class=line><span class=cl>CID C
+</span></span><span class=line><span class=cl>CID D
+</span></span><span class=line><span class=cl>CID E
+</span></span><span class=line><span class=cl>...
+</span></span></code></pre></div><p>单独看到其中一个 CID，我自己也不知道它对应哪一次部署。</p><p>所以真正需要补上的，并不是一套新的博客备份系统。</p><p>IPFS 已经把内容保存好了，需要做的只是给每次部署额外记录：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>CID
+</span></span><span class=line><span class=cl>+
+</span></span><span class=line><span class=cl>发布时间
+</span></span><span class=line><span class=cl>+
+</span></span><span class=line><span class=cl>Git Commit
+</span></span></code></pre></div><p>这样原本没有关系的 CID 就变成了：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>某次 Commit
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>Hugo Build
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>IPFS CID
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>部署时间
+</span></span></code></pre></div><p>有了这些信息以后，就可以知道：</p><blockquote><p>某个 CID，对应的是博客过去某一个真实存在过的版本。</p></blockquote><p>到这里，“时光机”这个想法基本就出来了。</p><p>根据这些信息，按常规思路就是搞一个历史列表页，点击进入某一个历史的详情页。</p><p>我不喜欢这个实现，我想让这个功能变得<strong>好玩</strong>，而不单单就是增加一个列表和详情页。</p><p>既然叫“时光机”，我觉得就不应该让我先选择：</p><blockquote><p>我要回到 2026 年 9 月 3 日下午几点。</p></blockquote><p>真正有意思的方式应该是：</p><blockquote><p>点一下，看看它把我送到哪里。</p></blockquote><p>所以最后干脆不做历史列表。</p><p>也不提供时间选择。</p><p>时光机页面只做一件事情：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>启动
+</span></span><span class=line><span class=cl> ↓
+</span></span><span class=line><span class=cl>随机选择一个过去的博客快照
+</span></span><span class=line><span class=cl> ↓
+</span></span><span class=line><span class=cl>穿越
+</span></span></code></pre></div><p>至于会回到哪一天，不提前告诉你。</p><p>可能是昨天。</p><p>也可能是一个月以前。</p><p>这种不确定性反而更有意思。</p><p>平时我大概永远不会专门去翻：</p><blockquote><p>一个月前我的博客首页是什么样？</p></blockquote><p>但时光机如果随机把我扔回去，就会顺手看两眼。</p><p>偶尔还能看到一些自己已经忘掉的东西。</p><p>这才比较符合我想做的“时光机”。</p><p>需求基本上明确了，通过 CID 索引记录历史版本，通过前端页面随机穿越到某个历史版本。</p><h2 id=实现>实现</h2><h3 id=整体架构>整体架构</h3><p>功能想清楚以后，实现反而没那么复杂。</p><p>整个时光机主要分成三部分：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>GitHub Actions
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>生成并记录历史快照
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>ipfs-history
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>保存历史索引
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Hugo 静态页面
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>随机选择一个快照并穿越
+</span></span></code></pre></div><p>完整一点，大概是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>                         Git Push
+</span></span><span class=line><span class=cl>                            │
+</span></span><span class=line><span class=cl>                            ▼
+</span></span><span class=line><span class=cl>                     GitHub Actions
+</span></span><span class=line><span class=cl>                            │
+</span></span><span class=line><span class=cl>                            ▼
+</span></span><span class=line><span class=cl>                       Hugo Build
+</span></span><span class=line><span class=cl>                            │
+</span></span><span class=line><span class=cl>                         public/
+</span></span><span class=line><span class=cl>                            │
+</span></span><span class=line><span class=cl>                ┌───────────┴───────────┐
+</span></span><span class=line><span class=cl>                │                       │
+</span></span><span class=line><span class=cl>                ▼                       ▼
+</span></span><span class=line><span class=cl>            正常部署                  IPFS
+</span></span><span class=line><span class=cl>                │                       │
+</span></span><span class=line><span class=cl>                ▼                       ▼
+</span></span><span class=line><span class=cl>           liudon.com                  CID
+</span></span><span class=line><span class=cl>                                        │
+</span></span><span class=line><span class=cl>                                        ▼
+</span></span><span class=line><span class=cl>                               ipfs-history 分支
+</span></span><span class=line><span class=cl>                                        │
+</span></span><span class=line><span class=cl>                         ┌──────────────┴──────────────┐
+</span></span><span class=line><span class=cl>                         │                             │
+</span></span><span class=line><span class=cl>                         ▼                             ▼
+</span></span><span class=line><span class=cl>                    months.json                  history/
+</span></span><span class=line><span class=cl>                                                     │
+</span></span><span class=line><span class=cl>                                              YYYY-MM.jsonl
+</span></span><span class=line><span class=cl>                                                     │
+</span></span><span class=line><span class=cl>                                                     ▼
+</span></span><span class=line><span class=cl>                                              Hugo 时光机
+</span></span><span class=line><span class=cl>                                                     │
+</span></span><span class=line><span class=cl>                                              随机抽取记录
+</span></span><span class=line><span class=cl>                                                     │
+</span></span><span class=line><span class=cl>                                                     ▼
+</span></span><span class=line><span class=cl>                                                   CID
+</span></span><span class=line><span class=cl>                                                     │
+</span></span><span class=line><span class=cl>                                                     ▼
+</span></span><span class=line><span class=cl>                                       liudon.xyz/ipfs/&lt;CID&gt;/
+</span></span><span class=line><span class=cl>                                                     │
+</span></span><span class=line><span class=cl>                                                     ▼
+</span></span><span class=line><span class=cl>                                              过去的博客
+</span></span></code></pre></div><p>这里几个部分之间是相对独立的。</p><p>正常博客还是继续正常发布：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Git Push
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Hugo Build
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>liudon.com
+</span></span></code></pre></div><p>IPFS 时光机只是利用同一次构建的结果，额外生成一份历史快照。</p><p>即使哪天时光机坏了，主站也完全不受影响。</p><p>这点我觉得还是挺重要的。</p><p>毕竟这是一个为了好玩加出来的功能，不能反过来影响正常博客。</p><h3 id=发布时生成并记录历史快照>发布时：生成并记录历史快照</h3><h4 id=workflow每次发布自动留一个快照>Workflow：每次发布自动留一个快照</h4><p>博客原来就已经有 GitHub Actions 发布流程。</p><p>大致就是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Git Push
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Checkout
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Hugo Build
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>public/
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>发布
+</span></span></code></pre></div><p>Hugo 执行完以后，会得到最终的：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>public/
+</span></span></code></pre></div><p>这个目录就是浏览器最终看到的完整静态网站。</p><p>里面已经包含：</p><ul><li>HTML；</li><li>CSS；</li><li>JavaScript；</li><li>图片；</li><li>文章页面；</li><li>首页；</li><li>分类、标签等页面。</li></ul><p>所以 IPFS 的处理直接放在 Hugo Build 后面。</p><p>同一份：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>public/
+</span></span></code></pre></div><p>同时走两条路径：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>                    public/
+</span></span><span class=line><span class=cl>                       │
+</span></span><span class=line><span class=cl>              ┌────────┴────────┐
+</span></span><span class=line><span class=cl>              │                 │
+</span></span><span class=line><span class=cl>              ▼                 ▼
+</span></span><span class=line><span class=cl>          正常部署             IPFS
+</span></span><span class=line><span class=cl>              │                 │
+</span></span><span class=line><span class=cl>              ▼                 ▼
+</span></span><span class=line><span class=cl>         liudon.com            CID
+</span></span></code></pre></div><p>这样有一个好处：</p><p><strong>IPFS 保存的就是这次实际构建出来的网站。</strong></p><p>不是 Markdown。</p><p>不是 Hugo 源码。</p><p>也不是过一段时间再 checkout Git Commit 重新构建出来的一份网站。</p><p>而是当时 Workflow 真正生成出来的那一份静态文件。</p><p>每执行一次 Workflow，就会产生一个对应的 CID：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Commit A
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Hugo Build
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>CID A
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Commit B
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Hugo Build
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>CID B
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Commit C
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Hugo Build
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>CID C
+</span></span></code></pre></div><p>这样博客更新得越久，IPFS 上留下来的历史切片自然也就越多。</p><h4 id=workflow-还要把-cid-记录下来>Workflow 还要把 CID 记录下来</h4><p>只有 CID 还不够。</p><p>如果 Workflow 只是打印：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>bafyxxxx...
+</span></span></code></pre></div><p>任务跑完以后，这个 CID 很快就淹没在 Actions 日志里了。</p><p>所以生成 IPFS 快照以后，还要继续记录一些信息。</p><p>最基本的包括：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>CID
+</span></span><span class=line><span class=cl>source_commit
+</span></span><span class=line><span class=cl>deployed_at
+</span></span></code></pre></div><p>例如：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;cid&#34;</span><span class=p>:</span> <span class=s2>&#34;QmUYgSY9Safv5gTT9i2nwWLT9q5tvXzxuRBdXpv3TGAMrU&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;source_commit&#34;</span><span class=p>:</span> <span class=s2>&#34;3c9130e0d6d11a78858cb2463c9ea37e03fb1db8&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;deployed_at&#34;</span><span class=p>:</span> <span class=s2>&#34;2026-09-20T05:59:41Z&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>其中：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>cid
+</span></span><span class=line><span class=cl>→ 这次发布对应的博客快照
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>source_commit
+</span></span><span class=line><span class=cl>→ 这次构建对应哪个 Git Commit
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>deployed_at
+</span></span><span class=line><span class=cl>→ 实际部署时间
+</span></span></code></pre></div><p>Workflow 最终做的事情可以概括成：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Hugo Build
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>得到 public/
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>上传 IPFS
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>得到 CID
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>生成历史记录
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>写入 ipfs-history
+</span></span></code></pre></div><p>整个过程都是自动完成的。</p><p>正常写博客、提交代码、发布。</p><p>时光机的数据自然也就跟着增加了。</p><h3 id=ipfs-快照索引怎么组织>IPFS 快照索引怎么组织</h3><h4 id=单独用-ipfs-history-保存快照索引>单独用 ipfs-history 保存快照索引</h4><p>IPFS 快照记录没有直接放进博客源码。</p><p>我专门用了一个 <code>ipfs-history</code> 分支，用来保存每次部署产生的 CID，以及对应的发布时间、Commit 等索引信息。</p><p>目前结构大概是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>ipfs-history
+</span></span><span class=line><span class=cl>├── latest.json
+</span></span><span class=line><span class=cl>├── months.json
+</span></span><span class=line><span class=cl>└── history
+</span></span><span class=line><span class=cl>    ├── 2026-07.jsonl
+</span></span><span class=line><span class=cl>    ├── 2026-08.jsonl
+</span></span><span class=line><span class=cl>    └── 2026-09.jsonl
+</span></span></code></pre></div><p>这样做主要还是为了让 <code>博客源码</code> 和 <code>自动生成的部署历史</code> 彻底分开。</p><p>源码分支继续放：</p><ul><li>Markdown；</li><li>Hugo 配置；</li><li>主题；</li><li>静态资源；</li><li>Workflow。</li></ul><p><code>ipfs-history</code> 则只负责：</p><ul><li>CID；</li><li>发布时间；</li><li>Commit；</li><li>快照索引。</li></ul><p>这样每次发布以后，Workflow 只需要更新 <code>ipfs-history</code> 分支，不需要再往正常源码里提交一堆自动生成的数据。</p><h4 id=latestjson-记录当前快照>latest.json 记录当前快照</h4><p>除了完整的历史记录，还单独维护了一个 <code>latest.json</code>，它保存最近一次成功部署的 IPFS 快照信息。</p><p>大概是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;version&#34;</span><span class=p>:</span> <span class=mi>1</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;cid&#34;</span><span class=p>:</span> <span class=s2>&#34;bafy...&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;source_commit&#34;</span><span class=p>:</span> <span class=s2>&#34;...&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;deployed_at&#34;</span><span class=p>:</span> <span class=s2>&#34;...&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>之所以单独保留一份最新状态，是因为很多时候并不需要翻完整个历史。</p><p>对于时光机前端来说，它可以快速知道：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>哪个 CID 代表“现在”
+</span></span></code></pre></div><p>随机穿越时就可以把这个 CID 排除掉，避免启动一次时光机，结果又回到了当前版本。</p><p>所以三个文件的职责基本就是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>latest.json
+</span></span><span class=line><span class=cl>→ 当前最新快照
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>months.json
+</span></span><span class=line><span class=cl>→ 整个历史快照池的索引
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>history/YYYY-MM.jsonl
+</span></span><span class=line><span class=cl>→ 实际的历史快照记录
+</span></span></code></pre></div><h4 id=按月份拆分快照记录>按月份拆分快照记录</h4><p>最简单的做法当然是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>history.json
+</span></span></code></pre></div><p>每次发布都往里面追加一条记录。</p><p>刚开始几十条的时候没问题。</p><p>但如果博客一直更新：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>100 条
+</span></span><span class=line><span class=cl>500 条
+</span></span><span class=line><span class=cl>1000 条
+</span></span><span class=line><span class=cl>...
+</span></span></code></pre></div><p>这个文件会越来越大。</p><p>而时光机每次其实只需要：</p><p><strong>随机抽一条。</strong></p><p>完全没必要每次打开页面，都先把几年以来所有部署记录全部下载一遍。</p><p>所以最后把历史按月份拆开：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>history/
+</span></span><span class=line><span class=cl>├── 2026-07.jsonl
+</span></span><span class=line><span class=cl>├── 2026-08.jsonl
+</span></span><span class=line><span class=cl>├── 2026-09.jsonl
+</span></span><span class=line><span class=cl>├── 2026-10.jsonl
+</span></span><span class=line><span class=cl>└── ...
+</span></span></code></pre></div><p>每个月对应一个 JSONL 文件。</p><p>其中每一行就是一次发布。</p><p>这样文件本身比较小，写入也比较简单。</p><h4 id=monthsjson整个随机池的索引>months.json：整个随机池的索引</h4><p>既然历史文件按月份拆开了，页面就需要知道：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>现在有哪些月份？
+</span></span><span class=line><span class=cl>每个月有多少条记录？
+</span></span></code></pre></div><p>所以又维护了一个 <code>months.json</code> 文件。</p><p>类似这样：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;version&#34;</span><span class=p>:</span> <span class=mi>2</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;total&#34;</span><span class=p>:</span> <span class=mi>51</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;months&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;month&#34;</span><span class=p>:</span> <span class=s2>&#34;2026-09&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;count&#34;</span><span class=p>:</span> <span class=mi>36</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;month&#34;</span><span class=p>:</span> <span class=s2>&#34;2026-08&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;count&#34;</span><span class=p>:</span> <span class=mi>14</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;month&#34;</span><span class=p>:</span> <span class=s2>&#34;2026-07&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;count&#34;</span><span class=p>:</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>这里的月份并不是拿给用户选择的。</p><p>页面上也不会出现：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>请选择：
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>2026-07
+</span></span><span class=line><span class=cl>2026-08
+</span></span><span class=line><span class=cl>2026-09
+</span></span></code></pre></div><p>它只是内部索引。</p><p>时光机打开以后，先加载这个很小的文件，就已经知道了整个随机池的结构。</p><p>例如：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>总共 51 个快照
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>2026-07 → 1 个
+</span></span><span class=line><span class=cl>2026-08 → 14 个
+</span></span><span class=line><span class=cl>2026-09 → 36 个
+</span></span></code></pre></div><p>然后再决定这一次到底抽哪条记录。</p><h4 id=怎么做到全局均匀随机>怎么做到全局均匀随机</h4><p>这里还有一个小问题。</p><p>假设：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>2026-07   1 条
+</span></span><span class=line><span class=cl>2026-08  14 条
+</span></span><span class=line><span class=cl>2026-09  36 条
+</span></span></code></pre></div><p>如果简单写成：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>随机一个月份
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>再随机这个月的一条记录
+</span></span></code></pre></div><p>那么：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>2026-07
+</span></span><span class=line><span class=cl>2026-08
+</span></span><span class=line><span class=cl>2026-09
+</span></span></code></pre></div><p>三个自然月被选中的概率是一样的。</p><p>结果就是：</p><p>7 月唯一那条记录，被抽到的概率会远远高于 9 月的任何一条记录。</p><p>这显然不太合理。</p><p>我更希望的是：</p><blockquote><p>每一个可用的历史快照，都有大致相同的机会被穿越到。</p></blockquote><p>所以 <code>months.json</code> 里除了月份，还要保存 <code>count</code>。</p><p>随机的时候按照记录数量来选择。</p><p>例如一共有：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>51
+</span></span></code></pre></div><p>条历史。</p><p>那就相当于先在：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>1 ~ 51
+</span></span></code></pre></div><p>之间随机一个数字。</p><p>再通过每个月的 <code>count</code> 找出它落在哪个月。</p><p>这样某个月历史快照越多，这个月被命中的概率自然越高，但最终落到每一个具体历史快照上的概率基本是一致的。</p><h3 id=历史版本重建>历史版本重建</h3><p>之前的 GitHub Actions 构建日志里本身就有 CID 信息，所以又扫描了一遍历史 Workflow，通过日志里的 CID 尝试重建时光机上线之前的历史快照。</p><p>不过真正处理时发现，时间比较久的 Actions 日志已经无法获取。最后只找回了最近两个月左右的 CID，再早的历史也就没办法恢复了。</p><h3 id=穿越时hugo-页面怎么工作>穿越时：Hugo 页面怎么工作</h3><h4 id=页面和历史数据分离>页面和历史数据分离</h4><p>时光机页面没有配后端。</p><p>依然是 Hugo 正常生成出来的一个静态页面。</p><p>也就是说：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>访问时光机
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Cloudflare 返回 HTML
+</span></span></code></pre></div><p>到这里和普通文章页没什么区别。</p><p>真正的随机逻辑全部由浏览器里的 JavaScript 完成。</p><p>这里我没有让 Hugo 在构建阶段读取 <code>ipfs-history</code>。</p><p>否则就会出现一个比较奇怪的流程：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>发布博客
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>生成新的 CID
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>更新历史
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>为了让页面知道这个新 CID
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>再重新发布一次博客
+</span></span></code></pre></div><p>变成循环。</p><p>所以我把：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>时光机页面
+</span></span></code></pre></div><p>和：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>时光机数据
+</span></span></code></pre></div><p>彻底分开了。</p><p>Hugo 页面只负责：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>HTML
+</span></span><span class=line><span class=cl>CSS
+</span></span><span class=line><span class=cl>JavaScript
+</span></span></code></pre></div><p>历史数据则在页面打开以后动态获取。</p><p>这样新增一条历史快照的时候：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>只更新 ipfs-history
+</span></span></code></pre></div><p>完全不需要重新构建 <code>liudon.com</code>。</p><h4 id=随机选择一个历史快照>随机选择一个历史快照</h4><p>页面真正运行时，流程大概是这样：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>打开时光机页面
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>同时读取 months.json 和 latest.json
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>知道历史记录总数和当前最新 CID
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>从全部历史快照中随机一个位置
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>定位到对应月份
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>读取 history/YYYY-MM.jsonl
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>取得对应历史记录
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>排除当前最新 CID
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>开始穿越
+</span></span></code></pre></div><p>页面第一次只需要请求两个很小的索引文件：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>months.json
+</span></span><span class=line><span class=cl>+
+</span></span><span class=line><span class=cl>latest.json
+</span></span></code></pre></div><p><code>months.json</code> 用来描述整个历史快照池：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>一共有多少条历史记录
+</span></span><span class=line><span class=cl>每个月分别有多少条
+</span></span></code></pre></div><p><code>latest.json</code> 则告诉页面当前最新的博客快照是哪一个。</p><p>这里特意把最新 CID 排除掉。</p><p>毕竟人现在访问的就是当前博客，如果启动一次时光机，结果又回到“现在”，那就没什么意思了。</p><p>确定随机位置以后，页面再去请求对应月份的数据，例如：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>history/2026-09.jsonl
+</span></span></code></pre></div><p>也就是说，一次穿越通常只需要读取：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>2 个很小的索引 JSON
+</span></span><span class=line><span class=cl>+
+</span></span><span class=line><span class=cl>1 个当月 JSONL
+</span></span></code></pre></div><p>不需要把所有历史数据一次性加载到浏览器。</p><p>历史记录以后就算继续增长，这个流程也不会有太大变化。</p><h4 id=iframe-加载过去的博客>iframe 加载过去的博客</h4><p>随机到某一条历史记录以后，就拿到了对应的 CID。</p><p>例如：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>bafybeigq6ysku5e6uy4ahh2yodgpj3zvrioxt374d5amt3onsvjrcwloai
+</span></span></code></pre></div><p>对应的历史博客地址就是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>https://liudon.xyz/ipfs/&lt;CID&gt;/
+</span></span></code></pre></div><p>不过这里并没有直接把整个页面跳转过去。</p><p>时光机页面本身还保留着一个全屏的 <code>iframe</code>。</p><p>随机出 CID 以后，只需要把：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>https://liudon.xyz/ipfs/&lt;CID&gt;/
+</span></span></code></pre></div><p>设置成这个 <code>iframe</code> 的地址。</p><p>于是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>liudon.com/time/
+</span></span><span class=line><span class=cl>        │
+</span></span><span class=line><span class=cl>        ▼
+</span></span><span class=line><span class=cl>     时光机页面
+</span></span><span class=line><span class=cl>        │
+</span></span><span class=line><span class=cl>        ▼
+</span></span><span class=line><span class=cl>随机得到历史 CID
+</span></span><span class=line><span class=cl>        │
+</span></span><span class=line><span class=cl>        ▼
+</span></span><span class=line><span class=cl>iframe 加载
+</span></span><span class=line><span class=cl>liudon.xyz/ipfs/&lt;CID&gt;/
+</span></span><span class=line><span class=cl>        │
+</span></span><span class=line><span class=cl>        ▼
+</span></span><span class=line><span class=cl>   显示过去的博客
+</span></span></code></pre></div><p>这样用户实际上始终没有离开时光机页面。</p><p>历史博客负责占满页面主体，而时光机自己的控制面板仍然保留在上面。</p><p>穿越完成以后，可以看到当前快照对应的时间，也可以继续：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>🎲 再次随机
+</span></span></code></pre></div><p>或者：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>↩ 回到现在
+</span></span></code></pre></div><p>所以整个实现说白了，就是：</p><p><strong>随机挑一个过去的 CID，再把它加载到时光机页面里的 <code>iframe</code>。</strong></p><h4 id=加点时光穿梭的感觉>加点时光穿梭的感觉</h4><p>现在时光机页面打开以后，就会自动开始随机。</p><p>如果拿到 CID 以后，马上把：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>https://liudon.xyz/ipfs/&lt;CID&gt;/
+</span></span></code></pre></div><p>塞进 iframe 显示出来，那这个功能看起来其实还是很像：</p><p>随机打开了一个网页。</p><p>虽然功能已经实现了，但“时光机”的感觉还是差一点。</p><p>既然名字都叫时光机了，还是得稍微做点仪式感。</p><p>所以页面中间加了一段简单的“穿越过程”。</p><p>比如：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>BLOG TIME MACHINE
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>locating a point in blog history...
+</span></span><span class=line><span class=cl>reading immutable snapshots...
+</span></span><span class=line><span class=cl>time coordinate locked...
+</span></span><span class=line><span class=cl>travelling...
+</span></span></code></pre></div><p>等一下，再让历史页面慢慢显示出来。</p><p>同时为了让“穿越”看起来更像那么回事，我还给历史页面加了一层从模糊到清晰的过渡效果。</p><p>随机到历史 CID 后，并不会马上把页面完整显示出来，而是先让 <code>iframe</code> 中的历史博客以模糊、半透明的状态出现，再慢慢恢复清晰。</p><p>整个感觉有点像：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>正在穿越
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>过去的页面逐渐出现
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>画面从模糊变清晰
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>抵达过去
+</span></span></code></pre></div><p>本质上只是一些 CSS 过渡效果，没有什么复杂技术，但配合前面的终端文字和加载过程，整个“时光机”的感觉会完整很多。</p><p>这部分当然没有任何技术价值。</p><p>纯粹就是：</p><p><strong>为了好玩。</strong></p><p>本来这个功能的出发点也不是解决什么严肃需求。</p><p>那就干脆做得像个小玩具一点。</p><p>打开时光机。</p><p>不知道会去哪。</p><p>看着页面跑几行字。</p><p>然后过去某一次博客发布的页面慢慢出现在眼前。</p><p>这样才比较像“时光机”。</p><h3 id=最后把两条流程串起来>最后，把两条流程串起来</h3><p>现在整个方案其实可以分成两个阶段。</p><h4 id=发布博客的时候>发布博客的时候</h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Git Push
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>GitHub Actions
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Hugo Build
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>public/
+</span></span><span class=line><span class=cl>   │
+</span></span><span class=line><span class=cl>   ├────────→ 正常部署
+</span></span><span class=line><span class=cl>   │             ↓
+</span></span><span class=line><span class=cl>   │         liudon.com
+</span></span><span class=line><span class=cl>   │
+</span></span><span class=line><span class=cl>   └────────→ IPFS
+</span></span><span class=line><span class=cl>                 ↓
+</span></span><span class=line><span class=cl>                CID
+</span></span><span class=line><span class=cl>                 ↓
+</span></span><span class=line><span class=cl>         写入 ipfs-history
+</span></span><span class=line><span class=cl>                 ↓
+</span></span><span class=line><span class=cl>       history/YYYY-MM.jsonl
+</span></span><span class=line><span class=cl>                 +
+</span></span><span class=line><span class=cl>            months.json
+</span></span></code></pre></div><h4 id=玩时光机的时候>玩时光机的时候</h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>打开 Hugo 静态页面
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>读取 months.json + latest.json
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>从全部历史快照中随机一个
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>读取对应月份的 JSONL
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>取得 CID
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>播放穿越效果
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>iframe 加载 IPFS Gateway
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>显示过去的博客
+</span></span></code></pre></div><p>整个过程中没有：</p><ul><li>数据库；</li><li>动态后端；</li><li>历史查询 API；</li><li>专门的版本管理服务。</li></ul><p>用到的还是博客本身已有的东西：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Hugo
+</span></span><span class=line><span class=cl>+
+</span></span><span class=line><span class=cl>GitHub Actions
+</span></span><span class=line><span class=cl>+
+</span></span><span class=line><span class=cl>Git
+</span></span><span class=line><span class=cl>+
+</span></span><span class=line><span class=cl>IPFS
+</span></span><span class=line><span class=cl>+
+</span></span><span class=line><span class=cl>一点 JavaScript
+</span></span></code></pre></div><p>最后拼出来这么一个小功能。</p><h2 id=总结>总结</h2><p>最开始把博客内容托管到 IPFS，更多还是为了折腾。</p><p>当时看到网站真的能从 IPFS 上完整跑起来，还是挺有意思的。</p><p>但折腾完成以后，IPFS 和博客本身其实并没有真正产生联系。</p><p>对于平时访问博客的人来说：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>有没有 IPFS
+</span></span></code></pre></div><p>没有任何区别。</p><p>直到后来想到：</p><blockquote><p>每一次发布产生的 CID，本身不就是一个博客历史快照吗？</p></blockquote><p>于是把这些原本孤立的 CID 记录下来，再随机选一个跳回去。</p><p>时光机就这么出来了。</p><p>它没有解决什么特别重要的问题。</p><p>不会提高博客性能。</p><p>不会提高 SEO。</p><p>甚至从实用角度来说，一个历史版本列表可能都比它更有用。</p><p>但我最后还是没有做列表。</p><p>因为：</p><blockquote><p><strong>列表是拿来查东西的，时光机是拿来玩的。</strong></p></blockquote><p>点一下。</p><p>不知道会回到什么时候。</p><p>看看以前的首页。</p><p>看看过去写过的文章。</p><p>偶尔还能看到一些自己已经忘记的东西。</p><p>点击<a href=https://liudon.com/time>时光机</a>，看看它会带你回到哪一天吧。</p></div></div><section class=terminal-comments id=comments data-env-id=https://comment.liudon.com data-region data-lang=zh-CN data-path=/posts/hugo-ipfs-time-machine/ data-script=https://cdn.jsdelivr.net/npm/twikoo@2.0.9/dist/twikoo.min.js data-integrity aria-label=Comments><div class=terminal-comments__header><span class=terminal-prompt>$</span>
+<span class=terminal-cmd>twikoo</span>
+<span class=terminal-comments__args>--page /posts/hugo-ipfs-time-machine/</span>
+<span class=terminal-comments__status id=comments-status hidden></span>
+<button type=button class=terminal-comments__retry id=comments-retry hidden>retry</button></div><div class=terminal-comments__body><div class=terminal-comments__loading id=comments-loading role=status aria-live=polite><span class=terminal-comments__dots aria-hidden=true><span>.</span><span>.</span><span>.</span></span>
+<span class=terminal-comments__loading-text>loading comments</span>
+<span class=terminal-cursor aria-hidden=true></span></div><div id=twikoo-container></div><noscript><p class=terminal-comments__noscript>JavaScript is required to load comments.</p></noscript></div></section><nav class=terminal-section-nav aria-label="Previous and next posts"><a class=terminal-section-nav__btn href=../../posts/the-trip-of-shanxi/><span class=terminal-section-nav__arrow>&#8592;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>prev</span>
+<span class=terminal-section-nav__title>山西之旅</span>
+</span></a><a class="terminal-section-nav__btn terminal-section-nav__btn--next" href=../../posts/twikoo-2-netlify-cors/><span class=terminal-section-nav__arrow>&#8594;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>next</span>
+<span class=terminal-section-nav__title>Twikoo 2.x 升级踩坑：Netlify CORS 报错与解决方案</span></span></a></nav><footer class=terminal-footer><div class=terminal-footer-line><span class=terminal-prompt>$</span> echo "Maintained by Liudon"</div><div class=terminal-footer-output>Maintained by <a href=../../>Liudon</a> | Last updated 2026-09-21</div><div class=terminal-status-bar><span class=terminal-status-item>NORMAL</span>
+<span class=terminal-status-item>index.md</span>
+<span class=terminal-status-item>words: 5276</span>
+<span class="terminal-status-item terminal-status-right">EOF</span></div></footer></div></div></article><aside class=terminal-sidebar id=sidebar-toc aria-label="Quick navigation"><div class=terminal-sidebar__header><span class=terminal-sidebar__title><span class=terminal-prompt>$</span> tree</span>
+<button type=button class=terminal-sidebar__hide-btn id=sidebar-collapse aria-label="Toggle sidebar" title="Toggle sidebar (H)"><span class=terminal-sidebar__key>H</span> toggle</button></div><nav class=terminal-sidebar__nav id=sidebar-nav><a class=terminal-sidebar__link href=#%e5%89%8d%e8%a8%80 data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>前言</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%9d%e8%80%83 data-index=1><span class=terminal-sidebar__num>02</span>
+<span class=terminal-sidebar__link-title>思考</span>
+</a><a class=terminal-sidebar__link href=#%e5%ae%9e%e7%8e%b0 data-index=2><span class=terminal-sidebar__num>03</span>
+<span class=terminal-sidebar__link-title>实现</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%95%b4%e4%bd%93%e6%9e%b6%e6%9e%84 data-index=3><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>整体架构</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%8f%91%e5%b8%83%e6%97%b6%e7%94%9f%e6%88%90%e5%b9%b6%e8%ae%b0%e5%bd%95%e5%8e%86%e5%8f%b2%e5%bf%ab%e7%85%a7 data-index=4><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>发布时：生成并记录历史快照</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#ipfs-%e5%bf%ab%e7%85%a7%e7%b4%a2%e5%bc%95%e6%80%8e%e4%b9%88%e7%bb%84%e7%bb%87 data-index=5><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>IPFS 快照索引怎么组织</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%8e%86%e5%8f%b2%e7%89%88%e6%9c%ac%e9%87%8d%e5%bb%ba data-index=6><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>历史版本重建</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e7%a9%bf%e8%b6%8a%e6%97%b6hugo-%e9%a1%b5%e9%9d%a2%e6%80%8e%e4%b9%88%e5%b7%a5%e4%bd%9c data-index=7><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>穿越时：Hugo 页面怎么工作</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%9c%80%e5%90%8e%e6%8a%8a%e4%b8%a4%e6%9d%a1%e6%b5%81%e7%a8%8b%e4%b8%b2%e8%b5%b7%e6%9d%a5 data-index=8><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>最后，把两条流程串起来</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%bb%e7%bb%93 data-index=9><span class=terminal-sidebar__num>10</span>
+<span class=terminal-sidebar__link-title>总结</span></a></nav><div class=terminal-sidebar__footer><span class=terminal-sidebar__key>J</span><span class=terminal-sidebar__key>K</span> nav</div></aside><button type=button class=terminal-sidebar-fab id=sidebar-expand aria-label="Show table of contents" title="Show TOC (H)">
+<span class=terminal-sidebar-fab__icon>☰</span>
+<span class=terminal-sidebar-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-toc-fab" id=toc-toggle aria-label="Toggle table of contents" aria-expanded=false>
+<span class=terminal-mobile-fab__icon>☰</span>
+<span class=terminal-mobile-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-search-fab" data-search-open aria-label=Search>
+<span class=terminal-mobile-fab__icon>/</span>
+<span class=terminal-mobile-fab__label>SEARCH</span></button><div class=terminal-drawer id=toc-drawer aria-hidden=true><div class=terminal-drawer__backdrop id=drawer-backdrop></div><div class=terminal-drawer__content><div class=terminal-drawer__header><span class=terminal-prompt>$</span> ls ./sections/
+<button class=terminal-drawer__close id=drawer-close aria-label="Close navigation">&#215;</button></div><nav class=terminal-drawer__nav id=drawer-nav><a class=terminal-sidebar__link href=#%e5%89%8d%e8%a8%80 data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>前言</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%9d%e8%80%83 data-index=1><span class=terminal-sidebar__num>02</span>
+<span class=terminal-sidebar__link-title>思考</span>
+</a><a class=terminal-sidebar__link href=#%e5%ae%9e%e7%8e%b0 data-index=2><span class=terminal-sidebar__num>03</span>
+<span class=terminal-sidebar__link-title>实现</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%95%b4%e4%bd%93%e6%9e%b6%e6%9e%84 data-index=3><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>整体架构</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%8f%91%e5%b8%83%e6%97%b6%e7%94%9f%e6%88%90%e5%b9%b6%e8%ae%b0%e5%bd%95%e5%8e%86%e5%8f%b2%e5%bf%ab%e7%85%a7 data-index=4><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>发布时：生成并记录历史快照</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#ipfs-%e5%bf%ab%e7%85%a7%e7%b4%a2%e5%bc%95%e6%80%8e%e4%b9%88%e7%bb%84%e7%bb%87 data-index=5><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>IPFS 快照索引怎么组织</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%8e%86%e5%8f%b2%e7%89%88%e6%9c%ac%e9%87%8d%e5%bb%ba data-index=6><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>历史版本重建</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e7%a9%bf%e8%b6%8a%e6%97%b6hugo-%e9%a1%b5%e9%9d%a2%e6%80%8e%e4%b9%88%e5%b7%a5%e4%bd%9c data-index=7><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>穿越时：Hugo 页面怎么工作</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%9c%80%e5%90%8e%e6%8a%8a%e4%b8%a4%e6%9d%a1%e6%b5%81%e7%a8%8b%e4%b8%b2%e8%b5%b7%e6%9d%a5 data-index=8><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>最后，把两条流程串起来</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%bb%e7%bb%93 data-index=9><span class=terminal-sidebar__num>10</span>
+<span class=terminal-sidebar__link-title>总结</span></a></nav></div></div></main><button class=terminal-back-top id=back-top aria-label="Back to top" hidden>
+<span class=terminal-back-top__arrow>&#8593;</span>
+<span class=terminal-back-top__label>TOP</span></button><footer class=site-footer role=contentinfo><p class=site-footer__copyright>&copy; 2026 Liudon &#183; Made with Hugo & Terminal · 京ICP备13029522号-2</p></footer><div class=search-modal id=search-modal role=dialog aria-modal=true aria-label=Search><div class=search-modal__backdrop></div><div class=search-modal__dialog><label class=search-modal__input-row for=search-input><span class="search-modal__prompt terminal-prompt">$</span>
+<span class=terminal-search-fixed>find . -name </span><input class=search-modal__input id=search-input type=text placeholder=query autocomplete=off spellcheck=false></label><div class=search-modal__hint><span class=terminal-key>Enter</span> open&nbsp;&nbsp;<span class=terminal-key>&#8593;</span><span class=terminal-key>&#8595;</span> navigate&nbsp;&nbsp;<span class=terminal-key>Esc</span> close</div><div class=search-modal__results id=search-results></div><div class=search-modal__empty id=search-empty>Type a query to search the site&#8230;</div></div></div><script src=../../js/site.min.2e3c7c5662bddcb9ea47564053b6c79be76f6f6b0821e7dbf425f6efb6d08b6f.js integrity="sha256-Ljx8VmK93LnqR1ZAU7bHm+dvb2sIIefb9CX277bQi28=" crossorigin=anonymous defer></script><script src=../../js/article-comments.min.ad02af1bdddfb88d9e633bbaae895e05d2600adc813e02a307614b286f9ed88e.js integrity="sha256-rQKvG93fuI2eYzu6roleBdJgCtyBPgKjB2FLKG+e2I4=" crossorigin=anonymous defer></script></body></html>

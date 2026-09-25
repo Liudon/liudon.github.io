@@ -1,0 +1,222 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>给 Twikoo 接入 Jev，用 AI 判断博客评论是不是广告 | 流动</title><meta name=description content="给 Twikoo 接入 Jev / System One，通过评论正文、昵称和网址综合判断垃圾评论，并记录实际测试、Prompt 调整和阈值选择过程。"><meta name=author content="Liudon"><meta name=keywords content="Twikoo,Jev,AI,博客优化"><meta name=robots content="index, follow"><link rel=canonical href=https://liudon.com/posts/twikoo-jev-spam-detection/><meta property="og:title" content="给 Twikoo 接入 Jev，用 AI 判断博客评论是不是广告 | 流动"><meta property="og:description" content="给 Twikoo 接入 Jev / System One，通过评论正文、昵称和网址综合判断垃圾评论，并记录实际测试、Prompt 调整和阈值选择过程。"><meta property="og:type" content="article"><meta property="og:url" content="https://liudon.com/posts/twikoo-jev-spam-detection/"><meta property="og:site_name" content="流动"><meta property="article:published_time" content="2026-09-23T09:57:24+08:00"><meta property="article:modified_time" content="2026-09-23T09:57:24+08:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="给 Twikoo 接入 Jev，用 AI 判断博客评论是不是广告 | 流动"><meta name=twitter:description content="给 Twikoo 接入 Jev / System One，通过评论正文、昵称和网址综合判断垃圾评论，并记录实际测试、Prompt 调整和阈值选择过程。"><meta name=theme-color content="#ffffff" media="(prefers-color-scheme: light)"><meta name=theme-color content="#0a0a0a" media="(prefers-color-scheme: dark)"><meta name=msapplication-TileColor content="#ff9500"><link rel=icon type=image/svg+xml href=../../favicon.svg><link rel=icon href=../../favicon.ico><link rel=icon type=image/png sizes=16x16 href=../../favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=../../favicon-32x32.png><link rel=apple-touch-icon href=../../apple-touch-icon.png><link rel=mask-icon href=../../safari-pinned-tab.svg color=#c2410c><script>(function(){try{var t=location.search.match(/[?&]theme=(dark|light)/),e=t?t[1]:localStorage.getItem("theme");e||(e=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"),e==="light"&&document.documentElement.setAttribute("data-theme","light")}catch{}})()</script><link rel="preload stylesheet" href=../../css/site.min.995626dc413a7a4678bb4ce005d893254d4a1024bed3612dc25445863bd925a5.css as=style integrity="sha256-mVYm3EE6ekZ4u0zgBdiTJU1KECS+02EtwlRFhjvZJaU=" crossorigin=anonymous><script>window.__termBase="/",window.__termSearchIndex="search.json"</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","author":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"dateModified":"2026-09-23T09:57:24+08:00","datePublished":"2026-09-23T09:57:24+08:00","description":"给 Twikoo 接入 Jev / System One，通过评论正文、昵称和网址综合判断垃圾评论，并记录实际测试、Prompt 调整和阈值选择过程。","headline":"给 Twikoo 接入 Jev，用 AI 判断博客评论是不是广告","inLanguage":"zh-CN","keywords":["Twikoo Jev","Jev","Twikoo 垃圾评论","博客评论反垃圾","System One","AI 垃圾评论检测"],"mainEntityOfPage":{"@id":"https://liudon.com/posts/twikoo-jev-spam-detection/","@type":"WebPage"},"name":"给 Twikoo 接入 Jev，用 AI 判断博客评论是不是广告","publisher":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"wordCount":2097}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://liudon.com/","name":"流动","position":1},{"@type":"ListItem","item":"https://liudon.com/posts/","name":"文章","position":2},{"@type":"ListItem","item":"https://liudon.com/posts/twikoo-jev-spam-detection/","name":"给 Twikoo 接入 Jev，用 AI 判断博客评论是不是广告","position":3}]}</script><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous fetchpriority=low></script></head><body><a class=sr-only href=#main>Skip to content</a><header class=site-header><div class=site-header__inner><a class=site-logo href=../../ aria-label="流动 - Home">流动</a><nav class=site-nav aria-label="Main navigation"><a href=../../posts/>Posts</a>
+<a href=../../links/>Links</a>
+<a href=https://liudon.com/time/ target=_top>Time</a></nav><div class=header-actions><button type=button class="icon-btn search-trigger" data-search-open aria-label=Search title="Search (/)">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+</button>
+<button type=button class="icon-btn theme-toggle" aria-label="Toggle light and dark mode" title="Toggle light/dark" onclick='(function(){var e=document.documentElement;if(e.getAttribute("data-theme")==="light"){e.removeAttribute("data-theme");try{localStorage.setItem("theme","dark")}catch{}}else{e.setAttribute("data-theme","light");try{localStorage.setItem("theme","light")}catch{}}})()'>
+<svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+<svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</button>
+<button type=button class="icon-btn menu-toggle" id=menu-toggle aria-label="Toggle navigation" aria-expanded=false>
+<span></span><span></span><span></span></button></div></div><div class=mobile-menu-panel id=mobile-menu><nav class=site-nav aria-label="Mobile navigation"><a href=../../posts/>Posts</a>
+<a href=../../links/>Links</a>
+<a href=https://liudon.com/time/ target=_top>Time</a></nav></div></header><main id=main><article class=terminal-guide><div class=terminal-scanlines aria-hidden=true></div><div class=terminal-progress aria-hidden=true><div class=terminal-progress__bar id=reading-progress></div></div><div class=terminal-window><header class=terminal-titlebar><div class=terminal-buttons aria-hidden=true><span class="terminal-btn terminal-btn--close"></span>
+<span class="terminal-btn terminal-btn--minimize"></span>
+<span class="terminal-btn terminal-btn--maximize"></span></div><div class=terminal-title><span class=terminal-prompt>liudon@localhost</span>:<span class=terminal-path>~/blog</span>$ <span class=terminal-cmd>cd /posts/twikoo-jev-spam-detection</span><span class=terminal-cursor aria-hidden=true></span></div></header><div class=terminal-body><div class=terminal-output-header><h1 class=terminal-main-title>给 Twikoo 接入 Jev，用 AI 判断博客评论是不是广告</h1><p class=terminal-description># 给 Twikoo 接入 Jev / System One，通过评论正文、昵称和网址综合判断垃圾评论，并记录实际测试、Prompt 调整和阈值选择过程。</p><div class=terminal-meta><span class=terminal-meta-item><span class=terminal-meta-label>author:</span> Liudon</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>date:</span> 2026-09-23</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>words:</span> 2097</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>read_time:</span> 5m</span></div><div class=terminal-tags><a class=terminal-tag href=../../tags/twikoo/>#Twikoo</a><a class=terminal-tag href=../../tags/jev/>#Jev</a><a class=terminal-tag href=../../tags/ai/>#AI</a><a class=terminal-tag href=../../tags/%E5%8D%9A%E5%AE%A2%E4%BC%98%E5%8C%96/>#博客优化</a></div></div><nav class=terminal-toc aria-label="Table of contents" id=inline-toc><div class=terminal-toc-header><span class=terminal-prompt>$</span> ls -la ./sections/</div><div class=terminal-dir-listing><div class=terminal-dir-header>drwxr-xr-x 9 sections</div><a class=terminal-dir-row href=#%e5%89%8d%e8%a8%80 data-index=0><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>01</span>
+<span class=terminal-dir-name>前言.md</span>
+</a><a class=terminal-dir-row href=#%e5%ae%9e%e7%8e%b0 data-index=1><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>02</span>
+<span class=terminal-dir-name>实现.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#twikoo-%e5%bd%93%e5%89%8d%e7%9a%84%e8%af%84%e8%ae%ba%e6%a3%80%e6%b5%8b%e6%9c%ba%e5%88%b6 data-index=2><span class=terminal-dir-name>└── twikoo-当前的评论检测机制.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#jev-%e8%83%bd%e7%9b%b4%e6%8e%a5%e8%b5%b0-llm-%e5%90%97 data-index=3><span class=terminal-dir-name>└── jev-能直接走-llm-吗.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e6%8e%a5%e5%85%a5-jev data-index=4><span class=terminal-dir-name>└── 接入-jev.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e7%ac%ac%e4%b8%80%e6%ac%a1%e6%b5%8b%e8%af%95 data-index=5><span class=terminal-dir-name>└── 第一次测试.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e8%b0%83%e6%95%b4-instructions data-index=6><span class=terminal-dir-name>└── 调整-instructions.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e5%86%8d%e6%ac%a1%e6%b5%8b%e8%af%95 data-index=7><span class=terminal-dir-name>└── 再次测试.md</span>
+</a><a class=terminal-dir-row href=#%e6%80%bb%e7%bb%93 data-index=8><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>09</span>
+<span class=terminal-dir-name>总结.md</span></a></div></nav><div class=terminal-content><div class=terminal-content-header><span class=terminal-prompt>$</span> less index.md</div><div class=terminal-prose id=prose-content><h2 id=前言>前言</h2><p>最近 Jev 火了，时间线上全是讨论这个新模型的内容。</p><blockquote><p>Jev 是 TypeSafe AI 发布的首个 System One 模型，主要面向软件中的快速、结构化决策。</p></blockquote><p>和 ChatGPT、Claude 这类偏文本生成的大模型不太一样，它更偏向于“做判断”：输入一组状态和问题，直接返回结构化的判断结果以及概率。</p><p>刷微博的时候，发现酱紫表大佬利用 Jev 做了一个判断微博内容是不是广告的插件，详细见<a href=https://weibo.com/3138279871/Rj8amuD0g>原微博</a>。</p><p>刚好这两天折腾了一下 Twikoo 评论，想着能不能把 Jev 的能力加到 Twikoo 里。</p><p>现在有了 AI 助力，咱们说干就干。</p><h2 id=实现>实现</h2><h3 id=twikoo-当前的评论检测机制>Twikoo 当前的评论检测机制</h3><p>我们先来看一下 Twikoo 当前的评论检测机制。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>评论提交
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>长度 / 黑名单 / 禁用词等检查
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>验证码
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>限流
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>外部垃圾评论检测
+</span></span></code></pre></div><p>当评论提交后，会先经过一些前置的基础检查，最后会进入到外部垃圾评论检测机制。</p><p>Twikoo 目前支持了腾讯云内容安全、Akismet 和 LLM 三种方式进行检查。</p><p>这里并不会把一条评论依次交给所有服务判断，它采用的是互斥方式，谁排在前面并且已经配置，就使用谁。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=nx>config</span><span class=p>.</span><span class=nx>QCLOUD_SECRET_ID</span> <span class=o>&amp;&amp;</span> <span class=nx>config</span><span class=p>.</span><span class=nx>QCLOUD_SECRET_KEY</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=c1>// Tencent TMS
+</span></span></span><span class=line><span class=cl><span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=nx>config</span><span class=p>.</span><span class=nx>AKISMET_KEY</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=c1>// Akismet
+</span></span></span><span class=line><span class=cl><span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=nx>config</span><span class=p>.</span><span class=nx>LLM_API_KEY</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=c1>// LLM
+</span></span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><h3 id=jev-能直接走-llm-吗>Jev 能直接走 LLM 吗？</h3><p>既然已经支持 LLM 方式了，能不能直接用 LLM 进行 Jev 的接入呢？</p><p>答案是不行。</p><p>Twikoo 的 LLM 实现走的是 OpenAI Compatible 的文本生成接口，大致流程如下。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Twikoo
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>messages
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>OpenAI Compatible API
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>生成文本
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>{&#34;spam&#34;: true}
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>JSON.parse()
+</span></span></code></pre></div><p>Jev 的接口完全不是这套协议。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>POST /v1/systemone
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>请求数据：
+</span></span><span class=line><span class=cl>state
+</span></span><span class=line><span class=cl>+
+</span></span><span class=line><span class=cl>questions
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>返回：
+</span></span><span class=line><span class=cl>answers.spam.noul
+</span></span></code></pre></div><p>完全是两种不同的接口。</p><p>理论上当然也可以在中间再搞一个兼容层：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Twikoo LLM
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>OpenAI Compatible Bridge
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>Jev System One
+</span></span></code></pre></div><p>但是为了少改几行 Twikoo 代码，反而又多维护一个服务，感觉有点本末倒置。</p><p>所以最终决定，<strong>直接给 Twikoo 增加一个 Jev 检测器</strong>。</p><h3 id=接入-jev>接入 Jev</h3><p>实现本身并不复杂。</p><ul><li>增加配置项</li></ul><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>JEV_API_KEY
+</span></span><span class=line><span class=cl>JEV_API_ENDPOINT
+</span></span><span class=line><span class=cl>JEV_MODEL
+</span></span><span class=line><span class=cl>JEV_SPAM_THRESHOLD
+</span></span></code></pre></div><p>默认值为：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>JEV_API_ENDPOINT=https://api.typesafe.ai/v1/systemone
+</span></span><span class=line><span class=cl>JEV_MODEL=jev-latest
+</span></span><span class=line><span class=cl>JEV_SPAM_THRESHOLD=0.85
+</span></span></code></pre></div><ul><li>调用 Jev</li></ul><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=line><span class=cl><span class=kr>const</span> <span class=nx>response</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>httpPost</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>  <span class=nx>endpoint</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>model</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>state</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>comment</span>: <span class=kt>comment.comment</span> <span class=o>||</span> <span class=s2>&#34;&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nx>nickname</span>: <span class=kt>comment.nick</span> <span class=o>||</span> <span class=s2>&#34;&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nx>website</span>: <span class=kt>comment.link</span> <span class=o>||</span> <span class=s2>&#34;&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>questions</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>spam</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kr>type</span><span class=o>:</span> <span class=s2>&#34;noul&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>instructions</span><span class=o>:</span> <span class=s2>&#34;...&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>Authorization</span><span class=o>:</span> <span class=sb>`Bearer </span><span class=si>${</span><span class=nb>String</span><span class=p>(</span><span class=nx>config</span><span class=p>.</span><span class=nx>JEV_API_KEY</span><span class=p>)</span><span class=si>}</span><span class=sb>`</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=s2>&#34;Content-Type&#34;</span><span class=o>:</span> <span class=s2>&#34;application/json&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>timeout</span>: <span class=kt>30000</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl><span class=p>);</span>
+</span></span></code></pre></div><p>注意，这里把评论正文、昵称和网址这三个信息一起交给它进行判断。</p><p>因为有很多软广告，评论内容看着正常，但是会挂一个引流的昵称和网址。</p><p>所以这里我希望 Jev 判断的不是：</p><blockquote><p>这句话是不是广告？</p></blockquote><p>而是：</p><blockquote><p>这个完整的评论提交行为，是不是在利用博客评论做推广？</p></blockquote><h3 id=第一次测试>第一次测试</h3><p><em>下面这些测试是在调参阶段完成的，当时 JEV_SPAM_THRESHOLD 仍然设置为 0.9，最终默认值是在全部测试完成后才调整为 0.85。</em></p><p>代码写完以后，先用真实 Jev API 测了一下。</p><p>正常评论：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>这个 CORS 问题我之前也遇到过，感谢分享解决方案。
+</span></span></code></pre></div><p>返回：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Jev 判定为 HAM
+</span></span><span class=line><span class=cl>(score=0.0300, threshold=0.9, model=&#34;jev-1.13.0&#34;)
+</span></span></code></pre></div><p>很正常。</p><p>然后测试一个明显广告：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>专业网站建设、SEO 优化、快速提升 Google 排名，
+</span></span><span class=line><span class=cl>价格优惠，联系 example.com
+</span></span></code></pre></div><p>返回：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Jev 判定为 SPAM
+</span></span><span class=line><span class=cl>(score=0.9700, threshold=0.9, model=&#34;jev-1.13.0&#34;)
+</span></span></code></pre></div><p>这个也没问题。</p><p>接下来测试前面说的那种软广告：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>正文：
+</span></span><span class=line><span class=cl>文章写得很好，学习了！
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>昵称：
+</span></span><span class=line><span class=cl>SEO Agency
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>网址：
+</span></span><span class=line><span class=cl>https://example-seo.com
+</span></span></code></pre></div><p>结果却是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Jev 判定为 HAM
+</span></span><span class=line><span class=cl>(score=0.7100, threshold=0.9, model=&#34;jev-1.13.0&#34;)
+</span></span></code></pre></div><p>这个结果就有点意思了。</p><p>虽然最终判断是 HAM，但：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>0.71
+</span></span></code></pre></div><p>已经明显高于正常评论的：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>0.03
+</span></span></code></pre></div><p>也就是说：</p><p><strong>Jev 已经觉得它挺可疑，只是还没有可疑到超过 0.9。</strong></p><p>这时候最简单的办法当然是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>把 threshold 从 0.9 降到 0.7。
+</span></span></code></pre></div><p>但想了一下，没有马上这么做。</p><p>因为降低阈值虽然能提高垃圾评论召回率，也有可能增加正常评论的误杀，所以决定还是优先调整判断规则描述。</p><h3 id=调整-instructions>调整 instructions</h3><p>第一版的内容比较简单：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Is this submission spam for a personal blog? Treat unsolicited commercial advertisements, promotional links, SEO/link spam, scams, meaningless repetitive content, and automated promotional greetings as spam. Treat genuine questions, technical discussions, constructive feedback, and normal greetings as not spam. Consider all state fields, including nickname and website.
+</span></span></code></pre></div><p>第一版其实已经告诉 Jev 要看 nickname 和 website，但对“正文看起来正常，昵称或网址却明显带有推广意图”这种软广告，描述得还不够明确。</p><p>后来重点增加了几条规则：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Evaluate the comment text, nickname, and website together.
+</span></span></code></pre></div><p>以及：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>A harmless-looking comment does not make the submission legitimate
+</span></span><span class=line><span class=cl>if the nickname or website is primarily being used for promotion.
+</span></span></code></pre></div><p>意思就是：</p><blockquote><p>正文看起来无害，并不能证明这是一条正常评论。</p><p>如果昵称或者网站明显用于推广，也应该作为重要判断依据。</p></blockquote><p>同时又增加了一条反方向规则：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Do not penalize genuine personal blogs, developer websites,
+</span></span><span class=line><span class=cl>project pages, or personal homepages...
+</span></span></code></pre></div><p>避免走向另一个极端：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>有网址 = 垃圾评论
+</span></span></code></pre></div><p>我的目标其实很明确。</p><p>需要区分的是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>正常交流 + 正常个人网站
+</span></span></code></pre></div><p>和：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>空洞评论 + 明显商业推广身份
+</span></span></code></pre></div><p>而不是简单看有没有 URL。</p><h3 id=再次测试>再次测试</h3><p>调整 instructions 后，再跑了一轮，这次结果明显好了很多。</p><p><em>以下结果来自本轮真实 API 测试，部分网址使用示例域名替换。</em></p><table><thead><tr><th>正文</th><th>昵称</th><th>网址</th><th>结果</th><th style=text-align:right>Score</th></tr></thead><tbody><tr><td>这个 CORS 问题我之前也遇到过，感谢分享解决方案。</td><td>—</td><td>—</td><td>HAM</td><td style=text-align:right>0.05</td></tr><tr><td>专业网站建设、SEO 优化、快速提升 Google 排名，价格优惠，联系 example.com</td><td>—</td><td>—</td><td>SPAM</td><td style=text-align:right>0.98</td></tr><tr><td>文章写得很好，学习了！</td><td>SEO Agency</td><td>example-seo.com</td><td>SPAM</td><td style=text-align:right>0.95</td></tr><tr><td>我也做了一个类似项目，有些实现思路不太一样，可以交流一下。</td><td>Tom</td><td>tom.example.com</td><td>HAM</td><td style=text-align:right>0.12～0.15</td></tr><tr><td>感谢分享，学到了不少东西。</td><td>Alex</td><td>alex.example.com</td><td>HAM</td><td style=text-align:right>0.22</td></tr><tr><td>感谢分享，学到了很多。</td><td>SEO Agency</td><td>—</td><td>SPAM</td><td style=text-align:right>0.90</td></tr><tr><td>twikoo 2.x 的大版本更新引入的问题，升级到最新的 2.0.7 以上版本就好了</td><td>Alex</td><td>some-company.com</td><td>HAM</td><td style=text-align:right>0.17</td></tr><tr><td>写得真好！</td><td>Liu</td><td>personal-blog.example.com</td><td>HAM</td><td style=text-align:right>0.12</td></tr><tr><td>感谢分享！</td><td>深圳网站建设</td><td>example.com</td><td>SPAM</td><td style=text-align:right>0.90</td></tr></tbody></table><p>其中最明显的就是前面那条软广告。</p><p>同样的数据：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>文章写得很好，学习了！
+</span></span><span class=line><span class=cl>SEO Agency
+</span></span><span class=line><span class=cl>https://example-seo.com
+</span></span></code></pre></div><p>第一版：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>HAM
+</span></span><span class=line><span class=cl>score=0.71
+</span></span></code></pre></div><p>调整 instructions 以后：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>SPAM
+</span></span><span class=line><span class=cl>score=0.95
+</span></span></code></pre></div><p>这一轮测试下来，正常评论的结果基本集中在：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>0.05
+</span></span><span class=line><span class=cl>0.12
+</span></span><span class=line><span class=cl>0.15
+</span></span><span class=line><span class=cl>0.17
+</span></span><span class=line><span class=cl>0.22
+</span></span></code></pre></div><p>软广告则到了：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>0.90
+</span></span><span class=line><span class=cl>0.95
+</span></span></code></pre></div><p>明显广告：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>0.98
+</span></span></code></pre></div><p>中间其实出现了比较大的空档：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>正常评论
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>0.05 ~ 0.22
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>     很大间隔
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>软广告 / 广告
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>0.90 ~ 0.98
+</span></span></code></pre></div><p>考虑到模型结果本身可能存在一定波动，最后还是给它留了一点空间，把默认值调整成：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>JEV_SPAM_THRESHOLD=0.85
+</span></span></code></pre></div><h2 id=总结>总结</h2><p>本来只是看到别人拿 Jev 判断微博广告，觉得挺好玩，没想到放到博客评论里效果也还不错。</p><p>当前实现已提交 PR <a href=https://github.com/twikoojs/twikoo/pull/1182>twikoojs/twikoo#1182</a>，待官方审核。</p><p>后面如果 PR 能合入 Twikoo，等正式版本发布后，我会在博客真实评论环境里继续跑一段时间。</p><p><strong>09/25 日更新：PR 已合入，升级到 2.0.9 及之后的版本即可，<a href=https://twikoo.js.org/faq.html#%E9%85%8D%E7%BD%AE-jev-%E5%8F%8D%E5%9E%83%E5%9C%BE%E6%9C%8D%E5%8A%A1>配置文档</a>。</strong></p></div></div><section class=terminal-comments id=comments data-env-id=https://comment.liudon.com data-region data-lang=zh-CN data-path=/posts/twikoo-jev-spam-detection/ data-script=https://cdn.jsdelivr.net/npm/twikoo@2.0.9/dist/twikoo.min.js data-integrity aria-label=Comments><div class=terminal-comments__header><span class=terminal-prompt>$</span>
+<span class=terminal-cmd>twikoo</span>
+<span class=terminal-comments__args>--page /posts/twikoo-jev-spam-detection/</span>
+<span class=terminal-comments__status id=comments-status hidden></span>
+<button type=button class=terminal-comments__retry id=comments-retry hidden>retry</button></div><div class=terminal-comments__body><div class=terminal-comments__loading id=comments-loading role=status aria-live=polite><span class=terminal-comments__dots aria-hidden=true><span>.</span><span>.</span><span>.</span></span>
+<span class=terminal-comments__loading-text>loading comments</span>
+<span class=terminal-cursor aria-hidden=true></span></div><div id=twikoo-container></div><noscript><p class=terminal-comments__noscript>JavaScript is required to load comments.</p></noscript></div></section><nav class=terminal-section-nav aria-label="Previous and next posts"><a class=terminal-section-nav__btn href=../../posts/twikoo-2-netlify-cors/><span class=terminal-section-nav__arrow>&#8592;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>prev</span>
+<span class=terminal-section-nav__title>Twikoo 2.x 升级踩坑：Netlify CORS 报错与解决方案</span>
+</span></a><a class="terminal-section-nav__btn terminal-section-nav__btn--next" href=../../posts/muse-ai-registration-with-gemini-spark/><span class=terminal-section-nav__arrow>&#8594;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>next</span>
+<span class=terminal-section-nav__title>Muse AI 注册教程：借助 Google Gemini Spark 完成注册</span></span></a></nav><footer class=terminal-footer><div class=terminal-footer-line><span class=terminal-prompt>$</span> echo "Maintained by Liudon"</div><div class=terminal-footer-output>Maintained by <a href=../../>Liudon</a> | Last updated 2026-09-23</div><div class=terminal-status-bar><span class=terminal-status-item>NORMAL</span>
+<span class=terminal-status-item>index.md</span>
+<span class=terminal-status-item>words: 2097</span>
+<span class="terminal-status-item terminal-status-right">EOF</span></div></footer></div></div></article><aside class=terminal-sidebar id=sidebar-toc aria-label="Quick navigation"><div class=terminal-sidebar__header><span class=terminal-sidebar__title><span class=terminal-prompt>$</span> tree</span>
+<button type=button class=terminal-sidebar__hide-btn id=sidebar-collapse aria-label="Toggle sidebar" title="Toggle sidebar (H)"><span class=terminal-sidebar__key>H</span> toggle</button></div><nav class=terminal-sidebar__nav id=sidebar-nav><a class=terminal-sidebar__link href=#%e5%89%8d%e8%a8%80 data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>前言</span>
+</a><a class=terminal-sidebar__link href=#%e5%ae%9e%e7%8e%b0 data-index=1><span class=terminal-sidebar__num>02</span>
+<span class=terminal-sidebar__link-title>实现</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#twikoo-%e5%bd%93%e5%89%8d%e7%9a%84%e8%af%84%e8%ae%ba%e6%a3%80%e6%b5%8b%e6%9c%ba%e5%88%b6 data-index=2><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>Twikoo 当前的评论检测机制</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#jev-%e8%83%bd%e7%9b%b4%e6%8e%a5%e8%b5%b0-llm-%e5%90%97 data-index=3><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>Jev 能直接走 LLM 吗？</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%8e%a5%e5%85%a5-jev data-index=4><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>接入 Jev</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e7%ac%ac%e4%b8%80%e6%ac%a1%e6%b5%8b%e8%af%95 data-index=5><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>第一次测试</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e8%b0%83%e6%95%b4-instructions data-index=6><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>调整 instructions</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%86%8d%e6%ac%a1%e6%b5%8b%e8%af%95 data-index=7><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>再次测试</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%bb%e7%bb%93 data-index=8><span class=terminal-sidebar__num>09</span>
+<span class=terminal-sidebar__link-title>总结</span></a></nav><div class=terminal-sidebar__footer><span class=terminal-sidebar__key>J</span><span class=terminal-sidebar__key>K</span> nav</div></aside><button type=button class=terminal-sidebar-fab id=sidebar-expand aria-label="Show table of contents" title="Show TOC (H)">
+<span class=terminal-sidebar-fab__icon>☰</span>
+<span class=terminal-sidebar-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-toc-fab" id=toc-toggle aria-label="Toggle table of contents" aria-expanded=false>
+<span class=terminal-mobile-fab__icon>☰</span>
+<span class=terminal-mobile-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-search-fab" data-search-open aria-label=Search>
+<span class=terminal-mobile-fab__icon>/</span>
+<span class=terminal-mobile-fab__label>SEARCH</span></button><div class=terminal-drawer id=toc-drawer aria-hidden=true><div class=terminal-drawer__backdrop id=drawer-backdrop></div><div class=terminal-drawer__content><div class=terminal-drawer__header><span class=terminal-prompt>$</span> ls ./sections/
+<button class=terminal-drawer__close id=drawer-close aria-label="Close navigation">&#215;</button></div><nav class=terminal-drawer__nav id=drawer-nav><a class=terminal-sidebar__link href=#%e5%89%8d%e8%a8%80 data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>前言</span>
+</a><a class=terminal-sidebar__link href=#%e5%ae%9e%e7%8e%b0 data-index=1><span class=terminal-sidebar__num>02</span>
+<span class=terminal-sidebar__link-title>实现</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#twikoo-%e5%bd%93%e5%89%8d%e7%9a%84%e8%af%84%e8%ae%ba%e6%a3%80%e6%b5%8b%e6%9c%ba%e5%88%b6 data-index=2><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>Twikoo 当前的评论检测机制</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#jev-%e8%83%bd%e7%9b%b4%e6%8e%a5%e8%b5%b0-llm-%e5%90%97 data-index=3><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>Jev 能直接走 LLM 吗？</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e6%8e%a5%e5%85%a5-jev data-index=4><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>接入 Jev</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e7%ac%ac%e4%b8%80%e6%ac%a1%e6%b5%8b%e8%af%95 data-index=5><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>第一次测试</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e8%b0%83%e6%95%b4-instructions data-index=6><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>调整 instructions</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%86%8d%e6%ac%a1%e6%b5%8b%e8%af%95 data-index=7><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>再次测试</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%bb%e7%bb%93 data-index=8><span class=terminal-sidebar__num>09</span>
+<span class=terminal-sidebar__link-title>总结</span></a></nav></div></div></main><button class=terminal-back-top id=back-top aria-label="Back to top" hidden>
+<span class=terminal-back-top__arrow>&#8593;</span>
+<span class=terminal-back-top__label>TOP</span></button><footer class=site-footer role=contentinfo><p class=site-footer__copyright>&copy; 2026 Liudon &#183; Made with Hugo & Terminal · 京ICP备13029522号-2</p></footer><div class=search-modal id=search-modal role=dialog aria-modal=true aria-label=Search><div class=search-modal__backdrop></div><div class=search-modal__dialog><label class=search-modal__input-row for=search-input><span class="search-modal__prompt terminal-prompt">$</span>
+<span class=terminal-search-fixed>find . -name </span><input class=search-modal__input id=search-input type=text placeholder=query autocomplete=off spellcheck=false></label><div class=search-modal__hint><span class=terminal-key>Enter</span> open&nbsp;&nbsp;<span class=terminal-key>&#8593;</span><span class=terminal-key>&#8595;</span> navigate&nbsp;&nbsp;<span class=terminal-key>Esc</span> close</div><div class=search-modal__results id=search-results></div><div class=search-modal__empty id=search-empty>Type a query to search the site&#8230;</div></div></div><script src=../../js/site.min.2e3c7c5662bddcb9ea47564053b6c79be76f6f6b0821e7dbf425f6efb6d08b6f.js integrity="sha256-Ljx8VmK93LnqR1ZAU7bHm+dvb2sIIefb9CX277bQi28=" crossorigin=anonymous defer></script><script src=../../js/article-comments.min.ad02af1bdddfb88d9e633bbaae895e05d2600adc813e02a307614b286f9ed88e.js integrity="sha256-rQKvG93fuI2eYzu6roleBdJgCtyBPgKjB2FLKG+e2I4=" crossorigin=anonymous defer></script></body></html>

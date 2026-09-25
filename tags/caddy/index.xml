@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Caddy on 流动</title>
+		<link>https://liudon.com/tags/caddy/</link>
+		<description>Recent content in Caddy on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Thu, 30 Jul 2026 10:30:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/caddy/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Caddy 转发 GOST 报 TLS internal error 问题的排查与解决</title>
+				<link>https://liudon.com/posts/caddy-forward-gost-tls-internal-error/</link>
+				<pubDate>Thu, 30 Jul 2026 10:30:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/caddy-forward-gost-tls-internal-error/</guid>
+				<description>GOST 客户端直连 GOST 服务端正常，改为经 Caddy 转发后却报 tls: internal error。本文通过 tshark 抓包定位 TLS 握手失败原因，并给出 domain + ip 参数和 default_sni 两种解决方案。</description>
+			</item>
+	</channel>
+</rss>

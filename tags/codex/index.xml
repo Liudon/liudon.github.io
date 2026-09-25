@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Codex on 流动</title>
+		<link>https://liudon.com/tags/codex/</link>
+		<description>Recent content in Codex on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Thu, 30 Jul 2026 10:48:09 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/codex/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Windows 下 Codex Cli 更新报 Move-Item is denied 错误的解决</title>
+				<link>https://liudon.com/posts/windows-codex-update-failed/</link>
+				<pubDate>Thu, 30 Jul 2026 10:48:09 +0800</pubDate>
+				<guid>https://liudon.com/posts/windows-codex-update-failed/</guid>
+				<description>记录 Windows 下 Codex Cli 更新报 Move-Item is denied 错误的解决过程，最终定位是杀毒软件防护的原因导致。</description>
+			</item>
+	</channel>
+</rss>

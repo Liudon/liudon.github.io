@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Docker on 流动</title>
+		<link>https://liudon.com/tags/docker/</link>
+		<description>Recent content in Docker on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 09 Sep 2026 00:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>WrenAI GenBI Classic 本地部署：Docker &#43; Ollama 配置本地 LLM</title>
+				<link>https://liudon.com/posts/wrenai-local-llm-usage-guide/</link>
+				<pubDate>Sun, 16 Mar 2025 17:28:10 +0800</pubDate>
+				<guid>https://liudon.com/posts/wrenai-local-llm-usage-guide/</guid>
+				<description>&lt;blockquote&gt;&#xA;&lt;p&gt;本文记录 WrenAI GenBI Classic 的 Docker + Ollama 本地模型部署过程。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;&lt;strong&gt;版本说明（2026-09 更新）&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;本文最初写于 2025 年 3 月，配置基于 WrenAI 0.15.x 的 GenBI UI 架构。2026 年 5 月，WrenAI 已将旧的 GenBI 应用归档至 &lt;a href=&#34;https://github.com/Canner/WrenAI/tree/legacy/v1&#34;&gt;&lt;code&gt;legacy/v1&lt;/code&gt;&lt;/a&gt;：&lt;code&gt;wren-ui&lt;/code&gt;、&lt;code&gt;wren-ai-service&lt;/code&gt;、&lt;code&gt;wren-launcher&lt;/code&gt; 与 Docker 部署均属于该路线。它仍可使用，但已冻结，不再获得新功能和安全更新。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

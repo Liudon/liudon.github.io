@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>AI on 流动</title>
+		<link>https://liudon.com/tags/ai/</link>
+		<description>Recent content in AI on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 23 Sep 2026 09:57:24 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/ai/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>给 Twikoo 接入 Jev，用 AI 判断博客评论是不是广告</title>
+				<link>https://liudon.com/posts/twikoo-jev-spam-detection/</link>
+				<pubDate>Wed, 23 Sep 2026 09:57:24 +0800</pubDate>
+				<guid>https://liudon.com/posts/twikoo-jev-spam-detection/</guid>
+				<description>&lt;h2 id=&#34;前言&#34;&gt;前言&lt;/h2&gt;&#xA;&lt;p&gt;最近 Jev 火了，时间线上全是讨论这个新模型的内容。&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;Jev 是 TypeSafe AI 发布的首个 System One 模型，主要面向软件中的快速、结构化决策。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;和 ChatGPT、Claude 这类偏文本生成的大模型不太一样，它更偏向于“做判断”：输入一组状态和问题，直接返回结构化的判断结果以及概率。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>
