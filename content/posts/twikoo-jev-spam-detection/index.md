@@ -417,4 +417,6 @@ JEV_SPAM_THRESHOLD=0.85
 
 当前实现已提交 PR [twikoojs/twikoo#1182](https://github.com/twikoojs/twikoo/pull/1182)，待官方审核。
 
+**09/25 日更新：PR 已合入，升级到 2.0.9 及之后的版本即可，[配置文档](https://twikoo.js.org/faq.html#%E9%85%8D%E7%BD%AE-jev-%E5%8F%8D%E5%9E%83%E5%9C%BE%E6%9C%8D%E5%8A%A1)。**
+
 后面如果 PR 能合入 Twikoo，等正式版本发布后，我会在博客真实评论环境里继续跑一段时间。
