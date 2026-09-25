@@ -35,6 +35,10 @@ show_pagination: false
 
 {{< cards >}}
 {{< card name="Dvel’s Blog" url="https://dvel.me?referer=https://liudon.com" icon="https://dvel.me/avatar.png" description="Less is More." />}}
-{{< card name="林木木木木木" url="https://immmmm.com/?referer=https://liudon.com" icon="https://cdn.sep.cc/avatar/ba83fa02fc4b2ba621514941307e21be?d=identicon" description="木木老师" />}}
-{{< card name="老张博客" url="https://laozhang.org/?referer=https://liudon.com" icon="https://picx.s3.bitiful.net/2023/05/01/644f0e3acd666.png" description="老张头" />}}
+{{< card name="林木木木木木" url="https://immmmm.com?referer=https://liudon.com" icon="https://cdn.sep.cc/avatar/ba83fa02fc4b2ba621514941307e21be?d=identicon" description="木木老师" />}}
+{{< /cards >}}
+
+{{< cards >}}
+{{< card name="老张博客" url="https://laozhang.org?referer=https://liudon.com" icon="https://picx.s3.bitiful.net/2023/05/01/644f0e3acd666.png" description="老张头" />}}
+{{< card name="InkCodes" url="https://inkcodes.com?referer=https://liudon.com" icon="https://weavatar.com/avatar/53e97c1d70144099d065a94b7c0eb71c4f0b3e63bf82da230626abb4acee83b2.webp?s=100" description="读书，学习，睡觉" />}}
 {{< /cards >}}
