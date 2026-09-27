@@ -1,5 +1,16 @@
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 .guide-intro .terminal-main-title {
   margin: 0 0 var(--space-4);
+}
+
+.guide-tree,
+.guide-tree a,
+.guide-tree span {
+  font-size: inherit;
 }
 
 .guide-tree__listing {
