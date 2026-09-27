@@ -7,12 +7,12 @@
     <div class="terminal-body">
       <section class="terminal-content guide-intro" aria-labelledby="guide-title">
         <div class="terminal-content-header"><span class="terminal-prompt">$</span> cat index.md</div>
+        {{- with .Params.ascii }}
+        <div class="terminal-art" aria-hidden="true">
+          {{ partial "ascii.html" (partial "ascii-generate.html" .) }}
+        </div>
+        {{- end }}
         <div class="terminal-prose">
-          {{- with .Params.ascii }}
-          <div class="terminal-art" aria-hidden="true">
-            {{ partial "ascii.html" (partial "ascii-generate.html" .) }}
-          </div>
-          {{- end }}
           <h1 class="terminal-main-title" id="guide-title">{{ .Title }}</h1>
           {{- with .Content }}{{ . }}{{ end }}
         </div>
