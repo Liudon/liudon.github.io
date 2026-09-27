@@ -1,0 +1,38 @@
+.guide-intro .terminal-main-title {
+  margin: 0 0 var(--space-4);
+}
+
+.guide-tree__listing {
+  overflow-x: auto;
+  color: var(--term-text);
+  font-size: var(--font-sm);
+  line-height: 1.9;
+}
+
+.guide-tree__line {
+  min-width: max-content;
+  white-space: pre;
+}
+
+.guide-tree__branch {
+  color: var(--term-text-dim);
+}
+
+.guide-tree__directory {
+  color: var(--term-text);
+}
+
+.guide-tree a {
+  color: var(--term-cyan);
+  border-bottom: 1px dashed var(--term-cyan);
+}
+
+.guide-tree a:hover {
+  color: var(--term-phosphor-bright);
+  border-color: var(--term-phosphor-bright);
+  text-shadow: 0 0 8px var(--term-phosphor-glow);
+}
+
+.guide-missing {
+  color: var(--term-red, #ff5f57);
+}

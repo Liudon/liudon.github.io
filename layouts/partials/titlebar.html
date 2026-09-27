@@ -1,0 +1,21 @@
+{{- $user := site.Params.user | default "user" -}}
+{{- $host := site.Params.host | default "localhost" -}}
+{{- $dir  := site.Params.prompt_dir | default "~" -}}
+{{- $cmd := "ls" -}}
+{{- if .IsHome -}}
+  {{- $cmd = "ls" -}}
+{{- else -}}
+  {{- $path := urls.PathUnescape .RelPermalink -}}
+  {{- if ne .Section "guides" }}{{ $path = strings.TrimSuffix "/" $path }}{{ end -}}
+  {{- $cmd = printf "cd %s" $path -}}
+{{- end -}}
+<header class="terminal-titlebar">
+  <div class="terminal-buttons" aria-hidden="true">
+    <span class="terminal-btn terminal-btn--close"></span>
+    <span class="terminal-btn terminal-btn--minimize"></span>
+    <span class="terminal-btn terminal-btn--maximize"></span>
+  </div>
+  <div class="terminal-title">
+    <span class="terminal-prompt">{{ $user }}@{{ $host }}</span>:<span class="terminal-path">{{ $dir }}</span>$ <span class="terminal-cmd">{{ $cmd }}</span><span class="terminal-cursor" aria-hidden="true"></span>
+  </div>
+</header>

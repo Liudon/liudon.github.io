@@ -1,0 +1,31 @@
+{{ define "main" }}
+<article class="terminal-guide terminal-guide--index">
+  <div class="terminal-scanlines" aria-hidden="true"></div>
+
+  <div class="terminal-window">
+    {{ partial "titlebar.html" . }}
+    <div class="terminal-body">
+      <div class="terminal-output-header">
+        <h1 class="terminal-main-title">{{ .Title }}</h1>
+        {{- with .Description }}<p class="terminal-description"># {{ . }}</p>{{ end }}
+      </div>
+
+      <nav class="terminal-toc" aria-label="Guides">
+        <div class="terminal-toc-header"><span class="terminal-prompt">$</span> ls -la ./guides/</div>
+        <div class="terminal-dir-listing">
+          <div class="terminal-dir-header">total {{ len .RegularPages }}</div>
+          {{- range .RegularPages.ByWeight }}
+          <a class="terminal-dir-row" href="{{ .RelPermalink }}">
+            <span class="terminal-dir-perm">drwxr-xr-x</span>
+            <span class="terminal-dir-date">{{ .Date | time.Format "Jan 02 2006" }}</span>
+            <span class="terminal-dir-name">{{ .Title }}/</span>
+          </a>
+          {{- end }}
+        </div>
+      </nav>
+
+      {{ partial "footer-terminal.html" . }}
+    </div>
+  </div>
+</article>
+{{ end }}

@@ -1,0 +1,12 @@
+{{- $guide := .guide -}}
+{{- $ref := .ref -}}
+{{- with site.GetPage $ref -}}
+<a href="{{ .RelPermalink }}">{{ .Title }}</a>
+{{- else -}}
+  {{- if hugo.IsProduction -}}
+    {{- errorf "Guide %q references missing page %q" $guide.RelPermalink $ref -}}
+  {{- else -}}
+    {{- warnf "Guide %q references missing page %q" $guide.RelPermalink $ref -}}
+<span class="guide-missing">{{ $ref }} [missing]</span>
+  {{- end -}}
+{{- end -}}

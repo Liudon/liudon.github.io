@@ -100,13 +100,17 @@ hasCJKLanguage = true # 自动检测是否包含 中文日文韩文 如果文章
   url = "/posts/"
   weight = 1
 [[menu.main]]
+  name = "Guides"
+  url = "/guides/"
+  weight = 2
+[[menu.main]]
   name = "Links"
   url = "/links/"
-  weight = 2
+  weight = 3
 [[menu.main]]
   name = "Time"
   url = "https://liudon.com/time/"
-  weight = 3
+  weight = 4
   [menu.main.params]
     target = "_top"
 

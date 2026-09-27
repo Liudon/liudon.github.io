@@ -1,0 +1,49 @@
+{{ define "main" }}
+<article class="terminal-guide guide-detail">
+  <div class="terminal-scanlines" aria-hidden="true"></div>
+
+  <div class="terminal-window">
+    {{ partial "titlebar.html" . }}
+    <div class="terminal-body">
+      <section class="terminal-content guide-intro" aria-labelledby="guide-title">
+        <div class="terminal-content-header"><span class="terminal-prompt">$</span> cat index.md</div>
+        <div class="terminal-prose">
+          {{- with .Params.ascii }}
+          <div class="terminal-art" aria-hidden="true">
+            {{ partial "ascii.html" (partial "ascii-generate.html" .) }}
+          </div>
+          {{- end }}
+          <h1 class="terminal-main-title" id="guide-title">{{ .Title }}</h1>
+          {{- with .Content }}{{ . }}{{ end }}
+        </div>
+      </section>
+
+      <nav class="terminal-toc guide-tree" aria-label="{{ .Title }} 阅读路径">
+        <div class="terminal-toc-header"><span class="terminal-prompt">$</span> tree .</div>
+        <div class="guide-tree__listing">
+          <div class="guide-tree__line">.</div>
+          {{- $guide := . -}}
+          {{- $nodes := .Params.tree | default (slice) -}}
+          {{- range $nodeIndex, $node := $nodes -}}
+            {{- $nodeLast := eq (add $nodeIndex 1) (len $nodes) -}}
+            {{- with $node.post }}
+          <div class="guide-tree__line"><span class="guide-tree__branch" aria-hidden="true">{{ if $nodeLast }}└──{{ else }}├──{{ end }}</span> {{ partial "guide-post-link.html" (dict "guide" $guide "ref" .) }}</div>
+            {{- else }}
+              {{- with $node.name }}
+          <div class="guide-tree__line"><span class="guide-tree__branch" aria-hidden="true">{{ if $nodeLast }}└──{{ else }}├──{{ end }}</span> <span class="guide-tree__directory">{{ . }}/</span></div>
+                {{- $posts := $node.posts | default (slice) -}}
+                {{- range $postIndex, $ref := $posts -}}
+                  {{- $postLast := eq (add $postIndex 1) (len $posts) -}}
+          <div class="guide-tree__line"><span class="guide-tree__branch" aria-hidden="true">{{ if $nodeLast }}&nbsp;&nbsp;&nbsp;&nbsp;{{ else }}│&nbsp;&nbsp;&nbsp;{{ end }}{{ if $postLast }}└──{{ else }}├──{{ end }}</span> {{ partial "guide-post-link.html" (dict "guide" $guide "ref" $ref) }}</div>
+                {{- end }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+        </div>
+      </nav>
+
+      {{ partial "footer-terminal.html" . }}
+    </div>
+  </div>
+</article>
+{{ end }}
