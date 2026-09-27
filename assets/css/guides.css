@@ -19,17 +19,19 @@
 }
 
 .guide-tree__directory {
-  color: var(--term-text);
+  color: var(--term-phosphor);
 }
 
 .guide-tree a {
-  color: var(--term-cyan);
-  border-bottom: 1px dashed var(--term-cyan);
+  color: var(--term-phosphor);
+  border-bottom: 0;
+  text-decoration: none;
+  transition: color 0.15s ease, text-shadow 0.15s ease;
 }
 
-.guide-tree a:hover {
+.guide-tree a:hover,
+.guide-tree a:focus-visible {
   color: var(--term-phosphor-bright);
-  border-color: var(--term-phosphor-bright);
   text-shadow: 0 0 8px var(--term-phosphor-glow);
 }
 
