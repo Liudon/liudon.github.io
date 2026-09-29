@@ -30,6 +30,7 @@ tree:
       - /posts/deploy twikoo on netlify
       - /posts/twikoo-2-netlify-cors
       - /posts/twikoo-jev-spam-detection
+      - /posts/twikoo-comment-delay-post-submit
 
   - name: "SEO 与流量"
     posts:
