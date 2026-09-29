@@ -36,9 +36,9 @@
     "reduced_motion": "reduce"
   },
   "source": {
-    "snapshot_count": 89,
-    "latest_cid": "bafybeiaidllwhi4p5w3ctnnjojpqqsy3jqtm3ndgllxb5jwe2fkhkm3bmq",
-    "latest_deployed_at": "2026-09-29T07:44:53Z"
+    "snapshot_count": 90,
+    "latest_cid": "bafybeigbybdwynxteamtucau5us5orrevbuduxmes2ntojtxjsrq2id36u",
+    "latest_deployed_at": "2026-09-29T08:04:52Z"
   },
   "playback_profile": {
     "version": 1,
@@ -53,7 +53,7 @@
       "webp": "1.6.0"
     }
   },
-  "visual_count": 27,
+  "visual_count": 28,
   "frames": [
     {
       "cid": "Qmdiv1UNNYZprByDhLBzNQGVwRWMkjxRfjY1JyL5dAEZV2",
@@ -351,6 +351,17 @@
       "width": 960,
       "height": 967,
       "bytes": 27860
+    },
+    {
+      "cid": "bafybeigbybdwynxteamtucau5us5orrevbuduxmes2ntojtxjsrq2id36u",
+      "deployed_at": "2026-09-29T08:04:52Z",
+      "source_commit": "abc1831bed15281812a9e262d45b42422ed17a05",
+      "screenshot": "screenshots/playback/88954a953b60b81986a34789be2a67110fa7b1da86a7d90d6e7ed7e04224289b.webp",
+      "unchanged_deployments": 0,
+      "same_until": "2026-09-29T08:04:52Z",
+      "width": 960,
+      "height": 967,
+      "bytes": 27878
     }
   ]
 }
