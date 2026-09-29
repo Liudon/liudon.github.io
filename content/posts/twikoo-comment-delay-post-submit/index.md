@@ -15,6 +15,16 @@ keywords:
 description: "一次 Twikoo 评论提交耗时排查：从 QQ SMTP 的 3 秒多延迟，一路追到 POST_SUBMIT 的 5 秒等待窗口，并重新梳理 Netlify 下后置任务的异步执行方式。"
 ---
 
+> **2026/09/29 更新**
+>
+> 文中排查的问题已经修复并合入 Twikoo。
+>
+> 我升级后重新测试，评论请求耗时从原来的 **5-6s** 降到了 **1s 以内**。
+>
+> 有同样问题的，可以将服务端升级到 **2.0.12 或更高版本**。如果使用 Netlify 老部署，还需要按官方更新文档完成一次 Modern Functions 入口迁移。
+>
+> 本文保留完整的排查过程。
+
 ## 前言
 
 博客的评论系统使用的是 Twikoo，通过部署在 Netlify 上对外服务。
@@ -264,8 +274,14 @@ Netlify 现在提供了 context.waitUntil，刚好适合这里的场景。
 
 一开始怀疑 Jev，接着锁定 SMTP，最后才发现 SMTP 只是把 POST_SUBMIT 里的 5 秒等待窗口暴露了出来。
 
-当前优化 PR 已提，待官方审核合入后就能解决这个问题了。
+这个问题后来提交了两个 PR，目前都已经合入：
 
-[twikoojs/twikoo#1206](https://github.com/twikoojs/twikoo/pull/1206)
+- [twikoojs/twikoo#1206](https://github.com/twikoojs/twikoo/pull/1206)
+- [twikoojs/twikoo-netlify#12](https://github.com/twikoojs/twikoo-netlify/pull/12)
 
-[twikoojs/twikoo-netlify#12](https://github.com/twikoojs/twikoo-netlify/pull/12)
+修复后，Netlify 使用 Modern Functions 的 `context.waitUntil()` 托管后置任务，
+评论保存完成后可以直接返回，SMTP、垃圾检测和其他通知继续在后台执行。
+
+我已经升级到修复后的版本重新测试，评论请求耗时从之前的 **5-6s**，降到了现在的 **1s 以内**。
+
+![优化后的 Twikoo 评论耗时](twikoo-comment-speed-optimization.png)
