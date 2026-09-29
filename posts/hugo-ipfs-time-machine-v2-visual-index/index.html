@@ -1,0 +1,309 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>博客时光机 2.0 后端篇：构建可视索引 - 流动</title><meta name=description content="记录博客时光机 2.0 的可视索引构建过程：如何从 IPFS 历史 CID 中筛出真正发生页面变化的版本。"><meta name=author content="Liudon"><meta name=keywords content="Hugo,IPFS,博客优化"><meta name=robots content="index, follow"><link rel=canonical href=https://liudon.com/posts/hugo-ipfs-time-machine-v2-visual-index/><meta property="og:title" content="博客时光机 2.0 后端篇：构建可视索引 - 流动"><meta property="og:description" content="记录博客时光机 2.0 的可视索引构建过程：如何从 IPFS 历史 CID 中筛出真正发生页面变化的版本。"><meta property="og:type" content="article"><meta property="og:url" content="https://liudon.com/posts/hugo-ipfs-time-machine-v2-visual-index/"><meta property="og:site_name" content="流动"><meta property="article:published_time" content="2026-09-27T21:18:20+08:00"><meta property="article:modified_time" content="2026-09-27T21:18:20+08:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="博客时光机 2.0 后端篇：构建可视索引 - 流动"><meta name=twitter:description content="记录博客时光机 2.0 的可视索引构建过程：如何从 IPFS 历史 CID 中筛出真正发生页面变化的版本。"><meta name=theme-color content="#ffffff" media="(prefers-color-scheme: light)"><meta name=theme-color content="#0a0a0a" media="(prefers-color-scheme: dark)"><meta name=msapplication-TileColor content="#ff9500"><link rel=icon type=image/svg+xml href=../../favicon.svg><link rel=icon href=../../favicon.ico><link rel=icon type=image/png sizes=16x16 href=../../favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=../../favicon-32x32.png><link rel=apple-touch-icon href=../../apple-touch-icon.png><link rel=mask-icon href=../../safari-pinned-tab.svg color=#c2410c><script>(function(){try{var t=location.search.match(/[?&]theme=(dark|light)/),e=t?t[1]:localStorage.getItem("theme");e||(e=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"),e==="light"&&document.documentElement.setAttribute("data-theme","light")}catch{}})()</script><link rel="preload stylesheet" href=../../css/site.min.6fa682fa4a1d97152b2428c23acedb43b7e104a6c0dc40c152412bc9658344e1.css as=style integrity="sha256-b6aC+kodlxUrJCjCOs7bQ7fhBKbA3EDBUkEryWWDROE=" crossorigin=anonymous><script>window.__termBase="/",window.__termSearchIndex="search.json"</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","author":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"dateModified":"2026-09-27T21:18:20+08:00","datePublished":"2026-09-27T21:18:20+08:00","description":"记录博客时光机 2.0 的可视索引构建过程：如何从 IPFS 历史 CID 中筛出真正发生页面变化的版本。","headline":"博客时光机 2.0 后端篇：构建可视索引","inLanguage":"zh-CN","keywords":["Hugo IPFS","IPFS 历史快照","博客时光机","Playwright 截图","页面变化检测"],"mainEntityOfPage":{"@id":"https://liudon.com/posts/hugo-ipfs-time-machine-v2-visual-index/","@type":"WebPage"},"name":"博客时光机 2.0 后端篇：构建可视索引","publisher":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"wordCount":3677}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://liudon.com/","name":"流动","position":1},{"@type":"ListItem","item":"https://liudon.com/posts/","name":"文章","position":2},{"@type":"ListItem","name":"博客时光机 2.0 后端篇：构建可视索引","position":3}]}</script><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous fetchpriority=low></script></head><body><a class=sr-only href=#main>Skip to content</a><header class=site-header><div class=site-header__inner><a class=site-logo href=../../ aria-label="流动 - Home">流动</a><nav class=site-nav aria-label="Main navigation"><a href=../../posts/>Posts</a>
+<a href=../../guides/>Guides</a>
+<a href=../../links/>Links</a>
+<a href=https://liudon.com/time/ target=_top>Time</a></nav><div class=header-actions><button type=button class="icon-btn search-trigger" data-search-open aria-label=Search title="Search (/)">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+</button>
+<button type=button class="icon-btn theme-toggle" aria-label="Toggle light and dark mode" title="Toggle light/dark" onclick='(function(){var e=document.documentElement;if(e.getAttribute("data-theme")==="light"){e.removeAttribute("data-theme");try{localStorage.setItem("theme","dark")}catch{}}else{e.setAttribute("data-theme","light");try{localStorage.setItem("theme","light")}catch{}}})()'>
+<svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+<svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</button>
+<button type=button class="icon-btn menu-toggle" id=menu-toggle aria-label="Toggle navigation" aria-expanded=false>
+<span></span><span></span><span></span></button></div></div><div class=mobile-menu-panel id=mobile-menu><nav class=site-nav aria-label="Mobile navigation"><a href=../../posts/>Posts</a>
+<a href=../../guides/>Guides</a>
+<a href=../../links/>Links</a>
+<a href=https://liudon.com/time/ target=_top>Time</a></nav></div></header><main id=main><article class=terminal-guide><div class=terminal-scanlines aria-hidden=true></div><div class=terminal-progress aria-hidden=true><div class=terminal-progress__bar id=reading-progress></div></div><div class=terminal-window><header class=terminal-titlebar><div class=terminal-buttons aria-hidden=true><span class="terminal-btn terminal-btn--close"></span>
+<span class="terminal-btn terminal-btn--minimize"></span>
+<span class="terminal-btn terminal-btn--maximize"></span></div><div class=terminal-title><span class=terminal-prompt>liudon@localhost</span>:<span class=terminal-path>~/blog</span>$ <span class=terminal-cmd>cd /posts/hugo-ipfs-time-machine-v2-visual-index</span><span class=terminal-cursor aria-hidden=true></span></div></header><div class=terminal-body><div class=terminal-output-header><h1 class=terminal-main-title>博客时光机 2.0 后端篇：构建可视索引</h1><p class=terminal-description># 记录博客时光机 2.0 的可视索引构建过程：如何从 IPFS 历史 CID 中筛出真正发生页面变化的版本。</p><div class=terminal-meta><span class=terminal-meta-item><span class=terminal-meta-label>author:</span> Liudon</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>date:</span> 2026-09-27</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>words:</span> 3677</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>read_time:</span> 8m</span></div><div class=terminal-tags><a class=terminal-tag href=../../tags/hugo/>#Hugo</a><a class=terminal-tag href=../../tags/ipfs/>#IPFS</a><a class=terminal-tag href=../../tags/%E5%8D%9A%E5%AE%A2%E4%BC%98%E5%8C%96/>#博客优化</a></div></div><nav class=terminal-toc aria-label="Table of contents" id=inline-toc><div class=terminal-toc-header><span class=terminal-prompt>$</span> ls -la ./sections/</div><div class=terminal-dir-listing><div class=terminal-dir-header>drwxr-xr-x 12 sections</div><a class=terminal-dir-row href=#%e5%89%8d%e8%a8%80 data-index=0><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>01</span>
+<span class=terminal-dir-name>前言.md</span>
+</a><a class=terminal-dir-row href=#%e6%9c%89-cid%e7%9b%b4%e6%8e%a5%e6%88%aa%e5%9b%be%e4%b8%8d%e5%b0%b1%e8%a1%8c%e4%ba%86 data-index=1><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>02</span>
+<span class=terminal-dir-name>有 CID，直接截图不就行了？.md</span>
+</a><a class=terminal-dir-row href=#%e4%b8%8d%e5%90%8c%e7%9a%84-cid%e6%88%aa%e5%9b%be%e5%8d%b4%e4%b8%80%e6%a0%b7 data-index=2><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>03</span>
+<span class=terminal-dir-name>不同的 CID，截图却一样.md</span>
+</a><a class=terminal-dir-row href=#%e9%82%a3%e5%b0%b1%e6%af%94%e8%be%83%e6%88%aa%e5%9b%be data-index=3><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>04</span>
+<span class=terminal-dir-name>那就比较截图.md</span>
+</a><a class=terminal-dir-row href=#%e6%88%aa%e5%9b%be%e4%b8%80%e6%a0%b7%e7%9a%84%e9%97%ae%e9%a2%98%e4%bb%8d%e7%84%b6%e5%ad%98%e5%9c%a8 data-index=4><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>05</span>
+<span class=terminal-dir-name>截图一样的问题仍然存在.md</span>
+</a><a class=terminal-dir-row href=#%e8%ae%a9%e5%8f%af%e8%a7%86%e6%af%94%e8%be%83%e7%a8%b3%e5%ae%9a%e4%b8%8b%e6%9d%a5 data-index=5><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>06</span>
+<span class=terminal-dir-name>让可视比较稳定下来.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#1-%e4%bd%bf%e7%94%a8%e6%97%a0%e6%8d%9f%e5%9b%be%e7%89%87%e8%bf%9b%e8%a1%8c%e6%af%94%e8%be%83 data-index=6><span class=terminal-dir-name>└── 1. 使用无损图片进行比较.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#2-%e5%9b%ba%e5%ae%9a%e6%88%aa%e5%9b%be%e7%8e%af%e5%a2%83 data-index=7><span class=terminal-dir-name>└── 2. 固定截图环境.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#3-%e5%a2%9e%e5%8a%a0%e6%96%87%e5%ad%97%e4%b8%8e%e5%b1%80%e9%83%a8%e6%af%94%e8%be%83 data-index=8><span class=terminal-dir-name>└── 3. 增加文字与局部比较.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#4-%e8%b0%83%e6%95%b4%e6%af%94%e8%be%83%e5%9f%ba%e5%87%86 data-index=9><span class=terminal-dir-name>└── 4. 调整比较基准.md</span>
+</a><a class=terminal-dir-row href=#%e5%a6%82%e4%bd%95%e9%aa%8c%e6%94%b6 data-index=10><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>07</span>
+<span class=terminal-dir-name>如何验收？.md</span>
+</a><a class=terminal-dir-row href=#%e6%80%bb%e7%bb%93 data-index=11><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>08</span>
+<span class=terminal-dir-name>总结.md</span></a></div></nav><div class=terminal-content><div class=terminal-content-header><span class=terminal-prompt>$</span> less index.md</div><div class=terminal-prose id=prose-content><h2 id=前言>前言</h2><p>上一篇介绍了<a href=../../posts/hugo-ipfs-time-machine-v2/>博客时光机 2.0</a>的更新，这篇来聊聊它背后的实现。</p><p>2.0 想做的事情其实很直观：</p><blockquote><p>让博客从过去开始，一版一版走到今天。</p></blockquote><p>原本以为，把历史页面截下来，按时间播放就行了。</p><p>真正做起来以后才发现，截图只是一个开始。</p><h2 id=有-cid直接截图不就行了>有 CID，直接截图不就行了？</h2><p>在 1.0 版本中，已经记录了每一次 IPFS 发布对应的 CID 和部署时间，保存在 <code>ipfs-history</code> 分支里：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>ipfs-history/
+</span></span><span class=line><span class=cl>├── latest.json
+</span></span><span class=line><span class=cl>├── months.json
+</span></span><span class=line><span class=cl>└── history/
+</span></span><span class=line><span class=cl>    ├── 2026-08.jsonl
+</span></span><span class=line><span class=cl>    └── 2026-09.jsonl
+</span></span></code></pre></div><p>每条历史记录大概包含这些信息：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;cid&#34;</span><span class=p>:</span> <span class=s2>&#34;...&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;source_commit&#34;</span><span class=p>:</span> <span class=s2>&#34;...&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;deployed_at&#34;</span><span class=p>:</span> <span class=s2>&#34;...&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>既然 CID 和时间都有了，那实现起来不就很简单了嘛。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>读取 CID 历史
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>访问对应 IPFS 页面
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>Playwright 完整截图
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>按照部署时间排序
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>前端依次播放
+</span></span></code></pre></div><p>方案上感觉是可行的，接下来先做个 Demo 来验证。</p><p>博客首页的变化最直观，所以第一版就把范围限定在首页。</p><p>实现上也很直接，先从 <code>history/YYYY-MM.jsonl</code> 里读取历史记录，拿到每个版本对应的 CID：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>CID
+</span></span><span class=line><span class=cl> ↓
+</span></span><span class=line><span class=cl>拼接 IPFS Gateway 地址
+</span></span><span class=line><span class=cl> ↓
+</span></span><span class=line><span class=cl>https://liudon.xyz/ipfs/&lt;CID&gt;/
+</span></span></code></pre></div><p>然后用 Playwright 依次访问这些历史页面，对首页进行完整页面截图：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=kr>goto</span><span class=p>(</span><span class=sb>`https://liudon.xyz/ipfs/</span><span class=si>${</span><span class=nx>cid</span><span class=si>}</span><span class=sb>/`</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>await</span> <span class=nx>page</span><span class=p>.</span><span class=nx>screenshot</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>  <span class=nx>path</span><span class=o>:</span> <span class=sb>`</span><span class=si>${</span><span class=nx>cid</span><span class=si>}</span><span class=sb>.png`</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>fullPage</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></div><p>最后按照 deployed_at 排序，前端依次播放这些截图。</p><p>第一版的整个流程大概如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>history/*.jsonl
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>     CID
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>IPFS Gateway
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>  Playwright
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>Full Page Screenshot
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>按时间顺序播放
+</span></span></code></pre></div><p>实现并不复杂，把需求交给 AI，很快就做出了第一版 Demo，看起来方案完全可行。</p><p>但真正把历史版本跑起来以后，第一个问题马上就出现了。</p><h2 id=不同的-cid截图却一样>不同的 CID，截图却一样</h2><p>每个被记录下来的 CID，都对应着一次网站内容发生变化后的构建结果。</p><p>很多 CID 明明不一样，截出来的首页却一模一样。</p><p>有时候只是修改了一篇旧文章正文，或者调整了一个不会出现在首页上的内容，也会产生一次新的构建和新的 CID。</p><p>但首页可能什么都没有发生。</p><p>例如：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>部署记录：A → B → C → D
+</span></span><span class=line><span class=cl>首页状态：①   ①   ①   ②
+</span></span></code></pre></div><p>如果完全按照 CID 播放，看到的就是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>A
+</span></span><span class=line><span class=cl>↓
+</span></span><span class=line><span class=cl>还是 A
+</span></span><span class=line><span class=cl>↓
+</span></span><span class=line><span class=cl>还是 A
+</span></span><span class=line><span class=cl>↓
+</span></span><span class=line><span class=cl>终于变成 B
+</span></span></code></pre></div><p>日期一直在变化，画面却没有变化。</p><p>IPFS 保存的是完整历史，但时光机真正需要展示的，并不是每一次部署，而是那些真正发生变化的时间点。</p><p>问题也随之变成了：怎么判断两个历史版本到底有没有变化？</p><h2 id=那就比较截图>那就比较截图</h2><p>既然不同 CID 的首页可能没有变化，那就直接比较截图。</p><p>第一版采用的是 dHash，把完整截图缩成很小的灰度图，计算图片 Hash，再通过 Hamming Distance 判断两张截图是否足够相似。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>截图 A
+</span></span><span class=line><span class=cl>  ↓
+</span></span><span class=line><span class=cl>dHash
+</span></span><span class=line><span class=cl>  ↓
+</span></span><span class=line><span class=cl>Hamming Distance
+</span></span><span class=line><span class=cl>  ↑
+</span></span><span class=line><span class=cl>dHash
+</span></span><span class=line><span class=cl>  ↑
+</span></span><span class=line><span class=cl>截图 B
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>足够接近 → 跳过
+</span></span><span class=line><span class=cl>差异明显 → 保留
+</span></span></code></pre></div><p>比较方式也很直接，按照 CID 的时间顺序逐个比较：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>A → B
+</span></span><span class=line><span class=cl>B → C
+</span></span><span class=line><span class=cl>C → D
+</span></span></code></pre></div><p>拿全量 CID 索引跑了一遍，当时一共有 63 个历史 CID，经过图片比较去重后，剩下了 31 个可视版本。</p><p>看起来效果不错，正在我高兴的时候，又有了新问题。</p><h2 id=截图一样的问题仍然存在>截图一样的问题仍然存在</h2><p>打开 Demo 一张张往后看，发现里面仍然存在一些肉眼看起来几乎一样的截图。</p><p>第一反应当然还是算法的问题，于是又把 dHash 换成了一版更直接的像素相似度比较。</p><p>因为首页是一张很长的截图，如果整张图直接缩小后再比较，局部变化很容易被稀释，所以这一版同时比较：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>完整页面
+</span></span><span class=line><span class=cl>+
+</span></span><span class=line><span class=cl>页面顶部区域
+</span></span></code></pre></div><p>再根据像素差异和阈值判断是否相同。</p><p>调整了几轮，问题依旧存在，而且定位起来非常麻烦耗时。</p><p>为了快速验证，我一开始把截图的变化筛选和展示逻辑都塞进了 Demo 前端，想着验证完后在线上实施时再进行拆分。</p><p>当某个版本看起来不对时，很难马上知道问题究竟出在哪：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>历史页面真的没变？
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>截图有问题？
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>比较算法误判？
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>CID 和截图对应错了？
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>前端过滤错了？
+</span></span><span class=line><span class=cl>      ↓
+</span></span><span class=line><span class=cl>还是最终展示错图了？
+</span></span></code></pre></div><p>每次都要从头到尾排查一遍，非常耗时间。</p><p>因此决定，在不影响线上 1.0 版本的前提下，提前做拆分的方案：</p><ol><li>后端提前生成 Visual Index 可视索引</li><li>前端只读取 Visual Index 进行展示</li></ol><p>这样两部分角色清晰，实现也变得简单了。</p><p>整个的流程就变成了：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>历史页面
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>截图
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>可视变化比较
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Visual Index
+</span></span><span class=line><span class=cl>   │
+</span></span><span class=line><span class=cl>   ├── 有变化 → 保留
+</span></span><span class=line><span class=cl>   └── 无变化 → 跳过
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Visual Index + 截图
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>   前端时间线展示
+</span></span></code></pre></div><h2 id=让可视比较稳定下来>让可视比较稳定下来</h2><p>按新方案调整后，Visual Index 里仍然保留了一些 CID 不同、但肉眼看起来几乎一样的截图。</p><p>这样问题范围一下就缩小了：不用再怀疑前端展示，只需要继续检查截图和比较逻辑。</p><p>逻辑拆分的好处一下子就感受到了。</p><p>接下来要解决的，就是怎么让这份索引足够稳定、足够可信。</p><h3 id=1-使用无损图片进行比较>1. 使用无损图片进行比较</h3><p>新方案实现时，考虑到前端需要连续加载很多张历史截图，所以截图会先 resize，再转换成 WebP。</p><blockquote><p>给用户看的图片，并不一定适合拿来做像素比较。</p></blockquote><p>resize、WebP 有损编码，本身就会改变像素，这会导致算法上的误判。</p><p>因此决定增加无损截图进行比较：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>历史页面
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>无损截图
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>可视变化比较
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>生成 Visual Index
+</span></span><span class=line><span class=cl>  │
+</span></span><span class=line><span class=cl>  ├── 有变化 → 保留
+</span></span><span class=line><span class=cl>  └── 无变化 → 跳过
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>同时生成
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>有损 WebP + Visual Index
+</span></span><span class=line><span class=cl>         ↓
+</span></span><span class=line><span class=cl>    前端时间线展示
+</span></span></code></pre></div><p>比较始终使用无损截图，前端使用另外生成体积更小的 WebP。</p><p>这样至少先排除了 resize 和有损编码给比较带来的干扰。</p><h3 id=2-固定截图环境>2. 固定截图环境</h3><p>去掉有损图片后，重新跑索引，又发现了新问题。</p><p>重建索引的过程中，发现同一个页面，重新截图，像素结果发生了变化。</p><p>继续排查，发现影响截图结果的东西比想象中多：</p><ul><li>Chromium 版本</li><li>字体和字体抗锯齿</li><li>广告</li><li>动画</li><li>Lazy Load</li><li>图片和 Web Font 是否加载完成</li><li>页面布局是否已经稳定</li></ul><p>也就是说：</p><blockquote><p>页面内容没变，不代表两次截图一定逐像素相同。</p></blockquote><p>最后把这些条件统一成了 Capture Profile，固定截图的环境：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>固定 Chromium
+</span></span><span class=line><span class=cl>固定字体
+</span></span><span class=line><span class=cl>固定 viewport / DPR
+</span></span><span class=line><span class=cl>固定 locale / timezone
+</span></span><span class=line><span class=cl>固定 light mode
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>阻断广告
+</span></span><span class=line><span class=cl>删除广告容器
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>等待 stylesheet
+</span></span><span class=line><span class=cl>等待 image
+</span></span><span class=line><span class=cl>等待 font
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>滚动触发 lazy load
+</span></span><span class=line><span class=cl>再回顶部
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>持续检查文字和布局是否稳定
+</span></span></code></pre></div><p>最开始还想过一个最简单的方案，等三秒再截图。</p><p>后来发现这种方式还是太玄学，加载快的时候白等，加载慢的时候三秒又未必够。</p><p>最终改成了持续采集页面文字和元素布局，连续几次结果都不再变化，才认为页面稳定。</p><p>截图前后还会各检查一次，如果截图过程中页面又动了，这次 Capture 直接作废重试。</p><p>到这里，比较输入算是相对稳定了。</p><h3 id=3-增加文字与局部比较>3. 增加文字与局部比较</h3><p>截图环境稳定以后，再回头检查之前的比较结果，又发现了另一个问题。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>QmYHSNJDhtn3dyqmt5SRra8yWiiSdi82PBs5CuYJLHFsC6
+</span></span><span class=line><span class=cl>↓
+</span></span><span class=line><span class=cl>QmTvL4HCt2mqJ7pPrGT9YCpHAea8kzdEAqqgnpZzj2orui
+</span></span></code></pre></div><p>首页里有一处很小的文字变化：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>57.6K → 58.7K
+</span></span></code></pre></div><p>对于用户来说，这已经是一次真实变化。</p><p>但把它放到整张首页长截图里，只占非常小的一部分。</p><p>这时候如果继续只依赖图片相似度，就会陷入一个比较尴尬的问题。</p><p>阈值放宽一点，可能把这种真实的小变化吞掉。</p><p>阈值收紧一点，又容易把字体抗锯齿、浏览器渲染之类的细碎像素差异留下来。</p><p>既然文字本身就能直接判断，那就没必要再让像素算法去猜。</p><p>因此比较逻辑增加了一层：<strong>优先比较用户真正能看到的文字</strong>。</p><p>截图时同时提取页面 Visible Text，合并连续空格和换行以后进行比较。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>候选页面
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Visible Text 是否变化？
+</span></span><span class=line><span class=cl>   ├── 是 → 直接保留
+</span></span><span class=line><span class=cl>   └── 否 → 再比较图片
+</span></span></code></pre></div><p>这样，只要用户能看到的文字发生了变化，就直接认为产生了新的视觉版本。</p><p>不过 Visible Text 只能解决文字变化问题。</p><p>如果文字完全一样，但页面里的图片、布局、间距或者颜色发生了变化，还是得继续比较截图。</p><p>而首页又是一张很长的图片，如果只计算一个整页差异值，某个很小的局部变化，还是有可能被整张长图平均掉。</p><p><strong>整页变化很小 ≠ 局部没有明显变化</strong></p><p>所以图片比较又增加了局部 Tile：将缩小后的截图划分成一个个小区域，除了整体变化以外，再额外观察局部区域的变化程度。</p><p>最终的流程变成了：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>先比较 Visible Text
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>文字变化
+</span></span><span class=line><span class=cl>   └── 直接保留
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>文字没有变化
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>比较无损图片
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>整体差异 + Tile 局部差异
+</span></span><span class=line><span class=cl>        ↓
+</span></span><span class=line><span class=cl>判断保留 / 跳过
+</span></span></code></pre></div><p>Visible Text 负责判断文字变化；Tile 则用来补充判断图片、布局等局部的像素变化。</p><h3 id=4-调整比较基准>4. 调整比较基准</h3><p>算法继续检查下去以后，又发现比较对象本身也有问题。</p><p>第一版一直比较相邻版本：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>A → B
+</span></span><span class=line><span class=cl>B → C
+</span></span><span class=line><span class=cl>C → D
+</span></span></code></pre></div><p>如果每一次只有一点点变化：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>A → B：没超过阈值
+</span></span><span class=line><span class=cl>B → C：没超过阈值
+</span></span><span class=line><span class=cl>C → D：没超过阈值
+</span></span></code></pre></div><p>每一步可能都被认为相同。</p><p>但这些微小变化不断累积以后，A ↔ D 可能已经形成了比较明显的差异。</p><blockquote><p>相邻部署比较，存在把小变化一点点漂掉的风险。</p></blockquote><p>这种连续的小差异逐步累积，可以理解为一种基准漂移（Baseline Drift）。</p><p>于是 Baseline 也做了调整：不再和上一条 CID 比，而是始终和<strong>最近一个已经被保留下来的视觉版本</strong>进行比较。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>A ← Baseline
+</span></span><span class=line><span class=cl>│
+</span></span><span class=line><span class=cl>├── B vs A → same
+</span></span><span class=line><span class=cl>├── C vs A → same
+</span></span><span class=line><span class=cl>└── D vs A → changed
+</span></span><span class=line><span class=cl>                ↓
+</span></span><span class=line><span class=cl>             保留 D
+</span></span><span class=line><span class=cl>                ↓
+</span></span><span class=line><span class=cl>          D 成为新 Baseline
+</span></span></code></pre></div><p>这样真正判断的是：</p><blockquote><p>当前页面相比最近一次确认过的视觉状态，有没有形成一个新的版本。</p></blockquote><p>到这里，整套比较逻辑才逐渐稳定下来。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>History
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Stable Capture
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Candidate vs Retained Baseline
+</span></span><span class=line><span class=cl>   ↓
+</span></span><span class=line><span class=cl>Visible Text
+</span></span><span class=line><span class=cl>   ├── 变化 ──────────────┐
+</span></span><span class=line><span class=cl>   │                      │
+</span></span><span class=line><span class=cl>   └── 不变               │
+</span></span><span class=line><span class=cl>        ↓                 │
+</span></span><span class=line><span class=cl>   Lossless Pixel Diff    │
+</span></span><span class=line><span class=cl>        ↓                 │
+</span></span><span class=line><span class=cl>    Overall + Tile        │
+</span></span><span class=line><span class=cl>        ↓                 │
+</span></span><span class=line><span class=cl>      有变化 ─────────────┤
+</span></span><span class=line><span class=cl>        │                 │
+</span></span><span class=line><span class=cl>      无变化              ↓
+</span></span><span class=line><span class=cl>        ↓             保留 Candidate
+</span></span><span class=line><span class=cl>       跳过                ↓
+</span></span><span class=line><span class=cl>                    更新 Baseline
+</span></span><span class=line><span class=cl>                          ↓
+</span></span><span class=line><span class=cl>                     Visual Index
+</span></span></code></pre></div><h2 id=如何验收>如何验收？</h2><p>算法调到这里，剩下的问题就是：</p><blockquote><p>怎么确认它真的判断对了？</p></blockquote><p>最开始的办法很原始，在 Demo 里一张一张往后点，再自己用肉眼找变化。</p><p>次数少的时候还能看，几十张以后就开始怀疑人生了。</p><p>所以又做了一轮改动：</p><p>增加 <code>visual-diffs.jsonl</code> 文件，把每一次比较的详细信息都记下来：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>baseline CID
+</span></span><span class=line><span class=cl>candidate CID
+</span></span><span class=line><span class=cl>same / changed
+</span></span><span class=line><span class=cl>reason
+</span></span><span class=line><span class=cl>overall diff
+</span></span><span class=line><span class=cl>max tile diff
+</span></span><span class=line><span class=cl>mean delta
+</span></span><span class=line><span class=cl>changed bounds
+</span></span><span class=line><span class=cl>visible text before / after
+</span></span></code></pre></div><p>然后又单独做了一个 Diff 核对 Demo。</p><p><picture><source type=image/avif srcset="../../posts/hugo-ipfs-time-machine-v2-visual-index/diff-demo.png_320x.avif 320w, ../../posts/hugo-ipfs-time-machine-v2-visual-index/diff-demo.png_480x.avif 480w, ../../posts/hugo-ipfs-time-machine-v2-visual-index/diff-demo.png_720x.avif 720w, ../../posts/hugo-ipfs-time-machine-v2-visual-index/diff-demo.png_1080x.avif 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><source type=image/webp srcset="../../posts/hugo-ipfs-time-machine-v2-visual-index/diff-demo.png_320x.webp 320w, ../../posts/hugo-ipfs-time-machine-v2-visual-index/diff-demo.png_480x.webp 480w, ../../posts/hugo-ipfs-time-machine-v2-visual-index/diff-demo.png_720x.webp 720w, ../../posts/hugo-ipfs-time-machine-v2-visual-index/diff-demo.png_1080x.webp 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><img src=../../posts/hugo-ipfs-time-machine-v2-visual-index/diff-demo.png alt="Diff Demo 效果页" width=1080 height=740 loading=lazy decoding=async></picture></p><p>它不负责展示效果，只回答一个问题：</p><blockquote><p>这一帧为什么被保留？</p></blockquote><p>第一版图片去重，从 63 个历史 CID 中筛出了 31 个可视版本。</p><p>经过截图环境、比较算法和 Baseline 几轮调整后，最终进一步收敛到了 22 个。</p><p>经过人工逐个核对后，确认都能找到对应的页面变化。</p><p>第一步的预生成索引工作，到这里总算是搞定了！</p><h2 id=总结>总结</h2><p>到这里，原来那条 CID 时间线，终于变成了一条真正能够“看见变化”的时间线。</p><p>从中午的一个点子，到晚上方案可行性验证通过。</p><p>太激动了，真的就像回到以前第一次做产品的感觉。</p><p>兴奋地一晚上没有睡好，一心想着下一步前端的展示要怎么做。</p><p>这就是这个版本的后端实现了，下一篇我们来讲讲前端的事情，敬请期待。</p></div></div><section class=terminal-comments id=comments data-env-id=https://comment.liudon.com data-region data-lang=zh-CN data-path=/posts/hugo-ipfs-time-machine-v2-visual-index/ data-script=https://cdn.jsdelivr.net/npm/twikoo@2.0.12/dist/twikoo.min.js data-integrity aria-label=Comments><div class=terminal-comments__header><span class=terminal-prompt>$</span>
+<span class=terminal-cmd>twikoo</span>
+<span class=terminal-comments__args>--page /posts/hugo-ipfs-time-machine-v2-visual-index/</span>
+<span class=terminal-comments__status id=comments-status hidden></span>
+<button type=button class=terminal-comments__retry id=comments-retry hidden>retry</button></div><div class=terminal-comments__body><div class=terminal-comments__loading id=comments-loading role=status aria-live=polite><span class=terminal-comments__dots aria-hidden=true><span>.</span><span>.</span><span>.</span></span>
+<span class=terminal-comments__loading-text>loading comments</span>
+<span class=terminal-cursor aria-hidden=true></span></div><div id=twikoo-container></div><noscript><p class=terminal-comments__noscript>JavaScript is required to load comments.</p></noscript></div></section><nav class=terminal-section-nav aria-label="Previous and next posts"><a class=terminal-section-nav__btn href=../../posts/hugo-ipfs-time-machine-v2/><span class=terminal-section-nav__arrow>&#8592;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>prev</span>
+<span class=terminal-section-nav__title>博客时光机 2.0：在一台 Macintosh 里看见时间</span>
+</span></a><a class="terminal-section-nav__btn terminal-section-nav__btn--next" href=../../posts/twikoo-comment-delay-post-submit/><span class=terminal-section-nav__arrow>&#8594;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>next</span>
+<span class=terminal-section-nav__title>Twikoo 评论为什么这么慢：藏在 POST_SUBMIT 里的 5 秒等待窗口</span></span></a></nav><footer class=terminal-footer><div class=terminal-footer-line><span class=terminal-prompt>$</span> echo "Maintained by Liudon"</div><div class=terminal-footer-output>Maintained by <a href=../../>Liudon</a> | Last updated 2026-09-27</div><div class=terminal-status-bar><span class=terminal-status-item>NORMAL</span>
+<span class=terminal-status-item>index.md</span>
+<span class=terminal-status-item>words: 3677</span>
+<span class="terminal-status-item terminal-status-right">EOF</span></div></footer></div></div></article><aside class=terminal-sidebar id=sidebar-toc aria-label="Quick navigation"><div class=terminal-sidebar__header><span class=terminal-sidebar__title><span class=terminal-prompt>$</span> tree</span>
+<button type=button class=terminal-sidebar__hide-btn id=sidebar-collapse aria-label="Toggle sidebar" title="Toggle sidebar (H)"><span class=terminal-sidebar__key>H</span> toggle</button></div><nav class=terminal-sidebar__nav id=sidebar-nav><a class=terminal-sidebar__link href=#%e5%89%8d%e8%a8%80 data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>前言</span>
+</a><a class=terminal-sidebar__link href=#%e6%9c%89-cid%e7%9b%b4%e6%8e%a5%e6%88%aa%e5%9b%be%e4%b8%8d%e5%b0%b1%e8%a1%8c%e4%ba%86 data-index=1><span class=terminal-sidebar__num>02</span>
+<span class=terminal-sidebar__link-title>有 CID，直接截图不就行了？</span>
+</a><a class=terminal-sidebar__link href=#%e4%b8%8d%e5%90%8c%e7%9a%84-cid%e6%88%aa%e5%9b%be%e5%8d%b4%e4%b8%80%e6%a0%b7 data-index=2><span class=terminal-sidebar__num>03</span>
+<span class=terminal-sidebar__link-title>不同的 CID，截图却一样</span>
+</a><a class=terminal-sidebar__link href=#%e9%82%a3%e5%b0%b1%e6%af%94%e8%be%83%e6%88%aa%e5%9b%be data-index=3><span class=terminal-sidebar__num>04</span>
+<span class=terminal-sidebar__link-title>那就比较截图</span>
+</a><a class=terminal-sidebar__link href=#%e6%88%aa%e5%9b%be%e4%b8%80%e6%a0%b7%e7%9a%84%e9%97%ae%e9%a2%98%e4%bb%8d%e7%84%b6%e5%ad%98%e5%9c%a8 data-index=4><span class=terminal-sidebar__num>05</span>
+<span class=terminal-sidebar__link-title>截图一样的问题仍然存在</span>
+</a><a class=terminal-sidebar__link href=#%e8%ae%a9%e5%8f%af%e8%a7%86%e6%af%94%e8%be%83%e7%a8%b3%e5%ae%9a%e4%b8%8b%e6%9d%a5 data-index=5><span class=terminal-sidebar__num>06</span>
+<span class=terminal-sidebar__link-title>让可视比较稳定下来</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#1-%e4%bd%bf%e7%94%a8%e6%97%a0%e6%8d%9f%e5%9b%be%e7%89%87%e8%bf%9b%e8%a1%8c%e6%af%94%e8%be%83 data-index=6><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>1. 使用无损图片进行比较</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#2-%e5%9b%ba%e5%ae%9a%e6%88%aa%e5%9b%be%e7%8e%af%e5%a2%83 data-index=7><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>2. 固定截图环境</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#3-%e5%a2%9e%e5%8a%a0%e6%96%87%e5%ad%97%e4%b8%8e%e5%b1%80%e9%83%a8%e6%af%94%e8%be%83 data-index=8><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>3. 增加文字与局部比较</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#4-%e8%b0%83%e6%95%b4%e6%af%94%e8%be%83%e5%9f%ba%e5%87%86 data-index=9><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>4. 调整比较基准</span>
+</a><a class=terminal-sidebar__link href=#%e5%a6%82%e4%bd%95%e9%aa%8c%e6%94%b6 data-index=10><span class=terminal-sidebar__num>07</span>
+<span class=terminal-sidebar__link-title>如何验收？</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%bb%e7%bb%93 data-index=11><span class=terminal-sidebar__num>08</span>
+<span class=terminal-sidebar__link-title>总结</span></a></nav><div class=terminal-sidebar__footer><span class=terminal-sidebar__key>J</span><span class=terminal-sidebar__key>K</span> nav</div></aside><button type=button class=terminal-sidebar-fab id=sidebar-expand aria-label="Show table of contents" title="Show TOC (H)">
+<span class=terminal-sidebar-fab__icon>☰</span>
+<span class=terminal-sidebar-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-toc-fab" id=toc-toggle aria-label="Toggle table of contents" aria-expanded=false>
+<span class=terminal-mobile-fab__icon>☰</span>
+<span class=terminal-mobile-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-search-fab" data-search-open aria-label=Search>
+<span class=terminal-mobile-fab__icon>/</span>
+<span class=terminal-mobile-fab__label>SEARCH</span></button><div class=terminal-drawer id=toc-drawer aria-hidden=true><div class=terminal-drawer__backdrop id=drawer-backdrop></div><div class=terminal-drawer__content><div class=terminal-drawer__header><span class=terminal-prompt>$</span> ls ./sections/
+<button class=terminal-drawer__close id=drawer-close aria-label="Close navigation">&#215;</button></div><nav class=terminal-drawer__nav id=drawer-nav><a class=terminal-sidebar__link href=#%e5%89%8d%e8%a8%80 data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>前言</span>
+</a><a class=terminal-sidebar__link href=#%e6%9c%89-cid%e7%9b%b4%e6%8e%a5%e6%88%aa%e5%9b%be%e4%b8%8d%e5%b0%b1%e8%a1%8c%e4%ba%86 data-index=1><span class=terminal-sidebar__num>02</span>
+<span class=terminal-sidebar__link-title>有 CID，直接截图不就行了？</span>
+</a><a class=terminal-sidebar__link href=#%e4%b8%8d%e5%90%8c%e7%9a%84-cid%e6%88%aa%e5%9b%be%e5%8d%b4%e4%b8%80%e6%a0%b7 data-index=2><span class=terminal-sidebar__num>03</span>
+<span class=terminal-sidebar__link-title>不同的 CID，截图却一样</span>
+</a><a class=terminal-sidebar__link href=#%e9%82%a3%e5%b0%b1%e6%af%94%e8%be%83%e6%88%aa%e5%9b%be data-index=3><span class=terminal-sidebar__num>04</span>
+<span class=terminal-sidebar__link-title>那就比较截图</span>
+</a><a class=terminal-sidebar__link href=#%e6%88%aa%e5%9b%be%e4%b8%80%e6%a0%b7%e7%9a%84%e9%97%ae%e9%a2%98%e4%bb%8d%e7%84%b6%e5%ad%98%e5%9c%a8 data-index=4><span class=terminal-sidebar__num>05</span>
+<span class=terminal-sidebar__link-title>截图一样的问题仍然存在</span>
+</a><a class=terminal-sidebar__link href=#%e8%ae%a9%e5%8f%af%e8%a7%86%e6%af%94%e8%be%83%e7%a8%b3%e5%ae%9a%e4%b8%8b%e6%9d%a5 data-index=5><span class=terminal-sidebar__num>06</span>
+<span class=terminal-sidebar__link-title>让可视比较稳定下来</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#1-%e4%bd%bf%e7%94%a8%e6%97%a0%e6%8d%9f%e5%9b%be%e7%89%87%e8%bf%9b%e8%a1%8c%e6%af%94%e8%be%83 data-index=6><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>1. 使用无损图片进行比较</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#2-%e5%9b%ba%e5%ae%9a%e6%88%aa%e5%9b%be%e7%8e%af%e5%a2%83 data-index=7><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>2. 固定截图环境</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#3-%e5%a2%9e%e5%8a%a0%e6%96%87%e5%ad%97%e4%b8%8e%e5%b1%80%e9%83%a8%e6%af%94%e8%be%83 data-index=8><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>3. 增加文字与局部比较</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#4-%e8%b0%83%e6%95%b4%e6%af%94%e8%be%83%e5%9f%ba%e5%87%86 data-index=9><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>4. 调整比较基准</span>
+</a><a class=terminal-sidebar__link href=#%e5%a6%82%e4%bd%95%e9%aa%8c%e6%94%b6 data-index=10><span class=terminal-sidebar__num>07</span>
+<span class=terminal-sidebar__link-title>如何验收？</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%bb%e7%bb%93 data-index=11><span class=terminal-sidebar__num>08</span>
+<span class=terminal-sidebar__link-title>总结</span></a></nav></div></div></main><button class=terminal-back-top id=back-top aria-label="Back to top" hidden>
+<span class=terminal-back-top__arrow>&#8593;</span>
+<span class=terminal-back-top__label>TOP</span></button><footer class=site-footer role=contentinfo><p class=site-footer__copyright>&copy; 2026 Liudon &#183; Made with Hugo & Terminal · 京ICP备13029522号-2</p></footer><div class=search-modal id=search-modal role=dialog aria-modal=true aria-label=Search><div class=search-modal__backdrop></div><div class=search-modal__dialog><label class=search-modal__input-row for=search-input><span class="search-modal__prompt terminal-prompt">$</span>
+<span class=terminal-search-fixed>find . -name </span><input class=search-modal__input id=search-input type=text placeholder=query autocomplete=off spellcheck=false></label><div class=search-modal__hint><span class=terminal-key>Enter</span> open&nbsp;&nbsp;<span class=terminal-key>&#8593;</span><span class=terminal-key>&#8595;</span> navigate&nbsp;&nbsp;<span class=terminal-key>Esc</span> close</div><div class=search-modal__results id=search-results></div><div class=search-modal__empty id=search-empty>Type a query to search the site&#8230;</div></div></div><script src=../../js/site.min.2e3c7c5662bddcb9ea47564053b6c79be76f6f6b0821e7dbf425f6efb6d08b6f.js integrity="sha256-Ljx8VmK93LnqR1ZAU7bHm+dvb2sIIefb9CX277bQi28=" crossorigin=anonymous defer></script><script src=../../js/article-images.min.36b1f0c3c0fe4c914817cc5f696f3d56fc24f26a619e526057479aab45f9e4da.js integrity="sha256-NrHww8D+TJFIF8xfaW89Vvwk8mphnlJgV0eaq0X55No=" crossorigin=anonymous defer></script></body></html>
