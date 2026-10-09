@@ -1,7 +1,11 @@
 {
   "version": 2,
-  "total": 92,
+  "total": 93,
   "months": [
+    {
+      "month": "2026-10",
+      "count": 1
+    },
     {
       "month": "2026-09",
       "count": 77
