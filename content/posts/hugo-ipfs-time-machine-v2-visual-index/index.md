@@ -535,4 +535,6 @@ visible text before / after
 
 兴奋地一晚上没有睡好，一心想着下一步前端的展示要怎么做。
 
-这就是这个版本的后端实现了，下一篇我们来讲讲前端的事情，敬请期待。
+这就是这个版本的后端实现了，至于这些历史截图最后如何展示，以及为什么最终被装进了一台 Macintosh，放在下一篇：
+
+[博客时光机 2.0 前端篇：把时间装进一台 Macintosh](/posts/hugo-ipfs-time-machine-v2-frontend/)

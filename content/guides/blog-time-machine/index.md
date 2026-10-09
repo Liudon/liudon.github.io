@@ -22,6 +22,7 @@ tree:
     posts:
       - /posts/hugo-ipfs-time-machine-v2
       - /posts/hugo-ipfs-time-machine-v2-visual-index
+      - /posts/hugo-ipfs-time-machine-v2-frontend
 ---
 
 从将站点部署到 IPFS、保存历史快照，到时光机 1.0 的随机穿越，再到 2.0 的 Macintosh 可视时间线，这份指南完整记录了项目的演进过程，以及每个阶段解决的问题。

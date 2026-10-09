@@ -92,8 +92,10 @@ description: "记录博客时光机从随机穿越升级到可视时间线的 2.
 
 亲眼看着一个想法，一点点落地成型，恍惚有了一种当年做 ToC 产品的感觉。
 
-这次升级里其实还折腾了不少东西，详细的设计和实现过程，后面再慢慢写。
+这次升级里其实还折腾了不少东西，详细的设计和实现过程，也分别整理成了两篇文章。
 
-关于如何从 IPFS 历史 CID 中筛出真正发生页面变化的版本，可以继续看：[博客时光机 2.0：索引变化](/posts/hugo-ipfs-time-machine-v2-visual-index/)。
+如何从 IPFS 历史 CID 中筛出真正发生页面变化的版本，可以继续看：[博客时光机 2.0 后端篇：构建可视索引](/posts/hugo-ipfs-time-machine-v2-visual-index/)。
+
+前端如何从各种 Demo 一路折腾到最终的 Macintosh 方案，可以继续看：[博客时光机 2.0 前端篇：把时间装进一台 Macintosh](/posts/hugo-ipfs-time-machine-v2-frontend/)。
 
 明天就是中秋节了，祝大家中秋玉快，阖家团圆！
