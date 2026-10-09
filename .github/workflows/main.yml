@@ -394,10 +394,13 @@ jobs:
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         id: ipfs
         timeout-minutes: 10
-        # Use the official v2 tag so compatible v2 fixes are picked up automatically.
-        uses: ipshipyard/ipfs-deploy-action@v2
+        # v3 downloads Kubo from GitHub Releases instead of dist.ipfs.tech.
+        uses: ipshipyard/ipfs-deploy-action@v3
         with:
           path-to-deploy: ./public
+
+          # Keep the current Kubo version while changing only the download path.
+          kubo-version: v0.42.0
 
           # Use the modern deterministic UnixFS/CID profile.
           cid-profile: unixfs-v1-2025
