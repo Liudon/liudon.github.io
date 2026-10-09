@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>指南 on 流动</title>
+		<link>https://liudon.com/guides/</link>
+		<description>Recent content in 指南 on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Sun, 27 Sep 2026 00:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/guides/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Hugo 博客搭建、部署与优化实践</title>
+				<link>https://liudon.com/guides/hugo-blog/</link>
+				<pubDate>Sun, 27 Sep 2026 00:00:00 +0800</pubDate>
+				<guid>https://liudon.com/guides/hugo-blog/</guid>
+				<description>&lt;p&gt;本博客使用 Hugo 生成静态页面，并部署在 Cloudflare Pages 和 IPFS。&lt;/p&gt;&#xA;&lt;p&gt;长期维护过程中，我先后折腾过主题改造、图片加载、访问性能、部署发布、评论系统和搜索收录等问题。&lt;/p&gt;&#xA;&lt;p&gt;这份指南汇集了这些实践，记录每次调整背后的原因、遇到的问题，以及最终采用的实现。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>博客时光机</title>
+				<link>https://liudon.com/guides/blog-time-machine/</link>
+				<pubDate>Sun, 27 Sep 2026 00:00:00 +0800</pubDate>
+				<guid>https://liudon.com/guides/blog-time-machine/</guid>
+				<description>&lt;p&gt;从 1.0 的 IPFS 历史快照与随机穿越，到 2.0 的可视索引与 Macintosh 时间线，这份指南记录博客时光机从想法到实现的完整演进过程。&lt;/p&gt;&#xA;&lt;p&gt;时光机建立在博客的 IPFS 发布链路之上，相关部署与维护记录整理在：&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>AI 口播视频生成实践</title>
+				<link>https://liudon.com/guides/ai-video/</link>
+				<pubDate>Sun, 27 Sep 2026 00:00:00 +0800</pubDate>
+				<guid>https://liudon.com/guides/ai-video/</guid>
+				<description>&lt;p&gt;为了生成自然的 AI 口播视频，我先后部署并测试了多种音色克隆和人物对口型方案。&lt;/p&gt;&#xA;&lt;p&gt;这份指南记录了不同方案的实际效果与取舍，以及如何将这些能力组合起来，最终实现口播短视频二创工具 VideoRemaker。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>
