@@ -129,3 +129,15 @@ hasCJKLanguage = true # 自动检测是否包含 中文日文韩文 如果文章
 
 [taxonomies]
   tag = "tags"
+
+[params.sponsor]
+  enable = true
+  bio = "如果觉得有用，欢迎请我喝杯咖啡"
+
+  [[params.sponsor.wallets]]
+    img = "/wechat-qr.png"
+    title = "[01] WeChat" # optional; omitted captions stay hidden
+
+  [[params.sponsor.wallets]]
+    img = "/alipay-qr.png"
+    title = "[02] Alipay"
