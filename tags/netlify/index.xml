@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Netlify on 流动</title>
+		<link>https://liudon.com/tags/netlify/</link>
+		<description>Recent content in Netlify on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Tue, 29 Sep 2026 10:03:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/netlify/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Twikoo 评论为什么这么慢：藏在 POST_SUBMIT 里的 5 秒等待窗口</title>
+				<link>https://liudon.com/posts/twikoo-comment-delay-post-submit/</link>
+				<pubDate>Tue, 29 Sep 2026 10:03:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/twikoo-comment-delay-post-submit/</guid>
+				<description>&lt;blockquote&gt;&#xA;&lt;p&gt;&lt;strong&gt;2026/09/29 更新&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;文中排查的问题已经修复并合入 Twikoo。&lt;/p&gt;&#xA;&lt;p&gt;我升级后重新测试，评论请求耗时从原来的 &lt;strong&gt;5-6s&lt;/strong&gt; 降到了 &lt;strong&gt;1s 以内&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;p&gt;有同样问题的，可以将服务端升级到 &lt;strong&gt;2.0.12 或更高版本&lt;/strong&gt;。如果使用 Netlify 老部署，还需要按官方更新文档完成一次 Modern Functions 入口迁移。&lt;/p&gt;&#xA;&lt;p&gt;本文保留完整的排查过程。&lt;/p&gt;&#xA;&lt;/blockquote&gt;</description>
+			</item>
+			<item>
+				<title>Twikoo 2.x 升级踩坑：Netlify CORS 报错与解决方案</title>
+				<link>https://liudon.com/posts/twikoo-2-netlify-cors/</link>
+				<pubDate>Tue, 22 Sep 2026 00:48:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/twikoo-2-netlify-cors/</guid>
+				<description>&lt;h2 id=&#34;前言&#34;&gt;前言&lt;/h2&gt;&#xA;&lt;p&gt;刚更新完上一篇&lt;a href=&#34;../../posts/hugo-ipfs-time-machine/&#34;&gt;《我给博客做了一个时光机》&lt;/a&gt;，顺手打开文章看看效果，结果发现评论区挂了。&lt;/p&gt;&#xA;&lt;p&gt;浏览器控制台报错：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Access to XMLHttpRequest at &amp;#39;https://comment.example.com/&amp;#39;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;from origin &amp;#39;https://blog.example.com&amp;#39; has been blocked by CORS policy:&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Response to preflight request doesn&amp;#39;t pass access control check:&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;No &amp;#39;Access-Control-Allow-Origin&amp;#39; header is present on the requested resource.&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;评论服务一直使用 Twikoo + Netlify，之前也运行得好好的，最近并没有修改过 CORS 配置。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>在Netlify上部署Twikoo评论系统</title>
+				<link>https://liudon.com/posts/deploy-twikoo-on-netlify/</link>
+				<pubDate>Thu, 19 Oct 2023 19:46:32 +0800</pubDate>
+				<guid>https://liudon.com/posts/deploy-twikoo-on-netlify/</guid>
+				<description>&lt;blockquote&gt;&#xA;&lt;p&gt;在本篇文章里，我会介绍如何在Netlify上部署Twikoo评论系统，如何接入到静态博客Hugo，以及如何实现Twikoo系统版本自动更新。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;&lt;strong&gt;2026 年更新说明&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;Twikoo 官方目前仍提供 &lt;a href=&#34;https://twikoo.js.org/backend.html#netlify-%E9%83%A8%E7%BD%B2&#34;&gt;Netlify 部署方式&lt;/a&gt;：Fork &lt;code&gt;twikoojs/twikoo-netlify&lt;/code&gt;、配置 &lt;code&gt;MONGODB_URI&lt;/code&gt;，并将前端 &lt;code&gt;envId&lt;/code&gt; 设置为以 &lt;code&gt;/.netlify/functions/twikoo&lt;/code&gt; 结尾的地址。本文的 CORS、根路径 Rewrite 和自动更新属于我在此基础上的实际部署记录。&lt;/p&gt;&#xA;&lt;/blockquote&gt;</description>
+			</item>
+	</channel>
+</rss>

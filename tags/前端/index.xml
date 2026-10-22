@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>前端 on 流动</title>
+		<link>https://liudon.com/tags/%E5%89%8D%E7%AB%AF/</link>
+		<description>Recent content in 前端 on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 09 Oct 2026 08:57:46 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/%E5%89%8D%E7%AB%AF/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>博客时光机 2.0 前端篇：把时间装进一台 Macintosh</title>
+				<link>https://liudon.com/posts/hugo-ipfs-time-machine-v2-frontend/</link>
+				<pubDate>Fri, 09 Oct 2026 08:57:46 +0800</pubDate>
+				<guid>https://liudon.com/posts/hugo-ipfs-time-machine-v2-frontend/</guid>
+				<description>&lt;p&gt;上一篇《&lt;a href=&#34;../../posts/hugo-ipfs-time-machine-v2-visual-index/&#34;&gt;博客时光机 2.0 后端篇：构建可视索引&lt;/a&gt;》讲了后端的实现，如何把完整的 CID 构建历史整理成一条真正有意义的「可视时间线」。&lt;/p&gt;&#xA;&lt;p&gt;后端提前生成好了可视索引，前端只需要按索引展示就好了，但如何实现前端的效果也是折腾了一番。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

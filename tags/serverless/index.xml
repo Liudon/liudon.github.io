@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Serverless on 流动</title>
+		<link>https://liudon.com/tags/serverless/</link>
+		<description>Recent content in Serverless on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Tue, 29 Sep 2026 10:03:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/serverless/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Twikoo 评论为什么这么慢：藏在 POST_SUBMIT 里的 5 秒等待窗口</title>
+				<link>https://liudon.com/posts/twikoo-comment-delay-post-submit/</link>
+				<pubDate>Tue, 29 Sep 2026 10:03:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/twikoo-comment-delay-post-submit/</guid>
+				<description>&lt;blockquote&gt;&#xA;&lt;p&gt;&lt;strong&gt;2026/09/29 更新&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;文中排查的问题已经修复并合入 Twikoo。&lt;/p&gt;&#xA;&lt;p&gt;我升级后重新测试，评论请求耗时从原来的 &lt;strong&gt;5-6s&lt;/strong&gt; 降到了 &lt;strong&gt;1s 以内&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;p&gt;有同样问题的，可以将服务端升级到 &lt;strong&gt;2.0.12 或更高版本&lt;/strong&gt;。如果使用 Netlify 老部署，还需要按官方更新文档完成一次 Modern Functions 入口迁移。&lt;/p&gt;&#xA;&lt;p&gt;本文保留完整的排查过程。&lt;/p&gt;&#xA;&lt;/blockquote&gt;</description>
+			</item>
+	</channel>
+</rss>
