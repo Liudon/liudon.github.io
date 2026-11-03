@@ -434,6 +434,10 @@ cp /data/custom/SnowApp.orig /data/bin/SnowApp.new && mv -f /data/bin/SnowApp.ne
 
 ## 总结
 
+最后做了个订阅额度展示。
+
+![qingping_cgs1_show_ai_quota](IMG_8574.jpg)
+
 这就是我第一次的硬件折腾历程，让老的闲置硬件再次发挥作用。
 
 借助 Claude，完成从进入系统、分析 Qt 资源，到修改 QML 和生成二进制补丁的整个过程，再次感受到 AI 的强大。
