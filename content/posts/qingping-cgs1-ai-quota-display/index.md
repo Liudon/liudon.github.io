@@ -79,14 +79,14 @@ Mac 机器的 IP 并没有固定，这样会导致 QML 查询不到数据。
 
 能不能还是 Mac 本机这一套授权，但是通过公网查询额度呢？
 
+于是就有了这套方案：
+
 ```text
 Codex ───────┐
               ├─ Mac 定时采集 ──SSH──> VPS 静态 quota.json
 OpenCode Go ─┘                            │
                                           └──HTTPS──> 青萍 QML 页面
 ```
-
-于是就有了这套方案：
 
 - Mac 每分钟采集订阅额度数据，并通过 SSH 将 quota.json 写入 VPS。
 
