@@ -64,7 +64,7 @@ mkdir: cannot create directory '/run/service/chrome-cdp': Permission denied
 
 不过，究竟是哪里的权限变了呢？
 
-### s6-overlay 升级了？
+### s6-overlay 版本变了？
 
 对比了两个版本的 Dockerfile，发现使用的 s6-overlay 版本完全相同：
 
@@ -75,22 +75,7 @@ v0.23.0  S6_OVERLAY_VERSION=3.2.3.0
 
 所以不能把问题归因于 s6-overlay 版本变化。
 
-### 当前进程有额外权限吗？
-
-```console
-$ grep -E '^Cap(Eff|Prm)' /proc/self/status
-CapPrm: 0000000000000000
-CapEff: 0000000000000000
-
-$ command -v sudo
-# 无输出
-```
-
-当前脚本确实以普通用户身份运行，没有可用的额外 capability，也没有 `sudo`。
-
-但这只能说明为什么现在写不进去，还解释不了旧版为什么能写。
-
-### `/run/service` 的权限变了
+### /run/service 的权限变了
 
 继续查看目录的属主和权限，发现 `/run/service` 现在由 root 拥有，普通用户没有写权限。
 
@@ -134,7 +119,7 @@ $ ps -eo pid,user,args | grep '[s]6-svscan'
 
 沿着 `profile-gateways` 服务的 `run` 脚本继续查，找到了原因，它的注释明确说明：
 
-> 动态创建的 gateway 服务目录由 `hermes` 用户写入，其中的 `run`、`finish` 等脚本也可由该用户修改，因此不能再交给 root 身份的 `s6-supervise` 执行。
+> 动态创建的 gateway 服务目录由 hermes 用户写入，其中的 `run`、`finish` 等脚本也可由该用户修改，因此不能再交给 root 身份的 `s6-supervise` 执行。
 
 s6 的服务管理方式比较特别：
 
@@ -147,9 +132,11 @@ s6 的服务管理方式比较特别：
 
 这里的关键是：如果 `s6-supervise` 以 root 身份运行，那么它执行的 `run` 脚本也可能拥有 root 权限。
 
-旧版为了让 Hermes 在运行时动态注册不同 profile 的 gateway，会在容器初始化阶段把 `/run/service` 的写权限交给 `hermes`。这样注册服务很方便，却留下一个风险：**普通用户能够写入服务脚本，root 的监督进程却可能执行这些脚本。**如果这条边界被利用，就可能形成提权路径。
+旧版为了让 Hermes 在运行时动态注册不同 profile 的 gateway，会在容器初始化阶段把 `/run/service` 的写权限交给 `hermes`。这样注册服务很方便，却留下一个风险：
 
-为了消除这个提权风险，Hermes 在 v0.23.0 中调整了服务管理方式，对应的修改是 [PR #148251：supervise profile gateways outside the root s6 scandir](https://github.com/NousResearch/hermes-agent/pull/148251)：
+**普通用户能够写入服务脚本，root 的监督进程却可能执行这些脚本。**
+
+如果这条边界被利用，就可能形成提权路径。为了消除这个提权风险，Hermes 在 v0.23.0 中调整了服务管理方式，对应的修改是 [PR #148251：supervise profile gateways outside the root s6 scandir](https://github.com/NousResearch/hermes-agent/pull/148251)：
 
 在 root 管理的服务中保留一个静态的 `profile-gateways` 服务，它启动后先通过 `s6-setuidgid hermes` 降权，再运行第二个 `s6-svscan`。
 
@@ -205,4 +192,4 @@ up (pid 2692 pgid 2692) 6 seconds
 
 于是，我索性把原来自建的 Chrome s6 服务也撤掉了，改为使用 Hermes 提供的浏览器启动器。
 
-这次最大的教训是：升级成功不只是 `hermes doctor` 全绿，平时不常使用的备用功能也需要验证。
+这次的教训是：升级成功不能只看 `hermes doctor` 全绿，平时不常使用的备用功能也需要验证。
