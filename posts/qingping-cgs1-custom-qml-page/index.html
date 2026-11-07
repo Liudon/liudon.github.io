@@ -1,0 +1,271 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>青萍空气检测仪改造记：用 AI 给它加个新页面 - 流动</title><meta name=description content="借助 AI 折腾初代青萍空气检测仪 CGS1：通过 ADB 进入系统，提取并修改 SnowApp 中的 QML，给官方界面加上自定义页面。"><meta name=author content="Liudon"><meta name=keywords content="青萍,QML,AI,硬件折腾"><meta name=robots content="index, follow"><link rel=canonical href=https://liudon.com/posts/qingping-cgs1-custom-qml-page/><meta property="og:title" content="青萍空气检测仪改造记：用 AI 给它加个新页面 - 流动"><meta property="og:description" content="借助 AI 折腾初代青萍空气检测仪 CGS1：通过 ADB 进入系统，提取并修改 SnowApp 中的 QML，给官方界面加上自定义页面。"><meta property="og:type" content="article"><meta property="og:url" content="https://liudon.com/posts/qingping-cgs1-custom-qml-page/"><meta property="og:site_name" content="流动"><meta property="article:published_time" content="2026-11-02T11:39:38+08:00"><meta property="article:modified_time" content="2026-11-02T11:39:38+08:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="青萍空气检测仪改造记：用 AI 给它加个新页面 - 流动"><meta name=twitter:description content="借助 AI 折腾初代青萍空气检测仪 CGS1：通过 ADB 进入系统，提取并修改 SnowApp 中的 QML，给官方界面加上自定义页面。"><meta name=theme-color content="#ffffff" media="(prefers-color-scheme: light)"><meta name=theme-color content="#0a0a0a" media="(prefers-color-scheme: dark)"><meta name=msapplication-TileColor content="#ff9500"><link rel=icon type=image/svg+xml href=../../favicon.svg><link rel=icon href=../../favicon.ico><link rel=icon type=image/png sizes=16x16 href=../../favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=../../favicon-32x32.png><link rel=apple-touch-icon href=../../apple-touch-icon.png><link rel=mask-icon href=../../safari-pinned-tab.svg color=#c2410c><script>(function(){try{var t=location.search.match(/[?&]theme=(dark|light)/),e=t?t[1]:localStorage.getItem("theme");e||(e=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"),e==="light"&&document.documentElement.setAttribute("data-theme","light")}catch{}})()</script><link rel="preload stylesheet" href=../../css/site.min.96c8c88ca1e1201db82c81e83c017b81e2d27feeadc26840a7655f8f5893c5e1.css as=style integrity="sha256-lsjIjKHhIB24LIHoPAF7geLSf+6twmhAp2Vfj1iTxeE=" crossorigin=anonymous><script>window.__termBase="/",window.__termSearchIndex="search.json"</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","author":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"dateModified":"2026-11-02T11:39:38+08:00","datePublished":"2026-11-02T11:39:38+08:00","description":"借助 AI 折腾初代青萍空气检测仪 CGS1：通过 ADB 进入系统，提取并修改 SnowApp 中的 QML，给官方界面加上自定义页面。","headline":"青萍空气检测仪改造记：用 AI 给它加个新页面","inLanguage":"zh-CN","keywords":["青萍","QML","AI","硬件折腾"],"mainEntityOfPage":{"@id":"https://liudon.com/posts/qingping-cgs1-custom-qml-page/","@type":"WebPage"},"name":"青萍空气检测仪改造记：用 AI 给它加个新页面","publisher":{"@id":"https://liudon.com/#publisher","@type":"Person","image":{"@type":"ImageObject","url":"https://liudon.com/apple-touch-icon.png"},"name":"Liudon","url":"https://liudon.com/"},"wordCount":4199}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://liudon.com/","name":"流动","position":1},{"@type":"ListItem","item":"https://liudon.com/posts/","name":"文章","position":2},{"@type":"ListItem","name":"青萍空气检测仪改造记：用 AI 给它加个新页面","position":3}]}</script><meta name=google-site-verification content="rJrwFlRtYvRvSMxmD-zlGY6ozg6aDFMkfavno3ms5Ew"><meta name=google-adsense-account content="ca-pub-4739645989170648"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648" crossorigin=anonymous fetchpriority=low></script></head><body><a class=sr-only href=#main>Skip to content</a><header class=site-header><div class=site-header__inner><a class=site-logo href=../../ aria-label="流动 - Home">流动</a><nav class=site-nav aria-label="Main navigation"><a href=../../posts/>Posts</a>
+<a href=../../guides/>Guides</a>
+<a href=../../links/>Links</a>
+<a href=https://liudon.com/time/ target=_top>Time</a></nav><div class=header-actions><button type=button class="icon-btn search-trigger" data-search-open aria-label=Search title="Search (/)">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+</button>
+<button type=button class="icon-btn theme-toggle" aria-label="Toggle light and dark mode" title="Toggle light/dark" onclick='(function(){var e=document.documentElement;if(e.getAttribute("data-theme")==="light"){e.removeAttribute("data-theme");try{localStorage.setItem("theme","dark")}catch{}}else{e.setAttribute("data-theme","light");try{localStorage.setItem("theme","light")}catch{}}})()'>
+<svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+<svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</button>
+<button type=button class="icon-btn menu-toggle" id=menu-toggle aria-label="Toggle navigation" aria-expanded=false>
+<span></span><span></span><span></span></button></div></div><div class=mobile-menu-panel id=mobile-menu><nav class=site-nav aria-label="Mobile navigation"><a href=../../posts/>Posts</a>
+<a href=../../guides/>Guides</a>
+<a href=../../links/>Links</a>
+<a href=https://liudon.com/time/ target=_top>Time</a></nav></div></header><main id=main><article class=terminal-guide><div class=terminal-scanlines aria-hidden=true></div><div class=terminal-progress aria-hidden=true><div class=terminal-progress__bar id=reading-progress></div></div><div class=terminal-window><header class=terminal-titlebar><div class=terminal-buttons aria-hidden=true><span class="terminal-btn terminal-btn--close"></span>
+<span class="terminal-btn terminal-btn--minimize"></span>
+<span class="terminal-btn terminal-btn--maximize"></span></div><div class=terminal-title><span class=terminal-prompt>liudon@localhost</span>:<span class=terminal-path>~/blog</span>$ <span class=terminal-cmd>cd /posts/qingping-cgs1-custom-qml-page</span><span class=terminal-cursor aria-hidden=true></span></div></header><div class=terminal-body><div class=terminal-output-header><h1 class=terminal-main-title>青萍空气检测仪改造记：用 AI 给它加个新页面</h1><p class=terminal-description># 借助 AI 折腾初代青萍空气检测仪 CGS1：通过 ADB 进入系统，提取并修改 SnowApp 中的 QML，给官方界面加上自定义页面。</p><div class=terminal-meta><span class=terminal-meta-item><span class=terminal-meta-label>author:</span> Liudon</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>date:</span> 2026-11-02</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>words:</span> 4199</span>
+<span class=terminal-meta-item><span class=terminal-meta-label>read_time:</span> 9m</span></div><div class=terminal-tags><a class=terminal-tag href=../../tags/%E9%9D%92%E8%90%8D/>#青萍</a><a class=terminal-tag href=../../tags/qml/>#QML</a><a class=terminal-tag href=../../tags/ai/>#AI</a><a class=terminal-tag href=../../tags/%E7%A1%AC%E4%BB%B6%E6%8A%98%E8%85%BE/>#硬件折腾</a></div></div><nav class=terminal-toc aria-label="Table of contents" id=inline-toc><div class=terminal-toc-header><span class=terminal-prompt>$</span> ls -la ./sections/</div><div class=terminal-dir-listing><div class=terminal-dir-header>drwxr-xr-x 12 sections</div><a class=terminal-dir-row href=#%e5%89%8d%e8%a8%80 data-index=0><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>01</span>
+<span class=terminal-dir-name>前言.md</span>
+</a><a class=terminal-dir-row href=#%e5%85%88%e8%bf%9b%e7%b3%bb%e7%bb%9f data-index=1><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>02</span>
+<span class=terminal-dir-name>先进系统.md</span>
+</a><a class=terminal-dir-row href=#%e5%8a%a8%e6%89%8b%e5%89%8d%e5%85%88%e5%a4%87%e4%bb%bd data-index=2><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>03</span>
+<span class=terminal-dir-name>动手前先备份.md</span>
+</a><a class=terminal-dir-row href=#%e7%ac%ac%e4%b8%80%e6%ac%a1%e5%b0%9d%e8%af%95 data-index=3><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>04</span>
+<span class=terminal-dir-name>第一次尝试.md</span>
+</a><a class=terminal-dir-row href=#%e5%86%8d%e8%bf%9b%e4%b8%80%e6%ad%a5%e8%83%bd%e4%b8%8d%e8%83%bd%e7%9b%b4%e6%8e%a5%e6%98%be%e7%a4%ba%e7%bd%91%e9%a1%b5 data-index=4><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>05</span>
+<span class=terminal-dir-name>再进一步：能不能直接显示网页？.md</span>
+</a><a class=terminal-dir-row href=#%e5%8f%a6%e4%b8%80%e6%9d%a1%e8%b7%af%e6%94%b9%e9%80%a0%e5%ae%98%e6%96%b9%e7%95%8c%e9%9d%a2 data-index=5><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>06</span>
+<span class=terminal-dir-name>另一条路：改造官方界面.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e8%a7%a3%e5%89%96-snowapp data-index=6><span class=terminal-dir-name>└── 解剖 SnowApp.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e5%88%86%e6%9e%90%e5%ae%98%e6%96%b9%e4%b8%bb%e9%a1%b5 data-index=7><span class=terminal-dir-name>└── 分析官方主页.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e9%97%ae%e9%a2%98%e7%a9%ba%e9%97%b4%e4%b8%8d%e5%a4%9f%e6%80%8e%e4%b9%88%e5%8a%9e data-index=8><span class=terminal-dir-name>└── 问题：空间不够怎么办？.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e9%97%ae%e9%a2%98wifi-%e4%b8%80%e7%9b%b4%e8%bf%9e%e4%b8%8d%e4%b8%8a data-index=9><span class=terminal-dir-name>└── 问题：WIFI 一直连不上.md</span>
+</a><a class="terminal-dir-row terminal-dir-row--sub" href=#%e7%95%8c%e9%9d%a2%e5%88%87%e6%8d%a2 data-index=10><span class=terminal-dir-name>└── 界面切换.md</span>
+</a><a class=terminal-dir-row href=#%e6%80%bb%e7%bb%93 data-index=11><span class=terminal-dir-perm>-rw-r--r--</span> <span class=terminal-dir-num>07</span>
+<span class=terminal-dir-name>总结.md</span></a></div></nav><div class=terminal-content><div class=terminal-content-header><span class=terminal-prompt>$</span> less index.md</div><div class=terminal-prose id=prose-content><h2 id=前言>前言</h2><p>最近看到不少人用 AI 折腾旧硬件，各种玩法看得我也有点手痒。</p><p>突然想到家里有一台闲置了好久的青萍空气检测仪，官方系统也很久没有更新过了，正好拿来折腾一下。</p><blockquote><p><strong>风险提示</strong>：下面涉及 root 权限和修改设备上的程序。我只在自己的一台设备上做过，固件版本 <code>4.1.8_0287</code>。照做可能让设备异常，也可能影响保修。动手前先完整备份。</p></blockquote><h2 id=先进系统>先进系统</h2><p>网上查了一下，有个二代机器的改造方案，说是进入设置 → 关于里连点「设备名称」7 次，可以打开开发者选项。</p><p>试了一下，一代机器也可以，顺利开启 ADB 调试模式。</p><p><picture><source type=image/avif srcset="../../posts/qingping-cgs1-custom-qml-page/IMG_8569.jpg_320x.avif 320w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8569.jpg_480x.avif 480w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8569.jpg_720x.avif 720w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8569.jpg_1080x.avif 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><source type=image/webp srcset="../../posts/qingping-cgs1-custom-qml-page/IMG_8569.jpg_320x.webp 320w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8569.jpg_480x.webp 480w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8569.jpg_720x.webp 720w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8569.jpg_1080x.webp 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><img src=../../posts/qingping-cgs1-custom-qml-page/IMG_8569.jpg alt=qingping_cgs1_enable_adb width=1080 height=1440 loading=lazy decoding=async></picture></p><p>Mac 通过 USB 数据线连接设备，进入系统：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>brew install android-platform-tools
+</span></span><span class=line><span class=cl>adb devices
+</span></span><span class=line><span class=cl>adb shell
+</span></span></code></pre></div><p>没想到进去直接就是 root，不用再折腾提权：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>/ # id
+</span></span><span class=line><span class=cl>uid=0(root) gid=0(root)
+</span></span><span class=line><span class=cl>/ # uname -a
+</span></span><span class=line><span class=cl>Linux rockchip 3.10.104 #12 SMP PREEMPT Fri Dec 24 11:00:23 CST 2021 armv7l GNU/Linux
+</span></span><span class=line><span class=cl>/ # grep Hardware /proc/cpuinfo
+</span></span><span class=line><span class=cl>Hardware        : Rockchip RK3128
+</span></span></code></pre></div><p>从内核信息、目录和启动方式来看，它更像一个精简的嵌入式 Linux，而不是安卓。</p><p>再往下看，配置比我想象的有意思：</p><ul><li>四核 Cortex-A7，内存约 225MB。</li><li><code>/</code> 是只读 squashfs（52MB，用满）；<code>/data</code> 是可写的 ext4，约 106MB，剩 75～80MB，重启数据不会丢；<code>/tmp</code> 是内存盘，重启数据就没了。</li><li>系统里有 BusyBox 1.25、<code>qmlscene</code>、<code>node</code>、<code>gdb</code>、<code>curl</code>、<code>wget</code>，没看到编译器。</li><li><code>/proc/asound/cards</code> 显示没有声卡。</li><li>安装了 Qt 5.9.4。</li></ul><p>发现系统里已经内置了 <code>qmlscene</code>，有了现成的 QML 运行环境。</p><p>那是不是不需要重新编译固件，就能画自己的页面了？</p><p>环境信息拿到了，接下来准备动手改造。</p><h2 id=动手前先备份>动手前先备份</h2><p><code>/data</code> 是可写分区，官方程序、配置和设备数据都在这里。</p><p>在正式动手前，先做备份，以免有问题回滚。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 设备上</span>
+</span></span><span class=line><span class=cl>tar cf /tmp/data_backup.tar -C / data
+</span></span><span class=line><span class=cl>md5sum /tmp/data_backup.tar
+</span></span><span class=line><span class=cl><span class=c1># Mac 上</span>
+</span></span><span class=line><span class=cl>adb pull /tmp/data_backup.tar ~/qingping_data_backup.tar
+</span></span><span class=line><span class=cl>md5 ~/qingping_data_backup.tar
+</span></span></code></pre></div><p><em>BusyBox 的 <code>tar</code> 不认 <code>-z</code>，只能打不压缩的包。</em></p><p>备份里有云端凭据和 Wi-Fi 配置，千万别外传。</p><h2 id=第一次尝试>第一次尝试</h2><p>先从最简单的开始：让屏幕显示一句「Hello CGS1」，点一下就退出。</p><p>设备运行 Qt 时要设置 EGLFS、触摸设备和库路径。</p><p>我把官方启动脚本里的环境变量整理到 <code>/data/custom/env.sh</code>，然后写了一个最小的 QML 页面：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>mkdir -p /data/custom
+</span></span><span class=line><span class=cl>cat &gt; /data/custom/env.sh <span class=s>&lt;&lt;&#39;EOF&#39;
+</span></span></span><span class=line><span class=cl><span class=s>mkdir -p /tmp/runtime-root &amp;&amp; chmod 700 /tmp/runtime-root
+</span></span></span><span class=line><span class=cl><span class=s>export XDG_RUNTIME_DIR=/tmp/runtime-root
+</span></span></span><span class=line><span class=cl><span class=s>export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/qt/plugins
+</span></span></span><span class=line><span class=cl><span class=s>export QT_QPA_PLATFORM=eglfs
+</span></span></span><span class=line><span class=cl><span class=s>export QT_QPA_FONTDIR=/usr/lib/fonts
+</span></span></span><span class=line><span class=cl><span class=s>export QT_QPA_GENERIC_PLUGINS=evdevtouch:/dev/input/event0
+</span></span></span><span class=line><span class=cl><span class=s>export QT_QPA_EGLFS_WIDTH=720
+</span></span></span><span class=line><span class=cl><span class=s>export QT_QPA_EGLFS_HEIGHT=720
+</span></span></span><span class=line><span class=cl><span class=s>export QT_QPA_EGLFS_PHYSICAL_WIDTH=720
+</span></span></span><span class=line><span class=cl><span class=s>export QT_QPA_EGLFS_PHYSICAL_HEIGHT=720
+</span></span></span><span class=line><span class=cl><span class=s>export LD_LIBRARY_PATH=/data/lib/:/usr/lib/:$QT_QPA_PLATFORM_PLUGIN_PATH:$QT_QPA_FONTDIR
+</span></span></span><span class=line><span class=cl><span class=s>export QML_IMPORT_PATH=/data/lib/:/usr/qml/
+</span></span></span><span class=line><span class=cl><span class=s>export QML2_IMPORT_PATH=/data/lib/:/usr/qml/
+</span></span></span><span class=line><span class=cl><span class=s>EOF</span>
+</span></span><span class=line><span class=cl>cat &gt; /data/custom/test.qml <span class=s>&lt;&lt;&#39;EOF&#39;
+</span></span></span><span class=line><span class=cl><span class=s>import QtQuick 2.9
+</span></span></span><span class=line><span class=cl><span class=s>Rectangle {
+</span></span></span><span class=line><span class=cl><span class=s>    width: 720; height: 720; color: &#34;#101820&#34;
+</span></span></span><span class=line><span class=cl><span class=s>    Text { anchors.centerIn: parent; color: &#34;white&#34;; font.pixelSize: 48; text: &#34;Hello CGS1&#34; }
+</span></span></span><span class=line><span class=cl><span class=s>    MouseArea { anchors.fill: parent; onClicked: Qt.quit() }
+</span></span></span><span class=line><span class=cl><span class=s>}
+</span></span></span><span class=line><span class=cl><span class=s>EOF</span>
+</span></span><span class=line><span class=cl>sync
+</span></span></code></pre></div><p>启动服务。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>. /data/custom/env.sh
+</span></span><span class=line><span class=cl>qmlscene -platform EGLFS /data/custom/test.qml <span class=p>&amp;</span>
+</span></span></code></pre></div><p>屏幕上"Hello CGS1"闪了一下，立刻又恢复成官方界面。</p><p>原来是官方 <code>SnowApp</code> 还在跑，两个程序抢同一块屏幕，官方的盖了回来。</p><p>杀掉 <code>SnowApp</code>后再跑，发现还是不行。</p><p>原来是还有一个看门狗 <code>/data/bin/watchdog.sh</code>，每 5 秒检查一次，<code>SnowApp</code> 不在就拉起。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>. /data/custom/env.sh
+</span></span><span class=line><span class=cl><span class=nb>kill</span> &lt;看门狗进程号&gt;
+</span></span><span class=line><span class=cl><span class=nb>kill</span> -9 &lt;SnowApp 进程号&gt;
+</span></span><span class=line><span class=cl>qmlscene -platform EGLFS /data/custom/test.qml <span class=p>&amp;</span>
+</span></span></code></pre></div><p>调整脚本执行顺序，这次终于成功了。</p><p><picture><source type=image/avif srcset="../../posts/qingping-cgs1-custom-qml-page/IMG_8571.jpg_320x.avif 320w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8571.jpg_480x.avif 480w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8571.jpg_720x.avif 720w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8571.jpg_1080x.avif 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><source type=image/webp srcset="../../posts/qingping-cgs1-custom-qml-page/IMG_8571.jpg_320x.webp 320w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8571.jpg_480x.webp 480w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8571.jpg_720x.webp 720w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8571.jpg_1080x.webp 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><img src=../../posts/qingping-cgs1-custom-qml-page/IMG_8571.jpg alt=qingping_cgs1_show_hello width=1080 height=1440 loading=lazy decoding=async></picture></p><p>这次屏幕上稳定显示出 &ldquo;Hello CGS1&rdquo;，点一下屏幕退出，说明机器是可以改造的。</p><p>重启机器，就可以回到原来的官方界面了。</p><h2 id=再进一步能不能直接显示网页>再进一步：能不能直接显示网页？</h2><p>既然自己的 QML 能上屏，那能不能直接显示网页？这样后续的可玩性就更大了。</p><p>结果马上就被泼了一盆冷水：</p><p><strong>设备的 Qt 里没有 WebKit 和 WebEngine，系统里也没有浏览器。</strong></p><p>理论上可以交叉编译一份 QtWebKit 放进 <code>/data/lib</code>，但要有和设备 glibc、Qt 5.9.4 编译选项都匹配的工具链，还要补依赖库，而 <code>/data</code> 只剩 80MB、内存只有 225MB，这个工作量太大了。</p><p>看来就只能走 QML 这条路了。</p><h2 id=另一条路改造官方界面>另一条路：改造官方界面</h2><p>官方界面展示了空气质量/设置等信息，如果用第一步的方案就会把官方的这些信息全丢掉，那有没有可能在官方的界面上进行改造呢？</p><h3 id=解剖-snowapp>解剖 SnowApp</h3><p>从备份里拿到 <code>SnowApp</code> 文件。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>tar xf qingping_data_backup.tar data/bin/SnowApp
+</span></span></code></pre></div><p>它是一个 32 位 ARM 的 ELF 可执行文件，而且没有去掉符号表。</p><p>用 <code>nm -C</code> 查看，能直接找到 Qt 资源系统的数据结构：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>$ nm -C data/bin/SnowApp | grep qt_resource
+</span></span><span class=line><span class=cl>002bea48 r qt_resource_struct
+</span></span><span class=line><span class=cl>002c0060 r qt_resource_name
+</span></span><span class=line><span class=cl>002c1ea8 r qt_resource_data
+</span></span><span class=line><span class=cl>...（共 4 组）
+</span></span></code></pre></div><p>Qt 使用资源系统（QRC）将 QML、图片等文件打包到可执行程序中，主要包含三部分：</p><ul><li><code>qt_resource_struct</code>：资源目录树，记录文件的索引和偏移量。</li><li><code>qt_resource_name</code>：文件名信息，使用 UTF-16BE 编码。</li><li><code>qt_resource_data</code>：实际的文件内容，部分文件通过 <code>qCompress</code> 压缩。</li></ul><p>其中，资源数据是连续存放的。每个文件前面有 4 字节的长度信息，后面紧跟文件内容。如果文件经过压缩，内容采用 <code>qCompress</code> 格式，即 4 字节原始长度加一段 zlib 数据。</p><p>目录树中记录着各个资源的偏移量，程序运行时根据这些偏移量查找文件。</p><p>以我们后面要修改的 <code>MainPage.qml</code> 为例，存储结构大致如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>qt_resource_struct（目录树，记录资源偏移量）
+</span></span><span class=line><span class=cl>    MainPage.qml  → 偏移 0x1234
+</span></span><span class=line><span class=cl>    其他页面.qml  → 偏移 0x1234 + 1781 + ...
+</span></span><span class=line><span class=cl>    ...
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>qt_resource_data（数据区，首尾相接）
+</span></span><span class=line><span class=cl> ┌────────────┬──────────────────┬─────────────┐
+</span></span><span class=line><span class=cl> │ 前面的资源 │ MainPage.qml     │ 下一个资源  │
+</span></span><span class=line><span class=cl> │            │ 4 字节长度 + 1777│             │
+</span></span><span class=line><span class=cl> └────────────┴──────────────────┴─────────────┘
+</span></span></code></pre></div><p><em>偏移量 <code>0x1234</code> 仅为示意。</em></p><p>了解资源结构之后，就可以尝试把文件提取出来。</p><p>我借助 AI 写了一个 QRC 解包脚本：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>python3 qrc_dump.py data/bin/SnowApp out/
+</span></span></code></pre></div><p>结果比预想的顺利。</p><p>QML 资源包中一共有 197 个文件，其中 120 个未压缩、77 个使用 zlib 压缩。</p><p>官方界面的 QML 文件都能完整提取出来，而且是可以直接阅读的源码，并没有被编译成机器码。</p><p>这意味着，我们不光能看到官方界面的实现，还有机会直接修改它。</p><h3 id=分析官方主页>分析官方主页</h3><p>主页是 <code>Main/MainPage.qml</code>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-qml data-lang=qml><span class=line><span class=cl>                <span class=k>model:</span> <span class=nx>ListModel</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=kd>id: model</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>ListElement</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                        <span class=k>name:</span> <span class=s2>&#34;airDatasView&#34;</span>
+</span></span><span class=line><span class=cl>                        <span class=k>source:</span> <span class=s2>&#34;qrc:/Main/Views/AirDatas/AirDatasView2.qml&#34;</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>ListElement</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                        <span class=k>name:</span> <span class=s2>&#34;settingView&#34;</span>
+</span></span><span class=line><span class=cl>                        <span class=k>source:</span> <span class=s2>&#34;qrc:/Main/Views/Setting/SettingView.qml&#34;</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>ListElement</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                        <span class=k>name:</span> <span class=s2>&#34;airmxView&#34;</span>
+</span></span><span class=line><span class=cl>                        <span class=k>source:</span> <span class=s2>&#34;qrc:/Main/Views/AirMX/AirmxView.qml&#34;</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>ListElement</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                        <span class=k>name:</span> <span class=s2>&#34;appView&#34;</span>
+</span></span><span class=line><span class=cl>                        <span class=k>source:</span> <span class=s2>&#34;qrc:/Main/Views/App/AppView.qml&#34;</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                    <span class=k>Component.onCompleted:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                        <span class=c1>// 已绑定Eagle，则显示AIRMX界面
+</span></span></span><span class=line><span class=cl>                        <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=nx>appController</span><span class=p>.</span><span class=nx>airmxApp</span><span class=p>.</span><span class=nx>isPaired</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                            <span class=nx>removePage</span><span class=p>(</span><span class=s2>&#34;airmxView&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>                        <span class=p>}</span>
+</span></span><span class=line><span class=cl>                        <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=nx>global</span><span class=p>.</span><span class=nx>isShowAppView</span> <span class=o>||</span> <span class=p>(</span><span class=nx>global</span><span class=p>.</span><span class=nx>product</span> <span class=o>===</span> <span class=nx>Global</span><span class=p>.</span><span class=nx>PROD_HAIER</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                            <span class=nx>removePage</span><span class=p>(</span><span class=s2>&#34;appView&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>                        <span class=p>}</span>
+</span></span><span class=line><span class=cl>                        <span class=c1>// 时间已初始化，则显示汇总界面
+</span></span></span><span class=line><span class=cl>                        <span class=k>if</span> <span class=p>(</span><span class=nx>datetimeManager</span><span class=p>.</span><span class=nx>isInitialized</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                            <span class=nx>insertPage</span><span class=p>(</span><span class=s2>&#34;airDatasView&#34;</span><span class=p>,</span> <span class=s2>&#34;summaryView&#34;</span><span class=p>,</span> <span class=s2>&#34;qrc:/Main/Views/Summary/SummaryView.qml&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>                        <span class=p>}</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span></code></pre></div><p>几个关键发现：</p><ul><li>页面是 <code>PathView</code>，由 <code>ListModel</code> 驱动，每项有 <code>name</code> 和 <code>source</code>，用 <code>Loader</code> 加载。</li><li>已经有 <code>insertPage()</code> 和 <code>removePage()</code>，官方用它们按条件增减页面。</li><li>页码圆点的数量绑定 <code>view.count</code>，页数变了会自动跟着变。</li><li>每次滑动结束，主页会对每个页面调用 <code>restore()</code>，所以新页面必须定义这个函数，哪怕是空的。</li><li>官方页面的读数是绑定在 C++ 暴露的对象上的，比如 <code>airdataController.airCO2</code>，带 <code>name</code>、<code>valueString</code>、<code>unitString</code>、<code>evalutionColor</code>。<strong>新页面可以直接用，不用自己读传感器。</strong></li></ul><p><strong>改动思路</strong>：往列表末尾加一个 <code>ListElement</code>，让它去加载设备上的外置文件 <code>/data/custom/CustomView.qml</code>。</p><p>页面内容全放在这个外置文件里，<code>MainPage.qml</code> 里只留几行这个文件的引用，这样以后改页面就不用再动二进制里。</p><p>接下来的问题就是：如何把这几行改动写进 <code>SnowApp</code>。</p><h3 id=问题空间不够怎么办>问题：空间不够怎么办？</h3><p>由于没有官方源码和对应的完整构建环境，我不准备重新编译整个程序，而是直接修改二进制中的 QML 资源。</p><p>前面分析 Qt 资源结构时已经发现，文件在 qt_resource_data 中是连续存放的。</p><p>如果修改后的 MainPage.qml 压缩数据变长，就可能覆盖后面的资源。</p><p>要解决这个问题，需要重新安排后续资源的位置，更新目录树中的偏移量，甚至可能涉及 ELF 段布局的调整。</p><p>理论上可以实现，但修改范围就比较大了。</p><p>既然只是增加一个页面入口，我觉得没必要这么折腾。</p><p>因此决定采用原位替换的方案：</p><ul><li><p>不改变 ELF 文件的整体大小。</p></li><li><p>不移动其他资源的位置。</p></li><li><p>只修改 MainPage.qml 对应的资源数据。</p></li><li><p>新内容不能超过原来的空间，剩余部分补零。</p></li></ul><p>原来的 MainPage.qml 压缩流为 1777 字节，加上 4 字节长度字段，整个资源槽位为 1781 字节。</p><p>也就是说，新的压缩数据必须能放进这个空间里。</p><p>先验证一点：用 zlib level 6 压缩原来的 <code>MainPage.qml</code>，得到的字节和二进制里<strong>完全一致</strong>，说明重新压缩是可控的。</p><p>然后试了两种改法（原压缩流 1777 字节）：</p><table><thead><tr><th>改法</th><th>压缩后（level 6 / 9）</th><th>结果</th></tr></thead><tbody><tr><td>只加 <code>ListElement</code></td><td>1805 / 1784</td><td>超出 28 / 7 字节，放不下</td></tr><tr><td>加 <code>ListElement</code>，并删掉 5 行纯注释</td><td>1657 / 1637</td><td>剩 120 / 140 字节</td></tr></tbody></table><p>通过删掉 5 行只有注释的行，不动任何逻辑，就放得下了。</p><p><code>MainPage.qml</code> 只留引用，空间就不会再成问题。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-diff data-lang=diff><span class=line><span class=cl><span class=gd>--- a/Main/MainPage.qml
+</span></span></span><span class=line><span class=cl><span class=gi>+++ b/Main/MainPage.qml
+</span></span></span><span class=line><span class=cl><span class=gu>@@ -34,7 +34,6 @@
+</span></span></span><span class=line><span class=cl>                 onConfirmed: openPage(&#34;qrc:/Modules/SystemUpdate/SystemUpdatePage.qml&#34;)
+</span></span><span class=line><span class=cl>             }
+</span></span><span class=line><span class=cl> 
+</span></span><span class=line><span class=cl><span class=gd>-            // 顶栏提示器
+</span></span></span><span class=line><span class=cl>             HeaderBar {
+</span></span><span class=line><span class=cl>                 id: headerBar
+</span></span><span class=line><span class=cl>                 anchors.top: parent.top
+</span></span><span class=line><span class=cl><span class=gu>@@ -43,7 +42,6 @@
+</span></span></span><span class=line><span class=cl>                 height: 72
+</span></span><span class=line><span class=cl>                 timeVisible: !control.isSummary &amp;&amp; datetimeManager.isInitialized ? true : false
+</span></span><span class=line><span class=cl>             }
+</span></span><span class=line><span class=cl><span class=gd>-            // 页面指示器
+</span></span></span><span class=line><span class=cl>             PageIndicator {
+</span></span><span class=line><span class=cl>                 id: indicator
+</span></span><span class=line><span class=cl>                 count: view.count
+</span></span><span class=line><span class=cl><span class=gu>@@ -89,15 +87,17 @@
+</span></span></span><span class=line><span class=cl>                         name: &#34;appView&#34;
+</span></span><span class=line><span class=cl>                         source: &#34;qrc:/Main/Views/App/AppView.qml&#34;
+</span></span><span class=line><span class=cl>                     }
+</span></span><span class=line><span class=cl><span class=gi>+                    ListElement {
+</span></span></span><span class=line><span class=cl><span class=gi>+                        name: &#34;customView&#34;
+</span></span></span><span class=line><span class=cl><span class=gi>+                        source: &#34;file:///data/custom/CustomView.qml&#34;
+</span></span></span><span class=line><span class=cl><span class=gi>+                    }
+</span></span></span><span class=line><span class=cl>                     Component.onCompleted: {
+</span></span><span class=line><span class=cl><span class=gd>-                        // 已绑定Eagle，则显示AIRMX界面
+</span></span></span><span class=line><span class=cl>                         if (!appController.airmxApp.isPaired) {
+</span></span><span class=line><span class=cl>                             removePage(&#34;airmxView&#34;);
+</span></span><span class=line><span class=cl>                         }
+</span></span><span class=line><span class=cl>                         if (!global.isShowAppView || (global.product === Global.PROD_HAIER)) {
+</span></span><span class=line><span class=cl>                             removePage(&#34;appView&#34;);
+</span></span><span class=line><span class=cl>                         }
+</span></span><span class=line><span class=cl><span class=gd>-                        // 时间已初始化，则显示汇总界面
+</span></span></span><span class=line><span class=cl>                         if (datetimeManager.isInitialized) {
+</span></span><span class=line><span class=cl>                             insertPage(&#34;airDatasView&#34;, &#34;summaryView&#34;, &#34;qrc:/Main/Views/Summary/SummaryView.qml&#34;);
+</span></span><span class=line><span class=cl>                         }
+</span></span><span class=line><span class=cl><span class=gu>@@ -136,7 +136,6 @@
+</span></span></span><span class=line><span class=cl>             }
+</span></span><span class=line><span class=cl>         }
+</span></span><span class=line><span class=cl>     }
+</span></span><span class=line><span class=cl><span class=gd>-    // 加载子界面
+</span></span></span><span class=line><span class=cl>     Component {
+</span></span><span class=line><span class=cl>         id: childPage
+</span></span><span class=line><span class=cl>         Loader {
+</span></span></code></pre></div><p>执行打补丁的脚本，生成新的 <code>SnowApp.patched</code> 文件。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>python3 qrc_patch.py data/bin/SnowApp out/INDEX.tsv /Main/MainPage.qml MainPage.new.qml SnowApp.patched
+</span></span><span class=line><span class=cl><span class=c1># slot 1781 bytes, new payload 1641 bytes, spare 140</span>
+</span></span></code></pre></div><p>补丁生成后，我先在本地做了几项检查：文件大小没有变化，重新解包后，205 个资源中只有 MainPage.qml 发生了变化，其余资源的哈希均保持一致。</p><p>打包完之后，我没有急着替换官方的 <code>SnowApp</code>，而是把补丁版放在 <code>/data/custom/SnowApp.patched</code>。</p><p>手动跑一下看看效果：停看门狗、确认、<code>kill -9</code> 官方 <code>SnowApp</code>、确认、再启动补丁版。</p><p>结果比较顺利：官方界面正常启动，<strong>多出了一页，一共四页</strong>，滑动正常，读数实时刷新，日志里没有新页面的 QML 报错。</p><h3 id=问题wifi-一直连不上>问题：WIFI 一直连不上</h3><p>刚刚还沉浸在成功的喜悦中，突然发现左上角的 WIFI 标志一直在连接中，重新点击也连不上，感觉应该是哪里改坏了。</p><p>看日志，发现路由器其实已经连上了：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>wpa_state=COMPLETED
+</span></span><span class=line><span class=cl>已连接 Wi-Fi ssid=*** 无IP SSID无变化
+</span></span><span class=line><span class=cl>killall: udhcpc: no process killed
+</span></span></code></pre></div><p>关联成功，但没拿到 IP。</p><p>根据日志和看门狗的代码分析，可能的机制是：</p><p>官方程序重连 Wi-Fi 时会先 <code>killall udhcpc</code>，再靠<strong>看门狗</strong>在下一个 5 秒周期里把它拉起。</p><p>而这次试跑为了不让官方界面被拉回来，把看门狗停了，导致没人重启 DHCP。</p><p>恢复很简单，手动做一遍看门狗该做的事：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sh /data/etc/wifi/udhcpc_wlan0 restart <span class=p>&amp;</span>
+</span></span></code></pre></div><h3 id=界面切换>界面切换</h3><p>执行安装脚本，用补丁版替换原来的 <code>/data/bin/SnowApp</code>，让看门狗照旧管理它：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sh install_patched.sh
+</span></span></code></pre></div><ul><li>先校验补丁版和当前程序的 SHA-256，当前程序如果不是已知原版（比如被官方升级覆盖），拒绝覆盖。</li><li>先备份原版到 <code>/data/custom/SnowApp.orig</code> 并校验。</li><li>先复制到同目录临时文件并校验，再用 <code>mv</code> 原子替换。</li><li>看门狗在运行时，杀掉旧进程，约 5 秒内由看门狗用新文件拉起，设备不用重启，Wi-Fi 也不受影响。</li></ul><p>如果有问题，需要恢复时：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>cp /data/custom/SnowApp.orig /data/bin/SnowApp.new <span class=o>&amp;&amp;</span> mv -f /data/bin/SnowApp.new /data/bin/SnowApp <span class=o>&amp;&amp;</span> reboot
+</span></span></code></pre></div><p>装好之后，后续改页面只需要改 <code>/data/custom/CustomView.qml</code>，再重启一下机器即可。</p><p><picture><source type=image/avif srcset="../../posts/qingping-cgs1-custom-qml-page/IMG_8570.jpg_320x.avif 320w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8570.jpg_480x.avif 480w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8570.jpg_720x.avif 720w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8570.jpg_1080x.avif 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><source type=image/webp srcset="../../posts/qingping-cgs1-custom-qml-page/IMG_8570.jpg_320x.webp 320w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8570.jpg_480x.webp 480w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8570.jpg_720x.webp 720w, ../../posts/qingping-cgs1-custom-qml-page/IMG_8570.jpg_1080x.webp 1080w" sizes="auto, (min-width: 1080px) 1080px, calc(100vw - 32px)"><img src=../../posts/qingping-cgs1-custom-qml-page/IMG_8570.jpg alt=qingping_cgs1_custom_show width=1080 height=1440 loading=lazy decoding=async></picture></p><h2 id=总结>总结</h2><p>最后做了个订阅额度展示，详细的实现细节，另写了一篇<a href=../../posts/qingping-cgs1-ai-quota-display/>青萍空气检测仪改造记：展示 AI 订阅额度</a>。</p><p><img src=../qingping-cgs1-ai-quota-display/IMG_8574.jpg alt="青萍空气检测仪上显示 AI 订阅额度" loading=lazy decoding=async></p><p>这就是我第一次的硬件折腾历程，让老的闲置硬件再次发挥作用。</p><p>借助 Claude，完成从进入系统、分析 Qt 资源，到修改 QML 和生成二进制补丁的整个过程，再次感受到 AI 的强大。</p><p>文中使用的相关文件都放在 <a href=https://github.com/Liudon/qingping-cgs1>qingping-cgs1</a> 这个仓库下了。</p></div></div><section class=terminal-sponsor aria-label="Support the author"><div class=terminal-sponsor__header><div class=terminal-sponsor__command><span class=terminal-prompt>$</span>
+<span class=terminal-cmd>sponsor</span>
+<span class=terminal-sponsor__tag>--coffee</span><span class=terminal-sponsor__bio># 如果觉得有用，欢迎请我喝杯咖啡</span>
+<svg class="terminal-sponsor__coffee-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="terminal-sponsor__coffee-cup" d="M6 9h10v5.25A3.75 3.75.0 0112.25 18h-2.5A3.75 3.75.0 016 14.25V9z"/><path d="M16 10h1.5a2.5 2.5.0 010 5H16M5 20h13M9 6c-1-1-.2-2 .5-3M13 6c-1-1-.2-2 .5-3"/></svg></div><button class=terminal-sponsor__toggle type=button aria-expanded=true aria-controls=sponsor-wallets>
+<span class=terminal-sponsor__toggle-icon aria-hidden=true>[-]</span>
+<span class=terminal-sponsor__toggle-label>hide</span></button></div><div class=terminal-sponsor__wallets id=sponsor-wallets><div class=terminal-sponsor__loading role=status><span>[ loading payment channels</span><span class=terminal-sponsor__loading-dots><span>.</span><span>.</span><span>.</span></span><span> ]</span></div><figure class=terminal-sponsor__wallet><div class=terminal-sponsor__qr-frame><img class=terminal-sponsor__qr data-src=../../wechat-qr.png alt="[01] WeChat" decoding=async>
+<span class=terminal-sponsor__qr-fallback aria-hidden=true><span>[ qr unavailable ]</span>
+<small>check image path</small></span></div><figcaption><strong class=terminal-sponsor__wallet-title>[01] WeChat</strong></figcaption></figure><figure class=terminal-sponsor__wallet><div class=terminal-sponsor__qr-frame><img class=terminal-sponsor__qr data-src=../../alipay-qr.png alt="[02] Alipay" decoding=async>
+<span class=terminal-sponsor__qr-fallback aria-hidden=true><span>[ qr unavailable ]</span>
+<small>check image path</small></span></div><figcaption><strong class=terminal-sponsor__wallet-title>[02] Alipay</strong></figcaption></figure></div></section><section class=terminal-comments id=comments data-env-id=https://comment.liudon.com data-region data-lang=zh-CN data-path=/posts/qingping-cgs1-custom-qml-page/ data-script=https://cdn.jsdelivr.net/npm/twikoo@2.0.17/dist/twikoo.min.js data-integrity aria-label=Comments><div class=terminal-comments__header><span class=terminal-prompt>$</span>
+<span class=terminal-cmd>twikoo</span>
+<span class=terminal-comments__args>--page /posts/qingping-cgs1-custom-qml-page/</span>
+<span class=terminal-comments__status id=comments-status hidden></span>
+<button type=button class=terminal-comments__retry id=comments-retry hidden>retry</button></div><div class=terminal-comments__body><div class=terminal-comments__loading id=comments-loading role=status aria-live=polite><span class=terminal-comments__dots aria-hidden=true><span>.</span><span>.</span><span>.</span></span>
+<span class=terminal-comments__loading-text>loading comments</span>
+<span class=terminal-cursor aria-hidden=true></span></div><div id=twikoo-container></div><noscript><p class=terminal-comments__noscript>JavaScript is required to load comments.</p></noscript></div></section><nav class=terminal-section-nav aria-label="Previous and next posts"><a class=terminal-section-nav__btn href=../../posts/github-actions-ipfs-dist-ipfs-tech/><span class=terminal-section-nav__arrow>&#8592;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>prev</span>
+<span class=terminal-section-nav__title>一次 GitHub Actions 超时，追到 IPFS 基础设施的动荡</span>
+</span></a><a class="terminal-section-nav__btn terminal-section-nav__btn--next" href=../../posts/qingping-cgs1-ai-quota-display/><span class=terminal-section-nav__arrow>&#8594;</span>
+<span class=terminal-section-nav__text><span class=terminal-section-nav__label>next</span>
+<span class=terminal-section-nav__title>青萍空气检测仪改造记：展示 AI 订阅额度</span></span></a></nav><footer class=terminal-footer><div class=terminal-footer-line><span class=terminal-prompt>$</span> echo "Maintained by Liudon"</div><div class=terminal-footer-output>Maintained by <a href=../../>Liudon</a> | Last updated 2026-11-02</div><div class=terminal-status-bar><span class=terminal-status-item>NORMAL</span>
+<span class=terminal-status-item>index.md</span>
+<span class=terminal-status-item>words: 4199</span>
+<span class="terminal-status-item terminal-status-right">EOF</span></div></footer></div></div></article><aside class=terminal-sidebar id=sidebar-toc aria-label="Quick navigation"><div class=terminal-sidebar__header><span class=terminal-sidebar__title><span class=terminal-prompt>$</span> tree</span>
+<button type=button class=terminal-sidebar__hide-btn id=sidebar-collapse aria-label="Toggle sidebar" title="Toggle sidebar (H)"><span class=terminal-sidebar__key>H</span> toggle</button></div><nav class=terminal-sidebar__nav id=sidebar-nav><a class=terminal-sidebar__link href=#%e5%89%8d%e8%a8%80 data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>前言</span>
+</a><a class=terminal-sidebar__link href=#%e5%85%88%e8%bf%9b%e7%b3%bb%e7%bb%9f data-index=1><span class=terminal-sidebar__num>02</span>
+<span class=terminal-sidebar__link-title>先进系统</span>
+</a><a class=terminal-sidebar__link href=#%e5%8a%a8%e6%89%8b%e5%89%8d%e5%85%88%e5%a4%87%e4%bb%bd data-index=2><span class=terminal-sidebar__num>03</span>
+<span class=terminal-sidebar__link-title>动手前先备份</span>
+</a><a class=terminal-sidebar__link href=#%e7%ac%ac%e4%b8%80%e6%ac%a1%e5%b0%9d%e8%af%95 data-index=3><span class=terminal-sidebar__num>04</span>
+<span class=terminal-sidebar__link-title>第一次尝试</span>
+</a><a class=terminal-sidebar__link href=#%e5%86%8d%e8%bf%9b%e4%b8%80%e6%ad%a5%e8%83%bd%e4%b8%8d%e8%83%bd%e7%9b%b4%e6%8e%a5%e6%98%be%e7%a4%ba%e7%bd%91%e9%a1%b5 data-index=4><span class=terminal-sidebar__num>05</span>
+<span class=terminal-sidebar__link-title>再进一步：能不能直接显示网页？</span>
+</a><a class=terminal-sidebar__link href=#%e5%8f%a6%e4%b8%80%e6%9d%a1%e8%b7%af%e6%94%b9%e9%80%a0%e5%ae%98%e6%96%b9%e7%95%8c%e9%9d%a2 data-index=5><span class=terminal-sidebar__num>06</span>
+<span class=terminal-sidebar__link-title>另一条路：改造官方界面</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e8%a7%a3%e5%89%96-snowapp data-index=6><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>解剖 SnowApp</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%88%86%e6%9e%90%e5%ae%98%e6%96%b9%e4%b8%bb%e9%a1%b5 data-index=7><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>分析官方主页</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e9%97%ae%e9%a2%98%e7%a9%ba%e9%97%b4%e4%b8%8d%e5%a4%9f%e6%80%8e%e4%b9%88%e5%8a%9e data-index=8><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>问题：空间不够怎么办？</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e9%97%ae%e9%a2%98wifi-%e4%b8%80%e7%9b%b4%e8%bf%9e%e4%b8%8d%e4%b8%8a data-index=9><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>问题：WIFI 一直连不上</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e7%95%8c%e9%9d%a2%e5%88%87%e6%8d%a2 data-index=10><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>界面切换</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%bb%e7%bb%93 data-index=11><span class=terminal-sidebar__num>07</span>
+<span class=terminal-sidebar__link-title>总结</span></a></nav><div class=terminal-sidebar__footer><span class=terminal-sidebar__key>J</span><span class=terminal-sidebar__key>K</span> nav</div></aside><button type=button class=terminal-sidebar-fab id=sidebar-expand aria-label="Show table of contents" title="Show TOC (H)">
+<span class=terminal-sidebar-fab__icon>☰</span>
+<span class=terminal-sidebar-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-toc-fab" id=toc-toggle aria-label="Toggle table of contents" aria-expanded=false>
+<span class=terminal-mobile-fab__icon>☰</span>
+<span class=terminal-mobile-fab__label>TOC</span>
+</button>
+<button type=button class="terminal-mobile-fab terminal-search-fab" data-search-open aria-label=Search>
+<span class=terminal-mobile-fab__icon>/</span>
+<span class=terminal-mobile-fab__label>SEARCH</span></button><div class=terminal-drawer id=toc-drawer aria-hidden=true><div class=terminal-drawer__backdrop id=drawer-backdrop></div><div class=terminal-drawer__content><div class=terminal-drawer__header><span class=terminal-prompt>$</span> ls ./sections/
+<button class=terminal-drawer__close id=drawer-close aria-label="Close navigation">&#215;</button></div><nav class=terminal-drawer__nav id=drawer-nav><a class=terminal-sidebar__link href=#%e5%89%8d%e8%a8%80 data-index=0><span class=terminal-sidebar__num>01</span>
+<span class=terminal-sidebar__link-title>前言</span>
+</a><a class=terminal-sidebar__link href=#%e5%85%88%e8%bf%9b%e7%b3%bb%e7%bb%9f data-index=1><span class=terminal-sidebar__num>02</span>
+<span class=terminal-sidebar__link-title>先进系统</span>
+</a><a class=terminal-sidebar__link href=#%e5%8a%a8%e6%89%8b%e5%89%8d%e5%85%88%e5%a4%87%e4%bb%bd data-index=2><span class=terminal-sidebar__num>03</span>
+<span class=terminal-sidebar__link-title>动手前先备份</span>
+</a><a class=terminal-sidebar__link href=#%e7%ac%ac%e4%b8%80%e6%ac%a1%e5%b0%9d%e8%af%95 data-index=3><span class=terminal-sidebar__num>04</span>
+<span class=terminal-sidebar__link-title>第一次尝试</span>
+</a><a class=terminal-sidebar__link href=#%e5%86%8d%e8%bf%9b%e4%b8%80%e6%ad%a5%e8%83%bd%e4%b8%8d%e8%83%bd%e7%9b%b4%e6%8e%a5%e6%98%be%e7%a4%ba%e7%bd%91%e9%a1%b5 data-index=4><span class=terminal-sidebar__num>05</span>
+<span class=terminal-sidebar__link-title>再进一步：能不能直接显示网页？</span>
+</a><a class=terminal-sidebar__link href=#%e5%8f%a6%e4%b8%80%e6%9d%a1%e8%b7%af%e6%94%b9%e9%80%a0%e5%ae%98%e6%96%b9%e7%95%8c%e9%9d%a2 data-index=5><span class=terminal-sidebar__num>06</span>
+<span class=terminal-sidebar__link-title>另一条路：改造官方界面</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e8%a7%a3%e5%89%96-snowapp data-index=6><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>解剖 SnowApp</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e5%88%86%e6%9e%90%e5%ae%98%e6%96%b9%e4%b8%bb%e9%a1%b5 data-index=7><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>分析官方主页</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e9%97%ae%e9%a2%98%e7%a9%ba%e9%97%b4%e4%b8%8d%e5%a4%9f%e6%80%8e%e4%b9%88%e5%8a%9e data-index=8><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>问题：空间不够怎么办？</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e9%97%ae%e9%a2%98wifi-%e4%b8%80%e7%9b%b4%e8%bf%9e%e4%b8%8d%e4%b8%8a data-index=9><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>问题：WIFI 一直连不上</span>
+</a><a class="terminal-sidebar__link terminal-sidebar__link--sub" href=#%e7%95%8c%e9%9d%a2%e5%88%87%e6%8d%a2 data-index=10><span class=terminal-sidebar__num>·</span>
+<span class=terminal-sidebar__link-title>界面切换</span>
+</a><a class=terminal-sidebar__link href=#%e6%80%bb%e7%bb%93 data-index=11><span class=terminal-sidebar__num>07</span>
+<span class=terminal-sidebar__link-title>总结</span></a></nav></div></div></main><button class=terminal-back-top id=back-top aria-label="Back to top" hidden>
+<span class=terminal-back-top__arrow>&#8593;</span>
+<span class=terminal-back-top__label>TOP</span></button><footer class=site-footer role=contentinfo><p class=site-footer__copyright>&copy; 2026 Liudon &#183; Made with Hugo & Terminal · 京ICP备13029522号-2</p></footer><div class=search-modal id=search-modal role=dialog aria-modal=true aria-label=Search><div class=search-modal__backdrop></div><div class=search-modal__dialog><label class=search-modal__input-row for=search-input><span class="search-modal__prompt terminal-prompt">$</span>
+<span class=terminal-search-fixed>find . -name </span><input class=search-modal__input id=search-input type=text placeholder=query autocomplete=off spellcheck=false></label><div class=search-modal__hint><span class=terminal-key>Enter</span> open&nbsp;&nbsp;<span class=terminal-key>&#8593;</span><span class=terminal-key>&#8595;</span> navigate&nbsp;&nbsp;<span class=terminal-key>Esc</span> close</div><div class=search-modal__results id=search-results></div><div class=search-modal__empty id=search-empty>Type a query to search the site&#8230;</div></div></div><script src=../../js/site.min.eab4699537e4969b8d2dd0d307cde747d8af11c4c85e4850808a26bd7d3005a5.js integrity="sha256-6rRplTfklpuNLdDTB83nR9ivEcTIXkhQgIomvX0wBaU=" crossorigin=anonymous defer></script><script src=../../js/article-images.min.36b1f0c3c0fe4c914817cc5f696f3d56fc24f26a619e526057479aab45f9e4da.js integrity="sha256-NrHww8D+TJFIF8xfaW89Vvwk8mphnlJgV0eaq0X55No=" crossorigin=anonymous defer></script></body></html>

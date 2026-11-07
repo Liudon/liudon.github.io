@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Chromium on 流动</title>
+		<link>https://liudon.com/tags/chromium/</link>
+		<description>Recent content in Chromium on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Sat, 07 Nov 2026 14:27:18 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/chromium/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>一次 browser_exec 调用背后：Hermes Agent 如何管理浏览器</title>
+				<link>https://liudon.com/posts/hermes-agent-browser-management/</link>
+				<pubDate>Sat, 07 Nov 2026 14:27:18 +0800</pubDate>
+				<guid>https://liudon.com/posts/hermes-agent-browser-management/</guid>
+				<description>&lt;p&gt;上一篇《&lt;a href=&#34;../../posts/hermes-agent-v0-23-0-chrome-s6/&#34;&gt;Hermes Agent v0.23.0 升级：一次安全修复，让我的 Chrome 无法启动&lt;/a&gt;》讲了升级后 Chrome 无法启动的踩坑记录，今天来讲一下：当 Hermes 需要访问网页时，它究竟如何找到并管理浏览器？&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

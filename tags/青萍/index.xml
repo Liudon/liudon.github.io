@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>青萍 on 流动</title>
+		<link>https://liudon.com/tags/%E9%9D%92%E8%90%8D/</link>
+		<description>Recent content in 青萍 on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Tue, 03 Nov 2026 12:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/%E9%9D%92%E8%90%8D/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>青萍空气检测仪改造记：展示 AI 订阅额度</title>
+				<link>https://liudon.com/posts/qingping-cgs1-ai-quota-display/</link>
+				<pubDate>Tue, 03 Nov 2026 12:00:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/qingping-cgs1-ai-quota-display/</guid>
+				<description>&lt;h2 id=&#34;前言&#34;&gt;前言&lt;/h2&gt;&#xA;&lt;p&gt;上一篇&lt;a href=&#34;../../posts/qingping-cgs1-custom-qml-page/&#34;&gt;青萍空气检测仪改造记：用 AI 给它加个新页面&lt;/a&gt;把改造流程跑通了，这一篇来讲讲具体的实践：展示 AI 订阅额度。&lt;/p&gt;&#xA;&lt;p&gt;先上效果图：&lt;/p&gt;&#xA;&lt;p&gt;&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;../../posts/qingping-cgs1-ai-quota-display/IMG_8574.jpg_320x.avif 320w, ../../posts/qingping-cgs1-ai-quota-display/IMG_8574.jpg_480x.avif 480w, ../../posts/qingping-cgs1-ai-quota-display/IMG_8574.jpg_720x.avif 720w, ../../posts/qingping-cgs1-ai-quota-display/IMG_8574.jpg_1080x.avif 1080w&#34; sizes=&#34;auto, (min-width: 1080px) 1080px, calc(100vw - 32px)&#34;&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;../../posts/qingping-cgs1-ai-quota-display/IMG_8574.jpg_320x.webp 320w, ../../posts/qingping-cgs1-ai-quota-display/IMG_8574.jpg_480x.webp 480w, ../../posts/qingping-cgs1-ai-quota-display/IMG_8574.jpg_720x.webp 720w, ../../posts/qingping-cgs1-ai-quota-display/IMG_8574.jpg_1080x.webp 1080w&#34; sizes=&#34;auto, (min-width: 1080px) 1080px, calc(100vw - 32px)&#34;&gt;&lt;img src=&#34;../../posts/qingping-cgs1-ai-quota-display/IMG_8574.jpg&#34; alt=&#34;青萍空气检测仪上显示 AI 订阅额度&#34;&#xA;         width=&#34;1080&#34; height=&#34;1440&#34;&#xA;         loading=&#34;lazy&#34; decoding=&#34;async&#34;&gt;&#xA;  &lt;/picture&gt;&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>青萍空气检测仪改造记：用 AI 给它加个新页面</title>
+				<link>https://liudon.com/posts/qingping-cgs1-custom-qml-page/</link>
+				<pubDate>Mon, 02 Nov 2026 11:39:38 +0800</pubDate>
+				<guid>https://liudon.com/posts/qingping-cgs1-custom-qml-page/</guid>
+				<description>&lt;h2 id=&#34;前言&#34;&gt;前言&lt;/h2&gt;&#xA;&lt;p&gt;最近看到不少人用 AI 折腾旧硬件，各种玩法看得我也有点手痒。&lt;/p&gt;&#xA;&lt;p&gt;突然想到家里有一台闲置了好久的青萍空气检测仪，官方系统也很久没有更新过了，正好拿来折腾一下。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>
