@@ -188,7 +188,7 @@ up (pid 2692 pgid 2692) 6 seconds
 
 本以为只是一次简单的版本升级，没想到一个 `Permission denied`，最后追到了 Hermes 为消除提权风险而进行的服务架构调整。
 
-排查结束后，我又翻了一遍 Hermes 的浏览器相关代码，才发现项目中已经有 `tools.browser_launcher.launch_chromium()`，可以直接管理 Chromium 的启动、CDP 端口和进程生命周期。
+排查结束后，我又翻了一遍 Hermes 的浏览器相关代码，才发现项目中已经有 `tools.browser_launcher.launch_chromium()`，可以直接管理 Chromium 的启动、CDP 端口和进程生命周期，详细分析记录在[《一次 browser_exec 调用背后：Hermes Agent 如何管理浏览器》](/posts/hermes-agent-browser-management/)这篇文章。
 
 于是，我索性把原来自建的 Chrome s6 服务也撤掉了，改为使用 Hermes 提供的浏览器启动器。
 
