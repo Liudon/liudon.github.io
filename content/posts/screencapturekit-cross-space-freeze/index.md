@@ -1,7 +1,7 @@
 ---
 title: "录屏窗口看不见后，为什么画面会冻结"
 date: 2026-11-09T16:11:41+08:00
-draft: true
+draft: false
 description: "开发 Gecko 时，ScreenCaptureKit 在切换桌面后出现画面冻结。从倒计时浮层的意外线索，到 OBS 对照与多轮实验，记录一次跨桌面采集问题的排查过程。"
 tags:
   - "Gecko"
