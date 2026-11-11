@@ -89,5 +89,6 @@ Gecko 是一个 macOS 原生菜单栏应用，没有复杂的主窗口。
 
 虽然产品还没有达到预期，但开发过程中遇到了不少有意思的技术问题，接下来会陆续整理分享。
 
-- [录屏窗口看不见后，为什么画面会冻结](/posts/screencapturekit-cross-space-freeze/)
+- [切换桌面后，录屏画面几乎冻结](/posts/screencapturekit-cross-space-freeze/)
 - [从实验到实际录制：Gecko 的 Pulse 设计](/posts/gecko-adaptive-pulse-design/)
+- [Gecko 录屏自动化测试设计](/posts/gecko-recording-test-automation/)

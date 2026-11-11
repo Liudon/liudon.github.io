@@ -2,7 +2,7 @@
 title: "从实验到实际录制：Gecko 的 Pulse 设计"
 date: 2026-11-10T10:00:00+08:00
 draft: false
-description: "从 64×64 闪烁方块到 1×1 透明 Pulse：记录 Gecko 如何完成同进程验证与录制生命周期接入，再通过 30Hz/60Hz 帧率和功耗对照，最终确定 Adaptive 按需绘制方案。"
+description: "为改善 ScreenCaptureKit 跨桌面录制时的画面卡顿，Gecko 将 64×64 绘制窗口演进为 1×1 透明 Pulse，完成录制生命周期接入，并通过 30Hz/60Hz 帧率与功耗对照，最终确定 Adaptive 按需绘制方案。"
 tags:
   - "Gecko"
   - "macOS"
