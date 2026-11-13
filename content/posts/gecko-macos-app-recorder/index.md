@@ -36,7 +36,7 @@ keywords:
 
 ## 一个尽量简单的菜单栏工具
 
-Gecko 是一个 macOS 原生菜单栏应用，没有复杂的主窗口。
+Gecko 是一个 macOS 原生菜单栏应用，没有复杂的主窗口，主打后台录制，录制过程可以正常工作。
 
 它想做的事情很简单：**把指定应用正在播放的内容保存到本地**。
 
@@ -92,3 +92,5 @@ Gecko 是一个 macOS 原生菜单栏应用，没有复杂的主窗口。
 - [切换桌面后，录屏画面几乎冻结](/posts/screencapturekit-cross-space-freeze/)
 - [从实验到实际录制：Gecko 的 Pulse 设计](/posts/gecko-adaptive-pulse-design/)
 - [Gecko 录屏自动化测试设计](/posts/gecko-recording-test-automation/)
+- [Mac 跨桌面录屏，为什么 Safari 视频会黑屏](/posts/safari-offscreen-video-black/)
+- [Mac 跨桌面录屏，为什么 Chrome 视频会黑屏](/posts/chrome-offscreen-video-black/)

@@ -8,6 +8,18 @@ enableEmoji = true
 relativeURLs = true
 hasCJKLanguage = true # 自动检测是否包含 中文日文韩文 如果文章中使用了很多中文引号的话可以开启
 
+defaultContentLanguage = "zh-cn"
+
+[languages.zh-cn]
+  weight = 1
+  label = "中文"
+  contentDir = "content"
+
+[languages.en]
+  weight = 2
+  label = "English"
+  contentDir = "content/en"
+
 # Posts per page (Hugo >= 0.158 key; older Hugo versions use `paginate = 10`)
 [pagination]
   pagersize = 10
@@ -47,6 +59,8 @@ hasCJKLanguage = true # 自动检测是否包含 中文日文韩文 如果文章
 
   showFullTextinJSONFeed = true
   search_index = "search.json"
+
+  language_switcher = "article"
 
   footer_suffix = "Made with Hugo & Terminal · 京ICP备13029522号-2"
 
@@ -95,24 +109,29 @@ hasCJKLanguage = true # 自动检测是否包含 中文日文韩文 如果文章
   #  name = "weibo"
   #  url = "https://weibo.com/u/1674166010"
 
-[[menu.main]]
+[[languages.zh-cn.menu.main]]
   name = "Posts"
-  url = "/posts/"
+  pageRef = "/posts/"
   weight = 1
-[[menu.main]]
+[[languages.zh-cn.menu.main]]
   name = "Guides"
-  url = "/guides/"
+  pageRef = "/guides/"
   weight = 2
-[[menu.main]]
+[[languages.zh-cn.menu.main]]
   name = "Links"
-  url = "/links/"
+  pageRef = "/links/"
   weight = 3
-[[menu.main]]
+[[languages.zh-cn.menu.main]]
   name = "Time"
   url = "https://liudon.com/time/"
   weight = 4
-  [menu.main.params]
+  [languages.zh-cn.menu.main.params]
     target = "_top"
+
+[[languages.en.menu.main]]
+  name = "Posts"
+  pageRef = "/posts/"
+  weight = 1
 
 [markup]
   [markup.goldmark]
