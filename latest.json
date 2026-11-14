@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "digest": "sha256:a5a77416a8e2a52e3846bd5b9fbca65f0e391ff299a9fe90d9949e7a2ed8ac70",
-  "cid": "bafybeihqkdj2zndod5kug3sh6rkb5fzzmx5ivmtobaehlznsj77ni4gyoy",
+  "digest": "sha256:4a29ccb2878a24d203875ecc4f585bea00d052e1557d901ac595ccca4531ff04",
+  "cid": "bafybeiee5xdnzxlegmxsso6m74kbrmaqcjytqojcepv6qd4zgg5zdy4ehu",
   "cid_profile": "unixfs-v1-2025",
   "source_commit": "bc49a18b77cf1b3dde5e7d1172b4f5feccc52b81",
-  "deployed_at": "2026-11-13T08:04:18Z",
+  "deployed_at": "2026-11-14T06:20:45Z",
   "workflow_run_id": 43389775496,
-  "workflow_run_attempt": 1
+  "workflow_run_attempt": 2
 }
