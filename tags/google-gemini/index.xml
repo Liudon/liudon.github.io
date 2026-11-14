@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Google Gemini on 流动</title>
+		<link>https://liudon.com/tags/google-gemini/</link>
+		<description>Recent content in Google Gemini on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 23 Sep 2026 12:30:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/google-gemini/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Muse AI 注册教程：借助 Google Gemini Spark 完成注册</title>
+				<link>https://liudon.com/posts/muse-ai-registration-with-gemini-spark/</link>
+				<pubDate>Wed, 23 Sep 2026 12:30:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/muse-ai-registration-with-gemini-spark/</guid>
+				<description>&lt;p&gt;Muse 是 Meta 于 2026 年 9 月 8 日推出的全球首款面向普通消费者的个人 AI 智能体（AI Agent）应用。&lt;/p&gt;&#xA;&lt;p&gt;现在仅面向美国和加拿大地区的 18 岁以上用户开放。&lt;/p&gt;&#xA;&lt;p&gt;在 &lt;a href=&#34;https://v2ex.com&#34;&gt;V2ex&lt;/a&gt; 上看到可以通过 Gemini Spark 进行注册，绕过 IP 检测，本文记录整个操作过程。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

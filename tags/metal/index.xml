@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Metal on 流动</title>
+		<link>https://liudon.com/tags/metal/</link>
+		<description>Recent content in Metal on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Tue, 10 Nov 2026 10:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/metal/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>从实验到实际录制：Gecko 的 Pulse 设计</title>
+				<link>https://liudon.com/posts/gecko-adaptive-pulse-design/</link>
+				<pubDate>Tue, 10 Nov 2026 10:00:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-adaptive-pulse-design/</guid>
+				<description>&lt;p&gt;上一篇《&lt;a href=&#34;../../posts/screencapturekit-cross-space-freeze/&#34;&gt;切换桌面后，录屏画面几乎冻结&lt;/a&gt;》记录了 Gecko 遇到的跨桌面供帧问题。一个原本用于倒计时的浮层带来了线索，后来通过 Pulse 的开关实验，发现持续绘制的独立窗口在特定场景下确实能让采集恢复正常。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

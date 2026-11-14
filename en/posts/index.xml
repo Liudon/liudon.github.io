@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Posts on 流动</title>
+		<link>https://liudon.com/en/posts/</link>
+		<description>Recent content in Posts on 流动</description>
+		<generator>Hugo</generator>
+		<language>en</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 13 Nov 2026 15:05:09 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/en/posts/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Why Chrome Videos Go Black in ScreenCaptureKit Recordings When Switching macOS Spaces</title>
+				<link>https://liudon.com/en/posts/chrome-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:09 +0800</pubDate>
+				<guid>https://liudon.com/en/posts/chrome-offscreen-video-black/</guid>
+				<description>&lt;p&gt;In &lt;a href=&#34;../../en/posts/safari-offscreen-video-black/&#34;&gt;the Safari article&lt;/a&gt;, I mentioned a clue that came from Chrome. To explain it, I need to return to Gecko&amp;rsquo;s early tests of recording across macOS Spaces.&lt;/p&gt;&#xA;&lt;p&gt;Back then, switching away from Chrome&amp;rsquo;s Space mainly caused sparse picture updates. After introducing &lt;a href=&#34;../../posts/gecko-adaptive-pulse-design/&#34;&gt;Pulse&lt;/a&gt; (in Chinese), I could capture continuously changing video frames.&lt;/p&gt;&#xA;&lt;p&gt;Later, compatibility testing revealed black video in Safari while offscreen. Remembering that Chrome had worked, I returned to Chrome for comparison—and found that it now turned black too.&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Why Safari Videos Go Black in ScreenCaptureKit Recordings When Switching macOS Spaces</title>
+				<link>https://liudon.com/en/posts/safari-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:08 +0800</pubDate>
+				<guid>https://liudon.com/en/posts/safari-offscreen-video-black/</guid>
+				<description>&lt;p&gt;During application compatibility testing for &lt;a href=&#34;../../posts/gecko-macos-app-recorder/&#34;&gt;Gecko&lt;/a&gt; (in Chinese), I ran into a Safari problem: recording worked while the window was on the current desktop, but switching to another macOS Space made the video region in the recording turn black. Audio continued, and recording did not stop. Returning to the original Space restored the picture.&lt;/p&gt;&#xA;&lt;p&gt;I had already substantially improved QuickTime&amp;rsquo;s offscreen freezes with &lt;a href=&#34;../../posts/gecko-adaptive-pulse-design/&#34;&gt;Pulse&lt;/a&gt; (in Chinese). This time, Safari&amp;rsquo;s video content disappeared altogether. Adjusting the refresh frequency did not bring it back.&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

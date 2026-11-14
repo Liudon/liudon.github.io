@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Safari on 流动</title>
+		<link>https://liudon.com/tags/safari/</link>
+		<description>Recent content in Safari on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 13 Nov 2026 15:05:08 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/safari/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Mac 跨桌面录屏，为什么 Safari 视频会黑屏</title>
+				<link>https://liudon.com/posts/safari-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:08 +0800</pubDate>
+				<guid>https://liudon.com/posts/safari-offscreen-video-black/</guid>
+				<description>&lt;p&gt;在 &lt;a href=&#34;../../posts/gecko-macos-app-recorder/&#34;&gt;Gecko&lt;/a&gt; 的应用兼容性测试中，Safari 出现了一个问题：窗口在当前桌面时录制正常，切到另一个 Space，录像中的视频区域却变成了黑色。声音还在，录制也没有停止；切回原桌面，画面又恢复。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

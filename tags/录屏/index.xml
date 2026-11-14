@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>录屏 on 流动</title>
+		<link>https://liudon.com/tags/%E5%BD%95%E5%B1%8F/</link>
+		<description>Recent content in 录屏 on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 11 Nov 2026 11:48:56 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/%E5%BD%95%E5%B1%8F/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Gecko 录屏自动化测试设计</title>
+				<link>https://liudon.com/posts/gecko-recording-test-automation/</link>
+				<pubDate>Wed, 11 Nov 2026 11:48:56 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-recording-test-automation/</guid>
+				<description>&lt;p&gt;上一篇&lt;a href=&#34;../../posts/screencapturekit-cross-space-freeze/&#34;&gt;《切换桌面后，录屏画面几乎冻结》&lt;/a&gt;中的 OBS 对照测试就发现：一段 20 秒的录像输出了 1200 个视频样本，实际却只有 39 个不同的源画面。虽然文件保持着 60 FPS，真正的画面更新率却只有 1.95 FPS。&lt;/p&gt;&#xA;&lt;p&gt;这意味着，&lt;strong&gt;要判断录屏是否真正捕获到了新的画面，就必须分析最终录制的视频内容，而不能只依赖回调数量或文件帧率&lt;/strong&gt;。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>从实验到实际录制：Gecko 的 Pulse 设计</title>
+				<link>https://liudon.com/posts/gecko-adaptive-pulse-design/</link>
+				<pubDate>Tue, 10 Nov 2026 10:00:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-adaptive-pulse-design/</guid>
+				<description>&lt;p&gt;上一篇《&lt;a href=&#34;../../posts/screencapturekit-cross-space-freeze/&#34;&gt;切换桌面后，录屏画面几乎冻结&lt;/a&gt;》记录了 Gecko 遇到的跨桌面供帧问题。一个原本用于倒计时的浮层带来了线索，后来通过 Pulse 的开关实验，发现持续绘制的独立窗口在特定场景下确实能让采集恢复正常。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>切换桌面后，录屏画面几乎冻结</title>
+				<link>https://liudon.com/posts/screencapturekit-cross-space-freeze/</link>
+				<pubDate>Mon, 09 Nov 2026 16:11:41 +0800</pubDate>
+				<guid>https://liudon.com/posts/screencapturekit-cross-space-freeze/</guid>
+				<description>&lt;p&gt;上一篇介绍了自己做的 &lt;a href=&#34;../../posts/gecko-macos-app-recorder/&#34;&gt;Mac 录制工具 Gecko&lt;/a&gt;。我希望它不仅能录制一个窗口，还能在录制时切到其他桌面，继续做自己的事情。&lt;/p&gt;&#xA;&lt;p&gt;听起来没什么特别，实际做下来，最难解决的恰恰是这一点。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

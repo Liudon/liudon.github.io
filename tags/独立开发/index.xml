@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>独立开发 on 流动</title>
+		<link>https://liudon.com/tags/%E7%8B%AC%E7%AB%8B%E5%BC%80%E5%8F%91/</link>
+		<description>Recent content in 独立开发 on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Mon, 09 Nov 2026 11:42:14 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/%E7%8B%AC%E7%AB%8B%E5%BC%80%E5%8F%91/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Gecko：我做了一个 Mac 应用录制工具</title>
+				<link>https://liudon.com/posts/gecko-macos-app-recorder/</link>
+				<pubDate>Mon, 09 Nov 2026 11:42:14 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-macos-app-recorder/</guid>
+				<description>&lt;h2 id=&#34;起因&#34;&gt;起因&lt;/h2&gt;&#xA;&lt;p&gt;9月底的时候，媳妇想把微信的来电铃声设置到手机电话铃声上。&lt;/p&gt;&#xA;&lt;p&gt;微信里的来电铃声其实就是视频号里的一个视频，因为微信的这个音质更好，所以想着直接把它的音频弄出来。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

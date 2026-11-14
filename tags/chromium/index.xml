@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Chromium on 流动</title>
+		<link>https://liudon.com/tags/chromium/</link>
+		<description>Recent content in Chromium on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 13 Nov 2026 15:05:09 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/chromium/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Mac 跨桌面录屏，为什么 Chrome 视频会黑屏</title>
+				<link>https://liudon.com/posts/chrome-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:09 +0800</pubDate>
+				<guid>https://liudon.com/posts/chrome-offscreen-video-black/</guid>
+				<description>&lt;p&gt;在 &lt;a href=&#34;../../posts/safari-offscreen-video-black/&#34;&gt;Safari 篇&lt;/a&gt;里，提到了一条来自 Chrome 的线索。要讲清楚这条线索，还得回到 Gecko 早期的跨桌面录制测试。&lt;/p&gt;&#xA;&lt;p&gt;当时，Chrome 窗口切到其他 Space 后，主要表现是画面更新稀疏。引入 &lt;a href=&#34;../../posts/gecko-adaptive-pulse-design/&#34;&gt;Pulse&lt;/a&gt; 后，已经能够采集到连续变化的视频帧。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>一次 browser_exec 调用背后：Hermes Agent 如何管理浏览器</title>
+				<link>https://liudon.com/posts/hermes-agent-browser-management/</link>
+				<pubDate>Sat, 07 Nov 2026 14:27:18 +0800</pubDate>
+				<guid>https://liudon.com/posts/hermes-agent-browser-management/</guid>
+				<description>&lt;p&gt;上一篇《&lt;a href=&#34;../../posts/hermes-agent-v0-23-0-chrome-s6/&#34;&gt;Hermes Agent v0.23.0 升级：一次安全修复，让我的 Chrome 无法启动&lt;/a&gt;》讲了升级后 Chrome 无法启动的踩坑记录，今天来讲一下：当 Hermes 需要访问网页时，它究竟如何找到并管理浏览器？&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>

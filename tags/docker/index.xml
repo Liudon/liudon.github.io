@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Docker on 流动</title>
+		<link>https://liudon.com/tags/docker/</link>
+		<description>Recent content in Docker on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Sat, 07 Nov 2026 14:27:18 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>一次 browser_exec 调用背后：Hermes Agent 如何管理浏览器</title>
+				<link>https://liudon.com/posts/hermes-agent-browser-management/</link>
+				<pubDate>Sat, 07 Nov 2026 14:27:18 +0800</pubDate>
+				<guid>https://liudon.com/posts/hermes-agent-browser-management/</guid>
+				<description>&lt;p&gt;上一篇《&lt;a href=&#34;../../posts/hermes-agent-v0-23-0-chrome-s6/&#34;&gt;Hermes Agent v0.23.0 升级：一次安全修复，让我的 Chrome 无法启动&lt;/a&gt;》讲了升级后 Chrome 无法启动的踩坑记录，今天来讲一下：当 Hermes 需要访问网页时，它究竟如何找到并管理浏览器？&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Hermes Agent v0.23.0 升级：一次安全修复，让我的 Chrome 无法启动</title>
+				<link>https://liudon.com/posts/hermes-agent-v0-23-0-chrome-s6/</link>
+				<pubDate>Fri, 06 Nov 2026 22:20:23 +0800</pubDate>
+				<guid>https://liudon.com/posts/hermes-agent-v0-23-0-chrome-s6/</guid>
+				<description>&lt;p&gt;今天看到 Hermes Agent 发布了 v0.23.0 版本，加了很多新特性。&lt;/p&gt;&#xA;&lt;p&gt;刚好有时间，于是顺手做了一下升级。&lt;/p&gt;&#xA;&lt;h2 id=&#34;从-v0225-升级到-v0230&#34;&gt;从 v0.22.5 升级到 v0.23.0&lt;/h2&gt;&#xA;&lt;p&gt;我用的是 Docker 部署，升级非常简单：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;备份 .hermes 目录数据&lt;/li&gt;&#xA;&lt;li&gt;重新拉取 v0.23.0 镜像部署容器&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;一切顺利，升级后的版本信息：&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>WrenAI GenBI Classic 本地部署：Docker &#43; Ollama 配置本地 LLM</title>
+				<link>https://liudon.com/posts/wrenai-local-llm-usage-guide/</link>
+				<pubDate>Sun, 16 Mar 2025 17:28:10 +0800</pubDate>
+				<guid>https://liudon.com/posts/wrenai-local-llm-usage-guide/</guid>
+				<description>&lt;blockquote&gt;&#xA;&lt;p&gt;本文记录 WrenAI GenBI Classic 的 Docker + Ollama 本地模型部署过程。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;&lt;strong&gt;版本说明（2026-09 更新）&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;本文最初写于 2025 年 3 月，配置基于 WrenAI 0.15.x 的 GenBI UI 架构。2026 年 5 月，WrenAI 已将旧的 GenBI 应用归档至 &lt;a href=&#34;https://github.com/Canner/WrenAI/tree/legacy/v1&#34;&gt;&lt;code&gt;legacy/v1&lt;/code&gt;&lt;/a&gt;：&lt;code&gt;wren-ui&lt;/code&gt;、&lt;code&gt;wren-ai-service&lt;/code&gt;、&lt;code&gt;wren-launcher&lt;/code&gt; 与 Docker 部署均属于该路线。它仍可使用，但已冻结，不再获得新功能和安全更新。&lt;/p&gt;&#xA;&lt;p&gt;当前主线是面向 AI Agent 的 Context Engine、Wren CLI、MDL 和 Memory；首次使用 WrenAI 请优先阅读&lt;a href=&#34;https://github.com/Canner/WrenAI/blob/main/docs/core/get_started/quickstart.md&#34;&gt;官方 Quickstart&lt;/a&gt;。本文仅适合需要部署 &lt;strong&gt;WrenAI GenBI Classic / 旧版 Web UI&lt;/strong&gt; 的读者，文中的版本号不能直接替换为当前主线版本。&lt;/p&gt;&#xA;&lt;/blockquote&gt;</description>
+			</item>
+	</channel>
+</rss>

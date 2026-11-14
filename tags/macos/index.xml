@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>MacOS on 流动</title>
+		<link>https://liudon.com/tags/macos/</link>
+		<description>Recent content in MacOS on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 13 Nov 2026 15:05:09 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/macos/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Mac 跨桌面录屏，为什么 Chrome 视频会黑屏</title>
+				<link>https://liudon.com/posts/chrome-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:09 +0800</pubDate>
+				<guid>https://liudon.com/posts/chrome-offscreen-video-black/</guid>
+				<description>&lt;p&gt;在 &lt;a href=&#34;../../posts/safari-offscreen-video-black/&#34;&gt;Safari 篇&lt;/a&gt;里，提到了一条来自 Chrome 的线索。要讲清楚这条线索，还得回到 Gecko 早期的跨桌面录制测试。&lt;/p&gt;&#xA;&lt;p&gt;当时，Chrome 窗口切到其他 Space 后，主要表现是画面更新稀疏。引入 &lt;a href=&#34;../../posts/gecko-adaptive-pulse-design/&#34;&gt;Pulse&lt;/a&gt; 后，已经能够采集到连续变化的视频帧。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Mac 跨桌面录屏，为什么 Safari 视频会黑屏</title>
+				<link>https://liudon.com/posts/safari-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:08 +0800</pubDate>
+				<guid>https://liudon.com/posts/safari-offscreen-video-black/</guid>
+				<description>&lt;p&gt;在 &lt;a href=&#34;../../posts/gecko-macos-app-recorder/&#34;&gt;Gecko&lt;/a&gt; 的应用兼容性测试中，Safari 出现了一个问题：窗口在当前桌面时录制正常，切到另一个 Space，录像中的视频区域却变成了黑色。声音还在，录制也没有停止；切回原桌面，画面又恢复。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Gecko 录屏自动化测试设计</title>
+				<link>https://liudon.com/posts/gecko-recording-test-automation/</link>
+				<pubDate>Wed, 11 Nov 2026 11:48:56 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-recording-test-automation/</guid>
+				<description>&lt;p&gt;上一篇&lt;a href=&#34;../../posts/screencapturekit-cross-space-freeze/&#34;&gt;《切换桌面后，录屏画面几乎冻结》&lt;/a&gt;中的 OBS 对照测试就发现：一段 20 秒的录像输出了 1200 个视频样本，实际却只有 39 个不同的源画面。虽然文件保持着 60 FPS，真正的画面更新率却只有 1.95 FPS。&lt;/p&gt;&#xA;&lt;p&gt;这意味着，&lt;strong&gt;要判断录屏是否真正捕获到了新的画面，就必须分析最终录制的视频内容，而不能只依赖回调数量或文件帧率&lt;/strong&gt;。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>从实验到实际录制：Gecko 的 Pulse 设计</title>
+				<link>https://liudon.com/posts/gecko-adaptive-pulse-design/</link>
+				<pubDate>Tue, 10 Nov 2026 10:00:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-adaptive-pulse-design/</guid>
+				<description>&lt;p&gt;上一篇《&lt;a href=&#34;../../posts/screencapturekit-cross-space-freeze/&#34;&gt;切换桌面后，录屏画面几乎冻结&lt;/a&gt;》记录了 Gecko 遇到的跨桌面供帧问题。一个原本用于倒计时的浮层带来了线索，后来通过 Pulse 的开关实验，发现持续绘制的独立窗口在特定场景下确实能让采集恢复正常。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>切换桌面后，录屏画面几乎冻结</title>
+				<link>https://liudon.com/posts/screencapturekit-cross-space-freeze/</link>
+				<pubDate>Mon, 09 Nov 2026 16:11:41 +0800</pubDate>
+				<guid>https://liudon.com/posts/screencapturekit-cross-space-freeze/</guid>
+				<description>&lt;p&gt;上一篇介绍了自己做的 &lt;a href=&#34;../../posts/gecko-macos-app-recorder/&#34;&gt;Mac 录制工具 Gecko&lt;/a&gt;。我希望它不仅能录制一个窗口，还能在录制时切到其他桌面，继续做自己的事情。&lt;/p&gt;&#xA;&lt;p&gt;听起来没什么特别，实际做下来，最难解决的恰恰是这一点。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>Gecko：我做了一个 Mac 应用录制工具</title>
+				<link>https://liudon.com/posts/gecko-macos-app-recorder/</link>
+				<pubDate>Mon, 09 Nov 2026 11:42:14 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-macos-app-recorder/</guid>
+				<description>&lt;h2 id=&#34;起因&#34;&gt;起因&lt;/h2&gt;&#xA;&lt;p&gt;9月底的时候，媳妇想把微信的来电铃声设置到手机电话铃声上。&lt;/p&gt;&#xA;&lt;p&gt;微信里的来电铃声其实就是视频号里的一个视频，因为微信的这个音质更好，所以想着直接把它的音频弄出来。&lt;/p&gt;</description>
+			</item>
+	</channel>
+</rss>
