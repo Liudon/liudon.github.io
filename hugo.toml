@@ -55,6 +55,7 @@ defaultContentLanguage = "zh-cn"
   host = "localhost"
   prompt_dir = "~/blog"
   main_sections = ["posts"]
+  rss_sections = ["posts"]        # Homepage RSS only includes blog posts
   status_right = "EOF"
 
   showFullTextinJSONFeed = true
