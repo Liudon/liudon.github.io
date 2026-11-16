@@ -14,6 +14,7 @@ tree:
   - post: /posts/gecko-recording-test-automation/
   - post: /posts/safari-offscreen-video-black/
   - post: /posts/chrome-offscreen-video-black/
+  - post: /posts/gecko-logging-performance-investigation/
 ---
 
 Gecko 是我开发的一款 macOS 原生录屏工具，基于 ScreenCaptureKit 和 AVFoundation，实现指定应用的音视频录制。
