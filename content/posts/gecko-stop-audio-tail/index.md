@@ -1,7 +1,7 @@
 ---
 title: "录屏结束了，声音却少了三秒"
 date: 2026-11-16T14:25:00+08:00
-draft: true
+draft: false
 slug: "gecko-stop-audio-tail"
 description: "Gecko 正常停止录制后，音频却比视频提前约 2.94 秒结束。沿着两条采集流依次停止的时序，分析尾差如何产生，以及如何借助共用串行队列统一样本的接收截止点。"
 tags:
