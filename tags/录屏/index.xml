@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>录屏 on 流动</title>
+		<link>https://liudon.com/tags/%E5%BD%95%E5%B1%8F/</link>
+		<description>Recent content in 录屏 on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 20 Nov 2026 14:50:08 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/%E5%BD%95%E5%B1%8F/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Gecko 录屏音画同步测试设计</title>
+				<link>https://liudon.com/posts/gecko-recording-av-sync/</link>
+				<pubDate>Fri, 20 Nov 2026 14:50:08 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-recording-av-sync/</guid>
+				<description>在录屏自动化测试中增加音画同步检查：设计可配对的画面与声音标记，从成品测量偏移与漂移，再通过基线校准冻结阈值并接入自动判定。</description>
+			</item>
+			<item>
+				<title>Gecko 录屏自动化测试设计</title>
+				<link>https://liudon.com/posts/gecko-recording-test-automation/</link>
+				<pubDate>Wed, 11 Nov 2026 11:48:56 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-recording-test-automation/</guid>
+				<description>结合 Gecko 的真实实现，讲解 macOS 录屏自动化验证的完整链路：如何生成带 80-bit 帧号的参考视频、自动执行跨 Space 录制、通过日志与最终 MP4 验证画面更新并自动呈现判定结果。</description>
+			</item>
+			<item>
+				<title>从实验到实际录制：Gecko 的 Pulse 设计</title>
+				<link>https://liudon.com/posts/gecko-adaptive-pulse-design/</link>
+				<pubDate>Tue, 10 Nov 2026 10:00:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-adaptive-pulse-design/</guid>
+				<description>为改善 ScreenCaptureKit 跨桌面录制时的画面卡顿，Gecko 将 64×64 绘制窗口演进为 1×1 透明 Pulse，完成录制生命周期接入，并通过 30Hz/60Hz 帧率与功耗对照，最终确定 Adaptive 按需绘制方案。</description>
+			</item>
+			<item>
+				<title>切换桌面后，录屏画面几乎冻结</title>
+				<link>https://liudon.com/posts/screencapturekit-cross-space-freeze/</link>
+				<pubDate>Mon, 09 Nov 2026 16:11:41 +0800</pubDate>
+				<guid>https://liudon.com/posts/screencapturekit-cross-space-freeze/</guid>
+				<description>开发 Gecko 时，ScreenCaptureKit 在切换桌面后出现录屏画面严重卡顿、几乎冻结的问题。从 OBS 对照，到倒计时浮层的意外线索，记录一次跨桌面采集问题的排查过程。</description>
+			</item>
+	</channel>
+</rss>

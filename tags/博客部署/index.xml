@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>博客部署 on 流动</title>
+		<link>https://liudon.com/tags/%E5%8D%9A%E5%AE%A2%E9%83%A8%E7%BD%B2/</link>
+		<description>Recent content in 博客部署 on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Tue, 22 Sep 2026 00:48:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/%E5%8D%9A%E5%AE%A2%E9%83%A8%E7%BD%B2/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Twikoo 2.x 升级踩坑：Netlify CORS 报错与解决方案</title>
+				<link>https://liudon.com/posts/twikoo-2-netlify-cors/</link>
+				<pubDate>Tue, 22 Sep 2026 00:48:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/twikoo-2-netlify-cors/</guid>
+				<description>记录 Twikoo 2.x 升级后 Netlify 评论服务出现 CORS 报错的问题、原因以及临时和长期解决方案。</description>
+			</item>
+	</channel>
+</rss>

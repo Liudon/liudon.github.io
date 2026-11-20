@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>PagerMod on 流动</title>
+		<link>https://liudon.com/tags/pagermod/</link>
+		<description>Recent content in PagerMod on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 09 Sep 2026 00:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/pagermod/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>累计布局偏移修复方案改进 —— 自动生成图片宽高</title>
+				<link>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</link>
+				<pubDate>Wed, 24 Aug 2022 12:37:22 +0800</pubDate>
+				<guid>https://liudon.com/posts/hugo-auto-generate-image-width-and-height/</guid>
+				<description>记录通过远程图片信息自动补充宽高、降低 Hugo 页面 CLS 的历史方案，以及本站当前响应式图片实现入口。</description>
+			</item>
+			<item>
+				<title>优化博客的累计布局偏移(CLS)问题</title>
+				<link>https://liudon.com/posts/fix-blog-cls/</link>
+				<pubDate>Sat, 20 Aug 2022 07:27:22 +0800</pubDate>
+				<guid>https://liudon.com/posts/fix-blog-cls/</guid>
+				<description>记录通过补充图片宽高改善 Hugo 页面累计布局偏移（CLS）的早期方案，并提供本站当前响应式图片方案入口。</description>
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Safari on 流动</title>
+		<link>https://liudon.com/tags/safari/</link>
+		<description>Recent content in Safari on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 13 Nov 2026 15:05:08 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/safari/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Mac 跨桌面录屏，为什么 Safari 视频会黑屏</title>
+				<link>https://liudon.com/posts/safari-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:08 +0800</pubDate>
+				<guid>https://liudon.com/posts/safari-offscreen-video-black/</guid>
+				<description>从 Safari 跨桌面录屏的视频黑屏现象出发，通过本地网页、OBS 对照、四种 Canvas 实验及 WebKit 源码，逐步定位可见性如何影响视频呈现。</description>
+			</item>
+	</channel>
+</rss>

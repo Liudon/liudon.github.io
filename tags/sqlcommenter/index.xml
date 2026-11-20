@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Sqlcommenter on 流动</title>
+		<link>https://liudon.com/tags/sqlcommenter/</link>
+		<description>Recent content in Sqlcommenter on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Mon, 07 Sep 2026 00:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/sqlcommenter/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>sqlcommenter 原理与 GORM 实践：为 SQL 添加请求标识</title>
+				<link>https://liudon.com/posts/gorm-supports-sqlcommenter/</link>
+				<pubDate>Thu, 18 Apr 2024 21:25:24 +0800</pubDate>
+				<guid>https://liudon.com/posts/gorm-supports-sqlcommenter/</guid>
+				<description>sqlcommenter 如何通过 SQL 注释关联应用请求？本文介绍其基本思路，并以 GORM 插件为例，从 Context 获取请求 ID，为 SQL 自动添加注释，讲解 Callback 与自定义 Clause 的实现。</description>
+			</item>
+	</channel>
+</rss>

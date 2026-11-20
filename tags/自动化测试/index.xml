@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>自动化测试 on 流动</title>
+		<link>https://liudon.com/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/</link>
+		<description>Recent content in 自动化测试 on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 20 Nov 2026 14:50:08 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Gecko 录屏音画同步测试设计</title>
+				<link>https://liudon.com/posts/gecko-recording-av-sync/</link>
+				<pubDate>Fri, 20 Nov 2026 14:50:08 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-recording-av-sync/</guid>
+				<description>在录屏自动化测试中增加音画同步检查：设计可配对的画面与声音标记，从成品测量偏移与漂移，再通过基线校准冻结阈值并接入自动判定。</description>
+			</item>
+			<item>
+				<title>Gecko 录屏自动化测试设计</title>
+				<link>https://liudon.com/posts/gecko-recording-test-automation/</link>
+				<pubDate>Wed, 11 Nov 2026 11:48:56 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-recording-test-automation/</guid>
+				<description>结合 Gecko 的真实实现，讲解 macOS 录屏自动化验证的完整链路：如何生成带 80-bit 帧号的参考视频、自动执行跨 Space 录制、通过日志与最终 MP4 验证画面更新并自动呈现判定结果。</description>
+			</item>
+	</channel>
+</rss>

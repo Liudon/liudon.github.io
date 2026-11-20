@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Serverless on 流动</title>
+		<link>https://liudon.com/tags/serverless/</link>
+		<description>Recent content in Serverless on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Tue, 29 Sep 2026 10:03:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/serverless/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Twikoo 评论为什么这么慢：藏在 POST_SUBMIT 里的 5 秒等待窗口</title>
+				<link>https://liudon.com/posts/twikoo-comment-delay-post-submit/</link>
+				<pubDate>Tue, 29 Sep 2026 10:03:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/twikoo-comment-delay-post-submit/</guid>
+				<description>一次 Twikoo 评论提交耗时排查：从 QQ SMTP 的 3 秒多延迟，一路追到 POST_SUBMIT 的 5 秒等待窗口，并重新梳理 Netlify 下后置任务的异步执行方式。</description>
+			</item>
+	</channel>
+</rss>

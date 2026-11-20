@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>指南 on 流动</title>
+		<link>https://liudon.com/guides/</link>
+		<description>Recent content in 指南 on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 11 Nov 2026 15:55:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/guides/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Gecko：macOS 录屏工具开发实践</title>
+				<link>https://liudon.com/guides/gecko/</link>
+				<pubDate>Wed, 11 Nov 2026 15:55:00 +0800</pubDate>
+				<guid>https://liudon.com/guides/gecko/</guid>
+				<description>Gecko macOS 原生录屏工具开发指南，涵盖 ScreenCaptureKit、跨桌面录制、Pulse 优化、自动化测试，以及 Safari / Chrome 视频区域黑屏与 WebKit 可见性机制分析。</description>
+			</item>
+			<item>
+				<title>AI 口播视频生成实践</title>
+				<link>https://liudon.com/guides/ai-video/</link>
+				<pubDate>Sun, 27 Sep 2026 00:00:00 +0800</pubDate>
+				<guid>https://liudon.com/guides/ai-video/</guid>
+				<description>AI 口播视频生成的实战参考。涵盖音色克隆与对口型方案的部署和对比，以及 VideoRemaker 的产品实现。</description>
+			</item>
+			<item>
+				<title>博客时光机</title>
+				<link>https://liudon.com/guides/blog-time-machine/</link>
+				<pubDate>Sun, 27 Sep 2026 00:00:00 +0800</pubDate>
+				<guid>https://liudon.com/guides/blog-time-machine/</guid>
+				<description>博客时光机项目的完整演进记录。涵盖 IPFS 历史快照、时光机 1.0 的随机穿越，以及 Macintosh 可视时间线 2.0 的设计与实现。</description>
+			</item>
+			<item>
+				<title>Hugo 博客搭建、部署与优化实践</title>
+				<link>https://liudon.com/guides/hugo-blog/</link>
+				<pubDate>Sun, 27 Sep 2026 00:00:00 +0800</pubDate>
+				<guid>https://liudon.com/guides/hugo-blog/</guid>
+				<description>基于本站长期维护经验整理的 Hugo 博客实践指南。涵盖主题改造、图片优化、Cloudflare Pages 和 IPFS 部署、访问加速、评论系统与搜索收录。</description>
+			</item>
+	</channel>
+</rss>

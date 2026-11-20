@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Google Gemini on 流动</title>
+		<link>https://liudon.com/tags/google-gemini/</link>
+		<description>Recent content in Google Gemini on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 23 Sep 2026 12:30:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/google-gemini/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Muse AI 注册教程：借助 Google Gemini Spark 完成注册</title>
+				<link>https://liudon.com/posts/muse-ai-registration-with-gemini-spark/</link>
+				<pubDate>Wed, 23 Sep 2026 12:30:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/muse-ai-registration-with-gemini-spark/</guid>
+				<description>借助 Google Gemini Spark 完成 Muse AI 注册。</description>
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>MacOS on 流动</title>
+		<link>https://liudon.com/tags/macos/</link>
+		<description>Recent content in MacOS on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 20 Nov 2026 14:50:08 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/macos/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Gecko 录屏音画同步测试设计</title>
+				<link>https://liudon.com/posts/gecko-recording-av-sync/</link>
+				<pubDate>Fri, 20 Nov 2026 14:50:08 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-recording-av-sync/</guid>
+				<description>在录屏自动化测试中增加音画同步检查：设计可配对的画面与声音标记，从成品测量偏移与漂移，再通过基线校准冻结阈值并接入自动判定。</description>
+			</item>
+			<item>
+				<title>录屏结束了，声音却少了三秒</title>
+				<link>https://liudon.com/posts/gecko-stop-audio-tail/</link>
+				<pubDate>Mon, 16 Nov 2026 14:25:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-stop-audio-tail/</guid>
+				<description>Gecko 正常停止录制后，音频却比视频提前约 2.94 秒结束。沿着两条采集流依次停止的时序，分析尾差如何产生，以及如何借助共用串行队列统一样本的接收截止点。</description>
+			</item>
+			<item>
+				<title>一条诊断日志，为什么让录屏卡了十五秒</title>
+				<link>https://liudon.com/posts/gecko-logging-performance-investigation/</link>
+				<pubDate>Mon, 16 Nov 2026 13:20:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-logging-performance-investigation/</guid>
+				<description>一次诊断日志调用暴露了媒体队列、主线程与 Metal 绘制之间的等待链。结合分段计时、线程栈和异步对照，分析延迟如何跨线程传播，以及如何解除不必要的同步依赖。</description>
+			</item>
+			<item>
+				<title>Mac 跨桌面录屏，为什么 Chrome 视频会黑屏</title>
+				<link>https://liudon.com/posts/chrome-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:09 +0800</pubDate>
+				<guid>https://liudon.com/posts/chrome-offscreen-video-black/</guid>
+				<description>Mac 录制 Chrome 视频，为什么早期切换桌面正常，后来却黑屏？从一条被遗忘的启动参数出发，通过 Pulse 对照、Chromium 源码和媒体 trace，定位窗口遮挡如何抑制视频提交，并解释解码仍在继续时画面为何消失。</description>
+			</item>
+			<item>
+				<title>Mac 跨桌面录屏，为什么 Safari 视频会黑屏</title>
+				<link>https://liudon.com/posts/safari-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:08 +0800</pubDate>
+				<guid>https://liudon.com/posts/safari-offscreen-video-black/</guid>
+				<description>从 Safari 跨桌面录屏的视频黑屏现象出发，通过本地网页、OBS 对照、四种 Canvas 实验及 WebKit 源码，逐步定位可见性如何影响视频呈现。</description>
+			</item>
+			<item>
+				<title>Gecko 录屏自动化测试设计</title>
+				<link>https://liudon.com/posts/gecko-recording-test-automation/</link>
+				<pubDate>Wed, 11 Nov 2026 11:48:56 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-recording-test-automation/</guid>
+				<description>结合 Gecko 的真实实现，讲解 macOS 录屏自动化验证的完整链路：如何生成带 80-bit 帧号的参考视频、自动执行跨 Space 录制、通过日志与最终 MP4 验证画面更新并自动呈现判定结果。</description>
+			</item>
+			<item>
+				<title>从实验到实际录制：Gecko 的 Pulse 设计</title>
+				<link>https://liudon.com/posts/gecko-adaptive-pulse-design/</link>
+				<pubDate>Tue, 10 Nov 2026 10:00:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-adaptive-pulse-design/</guid>
+				<description>为改善 ScreenCaptureKit 跨桌面录制时的画面卡顿，Gecko 将 64×64 绘制窗口演进为 1×1 透明 Pulse，完成录制生命周期接入，并通过 30Hz/60Hz 帧率与功耗对照，最终确定 Adaptive 按需绘制方案。</description>
+			</item>
+			<item>
+				<title>切换桌面后，录屏画面几乎冻结</title>
+				<link>https://liudon.com/posts/screencapturekit-cross-space-freeze/</link>
+				<pubDate>Mon, 09 Nov 2026 16:11:41 +0800</pubDate>
+				<guid>https://liudon.com/posts/screencapturekit-cross-space-freeze/</guid>
+				<description>开发 Gecko 时，ScreenCaptureKit 在切换桌面后出现录屏画面严重卡顿、几乎冻结的问题。从 OBS 对照，到倒计时浮层的意外线索，记录一次跨桌面采集问题的排查过程。</description>
+			</item>
+			<item>
+				<title>Gecko：我做了一个 Mac 应用录制工具</title>
+				<link>https://liudon.com/posts/gecko-macos-app-recorder/</link>
+				<pubDate>Mon, 09 Nov 2026 11:42:14 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-macos-app-recorder/</guid>
+				<description>从录制指定应用的声音和画面开始，折腾出一个基于 ScreenCaptureKit 的 Mac 菜单栏工具 Gecko。</description>
+			</item>
+	</channel>
+</rss>

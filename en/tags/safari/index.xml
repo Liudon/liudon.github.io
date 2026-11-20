@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Safari on 流动</title>
+		<link>https://liudon.com/en/tags/safari/</link>
+		<description>Recent content in Safari on 流动</description>
+		<generator>Hugo</generator>
+		<language>en</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 13 Nov 2026 15:05:08 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/en/tags/safari/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Why Safari Videos Go Black in ScreenCaptureKit Recordings When Switching macOS Spaces</title>
+				<link>https://liudon.com/en/posts/safari-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:08 +0800</pubDate>
+				<guid>https://liudon.com/en/posts/safari-offscreen-video-black/</guid>
+				<description>Why does Safari video turn black in a Mac window recording after switching Spaces? Local video tests, OBS comparisons, Canvas experiments, WebKit source, and runtime logs reveal the visibility policy behind it.</description>
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Jev on 流动</title>
+		<link>https://liudon.com/tags/jev/</link>
+		<description>Recent content in Jev on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 23 Sep 2026 09:57:24 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/jev/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>给 Twikoo 接入 Jev，用 AI 判断博客评论是不是广告</title>
+				<link>https://liudon.com/posts/twikoo-jev-spam-detection/</link>
+				<pubDate>Wed, 23 Sep 2026 09:57:24 +0800</pubDate>
+				<guid>https://liudon.com/posts/twikoo-jev-spam-detection/</guid>
+				<description>给 Twikoo 接入 Jev / System One，通过评论正文、昵称和网址综合判断垃圾评论，并记录实际测试、Prompt 调整和阈值选择过程。</description>
+			</item>
+	</channel>
+</rss>

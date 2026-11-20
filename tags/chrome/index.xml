@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Chrome on 流动</title>
+		<link>https://liudon.com/tags/chrome/</link>
+		<description>Recent content in Chrome on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 13 Nov 2026 15:05:09 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/chrome/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Mac 跨桌面录屏，为什么 Chrome 视频会黑屏</title>
+				<link>https://liudon.com/posts/chrome-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:09 +0800</pubDate>
+				<guid>https://liudon.com/posts/chrome-offscreen-video-black/</guid>
+				<description>Mac 录制 Chrome 视频，为什么早期切换桌面正常，后来却黑屏？从一条被遗忘的启动参数出发，通过 Pulse 对照、Chromium 源码和媒体 trace，定位窗口遮挡如何抑制视频提交，并解释解码仍在继续时画面为何消失。</description>
+			</item>
+	</channel>
+</rss>

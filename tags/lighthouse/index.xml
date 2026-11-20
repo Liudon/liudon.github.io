@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Lighthouse on 流动</title>
+		<link>https://liudon.com/tags/lighthouse/</link>
+		<description>Recent content in Lighthouse on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 09 Sep 2026 00:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/lighthouse/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>博客加速实践</title>
+				<link>https://liudon.com/posts/blog-performance-optimization/</link>
+				<pubDate>Tue, 01 Sep 2026 15:14:02 +0800</pubDate>
+				<guid>https://liudon.com/posts/blog-performance-optimization/</guid>
+				<description>记录一次博客完整的性能优化实践：响应式图片预生成和JS文件延迟加载。</description>
+			</item>
+	</channel>
+</rss>

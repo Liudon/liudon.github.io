@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>独立开发 on 流动</title>
+		<link>https://liudon.com/tags/%E7%8B%AC%E7%AB%8B%E5%BC%80%E5%8F%91/</link>
+		<description>Recent content in 独立开发 on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Mon, 09 Nov 2026 11:42:14 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/%E7%8B%AC%E7%AB%8B%E5%BC%80%E5%8F%91/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Gecko：我做了一个 Mac 应用录制工具</title>
+				<link>https://liudon.com/posts/gecko-macos-app-recorder/</link>
+				<pubDate>Mon, 09 Nov 2026 11:42:14 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-macos-app-recorder/</guid>
+				<description>从录制指定应用的声音和画面开始，折腾出一个基于 ScreenCaptureKit 的 Mac 菜单栏工具 Gecko。</description>
+			</item>
+	</channel>
+</rss>
