@@ -95,3 +95,5 @@ Gecko 是一个 macOS 原生菜单栏应用，没有复杂的主窗口，主打�
 - [Mac 跨桌面录屏，为什么 Safari 视频会黑屏](/posts/safari-offscreen-video-black/)
 - [Mac 跨桌面录屏，为什么 Chrome 视频会黑屏](/posts/chrome-offscreen-video-black/)
 - [一条诊断日志，为什么让录屏卡了十五秒](/posts/gecko-logging-performance-investigation/)
+- [录屏结束了，声音却少了三秒](/posts/gecko-stop-audio-tail/)
+- [Gecko 录屏音画同步测试设计](/posts/gecko-recording-av-sync/)
