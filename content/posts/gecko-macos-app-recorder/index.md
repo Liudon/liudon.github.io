@@ -97,3 +97,4 @@ Gecko 是一个 macOS 原生菜单栏应用，没有复杂的主窗口，主打�
 - [一条诊断日志，为什么让录屏卡了十五秒](/posts/gecko-logging-performance-investigation/)
 - [录屏结束了，声音却少了三秒](/posts/gecko-stop-audio-tail/)
 - [Gecko 录屏音画同步测试设计](/posts/gecko-recording-av-sync/)
+- [开始、取消、停止撞在一起时：Gecko 的录制会话管理](/posts/gecko-recording-session-management/)

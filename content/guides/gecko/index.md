@@ -17,6 +17,7 @@ tree:
   - post: /posts/gecko-logging-performance-investigation/
   - post: /posts/gecko-stop-audio-tail/
   - post: /posts/gecko-recording-av-sync/
+  - post: /posts/gecko-recording-session-management/
 ---
 
 Gecko 是我开发的一款 macOS 原生录屏工具，基于 ScreenCaptureKit 和 AVFoundation，实现指定应用的音视频录制。
