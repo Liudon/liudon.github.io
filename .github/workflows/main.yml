@@ -515,7 +515,7 @@ jobs:
       # ------------------------------------------------------
 
       - name: Upload CAR to Filebase
-        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
+        if: false && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         timeout-minutes: 10
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.FILEBASE_KEY }}
@@ -569,7 +569,7 @@ jobs:
           echo "Kubo IPNS: OK"
 
       - name: Publish Filebase IPNS
-        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
+        if: false && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
         timeout-minutes: 5
         env:
           FILEBASE_KEY: ${{ secrets.FILEBASE_KEY }}
