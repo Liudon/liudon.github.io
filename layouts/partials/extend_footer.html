@@ -1,0 +1,22 @@
+{{- if and .IsPage (eq .Section "posts") }}
+<script>
+(function () {
+  var loaded = false;
+  function loadAdsense() {
+    if (loaded) return;
+    loaded = true;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648';
+    s.crossOrigin = 'anonymous';
+    document.head.appendChild(s);
+  }
+  ['scroll', 'pointerdown', 'keydown'].forEach(function (ev) {
+    window.addEventListener(ev, loadAdsense, { once: true, passive: true });
+  });
+  window.addEventListener('load', function () {
+    setTimeout(loadAdsense, 3500);
+  }, { once: true });
+})();
+</script>
+{{- end }}

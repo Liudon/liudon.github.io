@@ -147,11 +147,11 @@ run: |
 
 优化前：
 
-![optimize before](before.jpg)
+![optimize before](before.png)
 
 优化后：
 
-![optimize after](after.jpg)
+![optimize after](after.png)
 
 从WEBP切换到AVIF，文件大小减少了30%左右。
 

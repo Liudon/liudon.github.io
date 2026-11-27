@@ -18,7 +18,10 @@ defaultContentLanguage = "zh-cn"
 [languages.en]
   weight = 2
   label = "English"
+  title = "Liudon"
   contentDir = "content/en"
+  [languages.en.params]
+    description = "Life is a process of flowing."
 
 # Posts per page (Hugo >= 0.158 key; older Hugo versions use `paginate = 10`)
 [pagination]
@@ -51,6 +54,7 @@ defaultContentLanguage = "zh-cn"
   description = "生活就是一个流动的过程."
   keywords = ["流动", "博客", "liudon", "生活", "技术"]
   author = "Liudon"
+  og_image = "og-default.png"
   user = "liudon"
   host = "localhost"
   prompt_dir = "~/blog"
@@ -96,12 +100,11 @@ defaultContentLanguage = "zh-cn"
     env_id = "https://comment.liudon.com" # required — Tencent CloudBase env id or backend URL
     version = "1.7.20"                       # keep the frontend and backend versions aligned
     lang = "zh-CN"
+    integrity = ""                           # auto-populated in CI for the pinned version
   #   # Tencent CloudBase only:
   #   # use_full = true
   #   # region = "ap-shanghai"
   #   # script = "https://cdn.example.com/twikoo.min.js"
-  #   # Optional SRI — only when you pin the version; supply the hash yourself:
-  #   # integrity = "sha384-..."
 
   #[[params.social]]
   #  name = "github"

@@ -41,6 +41,7 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -61,12 +62,16 @@ jobs:
         run: |
           version=$(curl -fsSL https://raw.githubusercontent.com/Liudon/twikoo-netlify/main/package.json | jq -er '.dependencies."twikoo-netlify"')
           echo "Twikoo version: $version"
+          sri="sha384-$(curl -fsSL "https://cdn.jsdelivr.net/npm/twikoo@${version}/dist/twikoo.min.js" | openssl dgst -sha384 -binary | openssl base64 -A)"
+          echo "Twikoo integrity: $sri"
           echo "twikoo_version=$version" >> $GITHUB_OUTPUT
+          echo "twikoo_integrity=$sri" >> $GITHUB_OUTPUT
 
       - name: Update hugo.toml version
         if: github.event_name != 'schedule'
         env:
           TWIKOO_VERSION: ${{ steps.twikoo.outputs.twikoo_version }}
+          TWIKOO_INTEGRITY: ${{ steps.twikoo.outputs.twikoo_integrity }}
         run: |
           python3 - <<'PY'
           import os
@@ -75,29 +80,44 @@ jobs:
           from pathlib import Path
 
           version = os.environ["TWIKOO_VERSION"]
+          integrity = os.environ["TWIKOO_INTEGRITY"]
           if not re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?", version):
               raise SystemExit(f"Invalid Twikoo version: {version!r}")
+          if not re.fullmatch(r"sha384-[A-Za-z0-9+/=]+", integrity):
+              raise SystemExit(f"Invalid Twikoo integrity: {integrity!r}")
 
           path = Path("hugo.toml")
           lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
           section = None
-          updated = 0
+          updated_version = 0
+          updated_integrity = 0
 
           for index, line in enumerate(lines):
               stripped = line.strip()
               if stripped.startswith("[") and stripped.endswith("]"):
                   section = stripped
-              elif section == "[params.twikoo]" and re.match(r"^\s*version\s*=", line):
-                  lines[index], count = re.subn(
-                      r'^(\s*version\s*=\s*)"[^"]*"',
-                      rf'\g<1>"{version}"',
-                      line,
-                      count=1,
-                  )
-                  updated += count
+              elif section == "[params.twikoo]":
+                  if re.match(r"^\s*version\s*=", line):
+                      lines[index], count = re.subn(
+                          r'^(\s*version\s*=\s*)"[^"]*"',
+                          rf'\g<1>"{version}"',
+                          line,
+                          count=1,
+                      )
+                      updated_version += count
+                  elif re.match(r"^\s*integrity\s*=", line):
+                      lines[index], count = re.subn(
+                          r'^(\s*integrity\s*=\s*)"[^"]*"',
+                          rf'\g<1>"{integrity}"',
+                          line,
+                          count=1,
+                      )
+                      updated_integrity += count
 
-          if updated != 1:
-              raise SystemExit(f"Expected one params.twikoo.version, updated {updated}")
+          if updated_version != 1 or updated_integrity != 1:
+              raise SystemExit(
+                  f"Expected one version and integrity in [params.twikoo], got {updated_version=}, {updated_integrity=}"
+              )
 
           content = "".join(lines)
           tomllib.loads(content)
@@ -163,8 +183,16 @@ jobs:
       # ImageMagick configure/make
       # ------------------------------------------------------
 
-      - name: Install Sharp
+      - name: Cache media dependencies
         if: github.event_name != 'schedule'
+        id: media-deps-cache
+        uses: actions/cache@v5
+        with:
+          path: .github/scripts/media/node_modules
+          key: media-deps-${{ runner.os }}-${{ hashFiles('.github/scripts/media/package.json') }}
+
+      - name: Install Sharp
+        if: github.event_name != 'schedule' && steps.media-deps-cache.outputs.cache-hit != 'true'
         run: |
           npm install \
             --prefix .github/scripts/media \
@@ -272,17 +300,30 @@ jobs:
 
       - name: Easyindex
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          GOOGLE_INDEXING_API_TOKEN: ${{ secrets.GOOGLE_INDEXING_API_TOKEN }}
+        shell: bash
         run: |
-          echo '${{ secrets.GOOGLE_INDEXING_API_TOKEN }}' > ./credentials.json
+          set -euo pipefail
 
-          touch ./url.csv
-          echo "\"notification_type\",\"url\"" >> ./url.csv # Headers line
-          echo "\"URL_UPDATED\",\"https://liudon.com/\"" >> ./url.csv # ADD URL
-          echo "\"URL_UPDATED\",\"https://liudon.com/sitemap.xml\"" >> ./url.csv # ADD URL
+          EASYINDEX_DIR="${RUNNER_TEMP}/easyindex"
+          rm -rf "$EASYINDEX_DIR"
+          mkdir -p "$EASYINDEX_DIR"
 
-          curl -s -L https://github.com/usk81/easyindex-cli/releases/download/v1.0.6/easyindex-cli_1.0.6_linux_amd64.tar.gz | tar xz
-          chmod +x ./easyindex-cli
-          ./easyindex-cli google -d -c ./url.csv
+          printf '%s' "$GOOGLE_INDEXING_API_TOKEN" > "${EASYINDEX_DIR}/credentials.json"
+          chmod 600 "${EASYINDEX_DIR}/credentials.json"
+
+          cat <<'CSV' > "${EASYINDEX_DIR}/url.csv"
+          "notification_type","url"
+          "URL_UPDATED","https://liudon.com/"
+          "URL_UPDATED","https://liudon.com/sitemap.xml"
+          CSV
+
+          curl -fsSL https://github.com/usk81/easyindex-cli/releases/download/v1.0.6/easyindex-cli_1.0.6_linux_amd64.tar.gz \
+            | tar xz -C "$EASYINDEX_DIR"
+          chmod +x "${EASYINDEX_DIR}/easyindex-cli"
+          (cd "$EASYINDEX_DIR" && ./easyindex-cli google -d -c ./url.csv)
+          rm -rf "$EASYINDEX_DIR"
 
       # Keep Hugo's normal robots.txt in the IPFS copy. The public gateway
       # controls snapshot indexing with X-Robots-Tag: noindex, nofollow, noarchive,
@@ -298,42 +339,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          DIGEST=$(python3 - <<'PY'
-          from pathlib import Path
-          import hashlib
-
-          root = Path("public")
-          h = hashlib.sha256()
-
-          def add_field(tag: bytes, value: bytes) -> None:
-              h.update(tag)
-              h.update(len(value).to_bytes(8, "big"))
-              h.update(value)
-
-          entries = sorted(
-              root.rglob("*"),
-              key=lambda p: p.relative_to(root).as_posix(),
-          )
-
-          for path in entries:
-              rel = path.relative_to(root).as_posix().encode("utf-8")
-
-              if path.is_symlink():
-                  add_field(b"L", rel)
-                  add_field(b"T", path.readlink().as_posix().encode("utf-8"))
-              elif path.is_dir():
-                  add_field(b"D", rel)
-              elif path.is_file():
-                  add_field(b"F", rel)
-                  with path.open("rb") as f:
-                      while chunk := f.read(1024 * 1024):
-                          h.update(chunk)
-              else:
-                  raise SystemExit(f"Unsupported filesystem entry: {path}")
-
-          print("sha256:" + h.hexdigest())
-          PY
-          )
+          DIGEST=$(python3 .github/scripts/ipfs-history/public-digest.py public)
 
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
           echo "IPFS content digest: $DIGEST"
@@ -815,6 +821,14 @@ jobs:
             done
           fi
 
+      - name: Cache Playwright Chromium
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.ipfs-state.outputs.deploy == 'true'
+        id: playwright-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-1.56.1-chromium
+
       # Capture the newly published snapshot directly from the local ./public
       # tree. The legacy screenshots/<cid>.webp path is frozen; new captures
       # are written under captures/<profile-id>/<cid>/.
@@ -831,6 +845,7 @@ jobs:
           SCREENSHOT_ATTEMPTS: "2"
           CAPTURE_MAX_PIXELS: "40000000"
           CAPTURE_ENVIRONMENT_ID: ubuntu-24.04-playwright-1.56.1-sharp-0.35.0-noto-cjk-v1
+          PLAYWRIGHT_CACHE_HIT: ${{ steps.playwright-cache.outputs.cache-hit }}
         shell: bash
         run: |
           set -euo pipefail
@@ -851,7 +866,11 @@ jobs:
             --no-fund \
             playwright@1.56.1 sharp@0.35.0
 
-          npx playwright install --with-deps chromium
+          if [[ "$PLAYWRIGHT_CACHE_HIT" == "true" ]]; then
+            npx playwright install-deps chromium
+          else
+            npx playwright install --with-deps chromium
+          fi
 
           BROWSER_EVIDENCE=$(node --input-type=module <<'NODE'
           import { chromium } from "playwright";
@@ -881,41 +900,7 @@ jobs:
 
           # Re-hash the exact public tree immediately before capture. Nothing
           # may rewrite public between CAR creation and the local screenshot.
-          CURRENT_DIGEST=$(python3 - <<'PY'
-          from pathlib import Path
-          import hashlib
-
-          root = Path("public")
-          h = hashlib.sha256()
-
-          def add_field(tag: bytes, value: bytes) -> None:
-              h.update(tag)
-              h.update(len(value).to_bytes(8, "big"))
-              h.update(value)
-
-          entries = sorted(
-              root.rglob("*"),
-              key=lambda p: p.relative_to(root).as_posix(),
-          )
-
-          for path in entries:
-              rel = path.relative_to(root).as_posix().encode("utf-8")
-              if path.is_symlink():
-                  add_field(b"L", rel)
-                  add_field(b"T", path.readlink().as_posix().encode("utf-8"))
-              elif path.is_dir():
-                  add_field(b"D", rel)
-              elif path.is_file():
-                  add_field(b"F", rel)
-                  with path.open("rb") as f:
-                      while chunk := f.read(1024 * 1024):
-                          h.update(chunk)
-              else:
-                  raise SystemExit(f"Unsupported filesystem entry: {path}")
-
-          print("sha256:" + h.hexdigest())
-          PY
-          )
+          CURRENT_DIGEST=$(python3 .github/scripts/ipfs-history/public-digest.py public)
 
           if [[ "$CURRENT_DIGEST" != "$CONTENT_DIGEST" ]]; then
             echo "ERROR: public changed between CAR creation and screenshot capture"

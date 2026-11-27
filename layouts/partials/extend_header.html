@@ -4,7 +4,11 @@
 {{- $guidesCSS := resources.Get "css/guides.css" | minify | fingerprint }}
 <link rel="stylesheet" href="{{ $guidesCSS.RelPermalink }}" integrity="{{ $guidesCSS.Data.Integrity }}" crossorigin="anonymous">
 {{- end }}
-{{- if and .IsPage (eq .Section "posts") }}
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4739645989170648"
-        crossorigin="anonymous" fetchpriority="low"></script>
+{{- if and .IsPage site.Params.twikoo.env_id (not .Params.disable_comments) }}
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+{{- with resources.Get "css/twikoo.css" }}
+{{- $twikooCSS := . | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $twikooCSS.RelPermalink }}" integrity="{{ $twikooCSS.Data.Integrity }}" crossorigin="anonymous" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="{{ $twikooCSS.RelPermalink }}" integrity="{{ $twikooCSS.Data.Integrity }}" crossorigin="anonymous"></noscript>
+{{- end }}
 {{- end }}
