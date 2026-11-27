@@ -6,6 +6,10 @@
 {{- else -}}
 {{- $pages = $pctx.Pages -}}
 {{- end -}}
+{{- if and $.IsHome site.Params.rss_sections -}}
+{{- $pages = where $pages "Section" "in" site.Params.rss_sections -}}
+{{- end -}}
+{{- $pages = $pages.ByPublishDate.Reverse -}}
 {{- $limit := site.Config.Services.RSS.Limit -}}
 {{- if ge $limit 1 -}}
 {{- $pages = $pages | first $limit -}}

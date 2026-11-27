@@ -31,9 +31,10 @@ permissions:
 
 concurrency:
   # Push and manual production runs share a group so IPFS state updates cannot race.
+  # Only cancel superseded pull requests; never abort an in-progress production deploy.
   # Scheduled cache keepalive runs remain independent.
   group: ${{ github.workflow }}-${{ github.event_name == 'schedule' && 'media-cache' || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -172,7 +173,7 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: .cache/media
-          key: media-v1-${{ hashFiles('content/posts/**/*.jpg', 'content/posts/**/*.jpeg', 'content/posts/**/*.png', 'content/posts/**/*.JPG', 'content/posts/**/*.JPEG', 'content/posts/**/*.PNG', 'content/posts/**/*.mp4', 'content/posts/**/*.MP4', 'static/ArchitectsDaughter-Regular.ttf', '.github/scripts/media/package.json', '.github/scripts/media/process-media.mjs') }}
+          key: media-v1-${{ hashFiles('content/posts/**/*.jpg', 'content/posts/**/*.jpeg', 'content/posts/**/*.png', 'content/posts/**/*.JPG', 'content/posts/**/*.JPEG', 'content/posts/**/*.PNG', 'content/posts/**/*.mp4', 'content/posts/**/*.MP4', '.github/scripts/media/ArchitectsDaughter-Regular.ttf', '.github/scripts/media/package.json', '.github/scripts/media/process-media.mjs') }}
           restore-keys: |
             media-v1-
 
@@ -318,6 +319,7 @@ jobs:
 
       - name: Easyindex
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        continue-on-error: true
         env:
           GOOGLE_INDEXING_API_TOKEN: ${{ secrets.GOOGLE_INDEXING_API_TOKEN }}
         shell: bash
@@ -334,7 +336,6 @@ jobs:
           cat <<'CSV' > "${EASYINDEX_DIR}/url.csv"
           "notification_type","url"
           "URL_UPDATED","https://liudon.com/"
-          "URL_UPDATED","https://liudon.com/sitemap.xml"
           CSV
 
           curl -fsSL https://github.com/usk81/easyindex-cli/releases/download/v1.0.6/easyindex-cli_1.0.6_linux_amd64.tar.gz \
@@ -1031,9 +1032,9 @@ jobs:
               echo "- Status: deployed"
               echo "- CID: $CID"
               echo "- VPS Kubo: OK"
-              echo "- Filebase: OK"
+              echo "- Filebase: disabled"
               echo "- Kubo IPNS: updated"
-              echo "- Filebase IPNS: updated"
+              echo "- Filebase IPNS: disabled"
               echo "- History: recorded"
             else
               echo "- Status: skipped (content unchanged)"

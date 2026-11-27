@@ -38,7 +38,7 @@ const VIDEO_CACHE_DIR =
 const FONT =
     path.join(
         ROOT,
-        "static/ArchitectsDaughter-Regular.ttf"
+        ".github/scripts/media/ArchitectsDaughter-Regular.ttf"
     );
 
 const SCRIPT_FILE =

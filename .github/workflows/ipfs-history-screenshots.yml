@@ -67,7 +67,16 @@ jobs:
 
           echo "dir=$HISTORY_DIR" >> "$GITHUB_OUTPUT"
 
+      - name: Cache Playwright Chromium
+        id: playwright-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-1.56.1-chromium
+
       - name: Install screenshot dependencies
+        env:
+          PLAYWRIGHT_CACHE_HIT: ${{ steps.playwright-cache.outputs.cache-hit }}
         shell: bash
         run: |
           set -euo pipefail
@@ -84,7 +93,11 @@ jobs:
             --no-fund \
             playwright@1.56.1 sharp@0.35.0
 
-          npx playwright install --with-deps chromium
+          if [[ "$PLAYWRIGHT_CACHE_HIT" == "true" ]]; then
+            npx playwright install-deps chromium
+          else
+            npx playwright install --with-deps chromium
+          fi
 
       - name: Collect capture runtime evidence
         shell: bash

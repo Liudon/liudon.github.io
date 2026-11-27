@@ -28,6 +28,10 @@ defaultContentLanguage = "zh-cn"
   pagersize = 10
   path = "page"
 
+[services]
+  [services.rss]
+    limit = 20
+
 [outputs]
   home = ["html", "rss", "json", "jsonfeed"]        # json powers the built-in search
 
@@ -43,7 +47,7 @@ defaultContentLanguage = "zh-cn"
 [outputFormats.json]
   mediaType = "application/json"
   baseName = "search"
-  rel = "alternate"
+  notAlternative = true
   isPlainText = true
 
 [minify]
@@ -62,7 +66,7 @@ defaultContentLanguage = "zh-cn"
   rss_sections = ["posts"]        # Homepage RSS only includes blog posts
   status_right = "EOF"
 
-  showFullTextinJSONFeed = true
+  showFullTextinJSONFeed = false
   search_index = "search.json"
 
   language_switcher = "article"
@@ -153,6 +157,14 @@ defaultContentLanguage = "zh-cn"
 
 [taxonomies]
   tag = "tags"
+
+[[cascade]]
+  [cascade.params]
+    robots = "noindex, follow"
+  [cascade.sitemap]
+    disable = true
+  [cascade.target]
+    kind = "{taxonomy,term}"
 
 [params.sponsor]
   enable = true

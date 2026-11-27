@@ -18,6 +18,15 @@ concurrency:
 
 jobs:
   build:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.name == 'Repair IPFS History Screenshots' ||
+      (
+        github.event.workflow_run.name == 'CI' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event != 'pull_request' &&
+        github.event.workflow_run.event != 'schedule'
+      )
     runs-on: ubuntu-24.04
     timeout-minutes: 30
 

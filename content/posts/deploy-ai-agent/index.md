@@ -156,7 +156,7 @@ Ask the bot owner to run:
 
 ### 问题
 
-![](hermes%20agent%20cost.png)
+![Hermes Agent 辅助模型计费截图](hermes-agent-cost.png)
 
 我配置的是免费模型，但是看OpenRouter的Logs，时不时会有`Gemini 3 Flash Preview`模型的调用，产生费用。
 

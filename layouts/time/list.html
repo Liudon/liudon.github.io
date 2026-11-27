@@ -7,15 +7,34 @@
   <meta name="description" content="{{ .Description | default site.Params.description | plainify | truncate 160 }}">
   <meta name="robots" content="{{ .Params.robots | default "index, follow" }}">
   <link rel="canonical" href="{{ .Permalink }}">
+  {{- if gt (len hugo.Sites) 1 }}
+    {{- range .AllTranslations }}
+  <link rel="alternate" hreflang="{{ .Language.Locale | default .Language.Lang }}" href="{{ .Permalink }}">
+    {{- end }}
+    {{- $defaultSite := index hugo.Sites 0 }}
+    {{- $xDefault := $defaultSite.Home.Permalink }}
+    {{- with where .AllTranslations "Language.Lang" $defaultSite.Language.Lang }}
+      {{- with index . 0 }}{{ $xDefault = .Permalink }}{{ end }}
+    {{- end }}
+  <link rel="alternate" hreflang="x-default" href="{{ $xDefault }}">
+  {{- end }}
 
+  {{- $imageURL := partial "resolve-image.html" . -}}
   <meta property="og:title" content="{{ .Title }} - {{ site.Title }}">
   <meta property="og:description" content="{{ .Description | default site.Params.description | plainify | truncate 200 }}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="{{ .Permalink }}">
+  <meta property="og:locale" content="{{ site.Language.Locale | default site.Language.Lang | default "zh-CN" }}">
+  {{- with $imageURL }}
+  <meta property="og:image" content="{{ . }}">
+  {{- end }}
   <meta property="og:site_name" content="{{ site.Title }}">
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="{{ if $imageURL }}summary_large_image{{ else }}summary{{ end }}">
   <meta name="twitter:title" content="{{ .Title }} - {{ site.Title }}">
   <meta name="twitter:description" content="{{ .Description | default site.Params.description | plainify | truncate 200 }}">
+  {{- with $imageURL }}
+  <meta name="twitter:image" content="{{ . }}">
+  {{- end }}
 
   <link rel="icon" type="image/svg+xml" href="{{ site.Params.assets.favicon_svg | default "favicon.svg" | relURL }}">
   <link rel="icon" href="{{ site.Params.assets.favicon | default "favicon.ico" | relURL }}">
@@ -25,8 +44,10 @@
 
   {{- $timeCSS := resources.Get "css/time.css" | minify | fingerprint "sha256" }}
   <link rel="stylesheet" href="{{ $timeCSS.RelPermalink }}" integrity="{{ $timeCSS.Data.Integrity }}" crossorigin="anonymous">
+  {{ partial "seo-schema.html" . }}
 </head>
 <body class="time-machine-page">
+<h1 class="sr-only">{{ .Title }}</h1>
 <div class="mac-hardware">
     <div class="mac-handle-groove"></div>
 
