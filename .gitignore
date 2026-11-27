@@ -9,3 +9,6 @@ resources
 
 # Node.js
 node_modules
+
+# Self-hosted Twikoo bundle (downloaded during CI)
+static/js/twikoo.*.min.js

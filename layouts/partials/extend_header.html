@@ -5,7 +5,6 @@
 <link rel="stylesheet" href="{{ $guidesCSS.RelPermalink }}" integrity="{{ $guidesCSS.Data.Integrity }}" crossorigin="anonymous">
 {{- end }}
 {{- if and .IsPage site.Params.twikoo.env_id (not .Params.disable_comments) }}
-<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 {{- with resources.Get "css/twikoo.css" }}
 {{- $twikooCSS := . | minify | fingerprint }}
 <link rel="stylesheet" href="{{ $twikooCSS.RelPermalink }}" integrity="{{ $twikooCSS.Data.Integrity }}" crossorigin="anonymous" media="print" onload="this.media='all'">

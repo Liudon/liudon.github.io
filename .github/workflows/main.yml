@@ -62,15 +62,21 @@ jobs:
         run: |
           version=$(curl -fsSL https://raw.githubusercontent.com/Liudon/twikoo-netlify/main/package.json | jq -er '.dependencies."twikoo-netlify"')
           echo "Twikoo version: $version"
-          sri="sha384-$(curl -fsSL "https://cdn.jsdelivr.net/npm/twikoo@${version}/dist/twikoo.min.js" | openssl dgst -sha384 -binary | openssl base64 -A)"
+          mkdir -p static/js
+          rm -f static/js/twikoo.*.min.js
+          twikoo_file="static/js/twikoo.${version}.min.js"
+          curl -fsSL "https://cdn.jsdelivr.net/npm/twikoo@${version}/dist/twikoo.min.js" -o "$twikoo_file"
+          sri="sha384-$(openssl dgst -sha384 -binary "$twikoo_file" | openssl base64 -A)"
           echo "Twikoo integrity: $sri"
           echo "twikoo_version=$version" >> $GITHUB_OUTPUT
+          echo "twikoo_script=/js/twikoo.${version}.min.js" >> $GITHUB_OUTPUT
           echo "twikoo_integrity=$sri" >> $GITHUB_OUTPUT
 
       - name: Update hugo.toml version
         if: github.event_name != 'schedule'
         env:
           TWIKOO_VERSION: ${{ steps.twikoo.outputs.twikoo_version }}
+          TWIKOO_SCRIPT: ${{ steps.twikoo.outputs.twikoo_script }}
           TWIKOO_INTEGRITY: ${{ steps.twikoo.outputs.twikoo_integrity }}
         run: |
           python3 - <<'PY'
@@ -80,9 +86,12 @@ jobs:
           from pathlib import Path
 
           version = os.environ["TWIKOO_VERSION"]
+          script = os.environ["TWIKOO_SCRIPT"]
           integrity = os.environ["TWIKOO_INTEGRITY"]
           if not re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?", version):
               raise SystemExit(f"Invalid Twikoo version: {version!r}")
+          if not re.fullmatch(r"/js/twikoo\.[0-9A-Za-z._-]+\.min\.js", script):
+              raise SystemExit(f"Invalid Twikoo script: {script!r}")
           if not re.fullmatch(r"sha384-[A-Za-z0-9+/=]+", integrity):
               raise SystemExit(f"Invalid Twikoo integrity: {integrity!r}")
 
@@ -90,6 +99,7 @@ jobs:
           lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
           section = None
           updated_version = 0
+          updated_script = 0
           updated_integrity = 0
 
           for index, line in enumerate(lines):
@@ -105,6 +115,14 @@ jobs:
                           count=1,
                       )
                       updated_version += count
+                  elif re.match(r"^\s*script\s*=", line):
+                      lines[index], count = re.subn(
+                          r'^(\s*script\s*=\s*)"[^"]*"',
+                          rf'\g<1>"{script}"',
+                          line,
+                          count=1,
+                      )
+                      updated_script += count
                   elif re.match(r"^\s*integrity\s*=", line):
                       lines[index], count = re.subn(
                           r'^(\s*integrity\s*=\s*)"[^"]*"',
@@ -114,9 +132,9 @@ jobs:
                       )
                       updated_integrity += count
 
-          if updated_version != 1 or updated_integrity != 1:
+          if updated_version != 1 or updated_script != 1 or updated_integrity != 1:
               raise SystemExit(
-                  f"Expected one version and integrity in [params.twikoo], got {updated_version=}, {updated_integrity=}"
+                  f"Expected one version/script/integrity in [params.twikoo], got {updated_version=}, {updated_script=}, {updated_integrity=}"
               )
 
           content = "".join(lines)

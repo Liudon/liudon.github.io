@@ -100,7 +100,8 @@ defaultContentLanguage = "zh-cn"
     env_id = "https://comment.liudon.com" # required — Tencent CloudBase env id or backend URL
     version = "1.7.20"                       # keep the frontend and backend versions aligned
     lang = "zh-CN"
-    integrity = ""                           # auto-populated in CI for the pinned version
+    script = "/js/twikoo.1.7.20.min.js"      # self-hosted same-origin bundle (updated in CI)
+    integrity = "sha384-yoiW6B9POkG8YiZgmBFK1Q3jJhKNqcdMOJGKRUDAno6UZBq8XHCDyx10i1INEjbz"                           # auto-populated in CI for the pinned version
   #   # Tencent CloudBase only:
   #   # use_full = true
   #   # region = "ap-shanghai"
