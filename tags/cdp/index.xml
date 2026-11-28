@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>CDP on 流动</title>
+		<link>https://liudon.com/tags/cdp/</link>
+		<description>Recent content in CDP on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Sat, 07 Nov 2026 14:27:18 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/cdp/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>一次 browser_exec 调用背后：Hermes Agent 如何管理浏览器</title>
+				<link>https://liudon.com/posts/hermes-agent-browser-management/</link>
+				<pubDate>Sat, 07 Nov 2026 14:27:18 +0800</pubDate>
+				<guid>https://liudon.com/posts/hermes-agent-browser-management/</guid>
+				<description>从一次 browser_exec 调用出发，梳理 Hermes Agent 的浏览器来源选择、CDP 连接，以及 Docker 中 Chromium 的启动、进程复用、锁协调与生命周期管理。</description>
+			</item>
+	</channel>
+</rss>

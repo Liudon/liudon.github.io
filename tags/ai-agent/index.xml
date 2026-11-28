@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Ai Agent on 流动</title>
+		<link>https://liudon.com/tags/ai-agent/</link>
+		<description>Recent content in Ai Agent on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 09 Sep 2026 00:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/ai-agent/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>AI Agent折腾记（OpenClaw / Hermes Agent）</title>
+				<link>https://liudon.com/posts/deploy-ai-agent/</link>
+				<pubDate>Tue, 14 Apr 2026 22:12:17 +0800</pubDate>
+				<guid>https://liudon.com/posts/deploy-ai-agent/</guid>
+				<description>记录在 2 核 4G 云服务器上部署和使用 OpenClaw、Hermes Agent 的过程，以及内存、定时任务和辅助模型计费问题。</description>
+			</item>
+	</channel>
+</rss>

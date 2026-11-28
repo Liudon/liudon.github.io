@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>WrenAI on 流动</title>
+		<link>https://liudon.com/tags/wrenai/</link>
+		<description>Recent content in WrenAI on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Wed, 09 Sep 2026 00:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/wrenai/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>WrenAI GenBI Classic 本地部署：Docker &#43; Ollama 配置本地 LLM</title>
+				<link>https://liudon.com/posts/wrenai-local-llm-usage-guide/</link>
+				<pubDate>Sun, 16 Mar 2025 17:28:10 +0800</pubDate>
+				<guid>https://liudon.com/posts/wrenai-local-llm-usage-guide/</guid>
+				<description>记录 WrenAI GenBI Classic 的本地部署过程：通过 Docker 部署 Ollama，并配置 Phi-4、nomic-embed-text、Qdrant 与 WrenAI 旧版 Web UI。本文基于 WrenAI 0.15.x 历史配置。</description>
+			</item>
+	</channel>
+</rss>

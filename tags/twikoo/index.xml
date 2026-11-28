@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Twikoo on 流动</title>
+		<link>https://liudon.com/tags/twikoo/</link>
+		<description>Recent content in Twikoo on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Tue, 29 Sep 2026 10:03:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/twikoo/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Twikoo 评论为什么这么慢：藏在 POST_SUBMIT 里的 5 秒等待窗口</title>
+				<link>https://liudon.com/posts/twikoo-comment-delay-post-submit/</link>
+				<pubDate>Tue, 29 Sep 2026 10:03:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/twikoo-comment-delay-post-submit/</guid>
+				<description>一次 Twikoo 评论提交耗时排查：从 QQ SMTP 的 3 秒多延迟，一路追到 POST_SUBMIT 的 5 秒等待窗口，并重新梳理 Netlify 下后置任务的异步执行方式。</description>
+			</item>
+			<item>
+				<title>给 Twikoo 接入 Jev，用 AI 判断博客评论是不是广告</title>
+				<link>https://liudon.com/posts/twikoo-jev-spam-detection/</link>
+				<pubDate>Wed, 23 Sep 2026 09:57:24 +0800</pubDate>
+				<guid>https://liudon.com/posts/twikoo-jev-spam-detection/</guid>
+				<description>给 Twikoo 接入 Jev / System One，通过评论正文、昵称和网址综合判断垃圾评论，并记录实际测试、Prompt 调整和阈值选择过程。</description>
+			</item>
+			<item>
+				<title>Twikoo 2.x 升级踩坑：Netlify CORS 报错与解决方案</title>
+				<link>https://liudon.com/posts/twikoo-2-netlify-cors/</link>
+				<pubDate>Tue, 22 Sep 2026 00:48:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/twikoo-2-netlify-cors/</guid>
+				<description>记录 Twikoo 2.x 升级后 Netlify 评论服务出现 CORS 报错的问题、原因以及临时和长期解决方案。</description>
+			</item>
+			<item>
+				<title>在Netlify上部署Twikoo评论系统</title>
+				<link>https://liudon.com/posts/deploy-twikoo-on-netlify/</link>
+				<pubDate>Thu, 19 Oct 2023 19:46:32 +0800</pubDate>
+				<guid>https://liudon.com/posts/deploy-twikoo-on-netlify/</guid>
+				<description>记录在 Netlify 部署 Twikoo 评论系统、配置 MongoDB、自定义域名，以及排查 CORS、404 和云函数路径问题的过程。</description>
+			</item>
+	</channel>
+</rss>

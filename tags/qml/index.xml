@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>QML on 流动</title>
+		<link>https://liudon.com/tags/qml/</link>
+		<description>Recent content in QML on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Tue, 03 Nov 2026 12:00:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/qml/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>青萍空气检测仪改造记：展示 AI 订阅额度</title>
+				<link>https://liudon.com/posts/qingping-cgs1-ai-quota-display/</link>
+				<pubDate>Tue, 03 Nov 2026 12:00:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/qingping-cgs1-ai-quota-display/</guid>
+				<description>在青萍空气检测仪 CGS1 上展示 Codex 和 OpenCode Go 订阅额度：由 Mac 采集数据，经 VPS 静态 JSON 同步，再用 QML 页面显示。</description>
+			</item>
+			<item>
+				<title>青萍空气检测仪改造记：用 AI 给它加个新页面</title>
+				<link>https://liudon.com/posts/qingping-cgs1-custom-qml-page/</link>
+				<pubDate>Mon, 02 Nov 2026 11:39:38 +0800</pubDate>
+				<guid>https://liudon.com/posts/qingping-cgs1-custom-qml-page/</guid>
+				<description>借助 AI 折腾初代青萍空气检测仪 CGS1：通过 ADB 进入系统，提取并修改 SnowApp 中的 QML，给官方界面加上自定义页面。</description>
+			</item>
+	</channel>
+</rss>

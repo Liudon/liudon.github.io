@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>文章 on 流动</title>
+		<link>https://liudon.com/posts/</link>
+		<description>Recent content in 文章 on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 27 Nov 2026 08:38:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/posts/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>开始、取消、停止撞在一起时：Gecko 的录制会话管理</title>
+				<link>https://liudon.com/posts/gecko-recording-session-management/</link>
+				<pubDate>Fri, 27 Nov 2026 08:38:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-recording-session-management/</guid>
+				<description>一次录屏背后同时跑着双路采集流、媒体写入器和多路系统守护任务。面对异步准备不可撤销、外部事件乱序并发的复杂场景，Gecko 如何通过职责拆分、状态收敛与真实文件校验管好整轮录制生命周期。</description>
+			</item>
+			<item>
+				<title>Gecko 录屏音画同步测试设计</title>
+				<link>https://liudon.com/posts/gecko-recording-av-sync/</link>
+				<pubDate>Fri, 20 Nov 2026 14:50:08 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-recording-av-sync/</guid>
+				<description>在录屏自动化测试中增加音画同步检查：设计可配对的画面与声音标记，从成品测量偏移与漂移，再通过基线校准冻结阈值并接入自动判定。</description>
+			</item>
+			<item>
+				<title>录屏结束了，声音却少了三秒</title>
+				<link>https://liudon.com/posts/gecko-stop-audio-tail/</link>
+				<pubDate>Mon, 16 Nov 2026 14:25:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-stop-audio-tail/</guid>
+				<description>Gecko 正常停止录制后，音频却比视频提前约 2.94 秒结束。沿着两条采集流依次停止的时序，分析尾差如何产生，以及如何借助共用串行队列统一样本的接收截止点。</description>
+			</item>
+			<item>
+				<title>一条诊断日志，为什么让录屏卡了十五秒</title>
+				<link>https://liudon.com/posts/gecko-logging-performance-investigation/</link>
+				<pubDate>Mon, 16 Nov 2026 13:20:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-logging-performance-investigation/</guid>
+				<description>一次诊断日志调用暴露了媒体队列、主线程与 Metal 绘制之间的等待链。结合分段计时、线程栈和异步对照，分析延迟如何跨线程传播，以及如何解除不必要的同步依赖。</description>
+			</item>
+			<item>
+				<title>Mac 跨桌面录屏，为什么 Chrome 视频会黑屏</title>
+				<link>https://liudon.com/posts/chrome-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:09 +0800</pubDate>
+				<guid>https://liudon.com/posts/chrome-offscreen-video-black/</guid>
+				<description>Mac 录制 Chrome 视频，为什么早期切换桌面正常，后来却黑屏？从一条被遗忘的启动参数出发，通过 Pulse 对照、Chromium 源码和媒体 trace，定位窗口遮挡如何抑制视频提交，并解释解码仍在继续时画面为何消失。</description>
+			</item>
+			<item>
+				<title>Mac 跨桌面录屏，为什么 Safari 视频会黑屏</title>
+				<link>https://liudon.com/posts/safari-offscreen-video-black/</link>
+				<pubDate>Fri, 13 Nov 2026 15:05:08 +0800</pubDate>
+				<guid>https://liudon.com/posts/safari-offscreen-video-black/</guid>
+				<description>从 Safari 跨桌面录屏的视频黑屏现象出发，通过本地网页、OBS 对照、四种 Canvas 实验及 WebKit 源码，逐步定位可见性如何影响视频呈现。</description>
+			</item>
+			<item>
+				<title>Gecko 录屏自动化测试设计</title>
+				<link>https://liudon.com/posts/gecko-recording-test-automation/</link>
+				<pubDate>Wed, 11 Nov 2026 11:48:56 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-recording-test-automation/</guid>
+				<description>结合 Gecko 的真实实现，讲解 macOS 录屏自动化验证的完整链路：如何生成带 80-bit 帧号的参考视频、自动执行跨 Space 录制、通过日志与最终 MP4 验证画面更新并自动呈现判定结果。</description>
+			</item>
+			<item>
+				<title>从实验到实际录制：Gecko 的 Pulse 设计</title>
+				<link>https://liudon.com/posts/gecko-adaptive-pulse-design/</link>
+				<pubDate>Tue, 10 Nov 2026 10:00:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-adaptive-pulse-design/</guid>
+				<description>为改善 ScreenCaptureKit 跨桌面录制时的画面卡顿，Gecko 将 64×64 绘制窗口演进为 1×1 透明 Pulse，完成录制生命周期接入，并通过 30Hz/60Hz 帧率与功耗对照，最终确定 Adaptive 按需绘制方案。</description>
+			</item>
+			<item>
+				<title>切换桌面后，录屏画面几乎冻结</title>
+				<link>https://liudon.com/posts/screencapturekit-cross-space-freeze/</link>
+				<pubDate>Mon, 09 Nov 2026 16:11:41 +0800</pubDate>
+				<guid>https://liudon.com/posts/screencapturekit-cross-space-freeze/</guid>
+				<description>开发 Gecko 时，ScreenCaptureKit 在切换桌面后出现录屏画面严重卡顿、几乎冻结的问题。从 OBS 对照，到倒计时浮层的意外线索，记录一次跨桌面采集问题的排查过程。</description>
+			</item>
+			<item>
+				<title>Gecko：我做了一个 Mac 应用录制工具</title>
+				<link>https://liudon.com/posts/gecko-macos-app-recorder/</link>
+				<pubDate>Mon, 09 Nov 2026 11:42:14 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-macos-app-recorder/</guid>
+				<description>从录制指定应用的声音和画面开始，折腾出一个基于 ScreenCaptureKit 的 Mac 菜单栏工具 Gecko。</description>
+			</item>
+			<item>
+				<title>一次 browser_exec 调用背后：Hermes Agent 如何管理浏览器</title>
+				<link>https://liudon.com/posts/hermes-agent-browser-management/</link>
+				<pubDate>Sat, 07 Nov 2026 14:27:18 +0800</pubDate>
+				<guid>https://liudon.com/posts/hermes-agent-browser-management/</guid>
+				<description>从一次 browser_exec 调用出发，梳理 Hermes Agent 的浏览器来源选择、CDP 连接，以及 Docker 中 Chromium 的启动、进程复用、锁协调与生命周期管理。</description>
+			</item>
+			<item>
+				<title>Hermes Agent v0.23.0 升级：一次安全修复，让我的 Chrome 无法启动</title>
+				<link>https://liudon.com/posts/hermes-agent-v0-23-0-chrome-s6/</link>
+				<pubDate>Fri, 06 Nov 2026 22:20:23 +0800</pubDate>
+				<guid>https://liudon.com/posts/hermes-agent-v0-23-0-chrome-s6/</guid>
+				<description>Hermes Agent v0.23.0 Docker 升级后，自建 Chrome 服务因 /run/service 权限变化无法启动。从 Permission denied 入手，追查 s6 服务目录迁移及其背后的安全修复。</description>
+			</item>
+			<item>
+				<title>青萍空气检测仪改造记：展示 AI 订阅额度</title>
+				<link>https://liudon.com/posts/qingping-cgs1-ai-quota-display/</link>
+				<pubDate>Tue, 03 Nov 2026 12:00:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/qingping-cgs1-ai-quota-display/</guid>
+				<description>在青萍空气检测仪 CGS1 上展示 Codex 和 OpenCode Go 订阅额度：由 Mac 采集数据，经 VPS 静态 JSON 同步，再用 QML 页面显示。</description>
+			</item>
+			<item>
+				<title>青萍空气检测仪改造记：用 AI 给它加个新页面</title>
+				<link>https://liudon.com/posts/qingping-cgs1-custom-qml-page/</link>
+				<pubDate>Mon, 02 Nov 2026 11:39:38 +0800</pubDate>
+				<guid>https://liudon.com/posts/qingping-cgs1-custom-qml-page/</guid>
+				<description>借助 AI 折腾初代青萍空气检测仪 CGS1：通过 ADB 进入系统，提取并修改 SnowApp 中的 QML，给官方界面加上自定义页面。</description>
+			</item>
+			<item>
+				<title>一次 GitHub Actions 超时，追到 IPFS 基础设施的动荡</title>
+				<link>https://liudon.com/posts/github-actions-ipfs-dist-ipfs-tech/</link>
+				<pubDate>Fri, 09 Oct 2026 11:08:15 +0800</pubDate>
+				<guid>https://liudon.com/posts/github-actions-ipfs-dist-ipfs-tech/</guid>
+				<description>一次博客 GitHub Actions 部署失败排查：从 Create IPFS CAR 阶段的 dist.ipfs.tech 连接异常，一路追到第三方 Action 的间接依赖，以及 Shipyard 停止 IPFS 维护后的基础设施变化。</description>
+			</item>
+			<item>
+				<title>博客时光机 2.0 前端篇：把时间装进一台 Macintosh</title>
+				<link>https://liudon.com/posts/hugo-ipfs-time-machine-v2-frontend/</link>
+				<pubDate>Fri, 09 Oct 2026 08:57:46 +0800</pubDate>
+				<guid>https://liudon.com/posts/hugo-ipfs-time-machine-v2-frontend/</guid>
+				<description>博客时光机 2.0 前端实现记录：从一个模糊的复古想法开始，反复尝试不同展示方案，最终把博客的可视历史装进一台 Macintosh。</description>
+			</item>
+			<item>
+				<title>Twikoo 评论为什么这么慢：藏在 POST_SUBMIT 里的 5 秒等待窗口</title>
+				<link>https://liudon.com/posts/twikoo-comment-delay-post-submit/</link>
+				<pubDate>Tue, 29 Sep 2026 10:03:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/twikoo-comment-delay-post-submit/</guid>
+				<description>一次 Twikoo 评论提交耗时排查：从 QQ SMTP 的 3 秒多延迟，一路追到 POST_SUBMIT 的 5 秒等待窗口，并重新梳理 Netlify 下后置任务的异步执行方式。</description>
+			</item>
+			<item>
+				<title>博客时光机 2.0 后端篇：构建可视索引</title>
+				<link>https://liudon.com/posts/hugo-ipfs-time-machine-v2-visual-index/</link>
+				<pubDate>Sun, 27 Sep 2026 21:18:20 +0800</pubDate>
+				<guid>https://liudon.com/posts/hugo-ipfs-time-machine-v2-visual-index/</guid>
+				<description>记录博客时光机 2.0 的可视索引构建过程：如何从 IPFS 历史 CID 中筛出真正发生页面变化的版本。</description>
+			</item>
+			<item>
+				<title>博客时光机 2.0：在一台 Macintosh 里看见时间</title>
+				<link>https://liudon.com/posts/hugo-ipfs-time-machine-v2/</link>
+				<pubDate>Thu, 24 Sep 2026 23:10:42 +0800</pubDate>
+				<guid>https://liudon.com/posts/hugo-ipfs-time-machine-v2/</guid>
+				<description>记录博客时光机从随机穿越升级到可视时间线的 2.0 迭代过程。</description>
+			</item>
+			<item>
+				<title>Muse AI 注册教程：借助 Google Gemini Spark 完成注册</title>
+				<link>https://liudon.com/posts/muse-ai-registration-with-gemini-spark/</link>
+				<pubDate>Wed, 23 Sep 2026 12:30:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/muse-ai-registration-with-gemini-spark/</guid>
+				<description>借助 Google Gemini Spark 完成 Muse AI 注册。</description>
+			</item>
+	</channel>
+</rss>

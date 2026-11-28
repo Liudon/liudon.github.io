@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Swift on 流动</title>
+		<link>https://liudon.com/tags/swift/</link>
+		<description>Recent content in Swift on 流动</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Fri, 27 Nov 2026 08:38:00 +0800</lastBuildDate>
+		
+			<atom:link href="https://liudon.com/tags/swift/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>开始、取消、停止撞在一起时：Gecko 的录制会话管理</title>
+				<link>https://liudon.com/posts/gecko-recording-session-management/</link>
+				<pubDate>Fri, 27 Nov 2026 08:38:00 +0800</pubDate>
+				<guid>https://liudon.com/posts/gecko-recording-session-management/</guid>
+				<description>一次录屏背后同时跑着双路采集流、媒体写入器和多路系统守护任务。面对异步准备不可撤销、外部事件乱序并发的复杂场景，Gecko 如何通过职责拆分、状态收敛与真实文件校验管好整轮录制生命周期。</description>
+			</item>
+	</channel>
+</rss>
