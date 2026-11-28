@@ -471,6 +471,23 @@ async function createWatermark(
 // Restore image outputs
 // ============================================================
 
+async function copyHashedVariant(
+    cachedFile,
+    destPrefix,
+    ext
+) {
+
+    const shortHash =
+        (await sha256File(cachedFile))
+            .slice(0, 8);
+
+    await copyFile(
+        cachedFile,
+        `${destPrefix}.${shortHash}.${ext}`
+    );
+}
+
+
 async function restoreImageOutputs(
     src,
     base,
@@ -486,24 +503,26 @@ async function restoreImageOutputs(
     );
 
 
-    // responsive variants
+    // responsive variants (fingerprinted filenames for immutable caching)
 
     for (const width of widths) {
 
-        await copyFile(
+        await copyHashedVariant(
             path.join(
                 cacheDir,
                 `${width}.webp`
             ),
-            `${src}_${width}x.webp`
+            `${src}_${width}x`,
+            "webp"
         );
 
-        await copyFile(
+        await copyHashedVariant(
             path.join(
                 cacheDir,
                 `${width}.avif`
             ),
-            `${src}_${width}x.avif`
+            `${src}_${width}x`,
+            "avif"
         );
     }
 }
@@ -1308,6 +1327,10 @@ async function processVideo(
 
             POSTER_QUALITY,
 
+            RESPONSIVE_WIDTHS,
+
+            AVIF_PHOTO_QUALITY,
+
             transcodeVideo,
 
             transcodeAudio,
@@ -1350,13 +1373,66 @@ async function processVideo(
     // Cache hit
     // --------------------------------------------------------
 
-    if (
+    let videoCacheOK =
         await validateVideo(outputVideo) &&
         await validateImage(
             poster,
             "image/webp"
-        )
-    ) {
+        );
+
+    let cachedPosterWidths = [];
+
+    if (videoCacheOK) {
+
+        const posterMeta =
+            await sharp(poster).metadata();
+
+        const posterWidth =
+            posterMeta.width;
+
+        cachedPosterWidths =
+            [
+                ...new Set([
+                    ...RESPONSIVE_WIDTHS.filter(
+                        w => w <= posterWidth
+                    ),
+                    posterWidth,
+                ]),
+            ].sort((a, b) => a - b);
+
+        for (const w of cachedPosterWidths) {
+
+            const wWebp =
+                path.join(
+                    cacheDir,
+                    `poster-${w}.webp`
+                );
+
+            const wAvif =
+                path.join(
+                    cacheDir,
+                    `poster-${w}.avif`
+                );
+
+            if (
+                !(await validateImage(
+                    wWebp,
+                    "image/webp"
+                )) ||
+                !(await validateImage(
+                    wAvif,
+                    "image/avif"
+                ))
+            ) {
+
+                videoCacheOK = false;
+
+                break;
+            }
+        }
+    }
+
+    if (videoCacheOK) {
 
         console.log(
             `CACHE VIDEO   ${path.relative(ROOT, src)}`
@@ -1371,6 +1447,27 @@ async function processVideo(
             poster,
             `${src}.poster.webp`
         );
+
+        for (const w of cachedPosterWidths) {
+
+            await copyHashedVariant(
+                path.join(
+                    cacheDir,
+                    `poster-${w}.webp`
+                ),
+                `${src}.poster.webp_${w}x`,
+                "webp"
+            );
+
+            await copyHashedVariant(
+                path.join(
+                    cacheDir,
+                    `poster-${w}.avif`
+                ),
+                `${src}.poster.webp_${w}x`,
+                "avif"
+            );
+        }
 
         videoCached++;
 
@@ -1642,14 +1739,6 @@ async function processVideo(
         .toFile(poster);
 
 
-    await rm(
-        frame,
-        {
-            force: true,
-        }
-    );
-
-
     if (
         !(await validateImage(
             poster,
@@ -1661,6 +1750,88 @@ async function processVideo(
             `Invalid poster: ${poster}`
         );
     }
+
+
+    // --------------------------------------------------------
+    // Responsive poster variants (WebP + AVIF)
+    // --------------------------------------------------------
+
+    const posterMeta =
+        await sharp(poster).metadata();
+
+    const posterWidth =
+        posterMeta.width;
+
+    const posterWidths =
+        [
+            ...new Set([
+                ...RESPONSIVE_WIDTHS.filter(
+                    w => w <= posterWidth
+                ),
+                posterWidth,
+            ]),
+        ].sort((a, b) => a - b);
+
+    for (const w of posterWidths) {
+
+        const wWebp =
+            path.join(
+                cacheDir,
+                `poster-${w}.webp`
+            );
+
+        const wAvif =
+            path.join(
+                cacheDir,
+                `poster-${w}.avif`
+            );
+
+        await sharp(frame)
+            .resize({
+                width: w,
+                withoutEnlargement: true,
+            })
+            .webp({
+                quality: POSTER_QUALITY,
+                effort: 6,
+            })
+            .toFile(wWebp);
+
+        await sharp(frame)
+            .resize({
+                width: w,
+                withoutEnlargement: true,
+            })
+            .avif({
+                quality: AVIF_PHOTO_QUALITY,
+                effort: 4,
+            })
+            .toFile(wAvif);
+
+        if (
+            !(await validateImage(
+                wWebp,
+                "image/webp"
+            )) ||
+            !(await validateImage(
+                wAvif,
+                "image/avif"
+            ))
+        ) {
+
+            throw new Error(
+                `Invalid responsive poster (${w}px): ${src}`
+            );
+        }
+    }
+
+
+    await rm(
+        frame,
+        {
+            force: true,
+        }
+    );
 
 
     // --------------------------------------------------------
@@ -1676,6 +1847,27 @@ async function processVideo(
         poster,
         `${src}.poster.webp`
     );
+
+    for (const w of posterWidths) {
+
+        await copyHashedVariant(
+            path.join(
+                cacheDir,
+                `poster-${w}.webp`
+            ),
+            `${src}.poster.webp_${w}x`,
+            "webp"
+        );
+
+        await copyHashedVariant(
+            path.join(
+                cacheDir,
+                `poster-${w}.avif`
+            ),
+            `${src}.poster.webp_${w}x`,
+            "avif"
+        );
+    }
 
 
     // --------------------------------------------------------
